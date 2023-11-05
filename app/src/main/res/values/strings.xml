@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">SoundHub</string>
+
+<!--    login page strings-->
     <string name="lets_start_login_btn">Давайте начнем</string>
+    <string name="get_account_switch_label">Стать частью сообщества</string>
+    <string name="email_placeholder">example@mail.com</string>
+    <string name="password_placeholder">Ваш пароль. Не менее 6 символов</string>
+    <string name="repeat_password_placeholder">Повторите пароль</string>
+
+<!--    validation strings-->
+    <string name="invalid_email">Некорректный адрес</string>
+    <string name="passwords_mismatch">Пароли не совпадают</string>
+    <string name="invalid_password">Пароль меньше 6 символов</string>
+
 </resources>
