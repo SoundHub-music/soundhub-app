@@ -36,9 +36,9 @@ class AuthenticationViewModel @Inject constructor(
                 viewModelScope.launch {
                     sendUiEvent(UiEvent.ShowToast(
                         message = "You successfully logged in!\n" +
-                                "Your data: {email: ${event.email}, password: ${event.password}}}"
+                                "Your data: {email: ${event.email}}"
                     ))
-                    repository.login(event.email, event.password)
+                    repository.login(event.email)
                 }
             }
             is AuthenticationEvent.OnRegister -> {
