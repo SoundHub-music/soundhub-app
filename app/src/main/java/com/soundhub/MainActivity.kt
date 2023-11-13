@@ -13,9 +13,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.theme.SoundHubTheme
-import com.soundhub.ui.login.LoginScreen
+import com.soundhub.ui.authentication.LoginScreen
 import com.soundhub.utils.Routes
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +35,9 @@ class MainActivity : ComponentActivity() {
                         startDestination = if (isLoggedIn.value) Routes.POSTlINE else Routes.AUTHENTICATION
                     ) {
                         composable(Routes.AUTHENTICATION) {
-                            LoginScreen()
+                            LoginScreen(onNavigate = {
+                                navController.navigate(it.route)
+                            })
                         }
                         composable(Routes.POSTlINE) {
                             Text(text = "This is a postline page")

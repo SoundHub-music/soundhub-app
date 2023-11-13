@@ -1,6 +1,7 @@
-package com.soundhub.ui.login
+package com.soundhub.ui.authentication
 
-import androidx.compose.animation.AnimatedVisibility
+import android.widget.Toast
+import  androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,6 +33,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +46,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,23 +56,40 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soundhub.R
 import com.soundhub.ui.components.BottomSheet
 import com.soundhub.ui.components.Container
 import com.soundhub.utils.Validator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.soundhub.data.model.User
+import com.soundhub.utils.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(name = "Login screen")
+//@Preview(name = "Login screen")
 @Composable
-fun LoginScreen(viewModel: AuthenticationViewModel = viewModel()) {
+fun LoginScreen(
+    onNavigate: (UiEvent.Navigate) -> Unit,
+    viewModel: AuthenticationViewModel = hiltViewModel()
+) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scope: CoroutineScope = rememberCoroutineScope()
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         SheetState(initialValue = SheetValue.Hidden, skipPartiallyExpanded = false)
     )
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = true ) {
+        viewModel.uiEvent.collect {
+            event ->
+            when(event) {
+                is UiEvent.ShowToast -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                else -> Unit
+            }
+        }
+    }
 
     Container(
         modifier = Modifier
@@ -153,6 +173,8 @@ fun LoginForm(isBottomSheetHidden: Boolean, viewModel: AuthenticationViewModel) 
         repeatPasswordValue = ""
         isRegisterModeEnabled = false
     }
+
+    if (!isRegisterModeEnabled) repeatPasswordValue = ""
 
     Column(
         modifier = Modifier
@@ -274,7 +296,7 @@ fun LoginForm(isBottomSheetHidden: Boolean, viewModel: AuthenticationViewModel) 
             colors = ButtonDefaults.buttonColors(),
             onClick = {
                 if (isRegisterModeEnabled) {
-                    viewModel.onEvent(AuthenticationEvent.OnRegister(emailValue, passwordValue))
+                    viewModel.onEvent(AuthenticationEvent.OnRegister(User(emailValue, passwordValue)))
                 }
                 else {
                     viewModel.onEvent(AuthenticationEvent.OnLogin(emailValue, passwordValue))
@@ -285,7 +307,10 @@ fun LoginForm(isBottomSheetHidden: Boolean, viewModel: AuthenticationViewModel) 
                 passwordValue,
                 if (isRegisterModeEnabled) repeatPasswordValue else null)
         ) {
-            Text(text = "Войти")
+            Text(text = stringResource(
+                id = if (isRegisterModeEnabled) R.string.auth_button_register_name
+                else R.string.auth_button_login_name
+            ))
         }
     }
 }

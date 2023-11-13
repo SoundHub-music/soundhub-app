@@ -3,7 +3,7 @@ package com.soundhub.utils
 sealed class Validator {
     companion object {
         fun validateEmail(text: String): Boolean {
-            val mask = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+            val mask: String = Constants.EMAIL_MASK
             if (text.isEmpty()) return true
             return text.matches(mask.toRegex())
         }
@@ -14,7 +14,7 @@ sealed class Validator {
 
         fun validatePassword(password: String): Boolean {
             if (password.isEmpty()) return true
-            return password.length >= 6
+            return password.length >= Constants.PASSWORD_MIN_LENGTH
         }
 
         fun validateAuthForm(email: String, password: String, repeatPassword: String?): Boolean {

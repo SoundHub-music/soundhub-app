@@ -1,16 +1,29 @@
 <resources>
     <string name="app_name">SoundHub</string>
 
-<!--    login page strings-->
+<!--    authentication page strings-->
     <string name="lets_start_login_btn">Давайте начнем</string>
     <string name="get_account_switch_label">Стать частью сообщества</string>
     <string name="email_placeholder">example@mail.com</string>
     <string name="password_placeholder">Ваш пароль. Не менее 6 символов</string>
     <string name="repeat_password_placeholder">Повторите пароль</string>
 
+<!--    authentication button names-->
+    <string name="auth_button_login_name">Войти</string>
+    <string name="auth_button_register_name">Зарегистрироваться</string>
+
+
 <!--    validation strings-->
     <string name="invalid_email">Некорректный адрес</string>
     <string name="passwords_mismatch">Пароли не совпадают</string>
     <string name="invalid_password">Пароль меньше 6 символов</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="login_failed">"Login failed"</string>
 
 </resources>
