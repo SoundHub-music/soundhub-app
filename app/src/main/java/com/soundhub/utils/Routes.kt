@@ -1,10 +1,10 @@
 package com.soundhub.utils
 
-object Routes {
-    const val AUTHENTICATION = "authentication"
-    const val PROFILE = "profile"
-    const val POSTlINE = "postline"
-    const val MUSIC = "music"
-    const val MESSENGER = "messenger"
-    const val SETTINGS = "setting"
+enum class Routes(route: String) {
+    AUTHENTICATION("authentication"),
+    PROFILE("profile"),
+    POSTLINE("postline"),
+    MUSIC("music"),
+    MESSENGER("messenger"),
+    SETTINGS("settings")
 }

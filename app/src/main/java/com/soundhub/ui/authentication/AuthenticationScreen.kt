@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.components.BottomSheet
-import com.soundhub.ui.components.Container
+import com.soundhub.ui.components.BoxContainer
 import com.soundhub.utils.Validator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -67,10 +67,9 @@ import com.soundhub.data.model.User
 import com.soundhub.utils.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
-//@Preview(name = "Login screen")
 @Composable
 fun LoginScreen(
-    onNavigate: (UiEvent.Navigate) -> Unit,
+    onNavigate: (String) -> Unit,
     viewModel: AuthenticationViewModel = hiltViewModel()
 ) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
@@ -81,17 +80,18 @@ fun LoginScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = true ) {
+    LaunchedEffect("navigation") {
         viewModel.uiEvent.collect {
             event ->
             when(event) {
                 is UiEvent.ShowToast -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                is UiEvent.Navigate -> onNavigate(event.route.name)
                 else -> Unit
             }
         }
     }
 
-    Container(
+    BoxContainer(
         modifier = Modifier
             .fillMaxSize()
             .paint(
@@ -155,7 +155,10 @@ fun AppName(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun LoginForm(isBottomSheetHidden: Boolean, viewModel: AuthenticationViewModel) {
+private fun LoginForm(
+    isBottomSheetHidden: Boolean,
+    viewModel: AuthenticationViewModel
+) {
     var emailValue: String by rememberSaveable { mutableStateOf("") }
     var passwordValue: String by rememberSaveable { mutableStateOf("") }
     var repeatPasswordValue: String by rememberSaveable { mutableStateOf("") }
@@ -296,10 +299,10 @@ fun LoginForm(isBottomSheetHidden: Boolean, viewModel: AuthenticationViewModel) 
             colors = ButtonDefaults.buttonColors(),
             onClick = {
                 if (isRegisterModeEnabled) {
-                    viewModel.onEvent(AuthenticationEvent.OnRegister(User(emailValue, passwordValue)))
+                    viewModel.onEvent(AuthEvent.OnRegister(User(emailValue, passwordValue)))
                 }
                 else {
-                    viewModel.onEvent(AuthenticationEvent.OnLogin(emailValue, passwordValue))
+                    viewModel.onEvent(AuthEvent.OnLogin(emailValue, passwordValue))
                 }
             },
             enabled = Validator.validateAuthForm(

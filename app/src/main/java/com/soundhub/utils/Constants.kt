@@ -5,4 +5,5 @@ object Constants {
     const val EMAIL_MASK: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
 
     const val DB_USERS: String = "users"
+
 }

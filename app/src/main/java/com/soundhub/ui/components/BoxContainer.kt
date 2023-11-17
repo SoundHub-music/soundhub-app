@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun Container(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun BoxContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(modifier = modifier) {
         content()
     }

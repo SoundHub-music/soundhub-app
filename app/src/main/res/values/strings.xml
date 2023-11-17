@@ -26,4 +26,8 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="login_failed">"Login failed"</string>
 
+    <string name="screen_title_postline">Новости</string>
+    <string name="screen_title_music">Музыка</string>
+    <string name="screen_title_messenger">Мессенджер</string>
+
 </resources>

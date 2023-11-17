@@ -22,7 +22,9 @@ object AppModule {
             app,
             UserDatabase::class.java,
             Constants.DB_USERS
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

@@ -89,20 +89,15 @@ dependencies {
 
     //Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
-//    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+    kapt("com.google.dagger:hilt-android-compiler:2.44.2")
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    val roomVersion = "2.6.0"
-
     implementation("androidx.room:room-runtime:2.6.0")
-    kapt("androidx.room:room-compiler:2.6.0")
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:2.6.0")
     // To use Kotlin Symbol Processing (KSP)
-//    kapt("androidx.room:room-compiler:$room_version")
     annotationProcessor("androidx.room:room-compiler:2.6.0")
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.6.0")
