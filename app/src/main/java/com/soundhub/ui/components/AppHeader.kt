@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,20 +30,20 @@ import com.soundhub.R
 
 @Composable
 fun AppHeader(
-    pageName: String,
+    pageName: String?,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
+            .height(60.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .shadow(
                 elevation = 4.dp,
                 spotColor = Color(0x40000000),
                 ambientColor = Color(0x40000000)
             )
-            .height(60.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -63,14 +62,13 @@ fun AppHeader(
                     contentDescription = "app logo"
                 )
                 Text(
-                    text = pageName,
+                    text = pageName ?: "",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+                    fontSize = 24.sp,
                 )
             }
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { /* TODO: write logic for notification button */ }) {
                 Icon(Icons.Rounded.Notifications, contentDescription = null)
-
             }
         }
     }

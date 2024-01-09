@@ -1,68 +1,136 @@
 package com.soundhub.ui.authentication
 
-import android.util.Log
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.repository.UserRepository
+import com.soundhub.data.model.User
+import com.soundhub.data.repository.AuthRepository
+import com.soundhub.ui.authentication.state.AuthValidationState
+import com.soundhub.ui.mainActivity.MainViewModel
 import com.soundhub.utils.Routes
 import com.soundhub.utils.UiEvent
+import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val repository: UserRepository,
+    private val authRepository: AuthRepository,
+    private val mainViewModel: MainViewModel,
 ): ViewModel() {
 
     private var _isLoggedIn = mutableStateOf(false)
-    val isLoggedIn: State<Boolean> = _isLoggedIn
-
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent = _uiEvent.receiveAsFlow()
+    var authValidationState by mutableStateOf(AuthValidationState())
+        private set
+    val isLoggedIn: MutableState<Boolean> get() = _isLoggedIn
 
     init {
-        Log.d("ViewModel", "ViewModel was created")
+        viewModelScope.launch {
+            if (authValidationState.email.isEmpty() && authValidationState.password.isEmpty())
+                authValidationState = authValidationState.copy(isEmailValid = true, isPasswordValid = true)
+        }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("ViewModel", "Login ViewModel is cleared")
+    fun resetState() {
+        viewModelScope.launch {
+            authValidationState = AuthValidationState()
+        }
     }
 
-    fun onEvent(event: AuthEvent) {
+    fun validateForm(): Boolean {
+        val isLoginFormValid =  authValidationState.isEmailValid
+                && authValidationState.isPasswordValid
+                && authValidationState.email.isNotEmpty()
+                && authValidationState.password.isNotEmpty()
+
+        if (authValidationState.isRegisterForm)
+            return isLoginFormValid
+                    && authValidationState.arePasswordsEqual
+                    && authValidationState.repeatedPassword?.isNotEmpty() ?: false
+        return isLoginFormValid
+
+    }
+
+    fun resetRepeatedPassword() {
+        viewModelScope.launch {
+            authValidationState = authValidationState.copy(repeatedPassword = null)
+        }
+    }
+
+    fun onEmailTextFieldChange(value: String) {
+        viewModelScope.launch {
+            val isEmailValid = Validator.validateEmail(value)
+            authValidationState = authValidationState.copy(
+                email = value,
+                isEmailValid = isEmailValid,
+            )
+        }
+    }
+
+    fun onPasswordTextFieldChange(value: String) {
+        viewModelScope.launch {
+            val isPasswordValid: Boolean = Validator.validatePassword(value)
+            authValidationState = authValidationState.copy(
+                password = value,
+                isPasswordValid = isPasswordValid,
+            )
+        }
+    }
+
+    fun onRepeatedPasswordTextFieldChange(value: String) {
+        viewModelScope.launch {
+            val arePasswordsEqual: Boolean = Validator
+                .arePasswordsEqual(authValidationState.password, value)
+
+            authValidationState = authValidationState.copy(
+                repeatedPassword = value,
+                arePasswordsEqual = arePasswordsEqual
+            )
+        }
+    }
+
+    fun onAuthTypeSwitchChange(value: Boolean) {
+        viewModelScope.launch {
+            authValidationState = authValidationState.copy(
+                isRegisterForm = value
+            )
+        }
+    }
+
+    fun onFormButtonClick() {
+        if (authValidationState.isRegisterForm)
+            onEvent(AuthEvent.OnRegister(User(authValidationState.email, authValidationState.password)))
+        else
+            onEvent(AuthEvent.OnLogin(authValidationState.email, authValidationState.password))
+    }
+
+    private fun onEvent(event: AuthEvent) {
         when (event) {
             is AuthEvent.OnLogin -> {
                 viewModelScope.launch {
-                    sendUiEvent(UiEvent.ShowToast(
+                    mainViewModel.sendUiEvent(UiEvent.ShowToast(
                         message = "You successfully logged in!\n" +
                                 "Your data: {email: ${event.email}}"
                     ))
-                    repository.login(event.email)
-                    sendUiEvent(UiEvent.Navigate(Routes.POSTLINE))
+                    authRepository.login(event.email)
+                    mainViewModel.sendUiEvent(UiEvent.Navigate(Routes.Authenticated))
                     _isLoggedIn.value = true
                 }
             }
             is AuthEvent.OnRegister -> {
                 viewModelScope.launch {
-                    sendUiEvent(UiEvent.ShowToast(
+                    mainViewModel.onEvent(UiEvent.ShowToast(
                         message = "You successfully signed up!\nYour data ${event.user.email}",
                     ))
-                    repository.registerUser(event.user)
-                    sendUiEvent(UiEvent.Navigate(Routes.POSTLINE))
+                    authRepository.registerUser(event.user)
                     _isLoggedIn.value = true
+                    mainViewModel.onEvent(UiEvent.Navigate(Routes.Authenticated))
                 }
             }
-        }
-    }
-
-    private fun sendUiEvent(event: UiEvent) {
-        viewModelScope.launch {
-            _uiEvent.send(event)
         }
     }
 }

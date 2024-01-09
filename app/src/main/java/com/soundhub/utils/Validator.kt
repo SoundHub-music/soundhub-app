@@ -8,8 +8,8 @@ sealed class Validator {
             return text.matches(mask.toRegex())
         }
 
-        fun arePasswordsNotEquals(password: String, repeatPassword: String): Boolean {
-            return password != repeatPassword && (password.isNotEmpty() && repeatPassword.isNotEmpty())
+        fun arePasswordsEqual(password: String, repeatPassword: String): Boolean {
+            return password == repeatPassword && (password.isNotEmpty() && repeatPassword.isNotEmpty())
         }
 
         fun validatePassword(password: String): Boolean {
@@ -20,7 +20,7 @@ sealed class Validator {
         fun validateAuthForm(email: String, password: String, repeatPassword: String?): Boolean {
             return validateEmail(email) &&
                     validatePassword(password) &&
-                    !arePasswordsNotEquals(password, repeatPassword ?: password) &&
+                    arePasswordsEqual(password, repeatPassword ?: password) &&
                     areFieldsNotEmpty(email, password, repeatPassword )
         }
 
