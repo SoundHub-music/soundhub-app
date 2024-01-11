@@ -1,5 +1,6 @@
 package com.soundhub.ui.authentication.components
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -48,11 +49,9 @@ fun AuthForm(
     authViewModel: AuthenticationViewModel = hiltViewModel()
 ) {
     val density: Density = LocalDensity.current
-    val context = LocalContext.current
+    val context: Context = LocalContext.current
     val authValidationState: AuthValidationState = authViewModel.authValidationState
-    var buttonFormText by remember {
-        mutableStateOf(context.getString(R.string.auth_button_login_name))
-    }
+    var buttonFormText: String = stringResource(id = R.string.auth_button_login_name)
 
     // if bottom sheet is hidden typed data is deleted
     if (isBottomSheetHidden) authViewModel.resetState()

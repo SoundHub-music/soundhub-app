@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavContro
                 ambientColor = Color(0x40000000)
             ),
         containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = Color.Cyan
     ) {
         items.forEach{ item ->
             NavigationBarItem(

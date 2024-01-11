@@ -9,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,12 +18,18 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(): ViewModel() {
     private var _currentRoute = MutableStateFlow<Routes>(Routes.AppStart)
+    val currentRoute: StateFlow<Routes> = _currentRoute.asStateFlow()
 
     private var _uiEvent = Channel<UiEvent>()
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     init {
         Log.d("route", _currentRoute.value.route)
+//        viewModelScope.launch {
+//            uiEvent.collect {
+//                event -> onEvent(event)
+//            }
+//        }
     }
 
     fun onEvent(event: UiEvent) {

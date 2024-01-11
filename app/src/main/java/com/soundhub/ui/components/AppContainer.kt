@@ -1,5 +1,6 @@
 package com.soundhub.ui.components
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -18,12 +19,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.Preferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,6 +44,8 @@ import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.utils.Routes
 import com.soundhub.utils.UiEvent
+import androidx.compose.runtime.State
+import androidx.datastore.preferences.core.stringPreferencesKey
 
 
 @Preview
@@ -54,9 +59,16 @@ fun AppContainer(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val isLoggedIn by authViewModel.isLoggedIn
+
     val context = LocalContext.current
     val currentRoute = navBackStackEntry?.destination?.route
 
+    val userCreds: State<Preferences?> = authViewModel.userCreds.collectAsState(initial = null)
+    val startDestination = getStartDestination(isLoggedIn, mainViewModel)
+
+    LaunchedEffect(key1 = userCreds.value) {
+        Log.d("creds", userCreds.value?.get(stringPreferencesKey("user_email")) ?: "null")
+    }
 
     // it works every time when uiEvent comes or changes
     LaunchedEffect(mainViewModel.uiEvent) {
@@ -83,14 +95,14 @@ fun AppContainer(
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = getStartDestination(isLoggedIn, mainViewModel)
+            startDestination = startDestination
         ) {
             navigation(
                 route = Routes.AppStart.route,
                 startDestination = Routes.Authentication.route
             ) {
                 composable(Routes.Authentication.route) {
-                    LoginScreen { navController.navigate(it) }
+                    LoginScreen { route -> navController.navigate(route) }
                 }
             }
 
@@ -100,24 +112,24 @@ fun AppContainer(
             ) {
                 composable(Routes.Postline.route) {
                     ScreenContainer(stringResource(id = R.string.screen_title_postline)) {
-                        PostLineScreen { navController.navigate(it) }
+                        PostLineScreen { route -> navController.navigate(route) }
                     }
                 }
 
                 composable(Routes.Music.route) {
                     ScreenContainer(stringResource(id = R.string.screen_title_music)) {
-                        MusicScreen { navController.navigate(it) }
+                        MusicScreen { route -> navController.navigate(route) }
                     }
                 }
 
                 composable(Routes.Messenger.route) {
                     ScreenContainer(stringResource(id = R.string.screen_title_messenger)) {
-                        MessengerScreen { navController.navigate(it) }
+                        MessengerScreen { route -> navController.navigate(route) }
                     }
                 }
 
                 composable(Routes.Profile.route) {
-                    ProfileScreen { navController.navigate(it) }
+                    ProfileScreen { route -> navController.navigate(route) }
                 }
             }
         }
@@ -129,6 +141,8 @@ fun getStartDestination(isLoggedIn: Boolean, viewModel: MainViewModel): String {
         viewModel.onEvent(UiEvent.Navigate(Routes.Authenticated))
         return Routes.Authenticated.route
     }
+
+    viewModel.onEvent(UiEvent.Navigate(Routes.AppStart))
     return Routes.AppStart.route
 }
 

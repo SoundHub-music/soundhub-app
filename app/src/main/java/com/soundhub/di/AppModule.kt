@@ -3,9 +3,9 @@ package com.soundhub.di
 import android.app.Application
 import androidx.room.Room
 import com.soundhub.data.UserDatabase
+import com.soundhub.data.UserStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.AuthRepositoryImpl
-import com.soundhub.data.usecases.AuthFormValidationUseCase
 import com.soundhub.ui.mainActivity.MainViewModel
 import com.soundhub.utils.Constants
 import dagger.Module
@@ -44,7 +44,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthFormValidationUseCase(): AuthFormValidationUseCase {
-        return AuthFormValidationUseCase()
+    fun provideUserDataStore(app: Application): UserStore {
+        return UserStore(app)
     }
 }
