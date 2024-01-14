@@ -7,6 +7,7 @@
     <string name="email_placeholder">example@mail.com</string>
     <string name="password_placeholder">Ваш пароль. Не менее 6 символов</string>
     <string name="repeat_password_placeholder">Повторите пароль</string>
+    <string name="password_label">Пароль</string>
 
 <!--    authentication button names-->
     <string name="auth_button_login_name">Войти</string>
@@ -26,9 +27,13 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="login_failed">"Login failed"</string>
 
-<!--    choose genre page strings-->
+    <string name="screen_title_postline">Главная</string>
+    <string name="screen_title_music">Музыка</string>
+    <string name="screen_title_messenger">Мессенджер</string>
+
+    <!--    choose genre page strings-->
     <string name="choose_genre_title">Выберите жанры</string>
 
-<!--    choose genre page strings-->
+    <!--    choose genre page strings-->
     <string name="cheese_singer_title">Выберите исполнителей</string>
 </resources>

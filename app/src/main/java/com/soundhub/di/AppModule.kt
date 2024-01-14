@@ -3,8 +3,10 @@ package com.soundhub.di
 import android.app.Application
 import androidx.room.Room
 import com.soundhub.data.UserDatabase
-import com.soundhub.data.repository.UserRepository
-import com.soundhub.data.repository.UserRepositoryImpl
+import com.soundhub.data.UserStore
+import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.repository.AuthRepositoryImpl
+import com.soundhub.ui.mainActivity.MainViewModel
 import com.soundhub.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -22,12 +24,27 @@ object AppModule {
             app,
             UserDatabase::class.java,
             Constants.DB_USERS
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideUserRepository(db: UserDatabase): UserRepository {
-        return UserRepositoryImpl(db.dao)
+    fun providesMainViewModel(): MainViewModel {
+        return MainViewModel()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(db: UserDatabase): AuthRepository {
+        return AuthRepositoryImpl(db.dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDataStore(app: Application): UserStore {
+        return UserStore(app)
     }
 }

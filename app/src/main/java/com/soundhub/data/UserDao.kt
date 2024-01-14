@@ -9,8 +9,8 @@ import com.soundhub.data.model.User
 @Dao
 interface UserDao {
 
-    @Query("SELECT * FROM user WHERE email = :userEmail")
-    suspend fun login(userEmail: String): User?
+    @Query("SELECT * FROM user WHERE email = :email AND password = :password")
+    suspend fun login(email: String, password: String): User?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun registerUser(user: User)

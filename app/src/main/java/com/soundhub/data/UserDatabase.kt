@@ -6,7 +6,7 @@ import com.soundhub.data.model.User
 
 @Database(
     entities = [User::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class UserDatabase: RoomDatabase() {

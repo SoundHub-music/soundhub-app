@@ -1,10 +1,12 @@
 package com.soundhub.utils
 
-object Routes {
-    const val AUTHENTICATION = "authentication"
-    const val PROFILE = "profile"
-    const val POSTlINE = "postline"
-    const val MUSIC = "music"
-    const val MESSENGER = "messenger"
-    const val SETTINGS = "setting"
+sealed class Routes(val route: String, val pageName: String? = null) {
+    object AppStart: Routes(route = "appStart")
+    object Authenticated: Routes(route = "authenticatedScreen")
+    object Authentication: Routes(route = "authentication")
+    object Profile: Routes(route = "profile")
+    object Postline: Routes(route = "postline")
+    object Music: Routes(route = "music")
+    object Messenger: Routes(route = "messenger")
+    object Settings: Routes(route = "settings")
 }
