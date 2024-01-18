@@ -1,9 +1,6 @@
 package com.soundhub.ui.components
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,69 +15,46 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.Preferences
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.LoginScreen
+import com.soundhub.ui.authentication.AuthenticationScreen
 import com.soundhub.ui.components.icons.queueMusicIconRounded
-import com.soundhub.ui.mainActivity.MainViewModel
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.utils.Routes
-import com.soundhub.utils.UiEvent
 import androidx.compose.runtime.State
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
+import com.soundhub.UiEventDispatcher
+import com.soundhub.data.UserPreferences
 
 
-@Preview
 @Composable
 fun AppContainer(
-    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    uiEventDispatcher: UiEventDispatcher,
+    modifier: Modifier = Modifier
 ) {
     val authViewModel: AuthenticationViewModel = hiltViewModel()
-    val mainViewModel: MainViewModel = hiltViewModel()
-
-    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val isLoggedIn by authViewModel.isLoggedIn
-
-    val context = LocalContext.current
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val userCreds: State<Preferences?> = authViewModel.userCreds.collectAsState(initial = null)
-    val startDestination = getStartDestination(isLoggedIn, mainViewModel)
-
-    LaunchedEffect(key1 = userCreds.value) {
-        Log.d("creds", userCreds.value?.get(stringPreferencesKey("user_email")) ?: "null")
-    }
-
-    // it works every time when uiEvent comes or changes
-    LaunchedEffect(mainViewModel.uiEvent) {
-        mainViewModel.uiEvent.collect { event ->
-            when(event) {
-                is UiEvent.ShowToast -> Toast.makeText(
-                    context, event.message, Toast.LENGTH_SHORT
-                ).show()
-                is UiEvent.Navigate -> navController.navigate(event.route.route)
-                else -> Unit
-            }
-        }
+    val userCreds: State<UserPreferences?> = authViewModel.userCreds.collectAsState(initial = null)
+    var topBarTitle: String? by remember {
+        mutableStateOf(null)
     }
 
     Scaffold(
@@ -90,60 +64,42 @@ fun AppContainer(
         bottomBar = {
             if (currentRoute != Routes.Authentication.route)
                 BottomNavigationBar(items = getNavBarItems(), navController = navController)
+        },
+        topBar = {
+            if (topBarTitle != null)
+                AppHeader(topBarTitle, Modifier.padding(0.dp))
         }
     ) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = startDestination
+            startDestination = Routes.Authentication.route
         ) {
-            navigation(
-                route = Routes.AppStart.route,
-                startDestination = Routes.Authentication.route
-            ) {
-                composable(Routes.Authentication.route) {
-                    LoginScreen { route -> navController.navigate(route) }
-                }
+            composable(Routes.Authentication.route) {
+                AuthenticationScreen()
             }
 
-            navigation(
-                route = Routes.Authenticated.route,
-                startDestination = Routes.Postline.route
-            ) {
-                composable(Routes.Postline.route) {
-                    ScreenContainer(stringResource(id = R.string.screen_title_postline)) {
-                        PostLineScreen { route -> navController.navigate(route) }
-                    }
-                }
+            composable(Routes.Postline.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_postline)
+                PostLineScreen()
+            }
 
-                composable(Routes.Music.route) {
-                    ScreenContainer(stringResource(id = R.string.screen_title_music)) {
-                        MusicScreen { route -> navController.navigate(route) }
-                    }
-                }
+            composable(Routes.Music.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_music)
+                MusicScreen()
+            }
 
-                composable(Routes.Messenger.route) {
-                    ScreenContainer(stringResource(id = R.string.screen_title_messenger)) {
-                        MessengerScreen { route -> navController.navigate(route) }
-                    }
-                }
+            composable(Routes.Messenger.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_messenger)
+                MessengerScreen()
+            }
 
-                composable(Routes.Profile.route) {
-                    ProfileScreen { route -> navController.navigate(route) }
-                }
+            composable(Routes.Profile.route) {
+                topBarTitle = null
+                ProfileScreen()
             }
         }
     }
-}
-
-fun getStartDestination(isLoggedIn: Boolean, viewModel: MainViewModel): String {
-    if (isLoggedIn) {
-        viewModel.onEvent(UiEvent.Navigate(Routes.Authenticated))
-        return Routes.Authenticated.route
-    }
-
-    viewModel.onEvent(UiEvent.Navigate(Routes.AppStart))
-    return Routes.AppStart.route
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,17 +126,4 @@ fun getNavBarItems(): MutableList<NavigationItemApp> {
             icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = Routes.Profile.pageName) }
         )
     )
-}
-
-@Composable
-fun ScreenContainer(
-    pageName: String?,
-    content: @Composable () -> Unit) {
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        AppHeader(pageName, Modifier.padding(0.dp))
-        content()
-    }
 }

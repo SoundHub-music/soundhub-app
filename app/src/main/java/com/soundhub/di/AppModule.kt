@@ -6,7 +6,7 @@ import com.soundhub.data.UserDatabase
 import com.soundhub.data.UserStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.AuthRepositoryImpl
-import com.soundhub.ui.mainActivity.MainViewModel
+import com.soundhub.UiEventDispatcher
 import com.soundhub.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -31,14 +31,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesMainViewModel(): MainViewModel {
-        return MainViewModel()
+    fun providesUiEventDispatcher(userStore: UserStore): UiEventDispatcher {
+        return UiEventDispatcher(userStore)
     }
 
 
     @Provides
     @Singleton
-    fun provideUserRepository(db: UserDatabase): AuthRepository {
+    fun provideAuthRepository(db: UserDatabase): AuthRepository {
         return AuthRepositoryImpl(db.dao)
     }
 

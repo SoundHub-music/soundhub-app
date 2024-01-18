@@ -31,4 +31,7 @@
     <string name="screen_title_music">Музыка</string>
     <string name="screen_title_messenger">Мессенджер</string>
 
+    <string name="edit_profile_btn_content">Редактировать профиль</string>
+    <string name="write_message_btn_content">Написать сообщение</string>
+
 </resources>

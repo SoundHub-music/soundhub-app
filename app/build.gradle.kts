@@ -5,7 +5,6 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
-    id("io.realm.kotlin")
 }
 
 
@@ -56,6 +55,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -93,19 +93,15 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    implementation("androidx.room:room-runtime:2.6.1")
 
     // To use Kotlin annotation processing tool (kapt)
+    implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     // To use Kotlin Symbol Processing (KSP)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.6.1")
 
-    // Realm
-//    implementation("io.realm.kotlin:library-base:1.11.0")
-    implementation("io.realm.kotlin:library-base:1.11.0")
-    implementation("io.realm.kotlin:library-sync:1.11.0")// If using Device Sync
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1") // If using coroutines with the SDK
 
     // Glide
@@ -113,8 +109,14 @@ dependencies {
 
     // Datastore preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc02")
+
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.18.0")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0") // Use the latest version
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Use the same version as Glide
+
 }
 
 kapt {

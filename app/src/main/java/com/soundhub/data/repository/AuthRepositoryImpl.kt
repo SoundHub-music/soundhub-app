@@ -8,7 +8,11 @@ class AuthRepositoryImpl(private val dao: UserDao): AuthRepository {
         return dao.login(email, password)
     }
 
-    override suspend fun registerUser(user: User) {
-        dao.registerUser(user)
+    override suspend fun register(user: User) {
+        dao.register(user)
+    }
+
+    override suspend fun deleteUser(user: User) {
+        dao.deleteUser(user)
     }
 }

@@ -1,6 +1,7 @@
 package com.soundhub.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -13,5 +14,8 @@ interface UserDao {
     suspend fun login(email: String, password: String): User?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun registerUser(user: User)
+    suspend fun register(user: User)
+
+    @Delete
+    suspend fun deleteUser(user: User)
 }

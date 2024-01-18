@@ -11,14 +11,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.soundhub.ui.mainActivity.MainViewModel
+import com.soundhub.UiEventDispatcher
 import com.soundhub.utils.Routes
 import com.soundhub.utils.UiEvent
 
@@ -26,7 +25,7 @@ import com.soundhub.utils.UiEvent
 @Composable
 fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavController) {
     var selectedItem: Routes by remember { mutableStateOf(Routes.Postline) }
-    val mainViewModel: MainViewModel = hiltViewModel()
+    val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 
     NavigationBar(
         modifier = Modifier
@@ -46,7 +45,7 @@ fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavContro
                 selected = selectedItem == item.route,
                 onClick = {
                     selectedItem = item.route
-                    mainViewModel.onEvent(UiEvent.Navigate(item.route))
+                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(item.route))
                     navController.navigate(item.route.route) {
                         popUpTo(Routes.Postline.route) {
                             inclusive = true

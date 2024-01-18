@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import com.soundhub.ui.components.ContentContainer
 
 @Composable
-fun MessengerScreen(onNavigate: (String) -> Unit) {
+fun MessengerScreen() {
     ContentContainer {
         Text(text = "This is a messenger screen")
     }

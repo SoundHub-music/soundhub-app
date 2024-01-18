@@ -1,17 +1,18 @@
 package com.soundhub.ui.authentication
 
-import androidx.compose.runtime.MutableState
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.data.UserPreferences
 import com.soundhub.data.UserStore
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.ui.authentication.state.AuthValidationState
-import com.soundhub.ui.mainActivity.MainViewModel
+import com.soundhub.UiEventDispatcher
+import com.soundhub.utils.Constants
 import com.soundhub.utils.Routes
 import com.soundhub.utils.UiEvent
 import com.soundhub.utils.Validator
@@ -23,21 +24,16 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val mainViewModel: MainViewModel,
-    private val userStore: UserStore
+    private val uiEventDispatcher: UiEventDispatcher,
+    private val userStore: UserStore,
 ): ViewModel() {
-    val userCreds: Flow<Preferences> = userStore.getCreds()
-
+    val userCreds: Flow<UserPreferences> = userStore.getCreds()
     var authValidationState by mutableStateOf(AuthValidationState())
         private set
 
-    private var _isLoggedIn = mutableStateOf(false)
-    val isLoggedIn: MutableState<Boolean> get() = _isLoggedIn
 
     init {
         viewModelScope.launch {
-            _isLoggedIn.value = userStore.ifUserStored()
-
             if (authValidationState.email.isEmpty() && authValidationState.password.isEmpty())
                 authValidationState = authValidationState.copy(isEmailValid = true, isPasswordValid = true)
         }
@@ -126,39 +122,38 @@ class AuthenticationViewModel @Inject constructor(
         when (event) {
             is AuthEvent.OnLogin -> {
                 viewModelScope.launch {
-                    mainViewModel.sendUiEvent(UiEvent.ShowToast(
-                        message = "You successfully logged in!\n" +
-                                "Your data: {email: ${event.email}}"
-                    ))
 
                     val user: User? = authRepository.login(event.email, event.password)
                     if (user != null) {
-                        userStore.saveUser(event.email, event.password)
+                        userStore.saveUser(user)
 
-                        mainViewModel.sendUiEvent(UiEvent.Navigate(Routes.Authenticated))
-                        _isLoggedIn.value = true
+                        uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Postline))
+                        uiEventDispatcher.sendUiEvent(UiEvent.ShowToast(
+                            message = "You successfully logged in!\n" +
+                                    "Your data: {email: ${event.email}}"
+                        ))
                     }
-                    mainViewModel.sendUiEvent(UiEvent.ShowToast("Неправильный логин или пароль"))
+                    else uiEventDispatcher.sendUiEvent(UiEvent.ShowToast("Неправильный логин или пароль"))
                 }
             }
 
             is AuthEvent.OnRegister -> {
                 viewModelScope.launch {
-                    mainViewModel.onEvent(UiEvent.ShowToast(
+                    uiEventDispatcher.sendUiEvent(UiEvent.ShowToast(
                         message = "You successfully signed up!\nYour data ${event.user.email}",
                     ))
-                    authRepository.registerUser(event.user)
-                    userStore.saveUser(event.user.email, event.user.name)
-                    _isLoggedIn.value = true
+                    authRepository.register(event.user)
+                    userStore.saveUser(event.user)
 
-                    mainViewModel.onEvent(UiEvent.Navigate(Routes.Authenticated))
+                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Postline))
                 }
             }
 
             is AuthEvent.OnLogout -> {
                 viewModelScope.launch {
                     userStore.clear()
-                    mainViewModel.onEvent(UiEvent.Navigate(Routes.AppStart))
+                    Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[onEvent]: $userCreds")
+                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Authentication))
                 }
             }
         }

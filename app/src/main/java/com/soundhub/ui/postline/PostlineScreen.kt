@@ -16,7 +16,6 @@ import com.soundhub.ui.postline.components.PostCard
 fun PostLineScreen(
     modifier: Modifier = Modifier,
     postLineViewModel: PostlineViewModel = hiltViewModel(),
-    onNavigate: (String) -> Unit,
 ) {
     val posts = listOf(
         Post(
