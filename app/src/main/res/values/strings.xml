@@ -34,4 +34,10 @@
     <string name="edit_profile_btn_content">Редактировать профиль</string>
     <string name="write_message_btn_content">Написать сообщение</string>
 
+    <!--    choose genre page strings-->
+    <string name="choose_genre_title">Выберите жанры</string>
+
+    <!--    choose genre page strings-->
+    <string name="cheese_singer_title">Выберите исполнителей</string>
+
 </resources>
