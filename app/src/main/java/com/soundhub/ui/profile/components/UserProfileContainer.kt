@@ -35,42 +35,48 @@ import com.soundhub.R
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
+import com.soundhub.ui.profile.components.sections.friend_list.FriendItem
+import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
+import com.soundhub.ui.profile.components.sections.photos.UserPhotoCarousel
 
 
 @Composable
-fun UserProfileContainer(user: User?) {
-    val authModelView: AuthenticationViewModel = hiltViewModel()
-    val userCreds = authModelView.userCreds.collectAsState(initial = null)
-
-    val isOriginProfile: () -> Boolean = { user?.id?.equals(userCreds.value?.id) ?: false }
-    val actionProfileButtonContent = if (isOriginProfile())
+fun UserProfileContainer(user: User?, authViewModel: AuthenticationViewModel = hiltViewModel()) {
+    val userCreds = authViewModel.userCreds.collectAsState(initial = null)
+    val isOriginProfile: Boolean = user?.id?.equals(userCreds.value?.id) ?: false
+    val actionProfileButtonContent = if (isOriginProfile)
         stringResource(id = R.string.edit_profile_btn_content)
     else stringResource(id = R.string.write_message_btn_content)
 
-    val profileActionButtonIcon: ImageVector = if (isOriginProfile())
+    val profileActionButtonIcon: ImageVector = if (isOriginProfile)
         Icons.Rounded.Edit
     else Icons.Rounded.MailOutline
 
     Column(
-//        modifier = Modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         Column {
-            UserName(user?.firstName, user?.lastName)
-            UserLocation(user?.country, user?.city)
+            UserNameWithDescription(user)
+            Text(
+                text = "${user?.country}, ${user?.city}",
+                fontWeight = FontWeight.Light,
+                fontSize = 14.sp
+            )
         }
 
         FilledTonalButton(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(),
-            onClick = { /* TODO make update profile or write a message logic click */ }) {
+            onClick = { /* TODO: make update profile or write a message logic click */ }
+        ) {
             Row(
                 modifier = Modifier.height(30.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = profileActionButtonIcon, contentDescription = null)
+                Icon(imageVector = profileActionButtonIcon, contentDescription = "profile_action_button_icon")
                 Text(
                     text = actionProfileButtonContent,
                     fontWeight = FontWeight.Bold,
@@ -79,8 +85,11 @@ fun UserProfileContainer(user: User?) {
             }
         }
 
+        // friend list with fake data
+        FriendMiniatureList(friendList = listOf(FriendItem(null)))
+
         // genres list with fake data
-        FavoriteGenresList(
+        FavoriteGenresSection(
             genreList = listOf(
                 Genre(name = "pop rock"),
                 Genre(name = "alternative rock"),
@@ -103,7 +112,7 @@ fun UserProfileContainer(user: User?) {
 
 
 @Composable
-fun UserName(firstName: String?, lastName: String?) {
+private fun UserNameWithDescription(user: User? = null) {
     var isDescriptionButtonChecked: Boolean by rememberSaveable {
         mutableStateOf(false)
     }
@@ -114,7 +123,7 @@ fun UserName(firstName: String?, lastName: String?) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "$firstName $lastName".trimIndent(),
+            text = "${user?.firstName} ${user?.lastName}".trimIndent(),
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             fontSize = 28.sp,
@@ -123,46 +132,25 @@ fun UserName(firstName: String?, lastName: String?) {
 
         IconToggleButton(
             checked = isDescriptionButtonChecked,
-            onCheckedChange = {
-                isDescriptionButtonChecked = it
-            },
+            onCheckedChange = { isDescriptionButtonChecked = it },
         ) {
-            ExpandDescriptionIcon(
-                imageVector = if (isDescriptionButtonChecked)
-                    Icons.Rounded.KeyboardArrowUp
-                else Icons.Rounded.KeyboardArrowDown
+            Icon(
+                imageVector =
+                if (isDescriptionButtonChecked) Icons.Rounded.KeyboardArrowUp
+                else Icons.Rounded.KeyboardArrowDown,
+                contentDescription = "expand_description",
+                modifier = Modifier.size(35.dp)
             )
         }
     }
     if (isDescriptionButtonChecked)
-        UserDescriptionBlock()
+        UserDescriptionBlock(user)
 }
 
 @Composable
-fun UserLocation(country: String?, city: String?) {
-    Text(
-        text = "$country, $city",
-        fontWeight = FontWeight.Light,
-        fontSize = 14.sp
-    )
-}
-
-@Composable
-fun ExpandDescriptionIcon(imageVector: ImageVector) {
-    Icon(
-        imageVector = imageVector,
-        contentDescription = null,
-        modifier = Modifier.size(35.dp)
-    )
-}
-
-@Composable
-fun UserDescriptionBlock() {
+private fun UserDescriptionBlock(user: User? = null) {
+    // TODO: expand the list of user data
     Column() {
-        Text("balblablablalbblablblal")
-        Text("balblablablalbblablblal")
-        Text("balblablablalbblablblal")
-        Text("balblablablalbblablblal")
-        Text("balblablablalbblablblal")
+        Text("О себе: ${user?.description}")
     }
 }

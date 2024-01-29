@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components
+package com.soundhub.ui.profile.components.sections.avatar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -19,12 +19,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
+import com.soundhub.UiEventDispatcher
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.utils.Route
+import com.soundhub.utils.UiEvent
 
 @Composable
 fun UserAvatar() {
     val avatar: Painter = painterResource(id = R.drawable.header)
     val authViewModel: AuthenticationViewModel = hiltViewModel()
+    val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 
     Box(
         modifier = Modifier
@@ -44,7 +48,7 @@ fun UserAvatar() {
         ) {
             IconButton(onClick = {
             /* TODO make onClick logic for settings page */
-                authViewModel.onLogoutButtonClick()
+                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Settings))
 
             }) {
                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)

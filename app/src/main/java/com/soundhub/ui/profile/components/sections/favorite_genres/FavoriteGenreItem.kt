@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components
+package com.soundhub.ui.profile.components.sections.favorite_genres
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components
+package com.soundhub.ui.profile.components.sections.favorite_genres
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FavoriteGenresList(genreList: List<Genre>) {
+fun FavoriteGenresSection(genreList: List<Genre>) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -28,10 +28,11 @@ fun FavoriteGenresList(genreList: List<Genre>) {
     ) {
         genreList.forEach { genre ->
             genre.name?.let { FavoriteGenreItem(
-                modifier = Modifier.weight(1f),
-                genreName = it,
-                genreColor = generateContrastColor(MaterialTheme.colorScheme.onPrimary)
-            )}
+                    modifier = Modifier.weight(1f),
+                    genreName = it,
+                    genreColor = generateContrastColor(MaterialTheme.colorScheme.onPrimary)
+                )
+            }
         }
         IconButton(
             onClick = { /* TODO: make adding favorite genre logic */ },
@@ -43,7 +44,7 @@ fun FavoriteGenresList(genreList: List<Genre>) {
 }
 
 private fun generateContrastColor(baseColor: Color): Color {
-    val contrastFactor = 0.2f // Можно настроить фактор контрастности
+    val contrastFactor = 1f
     val r = (baseColor.red + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
     val g = (baseColor.green + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
     val b = (baseColor.blue + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)

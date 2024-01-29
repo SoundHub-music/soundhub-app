@@ -11,20 +11,30 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.UiEventDispatcher
-import com.soundhub.utils.Routes
+import com.soundhub.utils.Route
 import com.soundhub.utils.UiEvent
 
 
 @Composable
 fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavController) {
-    var selectedItem: Routes by remember { mutableStateOf(Routes.Postline) }
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    var selectedItem: Route by remember { mutableStateOf(
+        Route.valueOf(currentRoute) ?: Route.Postline
+    )}
+
+    LaunchedEffect(currentRoute) {
+        selectedItem = Route.valueOf(currentRoute) ?: Route.Postline
+    }
+
     val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 
     NavigationBar(
@@ -47,7 +57,7 @@ fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavContro
                     selectedItem = item.route
                     uiEventDispatcher.sendUiEvent(UiEvent.Navigate(item.route))
                     navController.navigate(item.route.route) {
-                        popUpTo(Routes.Postline.route) {
+                        popUpTo(Route.Postline.route) {
                             inclusive = true
                         }
                     }
@@ -58,7 +68,7 @@ fun BottomNavigationBar(items: List<NavigationItemApp>, navController: NavContro
 }
 
 data class NavigationItemApp(
-    val route: Routes = Routes.Postline,
+    val route: Route = Route.Postline,
     val icon: @Composable () -> Unit,
     val label: String? = "",
 )

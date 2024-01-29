@@ -1,6 +1,6 @@
 package com.soundhub.ui.authentication.state
 
-data class AuthValidationState(
+data class AuthFormState(
     val isRegisterForm: Boolean = false,
     val email: String = "",
     val password: String = "",

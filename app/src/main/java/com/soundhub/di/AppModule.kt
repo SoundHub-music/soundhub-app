@@ -2,8 +2,9 @@ package com.soundhub.di
 
 import android.app.Application
 import androidx.room.Room
+import com.soundhub.BuildConfig
 import com.soundhub.data.UserDatabase
-import com.soundhub.data.UserStore
+import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.AuthRepositoryImpl
 import com.soundhub.UiEventDispatcher
@@ -12,6 +13,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
@@ -46,5 +50,26 @@ object AppModule {
     @Singleton
     fun provideUserDataStore(app: Application): UserStore {
         return UserStore(app)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.SERVER_API)
+            .client(okHttpClient)
+//            .addCallAdapterFactory(GsonConverterFactory.create())
+            .build()
     }
 }

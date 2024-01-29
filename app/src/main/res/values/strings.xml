@@ -28,16 +28,26 @@
     <string name="login_failed">"Login failed"</string>
 
     <string name="screen_title_postline">Главная</string>
+    <string name="screen_title_settings">Настройки</string>
     <string name="screen_title_music">Музыка</string>
     <string name="screen_title_messenger">Мессенджер</string>
 
     <string name="edit_profile_btn_content">Редактировать профиль</string>
     <string name="write_message_btn_content">Написать сообщение</string>
 
-    <!--    choose genre page strings-->
-    <string name="choose_genre_title">Выберите жанры</string>
+    <string name="choose_genres_page_title">Выберите жанры</string>
+    <string name="choose_artists_page_title">Выберите исполнителей</string>
+    <string name="fill_data_page_title">Пришло время знакомиться!</string>
 
-    <!--    choose genre page strings-->
-    <string name="cheese_singer_title">Выберите исполнителей</string>
+
+    <string name="text_field_name_placeholder">Имя</string>
+    <string name="text_field_last_name_placeholder">Фамилия</string>
+    <string name="text_field_description_placeholder">Расскажите о себе</string>
+
+    <string name="btn_description_back">Назад</string>
+
+    <string name="registration_firstname_error_message">Имя не может быть пустым</string>
+    <string name="registration_lastname_error_message">Фамилия не может быть пустой</string>
+    <string name="registration_birthday_error_message">Дата рождения должна быть задана</string>
 
 </resources>

@@ -3,37 +3,75 @@ package com.soundhub.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.soundhub.ui.authentication.state.RegistrationState
+import java.time.LocalDate
 import java.util.UUID
 
+interface IUser {
+    var id: UUID
+    var email: String
+    var firstName: String
+    var lastName: String
+    var country: String
+    var birthday: LocalDate?
+    var city: String
+    var languages: List<String>
+    var description: String
+    var token: String?
+}
+
+// room library is used temporarily.
+// In the future there will be a simple data class which will communicate with server via retrofit
 @Entity
 data class User(
     @PrimaryKey
-    val id: UUID = UUID.randomUUID(),
+    override var id: UUID = UUID.randomUUID(),
 
     @ColumnInfo("email")
-    val email: String,
+    override var email: String = "",
 
     @ColumnInfo("first_name")
-    val firstName: String = "",
+    override var firstName: String = "",
 
     @ColumnInfo("last_name")
-    val lastName: String = "",
+    override var lastName: String = "",
 
     @ColumnInfo("country")
-    val country: String = "",
+    override var country: String = "",
+
+    @ColumnInfo("birthday")
+    override var birthday: LocalDate? = null,
 
     @ColumnInfo("city")
-    val city: String = "",
+    override var city: String = "",
 
     @ColumnInfo("password")
-    val password: String? = null,
+    var password: String? = null,
 
     @ColumnInfo("languages")
-    val languages: List<String> = emptyList(),
+    override var languages: List<String> = emptyList(),
 
     @ColumnInfo("description")
-    val description: String = "",
+    override var description: String = "",
 
     @ColumnInfo("session_token")
-    val token: String? = null,
-)
+    override var token: String? = null,
+
+//    @ColumnInfo("friend_list")
+//    var friendList: List<User> = emptyList()
+): IUser {
+    constructor(registerState: RegistrationState?) : this() {
+        if (registerState != null) {
+            id = registerState.id
+            email = registerState.email
+            firstName = registerState.firstName
+            lastName = registerState.lastName
+            country = registerState.country
+            birthday = registerState.birthday
+            city = registerState.city
+            languages = registerState.languages
+            description = registerState.description
+            token = registerState.token
+        }
+    }
+}

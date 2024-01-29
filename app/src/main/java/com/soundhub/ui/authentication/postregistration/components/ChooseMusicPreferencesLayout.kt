@@ -21,22 +21,26 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.ui.components.ItemPlate
+import com.soundhub.UiEventDispatcher
+import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.NextButton
 
 @Composable
-fun ChoosePageDesign(
+fun ChooseMusicPreferencesPage(
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
     title: String,
     itemsList: List<*>
 ) {
+    val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
+
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         Column {
-
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,10 +56,7 @@ fun ChoosePageDesign(
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 100.dp),
-                contentPadding = PaddingValues(
-                    all = 10.dp
-                ),
-
+                contentPadding = PaddingValues(all = 10.dp),
                 content = {
                     itemsIndexed(itemsList) { index, plate ->
                         ItemPlate(
@@ -68,10 +69,15 @@ fun ChoosePageDesign(
             )
         }
 
-        NextButton (
+        NextButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {}
+                .padding(16.dp),
+            onClick = {
+                authViewModel.onPostRegisterNextButtonClick(
+                    uiEventDispatcher.currentRoute.value
+                )
+            }
+        )
     }
 }

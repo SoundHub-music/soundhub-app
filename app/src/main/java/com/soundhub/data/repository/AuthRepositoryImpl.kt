@@ -11,8 +11,4 @@ class AuthRepositoryImpl(private val dao: UserDao): AuthRepository {
     override suspend fun register(user: User) {
         dao.register(user)
     }
-
-    override suspend fun deleteUser(user: User) {
-        dao.deleteUser(user)
-    }
 }

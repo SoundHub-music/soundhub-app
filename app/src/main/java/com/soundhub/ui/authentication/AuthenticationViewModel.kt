@@ -1,24 +1,28 @@
 package com.soundhub.ui.authentication
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.UserPreferences
-import com.soundhub.data.UserStore
+import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
-import com.soundhub.ui.authentication.state.AuthValidationState
+import com.soundhub.ui.authentication.state.AuthFormState
 import com.soundhub.UiEventDispatcher
+import com.soundhub.ui.authentication.state.RegistrationState
 import com.soundhub.utils.Constants
-import com.soundhub.utils.Routes
+import com.soundhub.utils.Route
 import com.soundhub.utils.UiEvent
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.mindrot.jbcrypt.BCrypt
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,90 +32,147 @@ class AuthenticationViewModel @Inject constructor(
     private val userStore: UserStore,
 ): ViewModel() {
     val userCreds: Flow<UserPreferences> = userStore.getCreds()
-    var authValidationState by mutableStateOf(AuthValidationState())
-        private set
 
+    private var _authFormState = MutableStateFlow(AuthFormState())
+    val authFormState = _authFormState.asStateFlow()
+
+    private var _registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
+    val registerState: StateFlow<RegistrationState> = _registerState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            if (authValidationState.email.isEmpty() && authValidationState.password.isEmpty())
-                authValidationState = authValidationState.copy(isEmailValid = true, isPasswordValid = true)
+            if (_authFormState.value.email.isEmpty() && _authFormState.value.password.isEmpty())
+                _authFormState.update {
+                    _authFormState.value.copy(isEmailValid = true, isPasswordValid = true)
+                }
         }
     }
 
     fun resetState() {
         viewModelScope.launch {
-            authValidationState = AuthValidationState()
+            _authFormState.update { AuthFormState() }
         }
     }
 
     fun validateForm(): Boolean {
-        val isLoginFormValid =  authValidationState.isEmailValid
-                && authValidationState.isPasswordValid
-                && authValidationState.email.isNotEmpty()
-                && authValidationState.password.isNotEmpty()
+        val isLoginFormValid = _authFormState.value.isEmailValid
+                && _authFormState.value.isPasswordValid
+                && _authFormState.value.email.isNotEmpty()
+                && _authFormState.value.password.isNotEmpty()
 
-        if (authValidationState.isRegisterForm)
+        if (_authFormState.value.isRegisterForm)
             return isLoginFormValid
-                    && authValidationState.arePasswordsEqual
-                    && authValidationState.repeatedPassword?.isNotEmpty() ?: false
-        return isLoginFormValid
+                    && _authFormState.value.arePasswordsEqual
+                    && _authFormState.value.repeatedPassword?.isNotEmpty() ?: false
 
+        return isLoginFormValid
     }
 
     fun resetRepeatedPassword() {
         viewModelScope.launch {
-            authValidationState = authValidationState.copy(repeatedPassword = null)
+            _authFormState.update {
+                _authFormState.value.copy(repeatedPassword = null)
+            }
         }
     }
 
     fun onEmailTextFieldChange(value: String) {
         viewModelScope.launch {
             val isEmailValid = Validator.validateEmail(value)
-            authValidationState = authValidationState.copy(
-                email = value,
-                isEmailValid = isEmailValid,
-            )
+            _authFormState.update {
+                it.copy(email = value, isEmailValid = isEmailValid,)
+            }
         }
     }
 
     fun onPasswordTextFieldChange(value: String) {
         viewModelScope.launch {
             val isPasswordValid: Boolean = Validator.validatePassword(value)
-            authValidationState = authValidationState.copy(
-                password = value,
-                isPasswordValid = isPasswordValid,
-            )
+            _authFormState.update {
+                it.copy(password = value, isPasswordValid = isPasswordValid,)
+            }
         }
     }
 
     fun onRepeatedPasswordTextFieldChange(value: String) {
         viewModelScope.launch {
             val arePasswordsEqual: Boolean = Validator
-                .arePasswordsEqual(authValidationState.password, value)
+                .arePasswordsEqual(_authFormState.value.password, value)
 
-            authValidationState = authValidationState.copy(
-                repeatedPassword = value,
-                arePasswordsEqual = arePasswordsEqual
-            )
+            _authFormState.update {
+                it.copy(repeatedPassword = value, arePasswordsEqual = arePasswordsEqual)
+            }
         }
     }
 
     fun onAuthTypeSwitchChange(value: Boolean) {
         viewModelScope.launch {
-            authValidationState = authValidationState.copy(
-                isRegisterForm = value
-            )
+            _authFormState.update { it.copy(isRegisterForm = value) }
         }
     }
 
-    fun onFormButtonClick() {
-        if (authValidationState.isRegisterForm)
-            onEvent(AuthEvent.OnRegister(
-                User(email = authValidationState.email, password = authValidationState.password)
-            ))
+    fun onAuthFormButtonClick() {
+        if (_authFormState.value.isRegisterForm) {
+//            val salt = BCrypt.gensalt()
+//            _registerState.update {
+//                it.copy(
+//                    email = _authFormState.value.email,
+//                    password = BCrypt.hashpw(_authFormState.value.password, salt)
+//                )
+//            }
+//            onEvent(AuthEvent.OnChooseGenres)
+            onEvent(
+                AuthEvent.OnRegister(
+                    User(
+                        email = _authFormState.value.email,
+                        password = _authFormState.value.password
+                    )
+                )
+            )
+        }
         else
-            onEvent(AuthEvent.OnLogin(authValidationState.email, authValidationState.password))
+            onEvent(AuthEvent.OnLogin(
+                _authFormState.value.email, _authFormState.value.password
+            ))
+    }
+
+    fun onPostRegisterNextButtonClick(currentRoute: Route) {
+        when (currentRoute) {
+            is Route.Authentication.ChooseGenres -> onEvent(AuthEvent.OnChooseArtists)
+            is Route.Authentication.ChooseArtists -> onEvent(AuthEvent.OnFillUserData)
+            is Route.Authentication.FillUserData -> {
+                _registerState.update {
+                    it.copy(
+                        email = _authFormState.value.email, password = _authFormState.value.password
+                    )
+                }
+
+                if (Validator.validateRegistrationState(_registerState.value))
+                    onEvent(AuthEvent.OnRegister(User(registerState.value)))
+            }
+            else -> Unit
+        }
+    }
+
+    fun onFirstNameTextFieldChange(value: String) {
+        val isFirstNameValid: Boolean = value.isNotEmpty()
+        _registerState.update {
+            it.copy(firstName = value, isFirstNameValid = isFirstNameValid)
+        }
+    }
+
+    fun onLastNameTextFieldChange(value: String) {
+        val isLastNameValid: Boolean = value.isNotEmpty()
+        _registerState.update {
+            it.copy(lastName = value, isLastNameValid = isLastNameValid)
+        }
+    }
+
+    fun onBirthdayTextFieldChange(value: LocalDate?) {
+        val isBirthdayValid = value != null
+        _registerState.update {
+            it.copy(birthday = value, isBirthdayValid = isBirthdayValid)
+        }
     }
 
     fun onLogoutButtonClick() {
@@ -122,12 +183,13 @@ class AuthenticationViewModel @Inject constructor(
         when (event) {
             is AuthEvent.OnLogin -> {
                 viewModelScope.launch {
-
-                    val user: User? = authRepository.login(event.email, event.password)
+                    val salt = BCrypt.gensalt()
+                    val hashedPassword = BCrypt.hashpw(event.password, salt)
+                    val user: User? = authRepository.login(event.email, hashedPassword)
                     if (user != null) {
                         userStore.saveUser(user)
 
-                        uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Postline))
+                        uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
                         uiEventDispatcher.sendUiEvent(UiEvent.ShowToast(
                             message = "You successfully logged in!\n" +
                                     "Your data: {email: ${event.email}}"
@@ -145,7 +207,7 @@ class AuthenticationViewModel @Inject constructor(
                     authRepository.register(event.user)
                     userStore.saveUser(event.user)
 
-                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Postline))
+                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
                 }
             }
 
@@ -153,8 +215,19 @@ class AuthenticationViewModel @Inject constructor(
                 viewModelScope.launch {
                     userStore.clear()
                     Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[onEvent]: $userCreds")
-                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Routes.Authentication))
+                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
                 }
+            }
+            is AuthEvent.OnChooseGenres -> {
+                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseGenres))
+            }
+
+            is AuthEvent.OnChooseArtists -> {
+                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseArtists))
+            }
+
+            is AuthEvent.OnFillUserData -> {
+                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.FillUserData))
             }
         }
     }

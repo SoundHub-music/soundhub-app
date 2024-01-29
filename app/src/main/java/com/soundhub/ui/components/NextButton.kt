@@ -1,13 +1,10 @@
 package com.soundhub.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,13 +16,12 @@ fun NextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-
-    IconButton(
+    FloatingActionButton(
         onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier
-            .width(56.dp)
-            .height(56.dp)
-            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(size = 16.dp))
+
     ) {
         Icon(
             imageVector = Icons.Rounded.ArrowForward,
@@ -36,8 +32,6 @@ fun NextButton(
 
 @Preview
 @Composable
-fun viewBtn() {
-    NextButton {
-
-    }
+fun NextButtonPreview() {
+    NextButton {}
 }

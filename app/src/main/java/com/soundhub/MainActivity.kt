@@ -14,8 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
-import com.soundhub.ui.components.AppContainer
+import com.soundhub.ui.home.HomeScreen
 import com.soundhub.utils.Constants
 import com.soundhub.utils.UiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,11 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val uiEventDispatcher: UiEventDispatcher by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         setContent {
             SoundHubTheme {
                 Surface(
@@ -49,7 +47,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    AppContainer(navController, uiEventDispatcher)
+                    HomeScreen(navController, uiEventDispatcher)
                 }
             }
         }

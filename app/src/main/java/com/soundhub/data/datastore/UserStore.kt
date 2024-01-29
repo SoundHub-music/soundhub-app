@@ -1,4 +1,4 @@
-package com.soundhub.data
+package com.soundhub.data.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

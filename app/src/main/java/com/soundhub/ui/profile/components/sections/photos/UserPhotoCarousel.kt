@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components
+package com.soundhub.ui.profile.components.sections.photos
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyRow

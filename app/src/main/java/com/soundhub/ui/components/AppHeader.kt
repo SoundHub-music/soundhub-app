@@ -31,7 +31,8 @@ import com.soundhub.R
 @Composable
 fun AppHeader(
     pageName: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actionButton: @Composable () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -67,9 +68,7 @@ fun AppHeader(
                     fontSize = 24.sp,
                 )
             }
-            IconButton(onClick = { /* TODO: write logic for notification button */ }) {
-                Icon(Icons.Rounded.Notifications, contentDescription = null)
-            }
+            actionButton()
         }
     }
 }
@@ -77,5 +76,5 @@ fun AppHeader(
 @Preview
 @Composable
 fun PreviewAppHeader() {
-    AppHeader(pageName = "Главная")
+    AppHeader(pageName = "Главная") {}
 }

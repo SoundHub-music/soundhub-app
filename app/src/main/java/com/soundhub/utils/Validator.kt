@@ -1,5 +1,7 @@
 package com.soundhub.utils
 
+import com.soundhub.ui.authentication.state.RegistrationState
+
 sealed class Validator {
     companion object {
         fun validateEmail(text: String): Boolean {
@@ -17,18 +19,14 @@ sealed class Validator {
             return password.length >= Constants.PASSWORD_MIN_LENGTH
         }
 
-        fun validateAuthForm(email: String, password: String, repeatPassword: String?): Boolean {
-            return validateEmail(email) &&
-                    validatePassword(password) &&
-                    arePasswordsEqual(password, repeatPassword ?: password) &&
-                    areFieldsNotEmpty(email, password, repeatPassword )
-        }
+        fun validateRegistrationState(registerState: RegistrationState): Boolean {
+            registerState.isFirstNameValid = registerState.firstName.isNotEmpty()
+            registerState.isLastNameValid = registerState.lastName.isNotEmpty()
+            registerState.isBirthdayValid = registerState.birthday != null
 
-        private fun areFieldsNotEmpty(vararg fields: String?): Boolean {
-            for (field in fields) {
-                if (field?.isEmpty() == true) return false
-            }
-            return true
+            return registerState.isFirstNameValid &&
+                    registerState.isLastNameValid &&
+                    registerState.isBirthdayValid
         }
     }
 }
