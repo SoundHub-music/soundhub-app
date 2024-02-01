@@ -2,19 +2,22 @@ package com.soundhub.ui.authentication.postregistration
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.components.ChooseMusicPreferencesPage
 
-@Preview(showBackground = true)
 @Composable
-fun ChooseArtistsScreen(authViewModel: AuthenticationViewModel = hiltViewModel()) {
-    val list = List(12) {"BTS"}
+fun ChooseArtistsScreen(
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
+    val list = List(12) { "BTS" }
     ChooseMusicPreferencesPage(
         authViewModel = authViewModel,
-        title = stringResource(id = R.string.choose_artists_page_title),
-        itemsList = list
+        title = stringResource(id = R.string.screen_title_choose_artists),
+        itemsList = list,
+        navController = navController
     )
 }

@@ -12,7 +12,7 @@ fun SettingsScreen() {
     val authViewModel: AuthenticationViewModel = hiltViewModel()
 
     Box() {
-       Button(onClick = { authViewModel.onLogoutButtonClick() }) {
+       Button(onClick = { authViewModel.logout() }) {
            Text(text = "Выйти")
        }
     }

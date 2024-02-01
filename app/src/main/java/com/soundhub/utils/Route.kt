@@ -13,6 +13,8 @@ sealed class Route(val route: String) {
     object Music: Route(route = "music")
     object Messenger: Route(route = "messenger")
     object Settings: Route(route = "settings")
+    object Notifications: Route(route = "notifications")
+    object EditUserData: Route(route = "edit_user_data")
     
     companion object {
         fun valueOf(route: String?): Route? {
@@ -21,11 +23,13 @@ sealed class Route(val route: String) {
                 Authentication.ChooseArtists.route -> Authentication.ChooseArtists
                 Authentication.ChooseGenres.route -> Authentication.ChooseGenres
                 Authentication.FillUserData.route -> Authentication.FillUserData
-                Profile.route -> Profile
-                Postline.route -> Postline
-                Music.route -> Music
+                Notifications.route -> Notifications
+                EditUserData.route -> EditUserData
                 Messenger.route -> Messenger
+                Postline.route -> Postline
                 Settings.route -> Settings
+                Profile.route -> Profile
+                Music.route -> Music
                 else -> null
             }
         }

@@ -3,6 +3,7 @@ package com.soundhub.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.model.User
 import com.soundhub.utils.converters.DateConverter
 import com.soundhub.utils.converters.StringListConverter
@@ -13,6 +14,6 @@ import com.soundhub.utils.converters.StringListConverter
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class, DateConverter::class)
-abstract class UserDatabase: RoomDatabase() {
+abstract class RoomUserDatabase: RoomDatabase() {
     abstract val dao: UserDao
 }

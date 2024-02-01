@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.components.BottomSheet
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +37,7 @@ import com.soundhub.ui.components.onBottomSheetButtonClick
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthenticationScreen() {
+fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel()) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scope: CoroutineScope = rememberCoroutineScope()
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -72,7 +73,12 @@ fun AuthenticationScreen() {
 
                 BottomSheet(
                     scaffoldState = scaffoldState,
-                    sheetContent = { AuthForm(!scaffoldState.bottomSheetState.isVisible) }
+                    sheetContent = {
+                        AuthForm(
+                            isBottomSheetHidden = !scaffoldState.bottomSheetState.isVisible,
+                            authViewModel = authViewModel
+                        )
+                    }
                 )
             }
         }

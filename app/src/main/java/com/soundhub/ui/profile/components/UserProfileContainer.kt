@@ -31,20 +31,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Genre
-import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendItem
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
 import com.soundhub.ui.profile.components.sections.photos.UserPhotoCarousel
+import com.soundhub.utils.Route
 
 
 @Composable
-fun UserProfileContainer(user: User?, authViewModel: AuthenticationViewModel = hiltViewModel()) {
-    val userCreds = authViewModel.userCreds.collectAsState(initial = null)
-    val isOriginProfile: Boolean = user?.id?.equals(userCreds.value?.id) ?: false
+fun UserProfileContainer(
+    user: UserPreferences?,
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
+    val userCreds = authViewModel.userCreds.collectAsState(initial = null).value
+    val isOriginProfile: Boolean = user?.id?.equals(userCreds?.id) ?: false
     val actionProfileButtonContent = if (isOriginProfile)
         stringResource(id = R.string.edit_profile_btn_content)
     else stringResource(id = R.string.write_message_btn_content)
@@ -53,30 +59,37 @@ fun UserProfileContainer(user: User?, authViewModel: AuthenticationViewModel = h
         Icons.Rounded.Edit
     else Icons.Rounded.MailOutline
 
+    val userLocation: String = getUserLocation(user?.city, user?.country)
+
     Column(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         Column {
             UserNameWithDescription(user)
-            Text(
-                text = "${user?.country}, ${user?.city}",
-                fontWeight = FontWeight.Light,
-                fontSize = 14.sp
-            )
+            // user location
+            if (userLocation.isNotEmpty())
+                Text(
+                    text = userLocation,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 14.sp
+                )
         }
 
         FilledTonalButton(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(),
-            onClick = { /* TODO: make update profile or write a message logic click */ }
+            onClick = { navController.navigate(Route.EditUserData.route) }
         ) {
             Row(
                 modifier = Modifier.height(30.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = profileActionButtonIcon, contentDescription = "profile_action_button_icon")
+                Icon(
+                    imageVector = profileActionButtonIcon,
+                    contentDescription = "profile_action_button_icon"
+                )
                 Text(
                     text = actionProfileButtonContent,
                     fontWeight = FontWeight.Bold,
@@ -102,17 +115,19 @@ fun UserProfileContainer(user: User?, authViewModel: AuthenticationViewModel = h
         )
 
         // temporary user photos
-        UserPhotoCarousel(photos = listOf(
-            "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
-            "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
-            "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g"
-        ))
+        UserPhotoCarousel(
+            photos = listOf(
+                "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
+                "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
+                "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g"
+            )
+        )
     }
 }
 
 
 @Composable
-private fun UserNameWithDescription(user: User? = null) {
+private fun UserNameWithDescription(user: UserPreferences? = null) {
     var isDescriptionButtonChecked: Boolean by rememberSaveable {
         mutableStateOf(false)
     }
@@ -148,9 +163,28 @@ private fun UserNameWithDescription(user: User? = null) {
 }
 
 @Composable
-private fun UserDescriptionBlock(user: User? = null) {
+private fun UserDescriptionBlock(user: UserPreferences? = null) {
     // TODO: expand the list of user data
     Column() {
-        Text("О себе: ${user?.description}")
+        Text(
+            text = "О себе: ${user?.description ?: ""}",
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = "День рождения: ",
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = "Языки: ",
+            fontWeight = FontWeight.Medium
+        )
     }
+}
+
+
+fun getUserLocation(city: String?, country: String?): String {
+    return if ((city == null && country == null) || (city!!.isEmpty() && country!!.isEmpty()))
+        ""
+    else if (country!!.isNotEmpty() && city.isEmpty()) country
+    else "$country, $city"
 }

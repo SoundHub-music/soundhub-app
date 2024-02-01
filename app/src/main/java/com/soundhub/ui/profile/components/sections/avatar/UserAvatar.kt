@@ -18,17 +18,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.soundhub.R
-import com.soundhub.UiEventDispatcher
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.utils.Route
-import com.soundhub.utils.UiEvent
 
 @Composable
-fun UserAvatar() {
+fun UserAvatar(
+    navController: NavHostController,
+    authViewModel: AuthenticationViewModel = hiltViewModel()
+) {
     val avatar: Painter = painterResource(id = R.drawable.header)
-    val authViewModel: AuthenticationViewModel = hiltViewModel()
-    val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 
     Box(
         modifier = Modifier
@@ -36,7 +37,8 @@ fun UserAvatar() {
             .fillMaxHeight(0.45f)
     ) {
         Image(
-            painter = avatar, contentDescription = null,
+            painter = avatar,
+            contentDescription = "avatar",
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()
         )
@@ -47,9 +49,7 @@ fun UserAvatar() {
             horizontalArrangement = Arrangement.End
         ) {
             IconButton(onClick = {
-            /* TODO make onClick logic for settings page */
-                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Settings))
-
+                navController.navigate(Route.Settings.route)
             }) {
                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
             }

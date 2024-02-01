@@ -53,7 +53,7 @@ fun AuthForm(
     else stringResource(id = R.string.auth_button_login_name)
 
     // if bottom sheet is hidden typed data are deleted
-    if (isBottomSheetHidden) authViewModel.resetState()
+    if (isBottomSheetHidden) authViewModel.resetAuthFormState()
     if (!authFormState.value.isRegisterForm) authViewModel.resetRepeatedPassword()
 
     // it works every time when isRegisterForm variable is changed
@@ -73,9 +73,9 @@ fun AuthForm(
         // email field
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = authFormState.value.email ?: "",
+            value = authFormState.value.email,
             singleLine = true,
-            onValueChange = { value -> authViewModel.onEmailTextFieldChange(value) },
+            onValueChange = { value -> authViewModel.setEmail(value) },
             label = { Text("Email") },
             isError = !authFormState.value.isEmailValid,
             supportingText = {
@@ -93,9 +93,9 @@ fun AuthForm(
         // password field
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = authFormState.value.password ?: "",
+            value = authFormState.value.password,
             singleLine = true,
-            onValueChange = { value -> authViewModel.onPasswordTextFieldChange(value) },
+            onValueChange = { value -> authViewModel.setPassword(value) },
             label = { Text(stringResource(id = R.string.password_label)) },
             isError = !authFormState.value.isPasswordValid || !authFormState.value.arePasswordsEqual,
             visualTransformation = PasswordVisualTransformation(),
@@ -117,7 +117,7 @@ fun AuthForm(
                 modifier = Modifier.fillMaxWidth(),
                 value = authFormState.value.repeatedPassword ?: "",
                 singleLine = true,
-                onValueChange = { value -> authViewModel.onRepeatedPasswordTextFieldChange(value) },
+                onValueChange = { value -> authViewModel.setRepeatedPassword(value) },
                 label = { Text(stringResource(id = R.string.repeat_password_label)) },
                 isError = !authFormState.value.isPasswordValid || !authFormState.value.arePasswordsEqual,
                 visualTransformation = PasswordVisualTransformation(),
@@ -146,8 +146,8 @@ fun AuthForm(
                 .height(50.dp),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(),
-            onClick = { authViewModel.onAuthFormButtonClick() },
-            enabled = authViewModel.validateForm()
+            onClick = { authViewModel.authAction() },
+            enabled = authViewModel.validateAuthForm()
         ) { Text(text = buttonFormText) }
     }
 }

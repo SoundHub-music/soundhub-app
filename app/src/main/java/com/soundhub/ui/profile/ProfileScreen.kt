@@ -1,5 +1,6 @@
 package com.soundhub.ui.profile
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,37 +13,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.soundhub.data.model.User
+import androidx.navigation.NavHostController
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.profile.components.sections.avatar.UserAvatar
 import com.soundhub.ui.profile.components.UserProfileContainer
-import java.util.UUID
 
 @Composable
 fun ProfileScreen(
-    userId: UUID? = null,
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    navController: NavHostController,
+    userCreds: UserPreferences? = null
 ) {
-    val user: User? by remember {
-        mutableStateOf(
-            User(
-                email = "test@test.com",
-                firstName = "Anton",
-                lastName = "Petrov",
-                country = "Russia",
-                city = "Moscow",
-                description = "This is a description",
-                id = userId ?: UUID.randomUUID()
-            )
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -51,7 +37,7 @@ fun ProfileScreen(
         // negative indent provides an overlay of the content on the avatar
         verticalArrangement = Arrangement.spacedBy((-30).dp)
     ) {
-        UserAvatar()
+        UserAvatar(navController = navController, authViewModel = authViewModel)
 
         Box(
             modifier = Modifier
@@ -67,7 +53,10 @@ fun ProfileScreen(
                     .padding(start = 16.dp, end = 16.dp, top = 30.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                UserProfileContainer(user)
+                UserProfileContainer(
+                    user = userCreds,
+                    navController = navController
+                )
             }
         }
     }

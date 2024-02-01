@@ -5,12 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +26,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.AuthenticationScreen
-import com.soundhub.ui.components.icons.queueMusicIconRounded
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.postline.PostLineScreen
@@ -39,37 +33,36 @@ import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.utils.Route
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.soundhub.UiEventDispatcher
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
 import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
 import com.soundhub.ui.components.AppHeader
 import com.soundhub.ui.components.BottomNavigationBar
-import com.soundhub.ui.components.NavigationItemApp
-import com.soundhub.ui.components.TopBarButton
+import com.soundhub.ui.components.top_bar.TopBarActions
+import com.soundhub.ui.components.top_bar.TopBarButton
+import com.soundhub.ui.edit_profile.EditUserProfileScreen
+import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.utils.Constants
-import com.soundhub.utils.UiEvent
 
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    uiEventDispatcher: UiEventDispatcher,
-    modifier: Modifier = Modifier
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
 ) {
-    val authViewModel: AuthenticationViewModel = hiltViewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val userCreds: State<UserPreferences?> = authViewModel.userCreds.collectAsState(initial = null)
-    var topBarTitle: String? by remember { mutableStateOf(null) }
+    var topBarTitle: String? by rememberSaveable { mutableStateOf(null) }
 
     Scaffold(
         modifier = modifier
@@ -79,13 +72,7 @@ fun HomeScreen(
             TopAppBarBuilder(
                 currentRoute = currentRoute,
                 topBarTitle = topBarTitle,
-                uiEventDispatcher = uiEventDispatcher,
-                topBarButton = {
-                    TopBarButton(
-                        currentRoute = currentRoute ?: "",
-                        uiEventDispatcher = uiEventDispatcher
-                    )
-                }
+                navController = navController,
             )
         },
         bottomBar = { NavigationBarBuilder(navController, currentRoute) }
@@ -98,21 +85,34 @@ fun HomeScreen(
         ) {
             composable(Route.Authentication.route) {
                 topBarTitle = null
-                AuthenticationScreen()
+                AuthenticationScreen(authViewModel)
             }
 
             composable(
                 route = "${Route.Authentication.route}/{${Constants.POST_REGISTER_NAV_ARG}}",
-                arguments = listOf(navArgument(Constants.POST_REGISTER_NAV_ARG) {NavType.StringType})
+                arguments = listOf(navArgument(Constants.POST_REGISTER_NAV_ARG) { NavType.StringType })
             ) { entry ->
-                val nestedRoute = "${Route.Authentication.route}/${entry.arguments?.getString(Constants.POST_REGISTER_NAV_ARG)}"
+                val nestedRoute =
+                    "${Route.Authentication.route}/${entry.arguments?.getString(Constants.POST_REGISTER_NAV_ARG)}"
 
                 Log.d("nested_auth_route", nestedRoute)
                 when (Route.valueOf(nestedRoute)) {
-                    is Route.Authentication.ChooseGenres -> ChooseGenresScreen(authViewModel)
-                    is Route.Authentication.ChooseArtists -> ChooseArtistsScreen(authViewModel)
-                    is Route.Authentication.FillUserData -> FillUserDataScreen(authViewModel = authViewModel)
-                    else -> uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+                    is Route.Authentication.ChooseGenres -> ChooseGenresScreen(
+                        authViewModel = authViewModel,
+                        navController = navController
+                    )
+
+                    is Route.Authentication.ChooseArtists -> ChooseArtistsScreen(
+                        authViewModel = authViewModel,
+                        navController = navController
+                    )
+
+                    is Route.Authentication.FillUserData -> FillUserDataScreen(
+                        authViewModel = authViewModel,
+                        navController = navController
+                    )
+
+                    else -> navController.navigate(Route.Authentication.route)
                 }
             }
 
@@ -133,14 +133,29 @@ fun HomeScreen(
 
             composable(Route.Profile.route) {
                 topBarTitle = null
-                ProfileScreen(userCreds.value?.id)
+                ProfileScreen(
+                    authViewModel = authViewModel,
+                    navController = navController,
+                    userCreds = userCreds.value
+                )
+            }
+
+            composable(Route.Notifications.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_notifications)
+                NotificationScreen(navController)
+            }
+
+            composable(Route.EditUserData.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_edit_profile)
+                EditUserProfileScreen()
             }
 
             composable(
                 route = "${Route.Profile.route}/{${Constants.PROFILE_NAV_ARG}}",
-                arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) {NavType.StringType})
+                arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
             ) {
                 Text(text = "not implemented")
+                // TODO: profile routing
             }
 
             composable(Route.Settings.route) {
@@ -152,58 +167,46 @@ fun HomeScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-private fun getNavBarItems(): List<NavigationItemApp> {
-   return listOf(
-        NavigationItemApp(
-            route = Route.Postline,
-            icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
-        ),
-        NavigationItemApp(
-            route = Route.Music,
-            icon = { Icon(queueMusicIconRounded(), contentDescription = "Music") },
-        ),
-        NavigationItemApp(
-            route = Route.Messenger,
-            icon = {
-                BadgedBox(badge = { Badge { Text(text = "5")} }) {
-                    Icon(Icons.Rounded.Email, contentDescription = "Messenger")
-                }
-            },
-        ),
-        NavigationItemApp(
-            route = Route.Profile,
-            icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
-        )
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopAppBarBuilder(
     currentRoute: String?,
     topBarTitle: String?,
-    uiEventDispatcher: UiEventDispatcher,
-    topBarButton: @Composable () -> Unit = {}
+    navController: NavHostController,
 ) {
-    if (currentRoute.equals(Route.Settings.route))
+    val topAppBarScreens: List<String> = listOf(
+        Route.Settings.route,
+        Route.Notifications.route,
+        Route.EditUserData.route
+    )
+
+    if (topAppBarScreens.contains(currentRoute))
         TopAppBar(
-            title = { Text(text = stringResource(id = R.string.screen_title_settings))},
+            title = { Text(text = topBarTitle ?: "") },
             navigationIcon = {
-                IconButton(
-                    onClick = { uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Profile)) }
-                ) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        Icons.Rounded.ArrowBack,
+                        imageVector = Icons.Rounded.ArrowBack,
                         contentDescription = stringResource(id = R.string.btn_description_back)
                     )
                 }
+            },
+            actions = {
+                TopBarActions(
+                    currentRoute = currentRoute,
+                    navController = navController
+                )
             }
         )
     else topBarTitle?.let {
         AppHeader(
             modifier = Modifier.padding(0.dp),
             pageName = topBarTitle,
-            actionButton = topBarButton
+            actionButton = {
+                TopBarButton(
+                    currentRoute = currentRoute ?: "",
+                    navController = navController
+                )
+            }
         )
     }
 }
@@ -217,5 +220,5 @@ private fun NavigationBarBuilder(navController: NavHostController, currentRoute:
         Route.Messenger.route
     )
     if (currentRoute in allowedRoutes)
-        BottomNavigationBar(items = getNavBarItems(), navController = navController)
+        BottomNavigationBar(navController)
 }

@@ -15,13 +15,14 @@ object Constants {
     const val DATASTORE_USER_CITY = "user_city"
     const val DATASTORE_USER_EMAIL = "user_email"
     const val DATASTORE_USER_DESCRIPTION = "user_description"
-
-    // TODO: make datastore saving logic for user languages
+    /* TODO: make datastore saving logic for user languages */
     const val DATASTORE_USER_LANGUAGES = "user_languages"
     const val DATASTORE_SESSION_TOKEN = "user_session_token"
 
     const val LOG_CURRENT_EVENT_TAG = "current_event"
     const val LOG_USER_CREDS_TAG = "user_creds"
+    const val LOG_REGISTER_STATE = "registration_state"
+    const val LOG_CURRENT_ROUTE = "current_route"
 
     const val DATE_FORMAT = "yyyy-MM-dd"
 

@@ -24,6 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val uiEventDispatcher: UiEventDispatcher by viewModels()
+    private val authViewModel: AuthenticationViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,18 +38,30 @@ class MainActivity : ComponentActivity() {
                     val context = LocalContext.current
 
                     LaunchedEffect(key1 = uiEventDispatcher.uiEvent) {
-                        uiEventDispatcher.uiEvent.collect {
-                            event ->
+                        uiEventDispatcher.uiEvent.collect { event ->
                             Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
-                            when(event) {
-                                is UiEvent.ShowToast -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                                is UiEvent.Navigate -> navController.navigate(event.route.route)
+                            when (event) {
+                                is UiEvent.ShowToast -> Toast.makeText(
+                                    context,
+                                    event.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                is UiEvent.Navigate -> {
+                                    Log.d(
+                                        Constants.LOG_CURRENT_ROUTE,
+                                        "MainActivity[onCreate]: ${event.route.route}"
+                                    )
+                                    navController.navigate(event.route.route)
+                                }
+
+                                is UiEvent.PopBackStack -> navController.popBackStack()
                                 else -> Unit
                             }
                         }
                     }
 
-                    HomeScreen(navController, uiEventDispatcher)
+                    HomeScreen(navController = navController, authViewModel = authViewModel)
                 }
             }
         }

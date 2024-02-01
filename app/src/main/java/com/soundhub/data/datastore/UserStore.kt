@@ -51,14 +51,14 @@ class UserStore(private val context: Context) {
 
     suspend fun saveUser(user: User) {
         context.dataStore.edit {pref ->
-            pref[PreferenceKeys.email] = user.email
-            pref[PreferenceKeys.firstName] = user.firstName
-            pref[PreferenceKeys.lastName] = user.lastName
+            pref[PreferenceKeys.email] = user.email ?: ""
+            pref[PreferenceKeys.firstName] = user.firstName ?: ""
+            pref[PreferenceKeys.lastName] = user.lastName ?: ""
             pref[PreferenceKeys.userId] = user.id.toString()
-            pref[PreferenceKeys.country] = user.country
-            pref[PreferenceKeys.city] = user.city
+            pref[PreferenceKeys.country] = user.country ?: ""
+            pref[PreferenceKeys.city] = user.city ?: ""
             pref[PreferenceKeys.token] = user.token ?: ""
-            pref[PreferenceKeys.description] = user.description
+            pref[PreferenceKeys.description] = user.description ?: ""
         }
     }
 

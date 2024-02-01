@@ -35,6 +35,8 @@ android {
 
         // Set API keys in BuildConfig
         buildConfigField("String", "SERVER_API", properties.getProperty("SERVER_API"))
+        buildConfigField("String", "MOCKOON_API", properties.getProperty("MOCKOON_API"))
+        buildConfigField("String", "COUNTRIES_API", properties.getProperty("COUNTRIES_API"))
     }
 
 
@@ -80,7 +82,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.ui:ui-text-android:1.5.4")
+    implementation("androidx.compose.ui:ui-text-android:1.6.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.annotation:annotation:1.7.1")

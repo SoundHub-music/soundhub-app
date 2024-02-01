@@ -1,5 +1,6 @@
 package com.soundhub.ui.authentication.postregistration.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,19 +23,20 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.UiEventDispatcher
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.NextButton
+import com.soundhub.utils.Route
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun ChooseMusicPreferencesPage(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
+    navController: NavHostController,
     title: String,
-    itemsList: List<*>
+    itemsList: List<*>,
 ) {
-    val uiEventDispatcher: UiEventDispatcher = hiltViewModel()
-
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
@@ -50,8 +52,7 @@ fun ChooseMusicPreferencesPage(
                     fontSize = 32.sp,
                     fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-
-                    )
+                )
             )
 
             LazyVerticalGrid(
@@ -75,7 +76,7 @@ fun ChooseMusicPreferencesPage(
                 .padding(16.dp),
             onClick = {
                 authViewModel.onPostRegisterNextButtonClick(
-                    uiEventDispatcher.currentRoute.value
+                    Route.valueOf(navController.currentDestination?.route)!!
                 )
             }
         )
