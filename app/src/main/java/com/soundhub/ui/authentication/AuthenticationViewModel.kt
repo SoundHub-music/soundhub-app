@@ -9,7 +9,9 @@ import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.ui.authentication.state.AuthFormState
 import com.soundhub.UiEventDispatcher
+import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
+import com.soundhub.data.model.Genre
 import com.soundhub.ui.authentication.state.RegistrationState
 import com.soundhub.utils.Constants
 import com.soundhub.utils.Route
@@ -32,13 +34,14 @@ class AuthenticationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val uiEventDispatcher: UiEventDispatcher,
     private val userStore: UserStore
-): ViewModel() {
+) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userStore.getCreds()
 
     private var _authFormState = MutableStateFlow(AuthFormState())
     val authFormState = _authFormState.asStateFlow()
 
-    private var _registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
+    private var _registerState: MutableStateFlow<RegistrationState> =
+        MutableStateFlow(RegistrationState())
     val registerState: StateFlow<RegistrationState> = _registerState.asStateFlow()
 
     override fun onCleared() {
@@ -50,21 +53,6 @@ class AuthenticationViewModel @Inject constructor(
         _authFormState.update { AuthFormState() }
     }
 
-
-    fun validateAuthForm(): Boolean {
-        val isLoginFormValid = _authFormState.value.isEmailValid
-                && _authFormState.value.isPasswordValid
-                && _authFormState.value.email.isNotEmpty()
-                && _authFormState.value.password.isNotEmpty()
-
-        if (_authFormState.value.isRegisterForm)
-            return isLoginFormValid
-                    && _authFormState.value.arePasswordsEqual
-                    && _authFormState.value.repeatedPassword?.isNotEmpty() ?: false
-
-        return isLoginFormValid
-    }
-
     fun resetRepeatedPassword() = viewModelScope.launch {
         _authFormState.update {
             _authFormState.value.copy(repeatedPassword = null)
@@ -74,14 +62,14 @@ class AuthenticationViewModel @Inject constructor(
     fun setEmail(value: String) = viewModelScope.launch {
         val isEmailValid = Validator.validateEmail(value)
         _authFormState.update {
-            it.copy(email = value, isEmailValid = isEmailValid,)
+            it.copy(email = value, isEmailValid = isEmailValid)
         }
     }
 
     fun setPassword(value: String) = viewModelScope.launch {
         val isPasswordValid: Boolean = Validator.validatePassword(value)
         _authFormState.update {
-            it.copy(password = value, isPasswordValid = isPasswordValid,)
+            it.copy(password = value, isPasswordValid = isPasswordValid)
         }
     }
 
@@ -96,44 +84,50 @@ class AuthenticationViewModel @Inject constructor(
     }
 
 
-    fun onAuthTypeSwitchChange(value: Boolean) = viewModelScope.launch {
+    fun setAuthFormType(value: Boolean) = viewModelScope.launch {
         _authFormState.update { it.copy(isRegisterForm = value) }
     }
 
 
-    fun setFirstName(value: String) {
-        val isFirstNameValid: Boolean = value.isNotEmpty()
-        _registerState.update {
-            it.copy(firstName = value, isFirstNameValid = isFirstNameValid)
-        }
+    fun setFirstName(value: String) = _registerState.update {
+        it.copy(firstName = value, isFirstNameValid = value.isNotEmpty())
     }
 
-    fun setLastName(value: String) {
-        val isLastNameValid: Boolean = value.isNotEmpty()
-        _registerState.update {
-            it.copy(lastName = value, isLastNameValid = isLastNameValid)
-        }
+
+    fun setLastName(value: String) = _registerState.update {
+        it.copy(lastName = value, isLastNameValid = value.isNotEmpty())
     }
 
-    fun setBirthday(value: LocalDate?) {
-        val isBirthdayValid = value != null
-        _registerState.update {
-            it.copy(birthday = value, isBirthdayValid = isBirthdayValid)
-        }
+
+    fun setBirthday(value: LocalDate?) = _registerState.update {
+        it.copy(birthday = value, isBirthdayValid = value != null)
     }
+
 
     fun setGender(value: String) = _registerState.update {
         try {
             it.copy(gender = Gender.valueOf(value))
-        }
-        catch (exception: IllegalArgumentException) {
+        } catch (exception: IllegalArgumentException) {
             it.copy(gender = Gender.Unknown)
         }
     }
 
-    fun setDescription(value: String) = _registerState.update {
-        it.copy(description = value)
+    fun setCountry(value: String) = _registerState.update { it.copy(country = value) }
+
+    fun setDescription(value: String) = _registerState.update { it.copy(description = value) }
+
+    fun setChosenGenres(list: MutableList<Genre>) = _registerState.update {
+        it.copy(chosenGenres = list)
     }
+
+    fun setChosenGenres(genre: Genre) = _registerState.value.chosenGenres.add(genre)
+
+
+    fun setChosenArtists(list: MutableList<Artist>) = _registerState.update {
+        it.copy(chosenArtists = list)
+    }
+
+    fun setChosenArtists(artist: Artist) = _registerState.value.chosenArtists.add(artist)
 
     fun logout() = viewModelScope.launch {
         Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[logout]: $userCreds")
@@ -152,8 +146,7 @@ class AuthenticationViewModel @Inject constructor(
                 )
             }
             onEvent(AuthEvent.OnChooseGenres)
-        }
-        else onEvent(AuthEvent.OnLogin(_authFormState.value.email, _authFormState.value.password))
+        } else onEvent(AuthEvent.OnLogin(_authFormState.value.email, _authFormState.value.password))
     }
 
     fun onPostRegisterNextButtonClick(currentRoute: Route) {
@@ -167,6 +160,7 @@ class AuthenticationViewModel @Inject constructor(
             is Route.Authentication.FillUserData ->
                 if (Validator.validateRegistrationState(_registerState.value))
                     onEvent(AuthEvent.OnRegister(User(registerState.value)))
+
             else -> Unit
         }
     }
@@ -176,26 +170,28 @@ class AuthenticationViewModel @Inject constructor(
             is AuthEvent.OnLogin -> viewModelScope.launch {
                 val salt = BCrypt.gensalt()
                 val hashedPassword = BCrypt.hashpw(event.password, salt)
-                val user: User? =  authRepository.login(event.email, hashedPassword)
+                val user: User? = authRepository.login(event.email, hashedPassword)
                 if (user != null) {
                     userStore.saveUser(user)
                     uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
-                    uiEventDispatcher.sendUiEvent(UiEvent.ShowToast(
-                        message = "You successfully logged in!\n" +
-                                "Your data: {email: ${event.email}, password: ${event.password}}"
-                    ))
-                }
-                    else uiEventDispatcher.sendUiEvent(UiEvent.ShowToast("Неверный логин или пароль"))
+                    uiEventDispatcher.sendUiEvent(
+                        UiEvent.ShowToast(
+                            message = "You successfully logged in!\n" +
+                                    "Your data: {email: ${event.email}, password: ${event.password}}"
+                        )
+                    )
+                } else uiEventDispatcher.sendUiEvent(UiEvent.ShowToast("Неверный логин или пароль"))
             }
 
 
             is AuthEvent.OnRegister -> viewModelScope.launch {
-                uiEventDispatcher.sendUiEvent(UiEvent.ShowToast(
-                    message = "You successfully signed up!\nYour data email: ${event.user.email}}",
-                ))
+                uiEventDispatcher.sendUiEvent(
+                    UiEvent.ShowToast(
+                        message = "You successfully signed up!\nYour data email: ${event.user.email}}",
+                    )
+                )
                 authRepository.register(event.user)
                 userStore.saveUser(event.user)
-
                 uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
             }
 

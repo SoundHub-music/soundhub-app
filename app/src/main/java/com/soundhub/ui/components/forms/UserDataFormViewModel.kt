@@ -14,13 +14,14 @@ import javax.inject.Inject
 class UserDataFormViewModel @Inject constructor(
     private val countryRepository: CountryRepository
 ): ViewModel() {
-    var countryList = MutableStateFlow<List<Country>?>(emptyList())
+    var countryList = MutableStateFlow<List<Country>>(emptyList())
         private set
 
     init {
         viewModelScope.launch {
             val response: Response<List<Country>> = countryRepository.getAllCountryNames()
-            countryList.value = response.body()?.sortedBy { it.name.common }
+            if (response.isSuccessful)
+                countryList.value = response.body()?.sortedBy { it.name.common } ?: emptyList()
 
         }
     }

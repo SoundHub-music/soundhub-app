@@ -9,6 +9,7 @@ import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.UiEventDispatcher
 import com.soundhub.data.repository.CountryRepository
+import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.repository.implementations.AuthRepositoryImpl
 import com.soundhub.utils.Constants
 import dagger.Module
@@ -94,7 +95,25 @@ object AppModule {
 
     @Provides
     @Singleton
+    @Named("musicbrainz_api")
+    fun providesMusicBrainzRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.MUSICBRAINZ_API)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun providesCountryRepository(@Named("country_api") retrofit: Retrofit): CountryRepository {
         return retrofit.create(CountryRepository::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun providesMusicRepository(@Named("musicbrainz_api") retrofit: Retrofit): MusicRepository {
+        return retrofit.create(MusicRepository::class.java)
+    }
+
 }

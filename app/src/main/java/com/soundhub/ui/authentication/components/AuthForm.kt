@@ -24,22 +24,25 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.state.AuthFormState
+import com.soundhub.utils.Validator
 
 @Composable
 fun AuthForm(
@@ -48,17 +51,19 @@ fun AuthForm(
 ) {
     val density: Density = LocalDensity.current
     val context: Context = LocalContext.current
-    val authFormState: State<AuthFormState> = authViewModel.authFormState.collectAsState()
-    var buttonFormText: String = if (authFormState.value.isRegisterForm) stringResource(id = R.string.auth_button_register_name)
+
+    val authFormState = authViewModel.authFormState.collectAsState().value
+    var buttonFormText: String = if (authFormState.isRegisterForm)
+        stringResource(id = R.string.auth_button_register_name)
     else stringResource(id = R.string.auth_button_login_name)
 
     // if bottom sheet is hidden typed data are deleted
     if (isBottomSheetHidden) authViewModel.resetAuthFormState()
-    if (!authFormState.value.isRegisterForm) authViewModel.resetRepeatedPassword()
+    if (!authFormState.isRegisterForm) authViewModel.resetRepeatedPassword()
 
     // it works every time when isRegisterForm variable is changed
-    LaunchedEffect(key1 = authFormState.value.isRegisterForm) {
-        buttonFormText = if (authFormState.value.isRegisterForm)
+    LaunchedEffect(key1 = authFormState.isRegisterForm) {
+        buttonFormText = if (authFormState.isRegisterForm)
             context.getString(R.string.auth_button_register_name)
         else context.getString(R.string.auth_button_login_name)
     }
@@ -73,13 +78,13 @@ fun AuthForm(
         // email field
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = authFormState.value.email,
+            value = authFormState.email,
             singleLine = true,
-            onValueChange = { value -> authViewModel.setEmail(value) },
-            label = { Text("Email") },
-            isError = !authFormState.value.isEmailValid,
+            onValueChange = authViewModel::setEmail,
+            label = { Text(stringResource(id = R.string.email_label)) },
+            isError = !authFormState.isEmailValid,
             supportingText = {
-                if (!authFormState.value.isEmailValid)
+                if (!authFormState.isEmailValid)
                     Text(
                         text = stringResource(id = R.string.invalid_email),
                         color = MaterialTheme.colorScheme.error
@@ -93,19 +98,19 @@ fun AuthForm(
         // password field
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = authFormState.value.password,
+            value = authFormState.password,
             singleLine = true,
-            onValueChange = { value -> authViewModel.setPassword(value) },
+            onValueChange = authViewModel::setPassword,
             label = { Text(stringResource(id = R.string.password_label)) },
-            isError = !authFormState.value.isPasswordValid || !authFormState.value.arePasswordsEqual,
+            isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
             visualTransformation = PasswordVisualTransformation(),
             placeholder = { Text(stringResource(R.string.password_placeholder)) },
-            supportingText = { ErrorPasswordFieldColumn(authFormState.value) }
+            supportingText = { ErrorPasswordFieldColumn(authFormState) }
         )
 
         // repeat password field
         AnimatedVisibility(
-            visible = authFormState.value.isRegisterForm,
+            visible = authFormState.isRegisterForm,
             enter = slideInVertically(initialOffsetY = { with(density) { -40.dp.roundToPx() } }) +
                     expandVertically(expandFrom = Alignment.Top) +
                     fadeIn(initialAlpha = 0.3f),
@@ -115,14 +120,14 @@ fun AuthForm(
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = authFormState.value.repeatedPassword ?: "",
+                value = authFormState.repeatedPassword ?: "",
                 singleLine = true,
-                onValueChange = { value -> authViewModel.setRepeatedPassword(value) },
+                onValueChange = authViewModel::setRepeatedPassword,
                 label = { Text(stringResource(id = R.string.repeat_password_label)) },
-                isError = !authFormState.value.isPasswordValid || !authFormState.value.arePasswordsEqual,
+                isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
                 visualTransformation = PasswordVisualTransformation(),
                 placeholder = { Text(stringResource(R.string.password_placeholder)) },
-                supportingText = { ErrorPasswordFieldColumn(authFormState.value) }
+                supportingText = { ErrorPasswordFieldColumn(authFormState) }
             )
         }
 
@@ -131,8 +136,8 @@ fun AuthForm(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Switch(
-                checked = authFormState.value.isRegisterForm,
-                onCheckedChange = { state -> authViewModel.onAuthTypeSwitchChange(state) }
+                checked = authFormState.isRegisterForm,
+                onCheckedChange = authViewModel::setAuthFormType
             )
             Text(
                 text = stringResource(R.string.get_account_switch_label),
@@ -147,13 +152,20 @@ fun AuthForm(
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(),
             onClick = { authViewModel.authAction() },
-            enabled = authViewModel.validateAuthForm()
-        ) { Text(text = buttonFormText) }
+            enabled = Validator.validateAuthForm(authFormState)
+        ) {
+            Text(
+                text = buttonFormText,
+                fontFamily = FontFamily(Font(R.font.nunito_bold)),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
 @Composable
-fun ErrorPasswordFieldColumn(authFormState: AuthFormState) {
+private fun ErrorPasswordFieldColumn(authFormState: AuthFormState) {
     Column {
         if (!authFormState.isPasswordValid)
             Text(

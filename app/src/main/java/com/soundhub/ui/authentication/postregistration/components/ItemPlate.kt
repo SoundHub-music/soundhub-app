@@ -1,6 +1,8 @@
 package com.soundhub.ui.authentication.postregistration.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,17 +33,32 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 
 @Composable
-fun ItemPlate(modifier: Modifier = Modifier, caption: String, icon: Painter) {
+fun ItemPlate(
+    modifier: Modifier = Modifier,
+    caption: String, icon: Painter,
+    onClick: (Boolean) -> Unit = {}
+) {
+    var isItemChosen by rememberSaveable { mutableStateOf(false) }
+    var itemBoxModifier: Modifier = Modifier
+        .width(72.dp)
+        .height(72.dp)
+        .clip(shape = RoundedCornerShape(16.dp))
+        .clickable {
+            isItemChosen = !isItemChosen
+            onClick(isItemChosen)
+        }
+
+    if (isItemChosen)
+        itemBoxModifier = itemBoxModifier
+            .border(5.dp, MaterialTheme.colorScheme.primary)
+
     Column (
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box (
-            modifier = Modifier
-                .width(72.dp)
-                .height(72.dp)
-                .clip(shape = RoundedCornerShape(16.dp))
+            modifier = itemBoxModifier
         ) {
             Image(
                 painter = icon,

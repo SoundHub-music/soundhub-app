@@ -1,12 +1,33 @@
 package com.soundhub.ui.messenger
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.soundhub.ui.components.ContentContainer
+import com.soundhub.ui.messenger.components.ConversationItem
+import com.soundhub.ui.messenger.components.ConversationList
 
 @Composable
 fun MessengerScreen() {
+    val conversations = listOf(
+        ConversationItem(
+            "Name",
+            "LastName",
+            "last message"
+        ),
+
+        ConversationItem(
+            "Name",
+            "LastName",
+            "last message"
+        ),
+
+        ConversationItem(
+            "Name",
+            "LastName",
+            "last message"
+        )
+    )
+
     ContentContainer {
-        Text(text = "This is a messenger screen")
+        ConversationList(conversations = conversations)
     }
 }

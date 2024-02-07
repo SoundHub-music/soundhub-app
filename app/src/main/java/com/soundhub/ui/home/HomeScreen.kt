@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.soundhub.UiEventDispatcher
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
@@ -57,6 +58,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
+    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -73,6 +75,7 @@ fun HomeScreen(
                 currentRoute = currentRoute,
                 topBarTitle = topBarTitle,
                 navController = navController,
+                uiEventDispatcher = uiEventDispatcher
             )
         },
         bottomBar = { NavigationBarBuilder(navController, currentRoute) }
@@ -80,7 +83,7 @@ fun HomeScreen(
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = if (userCreds.value == null)
+            startDestination = if (userCreds.value?.id == null)
                 Route.Authentication.route else Route.Postline.route
         ) {
             composable(Route.Authentication.route) {
@@ -117,37 +120,49 @@ fun HomeScreen(
             }
 
             composable(Route.Postline.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_postline)
-                PostLineScreen()
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_postline)
+                    PostLineScreen()
+                }
             }
 
             composable(Route.Music.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_music)
-                MusicScreen()
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_music)
+                    MusicScreen()
+                }
             }
 
             composable(Route.Messenger.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_messenger)
-                MessengerScreen()
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_messenger)
+                    MessengerScreen()
+                }
             }
 
             composable(Route.Profile.route) {
-                topBarTitle = null
-                ProfileScreen(
-                    authViewModel = authViewModel,
-                    navController = navController,
-                    userCreds = userCreds.value
-                )
+                if (userCreds.value?.id != null) {
+                    topBarTitle = null
+                    ProfileScreen(
+                        authViewModel = authViewModel,
+                        navController = navController,
+                        userCreds = userCreds.value
+                    )
+                }
             }
 
             composable(Route.Notifications.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_notifications)
-                NotificationScreen(navController)
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_notifications)
+                    NotificationScreen(navController)
+                }
             }
 
             composable(Route.EditUserData.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_edit_profile)
-                EditUserProfileScreen()
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_edit_profile)
+                    EditUserProfileScreen()
+                }
             }
 
             composable(
@@ -159,8 +174,10 @@ fun HomeScreen(
             }
 
             composable(Route.Settings.route) {
-                topBarTitle = stringResource(id = R.string.screen_title_settings)
-                SettingsScreen()
+                if (userCreds.value?.id != null) {
+                    topBarTitle = stringResource(id = R.string.screen_title_settings)
+                    SettingsScreen()
+                }
             }
         }
     }
@@ -172,7 +189,9 @@ private fun TopAppBarBuilder(
     currentRoute: String?,
     topBarTitle: String?,
     navController: NavHostController,
+    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
 ) {
+    var inputValue by rememberSaveable { mutableStateOf("") }
     val topAppBarScreens: List<String> = listOf(
         Route.Settings.route,
         Route.Notifications.route,
@@ -197,6 +216,8 @@ private fun TopAppBarBuilder(
                 )
             }
         )
+
+    // custom top app bar
     else topBarTitle?.let {
         AppHeader(
             modifier = Modifier.padding(0.dp),
@@ -204,7 +225,8 @@ private fun TopAppBarBuilder(
             actionButton = {
                 TopBarButton(
                     currentRoute = currentRoute ?: "",
-                    navController = navController
+                    navController = navController,
+                    uiEventDispatcher = uiEventDispatcher
                 )
             }
         )

@@ -37,6 +37,7 @@ android {
         buildConfigField("String", "SERVER_API", properties.getProperty("SERVER_API"))
         buildConfigField("String", "MOCKOON_API", properties.getProperty("MOCKOON_API"))
         buildConfigField("String", "COUNTRIES_API", properties.getProperty("COUNTRIES_API"))
+        buildConfigField("String", "MUSICBRAINZ_API", properties.getProperty("MUSICBRAINZ_API"))
     }
 
 
@@ -142,7 +143,6 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")
-
 }
 
 kapt {

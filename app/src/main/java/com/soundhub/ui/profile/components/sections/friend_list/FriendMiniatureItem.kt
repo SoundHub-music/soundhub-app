@@ -16,12 +16,12 @@ import com.bumptech.glide.integration.compose.GlideImage
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FriendMiniature(avatarUrl: String? = null) {
+fun FriendMiniatureItem(avatarUrl: String? = null) {
     Box(
         modifier = Modifier
             .size(24.dp)
             .aspectRatio(1f)
-            .background(color = Color.Gray,  shape = CircleShape)
+            .background(color = Color.Gray, shape = CircleShape)
     ) {
         if (avatarUrl != null) {
             GlideImage(

@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.components.NextButton
+import com.soundhub.ui.components.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
 import com.soundhub.utils.Route
 
@@ -53,24 +53,15 @@ fun FillUserDataScreen(
                 onLastNameChange = authViewModel::setLastName,
                 onBirthdayChange = authViewModel::setBirthday,
                 onGenderChange = authViewModel::setGender,
-                onDescriptionChange = authViewModel::setDescription
+                onDescriptionChange = authViewModel::setDescription,
+                onCountryChange = authViewModel::setCountry
             )
         }
 
-        NextButton(
+        FloatingNextButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
-        ) {
-            authViewModel.onPostRegisterNextButtonClick(
-                Route.valueOf(navController.currentDestination?.route)!!
-            )
-        }
+        ) { authViewModel.onPostRegisterNextButtonClick(Route.Authentication.FillUserData) }
     }
 }
-
-//@Composable
-//@Preview
-//fun FillUserDataScreenPreview() {
-//    FillUserDataScreen()
-//}

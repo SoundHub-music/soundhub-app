@@ -50,7 +50,7 @@ fun UserProfileContainer(
     navController: NavHostController
 ) {
     val userCreds = authViewModel.userCreds.collectAsState(initial = null).value
-    val isOriginProfile: Boolean = user?.id?.equals(userCreds?.id) ?: false
+    val isOriginProfile: Boolean = userCreds?.id?.equals(user?.id) ?: false
     val actionProfileButtonContent = if (isOriginProfile)
         stringResource(id = R.string.edit_profile_btn_content)
     else stringResource(id = R.string.write_message_btn_content)
@@ -59,13 +59,13 @@ fun UserProfileContainer(
         Icons.Rounded.Edit
     else Icons.Rounded.MailOutline
 
-    val userLocation: String = getUserLocation(user?.city, user?.country)
+    val userLocation: String = getUserLocation(userCreds?.city, userCreds?.country)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         Column {
-            UserNameWithDescription(user)
+            UserNameWithDescription(userCreds)
             // user location
             if (userLocation.isNotEmpty())
                 Text(
@@ -138,7 +138,7 @@ private fun UserNameWithDescription(user: UserPreferences? = null) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "${user?.firstName} ${user?.lastName}".trimIndent(),
+            text = "${user?.firstName} ${user?.lastName}".trim(),
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             fontSize = 28.sp,

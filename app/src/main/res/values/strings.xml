@@ -8,6 +8,7 @@
     <string name="password_placeholder">Ваш пароль. Не менее 6 символов</string>
     <string name="repeat_password_label">Повторите пароль</string>
     <string name="password_label">Пароль</string>
+    <string name="email_label">Email</string>
 
 <!--    authentication button names-->
     <string name="auth_button_login_name">Войти</string>
@@ -52,9 +53,15 @@
     <string name="registration_firstname_error_message">Имя не может быть пустым</string>
     <string name="registration_lastname_error_message">Фамилия не может быть пустой</string>
     <string name="registration_birthday_error_message">Дата рождения должна быть задана</string>
+    <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
 
 
 <!--    profile screen string constants-->
     <string name="profile_screen_photo_section_caption">Фотографии</string>
+    <string name="profile_screen_friend_section_caption">Друзья</string>
+
+<!--    menu actions-->
+    <string name="menu_action_open_avatar">Открыть фото</string>
+    <string name="menu_action_change_avatar">Обновить аватар</string>
 
 </resources>

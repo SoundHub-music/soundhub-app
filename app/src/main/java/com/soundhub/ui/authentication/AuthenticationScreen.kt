@@ -11,6 +11,7 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -25,7 +26,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.components.BottomSheet
@@ -69,7 +74,15 @@ fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel(
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(),
                     onClick = { scope.launch { onBottomSheetButtonClick(scaffoldState)} }
-                ) { Text(text = stringResource(R.string.lets_start_login_btn)) }
+                ) {
+                    Text(
+                        text = stringResource(R.string.lets_start_login_btn),
+                        fontFamily = FontFamily(Font(R.font.nunito_bold)),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
 
                 BottomSheet(
                     scaffoldState = scaffoldState,

@@ -37,6 +37,12 @@ class MainActivity : ComponentActivity() {
                     val navController: NavHostController = rememberNavController()
                     val context = LocalContext.current
 
+                    navController.addOnDestinationChangedListener {
+                        _, _, _ ->
+                        uiEventDispatcher.setSearchBarActive(false)
+                        Log.d("search_bar", uiEventDispatcher.isSearchBarActive.value.toString())
+                    }
+
                     LaunchedEffect(key1 = uiEventDispatcher.uiEvent) {
                         uiEventDispatcher.uiEvent.collect { event ->
                             Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
@@ -56,12 +62,17 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 is UiEvent.PopBackStack -> navController.popBackStack()
+                                is UiEvent.SearchButtonClick -> uiEventDispatcher.toggleSearchBarActive()
                                 else -> Unit
                             }
                         }
                     }
 
-                    HomeScreen(navController = navController, authViewModel = authViewModel)
+                    HomeScreen(
+                        navController = navController,
+                        authViewModel = authViewModel,
+                        uiEventDispatcher = uiEventDispatcher
+                    )
                 }
             }
         }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -70,19 +71,22 @@ fun PostLineScreen(
     )
 
     ContentContainer {
-        LazyColumn(
-            modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(items = posts, key = { it.id }) { post ->
-                PostCard(
-                    postAuthor = post.postAuthor,
-                    publishDate = post.publishDate,
-                    textContent = post.textContent,
-                    imageContent = post.imageContent,
-                    avatarUrl = post.avatar
-                )
+        if (posts.isEmpty())
+            Text(text = "Здесь все ещё пусто :(")
+        else
+            LazyColumn(
+                modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(items = posts, key = { it.id }) { post ->
+                    PostCard(
+                        postAuthor = post.postAuthor,
+                        publishDate = post.publishDate,
+                        textContent = post.textContent,
+                        imageContent = post.imageContent,
+                        avatarUrl = post.avatar
+                    )
+                }
             }
-        }
     }
 }

@@ -19,6 +19,7 @@ interface IUser {
     var languages: List<String>
     var description: String?
     var gender: Gender
+    var avatarUrl: String?
     var token: String?
 }
 
@@ -32,6 +33,9 @@ data class User(
 
     @ColumnInfo("gender")
     override var gender: Gender = Gender.Unknown,
+
+    @ColumnInfo
+    override var avatarUrl: String? = null,
 
     @ColumnInfo("email")
     override var email: String? = "",

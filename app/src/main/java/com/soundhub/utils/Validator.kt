@@ -1,5 +1,6 @@
 package com.soundhub.utils
 
+import com.soundhub.ui.authentication.state.AuthFormState
 import com.soundhub.ui.authentication.state.RegistrationState
 
 sealed class Validator {
@@ -27,6 +28,20 @@ sealed class Validator {
             return registerState.isFirstNameValid &&
                     registerState.isLastNameValid &&
                     registerState.isBirthdayValid
+        }
+
+        fun validateAuthForm(authFormState: AuthFormState): Boolean {
+            val isLoginFormValid = authFormState.isEmailValid
+                    && authFormState.isPasswordValid
+                    && authFormState.email.isNotEmpty()
+                    && authFormState.password.isNotEmpty()
+
+            if (authFormState.isRegisterForm)
+                return isLoginFormValid
+                        && authFormState.arePasswordsEqual
+                        && authFormState.repeatedPassword?.isNotEmpty() ?: false
+
+            return isLoginFormValid
         }
     }
 }

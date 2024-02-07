@@ -13,5 +13,6 @@ sealed class UiEvent {
         val action: String? = null
     ): UiEvent()
 
+    object SearchButtonClick: UiEvent()
     object Loading: UiEvent()
 }

@@ -35,8 +35,9 @@ fun AvatarPicker(
     onAvatarSelected: (Uri) -> Unit
 ) {
     var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent())
-    { uri ->
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
         uri?.let {
             selectedImageUri = it
             onAvatarSelected(it)
@@ -54,9 +55,7 @@ fun AvatarPicker(
                 .size(150.dp)
                 .clip(CircleShape)
                 .background(Color.Gray)
-                .clickable {
-                    launcher.launch("image/*")
-                },
+                .clickable { launcher.launch("image/*") },
             imageUri = selectedImageUri
         )
     }

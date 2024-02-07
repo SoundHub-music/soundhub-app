@@ -16,8 +16,8 @@ fun ContentContainer(modifier: Modifier = Modifier, content: @Composable () -> U
             .background(MaterialTheme.colorScheme.background)
             .fillMaxWidth()
             .padding(
-                top = 5.dp,
-                bottom = 5.dp,
+                top = 10.dp,
+                bottom = 10.dp,
                 start = 16.dp, end = 16.dp
             )
     ) {

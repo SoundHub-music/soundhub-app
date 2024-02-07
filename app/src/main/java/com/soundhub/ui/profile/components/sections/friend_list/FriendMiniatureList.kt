@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +26,7 @@ fun FriendMiniatureList(friendList: List<FriendItem>) {
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = "Друзья",
+                text = stringResource(id = R.string.profile_screen_friend_section_caption),
                 fontFamily = FontFamily(Font(R.font.nunito_light)),
                 fontWeight = FontWeight.Light,
                 fontSize = 14.sp
@@ -40,8 +41,8 @@ fun FriendMiniatureList(friendList: List<FriendItem>) {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            friendList.forEach {friend ->
-                FriendMiniature(friend.avatarUrl)
+            friendList.forEach { friend ->
+                FriendMiniatureItem(friend.avatarUrl)
             }
         }
     }

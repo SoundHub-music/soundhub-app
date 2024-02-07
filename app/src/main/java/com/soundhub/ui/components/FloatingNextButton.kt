@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun NextButton(
+fun FloatingNextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -20,8 +20,7 @@ fun NextButton(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         containerColor = MaterialTheme.colorScheme.primary,
-        modifier = modifier
-
+        modifier = modifier,
     ) {
         Icon(
             imageVector = Icons.Rounded.ArrowForward,
@@ -33,5 +32,5 @@ fun NextButton(
 @Preview
 @Composable
 fun NextButtonPreview() {
-    NextButton {}
+    FloatingNextButton {}
 }

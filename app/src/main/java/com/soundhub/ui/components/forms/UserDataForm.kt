@@ -1,7 +1,6 @@
 package com.soundhub.ui.components.forms
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.data.model.Country
 import com.soundhub.data.model.Gender
 import com.soundhub.ui.components.AvatarPicker
 import com.soundhub.ui.components.DatePicker
@@ -63,16 +61,14 @@ fun UserDataForm(
 
 ) {
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
-    val countries = userDataFormViewModel.countryList.collectAsState()
+
+    val countries = userDataFormViewModel.countryList.collectAsState().value
 
     var avatarUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var isGenderDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     var isCountryDropdownExpanded by rememberSaveable {
         mutableStateOf(formState.value.country.isNotEmpty())
     }
-
-    var selectedCountry by rememberSaveable { mutableStateOf<Country?>(null) }
-
 
     Column(
         modifier = Modifier
@@ -110,10 +106,7 @@ fun UserDataForm(
         // gender dropdown menu
         ExposedDropdownMenuBox(
             expanded = isGenderDropdownExpanded,
-            onExpandedChange = {
-                isGenderDropdownExpanded = !isGenderDropdownExpanded
-            },
-            modifier = Modifier.fillMaxWidth(0.4f)
+            onExpandedChange = { isGenderDropdownExpanded = !isGenderDropdownExpanded },
         ) {
             OutlinedTextField(
                 value = formState.value.gender.value,
@@ -121,11 +114,11 @@ fun UserDataForm(
                 label = { Text(text = stringResource(R.string.dropdown_label_gender)) },
                 readOnly = true,
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = isGenderDropdownExpanded
-                    )
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
                 },
-                modifier = Modifier.menuAnchor()
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
             )
 
             ExposedDropdownMenu(
@@ -147,6 +140,7 @@ fun UserDataForm(
             }
         }
 
+        // country field
         ExposedDropdownMenuBox(
             expanded = isCountryDropdownExpanded,
             onExpandedChange = { isCountryDropdownExpanded = !isCountryDropdownExpanded },
@@ -156,14 +150,16 @@ fun UserDataForm(
                 value = formState.value.country,
                 onValueChange = onCountryChange,
                 label = { Text(text = stringResource(id = R.string.text_field_country_placeholder)) },
-                modifier = Modifier.menuAnchor()
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
             )
 
             ExposedDropdownMenu(
                 expanded = isCountryDropdownExpanded,
                 onDismissRequest = { isCountryDropdownExpanded = false }
             ) {
-                countries.value?.forEach {
+                countries.forEach {
                     DropdownMenuItem(
                         text = { Text(text = it.name.common) },
                         onClick = {
