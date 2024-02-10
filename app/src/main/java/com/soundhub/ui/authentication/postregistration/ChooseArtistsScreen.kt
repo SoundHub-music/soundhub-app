@@ -28,7 +28,7 @@ import com.soundhub.R
 import com.soundhub.data.model.Artist
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.components.ItemPlate
-import com.soundhub.ui.components.FloatingNextButton
+import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.utils.Route
 
 @Composable

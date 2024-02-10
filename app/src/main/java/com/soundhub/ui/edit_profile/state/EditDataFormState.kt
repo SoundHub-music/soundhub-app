@@ -1,16 +1,11 @@
-package com.soundhub.ui.authentication.state
+package com.soundhub.ui.edit_profile.state
 
-import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
-import com.soundhub.data.model.Genre
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.forms.IUserDataFormState
 import java.time.LocalDate
-import java.util.UUID
 
-data class RegistrationState(
-    var email: String = "",
-    var password: String = "",
-    var id: UUID = UUID.randomUUID(),
+data class EditDataFormState(
     override var firstName: String? = "",
     override var lastName: String? = "",
     override var gender: Gender = Gender.Unknown,
@@ -19,13 +14,21 @@ data class RegistrationState(
     override var city: String? = "",
     override var languages: List<String> = emptyList(),
     override var description: String? = "",
-    var token: String? = null,
-
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,
-    override var isBirthdayValid: Boolean = true,
-    var isLoading: Boolean = false,
+    override var isBirthdayValid: Boolean = true
 
-    var chosenGenres: MutableList<Genre> = emptyList<Genre>().toMutableList(),
-    var chosenArtists: MutableList<Artist> = emptyList<Artist>().toMutableList()
-) : IUserDataFormState
+): IUserDataFormState {
+    constructor(user: User?): this() {
+        if (user != null) {
+            firstName = user.firstName
+            lastName = user.lastName
+            gender = user.gender
+            country = user.country
+            birthday = user.birthday
+            city = user.city
+            languages = user.languages
+            description = user.description
+        }
+    }
+}

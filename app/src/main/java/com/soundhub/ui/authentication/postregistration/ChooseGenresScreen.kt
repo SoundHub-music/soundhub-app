@@ -32,7 +32,7 @@ import com.soundhub.data.model.Genre
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.components.ItemPlate
 import com.soundhub.ui.components.CircleLoader
-import com.soundhub.ui.components.FloatingNextButton
+import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.utils.Route
 
 @Composable

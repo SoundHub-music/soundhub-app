@@ -4,21 +4,14 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,11 +36,10 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
 import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
-import com.soundhub.ui.components.AppHeader
-import com.soundhub.ui.components.BottomNavigationBar
-import com.soundhub.ui.components.top_bar.TopBarActions
-import com.soundhub.ui.components.top_bar.TopBarButton
+import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.edit_profile.EditUserProfileScreen
+import com.soundhub.ui.components.bars.top.TopAppBarBuilder
+import com.soundhub.ui.messenger_conversation.MessengerChatScreen
 import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.utils.Constants
@@ -78,7 +70,10 @@ fun HomeScreen(
                 uiEventDispatcher = uiEventDispatcher
             )
         },
-        bottomBar = { NavigationBarBuilder(navController, currentRoute) }
+        bottomBar = {
+            if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
+                BottomNavigationBar(navController)
+        }
     ) {
         NavHost(
             modifier = Modifier.padding(it),
@@ -136,8 +131,17 @@ fun HomeScreen(
             composable(Route.Messenger.route) {
                 if (userCreds.value?.id != null) {
                     topBarTitle = stringResource(id = R.string.screen_title_messenger)
-                    MessengerScreen()
+                    MessengerScreen(navController)
                 }
+            }
+
+            composable(
+                route = Route.Messenger.Chat("{${Constants.CHAT_NAV_ARG}}").route,
+                arguments = listOf(navArgument(Constants.CHAT_NAV_ARG) {NavType.StringType})
+            ) { entry ->
+                val chatId = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
+                topBarTitle = "User"
+                MessengerChatScreen(chatId = chatId)
             }
 
             composable(Route.Profile.route) {
@@ -161,7 +165,7 @@ fun HomeScreen(
             composable(Route.EditUserData.route) {
                 if (userCreds.value?.id != null) {
                     topBarTitle = stringResource(id = R.string.screen_title_edit_profile)
-                    EditUserProfileScreen()
+                    EditUserProfileScreen(authViewModel = authViewModel)
                 }
             }
 
@@ -181,66 +185,4 @@ fun HomeScreen(
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopAppBarBuilder(
-    currentRoute: String?,
-    topBarTitle: String?,
-    navController: NavHostController,
-    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
-) {
-    var inputValue by rememberSaveable { mutableStateOf("") }
-    val topAppBarScreens: List<String> = listOf(
-        Route.Settings.route,
-        Route.Notifications.route,
-        Route.EditUserData.route
-    )
-
-    if (topAppBarScreens.contains(currentRoute))
-        TopAppBar(
-            title = { Text(text = topBarTitle ?: "") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = stringResource(id = R.string.btn_description_back)
-                    )
-                }
-            },
-            actions = {
-                TopBarActions(
-                    currentRoute = currentRoute,
-                    navController = navController
-                )
-            }
-        )
-
-    // custom top app bar
-    else topBarTitle?.let {
-        AppHeader(
-            modifier = Modifier.padding(0.dp),
-            pageName = topBarTitle,
-            actionButton = {
-                TopBarButton(
-                    currentRoute = currentRoute ?: "",
-                    navController = navController,
-                    uiEventDispatcher = uiEventDispatcher
-                )
-            }
-        )
-    }
-}
-
-@Composable
-private fun NavigationBarBuilder(navController: NavHostController, currentRoute: String?) {
-    val allowedRoutes: List<String> = listOf(
-        Route.Profile.route,
-        Route.Postline.route,
-        Route.Music.route,
-        Route.Messenger.route
-    )
-    if (currentRoute in allowedRoutes)
-        BottomNavigationBar(navController)
 }

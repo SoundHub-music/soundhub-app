@@ -1,7 +1,6 @@
 package com.soundhub.ui.components.icons
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
@@ -9,16 +8,17 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-@Composable
-fun queueMusicIconRounded(width: Dp = 32.dp, height: Dp = 32.dp): ImageVector {
-    return remember {
-        ImageVector.Builder(
+val Icons.Rounded.QueueMusic: ImageVector
+    get() {
+        if (_queueMusic != null)
+            return _queueMusic!!
+
+        _queueMusic = ImageVector.Builder(
             name = "queue_music",
-            defaultWidth = width,
-            defaultHeight = height,
+            defaultWidth = 32.dp,
+            defaultHeight = 32.dp,
             viewportWidth = 40.0f,
             viewportHeight = 40.0f
         ).apply {
@@ -88,5 +88,8 @@ fun queueMusicIconRounded(width: Dp = 32.dp, height: Dp = 32.dp): ImageVector {
                 close()
             }
         }.build()
+
+        return _queueMusic!!
     }
-}
+
+private var _queueMusic: ImageVector? = null

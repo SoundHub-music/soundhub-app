@@ -1,4 +1,4 @@
-package com.soundhub.ui.components
+package com.soundhub.ui.components.buttons
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons

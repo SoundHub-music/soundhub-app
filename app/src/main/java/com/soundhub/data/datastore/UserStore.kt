@@ -81,6 +81,21 @@ class UserStore(private val context: Context) {
         }
     }
 
+    fun getUser(): Flow<User> {
+        return context.dataStore.data.map {
+            pref ->
+            User(
+                id = runCatching { UUID.fromString(pref[PreferenceKeys.userId]) }
+                    .getOrElse { UUID.randomUUID() },
+                firstName = pref[PreferenceKeys.firstName],
+                lastName = pref[PreferenceKeys.lastName],
+                city = pref[PreferenceKeys.city],
+                country = pref[PreferenceKeys.country],
+                email = pref[PreferenceKeys.email]
+            )
+        }
+    }
+
     fun getData(key: Preferences.Key<String>): Flow<String?> {
         return context.dataStore.data.map { pref -> pref[key] }
     }

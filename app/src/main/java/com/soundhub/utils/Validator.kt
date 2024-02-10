@@ -21,8 +21,8 @@ sealed class Validator {
         }
 
         fun validateRegistrationState(registerState: RegistrationState): Boolean {
-            registerState.isFirstNameValid = registerState.firstName.isNotEmpty()
-            registerState.isLastNameValid = registerState.lastName.isNotEmpty()
+            registerState.isFirstNameValid = registerState.firstName?.isNotEmpty() ?: false
+            registerState.isLastNameValid = registerState.lastName?.isNotEmpty() ?: false
             registerState.isBirthdayValid = registerState.birthday != null
 
             return registerState.isFirstNameValid &&

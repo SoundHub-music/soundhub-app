@@ -15,7 +15,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UiEventDispatcher @Inject constructor(private val userDataStore: UserStore) : ViewModel() {
+class UiEventDispatcher @Inject constructor(
+    private val userDataStore: UserStore
+) : ViewModel() {
     private var _uiEvent = Channel<UiEvent>()
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
     var isSearchBarActive = MutableStateFlow(false)

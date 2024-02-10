@@ -1,4 +1,4 @@
-package com.soundhub.ui.components
+package com.soundhub.ui.components.bars.bottom
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,7 +8,6 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
@@ -28,7 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.soundhub.ui.components.icons.queueMusicIconRounded
+import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.utils.Route
 
 
@@ -54,7 +53,7 @@ fun BottomNavigationBar(navController: NavController) {
                 ambientColor = Color(0x40000000)
             ),
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = Color.Cyan
+        contentColor = MaterialTheme.colorScheme.primary
     ) {
         getNavBarItems().forEach{ item ->
             NavigationBarItem(
@@ -77,18 +76,17 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-private fun getNavBarItems(): List<NavigationItemApp> {
+private fun getNavBarItems(): List<NavBarItem> {
     return listOf(
-        NavigationItemApp(
+        NavBarItem(
             route = Route.Postline,
             icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
         ),
-        NavigationItemApp(
+        NavBarItem(
             route = Route.Music,
-            icon = { Icon(queueMusicIconRounded(), contentDescription = "Music") },
+            icon = { Icon(Icons.Rounded.QueueMusic, contentDescription = "Music") },
         ),
-        NavigationItemApp(
+        NavBarItem(
             route = Route.Messenger,
             icon = {
                 BadgedBox(badge = { Badge { Text(text = "5") } }) {
@@ -96,14 +94,14 @@ private fun getNavBarItems(): List<NavigationItemApp> {
                 }
             },
         ),
-        NavigationItemApp(
+        NavBarItem(
             route = Route.Profile,
             icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
         )
     )
 }
 
-data class NavigationItemApp(
+data class NavBarItem(
     val route: Route = Route.Postline,
     val icon: @Composable () -> Unit,
     val label: String? = "",
