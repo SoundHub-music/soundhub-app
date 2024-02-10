@@ -1,4 +1,4 @@
-package com.soundhub.ui.components
+package com.soundhub.ui.components.bars.top
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.UiEventDispatcher
+import com.soundhub.ui.components.fields.TransparentSearchTextField
 
 @Composable
 fun AppHeader(
@@ -40,51 +41,50 @@ fun AppHeader(
     val isTopAppBarPressed = uiEventDispatcher.isSearchBarActive.collectAsState().value
     var inputValue by rememberSaveable { mutableStateOf("") }
 
-    if (isTopAppBarPressed)
-        SearchTextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
-            modifier = Modifier.padding(10.dp)
-        )
-    else
-        Row(
-            modifier = modifier
-                .height(60.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .shadow(
-                    elevation = 4.dp,
-                    spotColor = Color(0x40000000),
-                    ambientColor = Color(0x40000000)
-                )
-                .padding(5.dp),
+    Row(
+        modifier = modifier
+            .height(60.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .shadow(
+                elevation = 4.dp,
+                spotColor = Color(0x40000000),
+                ambientColor = Color(0x40000000)
+            )
+            .padding(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (isTopAppBarPressed)
+            TransparentSearchTextField(
+                value = inputValue,
+                onValueChange = { inputValue = it },
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        else Row(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Image(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(40.dp),
-                        painter = painterResource(id = R.drawable.soundhub_logo),
-                        contentDescription = "app logo"
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Image(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp),
+                    painter = painterResource(id = R.drawable.soundhub_logo),
+                    contentDescription = "app logo"
+                )
+                if (pageName != null)
+                    Text(
+                        text = pageName,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
                     )
-                    if (pageName != null)
-                        Text(
-                            text = pageName,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp,
-                        )
-                }
-                actionButton()
             }
+            actionButton()
         }
+    }
 }

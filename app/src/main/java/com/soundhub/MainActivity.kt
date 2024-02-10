@@ -37,10 +37,9 @@ class MainActivity : ComponentActivity() {
                     val navController: NavHostController = rememberNavController()
                     val context = LocalContext.current
 
-                    navController.addOnDestinationChangedListener {
-                        _, _, _ ->
+                    navController.addOnDestinationChangedListener { controller, destination, _ ->
                         uiEventDispatcher.setSearchBarActive(false)
-                        Log.d("search_bar", uiEventDispatcher.isSearchBarActive.value.toString())
+                        Log.d("nav", destination.route.toString())
                     }
 
                     LaunchedEffect(key1 = uiEventDispatcher.uiEvent) {

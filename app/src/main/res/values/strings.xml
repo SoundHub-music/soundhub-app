@@ -45,6 +45,7 @@
     <string name="dropdown_label_gender">Пол</string>
     <string name="gender_item_female">Женский</string>
     <string name="gender_item_male">Мужской</string>
+    <string name="gender_item_unknown">Не указан</string>
     <string name="text_field_country_placeholder">Страна</string>
 
     <string name="btn_description_back">Назад</string>
@@ -63,5 +64,11 @@
 <!--    menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
     <string name="menu_action_change_avatar">Обновить аватар</string>
+
+
+<!--    chat menu actions-->
+    <string name="chat_menu_open_profile">Открыть профиль</string>
+    <string name="chat_menu_search">Поиск</string>
+    <string name="chat_menu_delete_history">Удалить историю</string>
 
 </resources>

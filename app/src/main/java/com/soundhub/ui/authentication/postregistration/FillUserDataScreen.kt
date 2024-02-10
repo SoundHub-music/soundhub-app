@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.components.FloatingNextButton
+import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
 import com.soundhub.utils.Route
 

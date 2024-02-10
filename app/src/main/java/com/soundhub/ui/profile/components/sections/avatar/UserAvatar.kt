@@ -41,7 +41,7 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.utils.Route
 
 @Composable
-fun UserAvatar(
+internal fun UserAvatar(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     userCreds: UserPreferences?

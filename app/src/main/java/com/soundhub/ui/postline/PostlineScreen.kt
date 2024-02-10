@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.data.model.Post
-import com.soundhub.ui.components.ContentContainer
+import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.postline.components.PostCard
 
 @Composable

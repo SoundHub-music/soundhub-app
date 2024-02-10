@@ -75,26 +75,28 @@ fun UserProfileContainer(
                 )
         }
 
-        FilledTonalButton(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(),
-            onClick = { navController.navigate(Route.EditUserData.route) }
-        ) {
-            Row(
-                modifier = Modifier.height(30.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Row() {
+            FilledTonalButton(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(),
+                onClick = { navController.navigate(Route.EditUserData.route) }
             ) {
-                Icon(
-                    imageVector = profileActionButtonIcon,
-                    contentDescription = "profile_action_button_icon"
-                )
-                Text(
-                    text = actionProfileButtonContent,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
+                Row(
+                    modifier = Modifier.height(30.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = profileActionButtonIcon,
+                        contentDescription = "profile_action_button_icon"
+                    )
+                    Text(
+                        text = actionProfileButtonContent,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
 

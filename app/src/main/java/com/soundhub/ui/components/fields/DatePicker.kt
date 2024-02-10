@@ -1,4 +1,4 @@
-package com.soundhub.ui.components
+package com.soundhub.ui.components.fields
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -48,10 +49,14 @@ fun DatePicker(
 
     OutlinedTextField(
         label = { Text(text = label) },
-        onValueChange = { onValueChange(it) },
+        onValueChange = onValueChange,
         value = currentDate,
-        enabled = false,
-        modifier = modifier.clickable { dialog.show() },
+        readOnly = true,
+        modifier = modifier.clickable { dialog.show() }
+            .onFocusChanged {
+                if (it.isFocused)
+                    dialog.show()
+            },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         supportingText = supportingText,

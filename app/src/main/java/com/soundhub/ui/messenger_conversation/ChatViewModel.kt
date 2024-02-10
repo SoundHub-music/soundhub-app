@@ -5,5 +5,5 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MessengerConversationViewModel @Inject constructor(): ViewModel() {
+class ChatViewModel @Inject constructor(): ViewModel() {
 }

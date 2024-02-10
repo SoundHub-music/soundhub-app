@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import java.util.UUID
 
-data class ConversationItem(
+data class ChatItem(
     val firstName: String,
     val lastName: String,
     val lastMessage: String = "",
@@ -20,45 +22,47 @@ data class ConversationItem(
 )
 
 @Composable
-fun ConversationList(
+internal fun ChatList(
     modifier: Modifier = Modifier,
-    conversations: List<ConversationItem> = emptyList()
+    chats: List<ChatItem> = emptyList(),
+    navController: NavHostController
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(top = 5.dp, bottom = 5.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        items(items = conversations, key = { it.id }) {
-            ConversationCard(data = it)
+        items(items = chats, key = { it.id }) {
+            ChatCard(chatItem = it, navController = navController)
         }
     }
 }
 
-
-
 @Composable
 @Preview
-fun ConversationListPreview() {
-    val conversations = listOf(
-        ConversationItem(
+fun ChatListPreview() {
+    val navController = rememberNavController()
+
+    val chats = listOf(
+        ChatItem(
             "Name",
             "LastName",
             "last message"
         ),
 
-        ConversationItem(
+        ChatItem(
             "Name",
             "LastName",
             "last message"
         ),
 
-        ConversationItem(
+        ChatItem(
             "Name",
             "LastName",
             "last message"
         )
     )
 
-    ConversationList(conversations = conversations)
+    ChatList(chats = chats, navController = navController)
 }

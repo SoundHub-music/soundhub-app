@@ -1,4 +1,4 @@
-package com.soundhub.ui.components.top_bar
+package com.soundhub.ui.components.bars.top
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -10,7 +10,7 @@ import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
 import com.soundhub.utils.Route
 
 @Composable
-fun TopBarButton(
+fun DynamicCustomTopBarButton(
     currentRoute: String?,
     navController: NavHostController,
     uiEventDispatcher: UiEventDispatcher = hiltViewModel()
@@ -19,6 +19,6 @@ fun TopBarButton(
         Route.Postline.route -> PostlineNotificationTopBarButton(navController)
         Route.Music.route -> MusicSearchTopBarButton(uiEventDispatcher)
         Route.Messenger.route -> MessengerSearchTopBarButton(uiEventDispatcher)
-        else -> Unit
+        else -> {}
     }
 }
