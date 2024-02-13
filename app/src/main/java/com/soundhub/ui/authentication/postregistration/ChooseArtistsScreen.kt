@@ -37,6 +37,7 @@ fun ChooseArtistsScreen(
     navController: NavHostController
 ) {
     val artists = emptyList<Artist>()
+    val postRegistrationViewModel: PostRegistrationViewModel = hiltViewModel()
 
     Box(
         modifier = Modifier
@@ -67,8 +68,8 @@ fun ChooseArtistsScreen(
                             icon = painterResource(id = R.drawable.musical_note),
                             onClick = { isChosen ->
                                 if (isChosen)
-                                    authViewModel.setChosenArtists(artist)
-                                else authViewModel.setChosenArtists(
+                                    postRegistrationViewModel.setChosenArtists(artist)
+                                else postRegistrationViewModel.setChosenArtists(
                                      artists.filter { it.id != artist.id }.toMutableList()
                                 )
                             }

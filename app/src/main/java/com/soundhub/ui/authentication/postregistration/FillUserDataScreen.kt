@@ -44,7 +44,8 @@ fun FillUserDataScreen(
                text = stringResource(id = R.string.screen_title_fill_user_data),
                fontWeight = FontWeight.Black,
                fontFamily = FontFamily(Font(R.font.nunito_black)),
-               fontSize = 32.sp
+               fontSize = 32.sp,
+               lineHeight = 42.sp
            )
 
             UserDataForm(
@@ -54,7 +55,8 @@ fun FillUserDataScreen(
                 onBirthdayChange = authViewModel::setBirthday,
                 onGenderChange = authViewModel::setGender,
                 onDescriptionChange = authViewModel::setDescription,
-                onCountryChange = authViewModel::setCountry
+                onCountryChange = authViewModel::setCountry,
+                onCityChange = authViewModel::setCity
             )
         }
 

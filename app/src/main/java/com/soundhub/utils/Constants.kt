@@ -30,11 +30,20 @@ object Constants {
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
     const val CHAT_NAV_ARG = "chatId"
+    const val GALLERY_NAV_ARG = "urls"
 
-    val ROUTES_WITH_NATIVE_TOP_APP_BAR: List<String> = listOf(
-        Route.Settings.route,
-        Route.Notifications.route,
-        Route.EditUserData.route,
+    val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
+        Route.Postline.route,
+        Route.Music.route,
+        Route.Messenger.route
+    )
+
+    val ROUTE_WITHOUT_TOP_APP_BAR: List<String> = listOf(
+        Route.Authentication.route,
+        Route.Authentication.ChooseGenres.route,
+        Route.Authentication.ChooseArtists.route,
+        Route.Authentication.FillUserData.route,
+        Route.Profile.route
     )
 
     val ROUTES_WITH_BOTTOM_BAR: List<String> = listOf(

@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val uiEventDispatcher: UiEventDispatcher by viewModels()
+    private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val authViewModel: AuthenticationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,13 +37,18 @@ class MainActivity : ComponentActivity() {
                     val navController: NavHostController = rememberNavController()
                     val context = LocalContext.current
 
-                    navController.addOnDestinationChangedListener { controller, destination, _ ->
-                        uiEventDispatcher.setSearchBarActive(false)
-                        Log.d("nav", destination.route.toString())
+                    navController.addOnDestinationChangedListener { _, _, _ ->
+                        uiStateDispatcher.setSearchBarActive(false)
                     }
 
-                    LaunchedEffect(key1 = uiEventDispatcher.uiEvent) {
-                        uiEventDispatcher.uiEvent.collect { event ->
+                    LaunchedEffect(key1 = authViewModel.registerState) {
+                        authViewModel.registerState.collect {
+                            Log.d("register_state", authViewModel.registerState.value.toString())
+                        }
+                    }
+
+                    LaunchedEffect(key1 = uiStateDispatcher.uiEvent) {
+                        uiStateDispatcher.uiEvent.collect { event ->
                             Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
                             when (event) {
                                 is UiEvent.ShowToast -> Toast.makeText(
@@ -61,7 +66,7 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 is UiEvent.PopBackStack -> navController.popBackStack()
-                                is UiEvent.SearchButtonClick -> uiEventDispatcher.toggleSearchBarActive()
+                                is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
                                 else -> Unit
                             }
                         }
@@ -70,7 +75,7 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(
                         navController = navController,
                         authViewModel = authViewModel,
-                        uiEventDispatcher = uiEventDispatcher
+                        uiStateDispatcher = uiStateDispatcher
                     )
                 }
             }

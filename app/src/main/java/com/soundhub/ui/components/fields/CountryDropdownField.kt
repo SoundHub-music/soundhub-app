@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.fields
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -7,6 +8,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
+import com.soundhub.data.model.Country
 import com.soundhub.ui.components.forms.IUserDataFormState
 import com.soundhub.ui.components.forms.UserDataFormViewModel
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,11 +31,16 @@ fun CountryDropdownField(
     onCountryChange: (String) -> Unit = {},
     userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 ) {
-    var isCountryDropdownExpanded by rememberSaveable {
-        mutableStateOf(formState.value.country?.isNotEmpty() ?: false)
-    }
+    var isCountryDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
-    val countries = userDataFormViewModel.countryList.collectAsState().value
+    val countries: List<Country> = userDataFormViewModel.countryList.collectAsState().value
+    val isLoading = userDataFormViewModel.isLoading.collectAsState().value
+    var filteredCountries: List<Country> by rememberSaveable { mutableStateOf(countries) }
+
+    LaunchedEffect(key1 = isLoading, key2 = countries) {
+        filteredCountries = countries
+        Log.d("countries", countries.toString())
+    }
 
     ExposedDropdownMenuBox(
         expanded = isCountryDropdownExpanded,
@@ -40,8 +49,14 @@ fun CountryDropdownField(
     ) {
         OutlinedTextField(
             value = formState.value.country ?: "",
-            onValueChange = onCountryChange,
-            label = { Text(text = stringResource(id = R.string.text_field_country_placeholder)) },
+            onValueChange = { c ->
+                onCountryChange(c)
+                filteredCountries = countries.filter {
+                    it.translations.rus.common.lowercase(Locale.ROOT)
+                        .startsWith(c.lowercase(Locale.ROOT))
+                }
+            },
+            label = { Text(text = stringResource(id = R.string.text_field_country_label)) },
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth()
@@ -51,11 +66,11 @@ fun CountryDropdownField(
             expanded = isCountryDropdownExpanded,
             onDismissRequest = { isCountryDropdownExpanded = false }
         ) {
-            countries.forEach {
+            filteredCountries.forEach {
                 DropdownMenuItem(
-                    text = { Text(text = it.name.common) },
+                    text = { Text(text = it.translations.rus.common) },
                     onClick = {
-                        onCountryChange(it.name.common)
+                        onCountryChange(it.translations.rus.common)
                         isCountryDropdownExpanded = false
                     }
                 )

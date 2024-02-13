@@ -7,11 +7,12 @@ import com.soundhub.BuildConfig
 import com.soundhub.data.RoomUserDatabase
 import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.repository.AuthRepository
-import com.soundhub.UiEventDispatcher
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.repository.implementations.AuthRepositoryImpl
 import com.soundhub.utils.Constants
+import com.soundhub.utils.CustomLoggingInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +43,8 @@ object AppModule {
     @Singleton
     fun providesUiEventDispatcher(
         userStore: UserStore,
-    ): UiEventDispatcher {
-        return UiEventDispatcher(userStore)
+    ): UiStateDispatcher {
+        return UiStateDispatcher(userStore)
     }
 
 
@@ -67,6 +68,7 @@ object AppModule {
 
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(CustomLoggingInterceptor())
             .build()
     }
 
@@ -87,7 +89,7 @@ object AppModule {
     @Named("country_api")
     fun providesCountryApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://restcountries.com/v3.1/")
+            .baseUrl(BuildConfig.COUNTRIES_API)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

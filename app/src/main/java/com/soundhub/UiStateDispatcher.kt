@@ -14,15 +14,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class UIState(
+    var isSearchBarActive: Boolean = false,
+    var searchBarText: String = "",
+    var galleryUrls: List<String> = emptyList()
+)
+
 @HiltViewModel
-class UiEventDispatcher @Inject constructor(
+class UiStateDispatcher @Inject constructor(
     private val userDataStore: UserStore
 ) : ViewModel() {
     private var _uiEvent = Channel<UiEvent>()
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
-    var isSearchBarActive = MutableStateFlow(false)
-        private set
-    var searchBarText = MutableStateFlow("")
+
+    var uiState = MutableStateFlow(UIState())
         private set
 
     init {
@@ -38,9 +43,23 @@ class UiEventDispatcher @Inject constructor(
         }
     }
 
-    fun toggleSearchBarActive() = isSearchBarActive.update { !isSearchBarActive.value }
-    fun setSearchBarActive(value: Boolean) { isSearchBarActive.value = value }
-    fun updateSearchBarText(value: String) = searchBarText.update { value }
+    fun clearState() = uiState.update { UIState() }
+
+    fun toggleSearchBarActive() = uiState.update {
+        it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")
+    }
+
+    fun setSearchBarActive(value: Boolean) = uiState.update {
+        it.copy(isSearchBarActive = value, searchBarText = "")
+    }
+
+    fun updateSearchBarText(value: String) = uiState.update {
+        it.copy(searchBarText = value)
+    }
+
+    fun setGalleryUrls(value: List<String>) = uiState.update {
+        it.copy(galleryUrls = value)
+    }
 
     fun sendUiEvent(event: UiEvent) = viewModelScope.launch { _uiEvent.send(event) }
 }

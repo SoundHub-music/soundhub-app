@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Face
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.utils.Route
@@ -44,12 +44,13 @@ import com.soundhub.utils.Route
 internal fun UserAvatar(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
     userCreds: UserPreferences?
 ) {
+    // temporary avatar
     val avatar: Painter = painterResource(id = R.drawable.header)
-    var isAvatarMenuExpanded by rememberSaveable { mutableStateOf(false) }
-
     var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var isAvatarMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     val changeAvatarLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -72,32 +73,19 @@ internal fun UserAvatar(
                 .clickable { isAvatarMenuExpanded = !isAvatarMenuExpanded }
         )
 
-        Box(
-            modifier = Modifier
-                .offset()
-                .align(Alignment.Center)
-        ) {
-            DropdownMenu(
-                expanded = isAvatarMenuExpanded,
-                onDismissRequest = { isAvatarMenuExpanded = false },
-                modifier = Modifier
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(id = R.string.menu_action_open_avatar)) },
-                    leadingIcon = { Icon(imageVector = Icons.Rounded.Face, contentDescription = "open_avatar") },
-                    onClick = { isAvatarMenuExpanded = false },
-                )
-
-                DropdownMenuItem(
-                    text = { Text(stringResource(id = R.string.menu_action_change_avatar)) },
-                    leadingIcon = { Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "change_avatar") },
-                    onClick = {
-                        isAvatarMenuExpanded = false
-                        changeAvatarLauncher.launch("image/*")
-                    }
-                )
+        AvatarDropdownMenu(
+            modifier = Modifier.align(Alignment.Center),
+            isAvatarMenuExpanded = isAvatarMenuExpanded,
+            onDismissRequest = { isAvatarMenuExpanded = false },
+            onOpenAvatarOptionClick = {
+                isAvatarMenuExpanded = false
+                /* TODO: make change avatar logic */
+            },
+            onChangeAvatarOptionClick = {
+                isAvatarMenuExpanded = false
+                changeAvatarLauncher.launch("image/*")
             }
-        }
+        )
 
         Row(
             modifier = Modifier
@@ -108,6 +96,38 @@ internal fun UserAvatar(
             IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
             }
+        }
+    }
+}
+
+
+@Composable
+private fun AvatarDropdownMenu(
+    modifier: Modifier = Modifier,
+    isAvatarMenuExpanded: Boolean,
+    onDismissRequest: () -> Unit = {},
+    onOpenAvatarOptionClick: () -> Unit = {},
+    onChangeAvatarOptionClick: () -> Unit = {}
+) {
+    Box(
+        modifier = modifier
+    ) {
+        DropdownMenu(
+            expanded = isAvatarMenuExpanded,
+            onDismissRequest = onDismissRequest,
+            modifier = Modifier
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.menu_action_open_avatar)) },
+                leadingIcon = { Icon(imageVector = Icons.Rounded.Face, contentDescription = "open_avatar") },
+                onClick = onOpenAvatarOptionClick
+            )
+
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.menu_action_change_avatar)) },
+                leadingIcon = { Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "change_avatar") },
+                onClick = onChangeAvatarOptionClick
+            )
         }
     }
 }

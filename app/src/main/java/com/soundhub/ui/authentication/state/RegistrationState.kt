@@ -1,8 +1,6 @@
 package com.soundhub.ui.authentication.state
 
-import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
-import com.soundhub.data.model.Genre
 import com.soundhub.ui.components.forms.IUserDataFormState
 import java.time.LocalDate
 import java.util.UUID
@@ -25,7 +23,4 @@ data class RegistrationState(
     override var isLastNameValid: Boolean = true,
     override var isBirthdayValid: Boolean = true,
     var isLoading: Boolean = false,
-
-    var chosenGenres: MutableList<Genre> = emptyList<Genre>().toMutableList(),
-    var chosenArtists: MutableList<Artist> = emptyList<Artist>().toMutableList()
 ) : IUserDataFormState

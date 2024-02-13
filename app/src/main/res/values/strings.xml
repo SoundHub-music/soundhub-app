@@ -39,21 +39,25 @@
     <string name="screen_title_fill_user_data">Пришло время знакомиться!</string>
 
 <!--    user data form field placeholders-->
-    <string name="text_field_name_placeholder">Имя</string>
-    <string name="text_field_last_name_placeholder">Фамилия</string>
+    <string name="text_field_name_label">Имя</string>
+    <string name="text_field_last_name_label">Фамилия</string>
     <string name="text_field_description_placeholder">Расскажите о себе</string>
     <string name="dropdown_label_gender">Пол</string>
     <string name="gender_item_female">Женский</string>
     <string name="gender_item_male">Мужской</string>
     <string name="gender_item_unknown">Не указан</string>
-    <string name="text_field_country_placeholder">Страна</string>
+    <string name="text_field_country_label">Страна</string>
+    <string name="text_field_city">Город</string>
+    <string name="text_field_birthdate">Дата рождения</string>
 
     <string name="btn_description_back">Назад</string>
 
-<!--    postregistration error messages-->
-    <string name="registration_firstname_error_message">Имя не может быть пустым</string>
-    <string name="registration_lastname_error_message">Фамилия не может быть пустой</string>
-    <string name="registration_birthday_error_message">Дата рождения должна быть задана</string>
+<!--    user data form error messages-->
+    <string name="userform_firstname_error_message">Имя не может быть пустым</string>
+    <string name="userform_lastname_error_message">Фамилия не может быть пустой</string>
+    <string name="userform_birthday_error_message">Дата рождения должна быть задана</string>
+    <string name="userform_invalid_birthday_error_message">Некорректная дата рождения</string>
+
     <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
 
 

@@ -37,14 +37,15 @@ fun UserDataForm(
     onBirthdayChange: (LocalDate?) -> Unit = {},
     onDescriptionChange: (String) -> Unit = {},
     onGenderChange: (String) -> Unit = {},
-    onCountryChange: (String) -> Unit = {}
+    onCountryChange: (String) -> Unit = {},
+    onCityChange: (String) -> Unit = {},
+    userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 ) {
-    val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     var avatarUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     Column(
         modifier = Modifier
-            .padding(start = 20.dp, end = 20.dp)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -53,12 +54,12 @@ fun UserDataForm(
             modifier = Modifier.fillMaxWidth(),
             value = formState.value.firstName ?: "",
             singleLine = true,
-            label = { Text(text = stringResource(id = R.string.text_field_name_placeholder)) },
+            label = { Text(text = stringResource(id = R.string.text_field_name_label)) },
             onValueChange = onFirstNameChange,
             isError = !formState.value.isFirstNameValid,
             supportingText = {
                 if (!formState.value.isFirstNameValid)
-                    Text(text = stringResource(id = R.string.registration_firstname_error_message))
+                    Text(text = stringResource(id = R.string.userform_firstname_error_message))
             }
         )
 
@@ -66,12 +67,12 @@ fun UserDataForm(
             modifier = Modifier.fillMaxWidth(),
             value = formState.value.lastName ?: "",
             singleLine = true,
-            label = { Text(stringResource(id = R.string.text_field_last_name_placeholder)) },
+            label = { Text(stringResource(id = R.string.text_field_last_name_label)) },
             onValueChange = onLastNameChange,
             isError = !formState.value.isLastNameValid,
             supportingText = {
                 if (!formState.value.isLastNameValid)
-                    Text(text = stringResource(id = R.string.registration_lastname_error_message))
+                    Text(text = stringResource(id = R.string.userform_lastname_error_message))
             }
         )
 
@@ -86,10 +87,18 @@ fun UserDataForm(
             userDataFormViewModel = userDataFormViewModel
         )
 
+        if (formState.value.country?.isNotEmpty() == true)
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = stringResource(id = R.string.text_field_city)) },
+                value = formState.value.city ?: "",
+                onValueChange = onCityChange
+            )
+
         DatePicker(
             modifier = Modifier.fillMaxWidth(),
             value = if (formState.value.birthday != null) formState.value.birthday.toString() else "",
-            label = Constants.DATE_FORMAT,
+            label = stringResource(id = R.string.text_field_birthdate),
             onValueChange = { value ->
                 val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
                 onBirthdayChange(date)
@@ -97,7 +106,7 @@ fun UserDataForm(
             isError = !formState.value.isBirthdayValid,
             supportingText = {
                 if (!formState.value.isBirthdayValid)
-                    Text(text = stringResource(id = R.string.registration_birthday_error_message))
+                    Text(text = stringResource(id = R.string.userform_birthday_error_message))
             }
         )
 

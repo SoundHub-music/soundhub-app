@@ -6,13 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.soundhub.UiEventDispatcher
+import com.soundhub.UiStateDispatcher
 
 @Composable
 fun CustomTopAppBar(
     topBarTitle: String?,
     currentRoute: String?,
-    uiEventDispatcher: UiEventDispatcher = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
     navController: NavHostController
 ) {
     topBarTitle?.let {
@@ -23,7 +23,7 @@ fun CustomTopAppBar(
                 DynamicCustomTopBarButton(
                     currentRoute = currentRoute,
                     navController = navController,
-                    uiEventDispatcher = uiEventDispatcher
+                    uiStateDispatcher = uiStateDispatcher
                 )
             }
         )

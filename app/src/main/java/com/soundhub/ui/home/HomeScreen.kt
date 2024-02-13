@@ -31,7 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.soundhub.UiEventDispatcher
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
@@ -39,7 +39,9 @@ import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.edit_profile.EditUserProfileScreen
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
-import com.soundhub.ui.messenger_conversation.MessengerChatScreen
+import com.soundhub.ui.friends.FriendListScreen
+import com.soundhub.ui.gallery.GalleryScreen
+import com.soundhub.ui.messenger_chat.MessengerChatScreen
 import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.utils.Constants
@@ -50,7 +52,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
-    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -67,7 +69,7 @@ fun HomeScreen(
                 currentRoute = currentRoute,
                 topBarTitle = topBarTitle,
                 navController = navController,
-                uiEventDispatcher = uiEventDispatcher
+                uiStateDispatcher = uiStateDispatcher
             )
         },
         bottomBar = {
@@ -117,7 +119,7 @@ fun HomeScreen(
             composable(Route.Postline.route) {
                 if (userCreds.value?.id != null) {
                     topBarTitle = stringResource(id = R.string.screen_title_postline)
-                    PostLineScreen()
+                    PostLineScreen(navController = navController)
                 }
             }
 
@@ -155,6 +157,13 @@ fun HomeScreen(
                 }
             }
 
+            composable(Route.FriendList.route) {
+                if (userCreds.value?.id != null) {
+                    topBarTitle = "Друзья"
+                    FriendListScreen()
+                }
+            }
+
             composable(Route.Notifications.route) {
                 if (userCreds.value?.id != null) {
                     topBarTitle = stringResource(id = R.string.screen_title_notifications)
@@ -182,6 +191,12 @@ fun HomeScreen(
                     topBarTitle = stringResource(id = R.string.screen_title_settings)
                     SettingsScreen()
                 }
+            }
+
+            composable(Route.Gallery.route) {
+                topBarTitle = null
+                val images = uiStateDispatcher.uiState.collectAsState().value.galleryUrls
+                GalleryScreen(images = images)
             }
         }
     }

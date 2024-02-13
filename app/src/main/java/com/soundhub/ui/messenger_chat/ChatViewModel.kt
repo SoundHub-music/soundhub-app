@@ -1,4 +1,4 @@
-package com.soundhub.ui.messenger_conversation
+package com.soundhub.ui.messenger_chat
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

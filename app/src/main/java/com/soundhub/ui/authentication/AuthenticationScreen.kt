@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -46,7 +47,11 @@ fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel(
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scope: CoroutineScope = rememberCoroutineScope()
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        SheetState(initialValue = SheetValue.Hidden, skipPartiallyExpanded = false)
+        SheetState(
+            skipPartiallyExpanded = false,
+            density = LocalDensity.current,
+            initialValue = SheetValue.Hidden
+        )
     )
 
     LaunchedEffect(scaffoldState) {

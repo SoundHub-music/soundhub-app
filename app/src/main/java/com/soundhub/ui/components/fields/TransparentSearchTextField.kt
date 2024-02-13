@@ -21,7 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.soundhub.UiEventDispatcher
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.datastore.UserStore
 import com.soundhub.utils.UiEvent
 
@@ -30,15 +30,11 @@ fun TransparentSearchTextField(
     modifier: Modifier = Modifier,
     value: String = "",
     onValueChange: (String) -> Unit = {},
-    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
 ) {
     TextField(
         modifier = modifier
             .fillMaxWidth(),
-//            .border(
-//                border = BorderStroke(1.dp, Color.Gray),
-//                shape = CircleShape
-//            ),
         value = value,
         onValueChange = onValueChange,
         shape = CircleShape,
@@ -48,7 +44,7 @@ fun TransparentSearchTextField(
         ),
         leadingIcon = { Icon(imageVector = Icons.Rounded.Search, contentDescription = null) },
         trailingIcon = {
-            IconButton(onClick = { uiEventDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }) {
+            IconButton(onClick = { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
             }
        },
@@ -72,6 +68,6 @@ fun SearchTextFieldPreview() {
     TransparentSearchTextField(
         onValueChange = { text = it },
         value = text,
-        uiEventDispatcher = UiEventDispatcher(UserStore(context))
+        uiStateDispatcher = UiStateDispatcher(UserStore(context))
     )
 }

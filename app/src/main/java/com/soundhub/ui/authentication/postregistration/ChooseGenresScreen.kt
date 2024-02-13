@@ -1,5 +1,6 @@
 package com.soundhub.ui.authentication.postregistration
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,13 +42,17 @@ fun ChooseGenresScreen(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val chooseGenreViewModel: ChooseGenreViewModel = hiltViewModel()
-    val genres: List<Genre> = chooseGenreViewModel.genres.collectAsState().value
-    val chosenGenres: List<Genre> = authViewModel.registerState.collectAsState().value.chosenGenres
-    val isLoading: Boolean = chooseGenreViewModel.isLoading.collectAsState().value
+    val postRegistrationViewModel: PostRegistrationViewModel = hiltViewModel()
+    val genres: List<Genre> = postRegistrationViewModel.genres.collectAsState().value
+    val chosenGenres: List<Genre> = postRegistrationViewModel.chosenGenres.collectAsState().value
+    val isLoading: Boolean = postRegistrationViewModel.isLoading.collectAsState().value
 
     val context = LocalContext.current
     val floatingBtnWarningText: String = stringResource(id = R.string.choose_genres_warning)
+
+    LaunchedEffect(key1 = chosenGenres) {
+        Log.d("chosen_genres", chosenGenres.toString())
+    }
 
     Box(
         modifier = Modifier
@@ -67,27 +73,26 @@ fun ChooseGenresScreen(
             )
 
             if (isLoading) CircleLoader()
-            else
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 100.dp),
-                    contentPadding = PaddingValues(all = 10.dp),
-                    content = {
-                        itemsIndexed(genres) { _, plate ->
-                            ItemPlate(
-                                modifier = Modifier.padding(bottom = 20.dp),
-                                caption = plate.name ?: "",
-                                icon = painterResource(id = R.drawable.musical_note),
-                                onClick = { isChosen ->
-                                    if (isChosen) {
-                                        authViewModel.setChosenGenres(plate)
-                                    } else authViewModel.setChosenGenres(
-                                        genres.filter { it.id != plate.id }.toMutableList()
-                                    )
-                                }
-                            )
-                        }
+            else LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 100.dp),
+                contentPadding = PaddingValues(all = 10.dp),
+                content = {
+                    itemsIndexed(genres) { _, plate ->
+                        ItemPlate(
+                            modifier = Modifier.padding(bottom = 20.dp),
+                            caption = plate.name ?: "",
+                            icon = painterResource(id = R.drawable.musical_note),
+                            onClick = { isChosen ->
+                                if (isChosen) {
+                                    postRegistrationViewModel.setChosenGenres(plate)
+                                } else postRegistrationViewModel.setChosenGenres(
+                                    chosenGenres.filter { it.id != plate.id }
+                                )
+                            }
+                        )
                     }
-                )
+                }
+            )
         }
 
         FloatingNextButton(

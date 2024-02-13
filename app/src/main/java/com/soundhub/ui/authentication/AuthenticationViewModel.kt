@@ -8,10 +8,8 @@ import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.ui.authentication.state.AuthFormState
-import com.soundhub.UiEventDispatcher
-import com.soundhub.data.model.Artist
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Gender
-import com.soundhub.data.model.Genre
 import com.soundhub.ui.authentication.state.RegistrationState
 import com.soundhub.utils.Constants
 import com.soundhub.utils.Route
@@ -28,10 +26,11 @@ import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import javax.inject.Inject
 
+// TODO: separate the registration logic
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val uiEventDispatcher: UiEventDispatcher,
+    private val uiStateDispatcher: UiStateDispatcher,
     private val userStore: UserStore
 ) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userStore.getCreds()
@@ -118,25 +117,13 @@ class AuthenticationViewModel @Inject constructor(
 
     fun setCountry(value: String) = registerState.update { it.copy(country = value) }
 
+    fun setCity(value: String) = registerState.update { it.copy(city = value) }
     fun setDescription(value: String) = registerState.update { it.copy(description = value) }
-
-    fun setChosenGenres(list: MutableList<Genre>) = registerState.update {
-        it.copy(chosenGenres = list)
-    }
-
-    fun setChosenGenres(genre: Genre) = registerState.value.chosenGenres.add(genre)
-
-
-    fun setChosenArtists(list: MutableList<Artist>) = registerState.update {
-        it.copy(chosenArtists = list)
-    }
-
-    fun setChosenArtists(artist: Artist) = registerState.value.chosenArtists.add(artist)
 
     fun logout() = viewModelScope.launch {
         Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[logout]: $userCreds")
         userStore.clear()
-        uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
     }
 
     fun authAction() {
@@ -177,36 +164,36 @@ class AuthenticationViewModel @Inject constructor(
                 val user: User? = authRepository.login(event.email, hashedPassword)
                 if (user != null) {
                     userStore.saveUser(user)
-                    uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
-                    uiEventDispatcher.sendUiEvent(
+                    uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                    uiStateDispatcher.sendUiEvent(
                         UiEvent.ShowToast(
                             message = "You successfully logged in!\n" +
                                     "Your data: {email: ${event.email}, password: ${event.password}}"
                         )
                     )
-                } else uiEventDispatcher.sendUiEvent(UiEvent.ShowToast("Неверный логин или пароль"))
+                } else uiStateDispatcher.sendUiEvent(UiEvent.ShowToast("Неверный логин или пароль"))
             }
 
 
             is AuthEvent.OnRegister -> viewModelScope.launch {
-                uiEventDispatcher.sendUiEvent(
+                uiStateDispatcher.sendUiEvent(
                     UiEvent.ShowToast(
                         message = "You successfully signed up!\nYour data email: ${event.user.email}}",
                     )
                 )
                 authRepository.register(event.user)
                 userStore.saveUser(event.user)
-                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
             }
 
             is AuthEvent.OnChooseGenres ->
-                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseGenres))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseGenres))
 
             is AuthEvent.OnChooseArtists ->
-                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseArtists))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseArtists))
 
             is AuthEvent.OnFillUserData ->
-                uiEventDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.FillUserData))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.FillUserData))
         }
     }
 }

@@ -10,10 +10,7 @@ import androidx.compose.ui.unit.dp
 fun ContentContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit = {}) {
     Box(
         modifier = modifier
-            .padding(
-                vertical = 10.dp,
-                horizontal = 16.dp,
-            )
+            .padding(horizontal = 16.dp,)
     ) {
         content()
     }

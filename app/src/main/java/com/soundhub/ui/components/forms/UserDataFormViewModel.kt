@@ -17,11 +17,17 @@ class UserDataFormViewModel @Inject constructor(
     var countryList = MutableStateFlow<List<Country>>(emptyList())
         private set
 
+    var isLoading = MutableStateFlow(false)
+        private set
+
     init {
         viewModelScope.launch {
+            isLoading.value = true
             val response: Response<List<Country>> = countryRepository.getAllCountryNames()
-            if (response.isSuccessful)
-                countryList.value = response.body()?.sortedBy { it.name.common } ?: emptyList()
+            if (response.isSuccessful) {
+                countryList.value = response.body()?.sortedBy { it.translations.rus.common } ?: emptyList()
+                isLoading.value = false
+            }
 
         }
     }

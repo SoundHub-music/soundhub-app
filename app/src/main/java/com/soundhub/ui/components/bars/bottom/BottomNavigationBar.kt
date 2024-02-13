@@ -30,7 +30,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.utils.Route
 
-
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -45,7 +44,7 @@ fun BottomNavigationBar(navController: NavController) {
 
     NavigationBar(
         modifier = Modifier
-            .padding(top = 0.dp, bottom = 10.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 10.dp, bottom = 10.dp, start = 16.dp, end = 16.dp)
             .clip(RoundedCornerShape(16.dp))
             .shadow(
                 elevation = 4.dp,
@@ -53,7 +52,7 @@ fun BottomNavigationBar(navController: NavController) {
                 ambientColor = Color(0x40000000)
             ),
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.primary
+        contentColor = MaterialTheme.colorScheme.primary,
     ) {
         getNavBarItems().forEach{ item ->
             NavigationBarItem(

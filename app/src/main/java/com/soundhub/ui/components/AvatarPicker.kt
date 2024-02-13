@@ -3,6 +3,7 @@ package com.soundhub.ui.components
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -56,30 +57,37 @@ fun AvatarPicker(
                 .clip(CircleShape)
                 .background(Color.Gray)
                 .clickable { launcher.launch("image/*") },
-            imageUri = selectedImageUri
+            imageUrl = selectedImageUri.toString()
         )
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun CircularAvatar(
+fun CircularAvatar(
     modifier: Modifier = Modifier,
-    imageUri: Uri? = null,
+    imageUrl: String? = null,
     contentDescription: String? = null
 ) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        GlideImage(
-            model = imageUri ?: painterResource(id = R.drawable.user),
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
+        if (imageUrl == null)
+            Image(
+                painter = painterResource(id = R.drawable.user),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+            )
+        else
+            GlideImage(
+                model = imageUrl,
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
     }
 }
 

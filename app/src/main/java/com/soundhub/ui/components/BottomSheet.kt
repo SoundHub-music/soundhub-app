@@ -13,14 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
     modifier: Modifier = Modifier,
@@ -28,17 +28,14 @@ fun BottomSheet(
     content: @Composable () -> Unit = {},
     scaffoldState: BottomSheetScaffoldState
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current;
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
-        sheetContent = {
-            sheetContent()
-        }) {
-        content()
-    }
+        sheetContent = { sheetContent() }
+    ) { content() }
 
     if (!scaffoldState.bottomSheetState.isVisible)
         keyboardController?.hide()
@@ -46,7 +43,7 @@ fun BottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 suspend fun onBottomSheetButtonClick(scaffoldState: BottomSheetScaffoldState) {
-    if (!scaffoldState.bottomSheetState.isVisible)
+    if (!scaffoldState.bottomSheetState.isVisible || scaffoldState.bottomSheetState.hasPartiallyExpandedState)
         scaffoldState.bottomSheetState.expand()
     else scaffoldState.bottomSheetState.hide()
 }
@@ -57,8 +54,13 @@ suspend fun onBottomSheetButtonClick(scaffoldState: BottomSheetScaffoldState) {
 fun BottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(
-        SheetState(skipPartiallyExpanded = false, initialValue = SheetValue.Expanded)
+        SheetState(
+            skipPartiallyExpanded = false,
+            density = LocalDensity.current,
+            initialValue = SheetValue.Expanded
+        )
     )
+
     BottomSheet(sheetContent = {
         Row(
             modifier = Modifier.fillMaxWidth(),

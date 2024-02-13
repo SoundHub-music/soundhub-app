@@ -13,10 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.UiEventDispatcher
+import com.soundhub.UiStateDispatcher
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 
 @Composable
@@ -36,10 +32,10 @@ fun AppHeader(
     pageName: String?,
     modifier: Modifier = Modifier,
     actionButton: @Composable () -> Unit,
-    uiEventDispatcher: UiEventDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
 ) {
-    val isTopAppBarPressed = uiEventDispatcher.isSearchBarActive.collectAsState().value
-    var inputValue by rememberSaveable { mutableStateOf("") }
+    val isSearchBarActive = uiStateDispatcher.uiState.collectAsState().value.isSearchBarActive
+    val inputValue = uiStateDispatcher.uiState.collectAsState().value.searchBarText
 
     Row(
         modifier = modifier
@@ -56,10 +52,10 @@ fun AppHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if (isTopAppBarPressed)
+        if (isSearchBarActive)
             TransparentSearchTextField(
                 value = inputValue,
-                onValueChange = { inputValue = it },
+                onValueChange = uiStateDispatcher::updateSearchBarText,
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
         else Row(

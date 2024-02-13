@@ -16,13 +16,19 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.utils.Route
 
 @Composable
-fun ChatTopBarMenu(state: MutableState<Boolean>) {
+fun ChatTopBarMenu(
+    menuState: MutableState<Boolean>,
+    chatId: String?,
+    navController: NavHostController
+) {
     DropdownMenu(
-        expanded = state.value,
-        onDismissRequest = { state.value = false }
+        expanded = menuState.value,
+        onDismissRequest = { menuState.value = false }
     ) {
         DropdownMenuItem(
             text = {
@@ -34,7 +40,10 @@ fun ChatTopBarMenu(state: MutableState<Boolean>) {
                     Text(text = stringResource(id = R.string.chat_menu_open_profile))
                 }
             },
-            onClick = { /*TODO*/ }
+            onClick = {
+                /* TODO: finish the logic */
+                navController.navigate("${Route.Profile}/$chatId")
+            }
         )
 
         DropdownMenuItem(
@@ -47,7 +56,7 @@ fun ChatTopBarMenu(state: MutableState<Boolean>) {
                     Text(text = stringResource(id = R.string.chat_menu_search))
                 }
             },
-            onClick = { /*TODO*/ }
+            onClick = { /* TODO: make search message logic */ }
         )
 
         DropdownMenuItem(
@@ -68,7 +77,7 @@ fun ChatTopBarMenu(state: MutableState<Boolean>) {
                     )
                 }
             },
-            onClick = { /*TODO*/ }
+            onClick = { /* TODO: make delete history logic */ }
         )
     }
 }

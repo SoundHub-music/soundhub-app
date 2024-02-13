@@ -6,6 +6,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
@@ -16,22 +17,21 @@ import com.soundhub.utils.Route
 
 @Composable
 fun TopBarActions(navController: NavHostController) {
-    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val dynamicPartRegex = Regex(Constants.DYNAMIC_PART_ROUTE)
-    var isMenuExpanded = rememberSaveable {
+    val staticRoute: String = dynamicPartRegex.replace(currentRoute ?: "", "")
+    val isMenuExpanded = rememberSaveable {
         mutableStateOf(false)
     }
 
-    when (dynamicPartRegex.replace(currentRoute ?: "", "")) {
+    when (staticRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
                 /* TODO: write logic for saving changes */
                 navController.popBackStack()
-            }) {
-                Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" )
-            }
+            }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
 
         Route.Messenger.Chat.staticDestination -> {
@@ -41,7 +41,11 @@ fun TopBarActions(navController: NavHostController) {
                 Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "options")
             }
 
-            ChatTopBarMenu(state = isMenuExpanded)
+            ChatTopBarMenu(
+                menuState = isMenuExpanded,
+                navController = navController,
+                chatId = currentBackStackEntry?.arguments?.getString(Constants.CHAT_NAV_ARG)
+            )
         }
         else -> {}
     }

@@ -10,7 +10,7 @@ import com.soundhub.utils.converters.StringListConverter
 
 @Database(
     entities = [User::class],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class, DateConverter::class)

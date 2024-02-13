@@ -13,9 +13,12 @@ sealed class Route(val route: String) {
     object Profile: Route(route = "profile")
     object Postline: Route(route = "postline")
     object Music: Route(route = "music")
+    object FriendList: Route(route = "friend_list")
+    object Gallery: Route(route = "gallery")
+
     object Messenger: Route(route = "messenger") {
         data class Chat(
-            val dynamicPart: String? = ""
+            val dynamicPart: String? = "{${Constants.CHAT_NAV_ARG}}"
         ): Route(route = "${Messenger.route}/chat/${dynamicPart}") {
             companion object {
                 val staticDestination: String = "${Messenger.route}/chat"
