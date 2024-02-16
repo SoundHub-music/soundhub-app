@@ -1,6 +1,7 @@
-package com.soundhub.utils
+package com.soundhub
 
 import android.os.Bundle
+import com.soundhub.utils.Constants
 
 sealed class Route(val route: String) {
     object Authentication: Route(route = "authentication") {

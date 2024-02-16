@@ -7,7 +7,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.UiStateDispatcher
-import com.soundhub.utils.UiEvent
+import com.soundhub.UiEvent
 
 @Composable
 fun MusicSearchTopBarButton(uiStateDispatcher: UiStateDispatcher = hiltViewModel()) {

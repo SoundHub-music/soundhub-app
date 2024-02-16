@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +21,7 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.UiStateDispatcher
-import com.soundhub.utils.Route
+import com.soundhub.Route
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
@@ -37,13 +36,6 @@ fun ImageHorizontalPager(
     height: Dp = 300.dp,
     clickable: Boolean = true
 ) {
-    var imageModifier = Modifier.fillMaxSize()
-    if (clickable)
-        imageModifier = imageModifier.clickable {
-            uiStateDispatcher.setGalleryUrls(images)
-            navController?.navigate(Route.Gallery.route)
-        }
-
     HorizontalPager(
         state = pagerState,
         modifier = modifier
@@ -58,15 +50,21 @@ fun ImageHorizontalPager(
                     scaleY = scaleFactor
                 }
                 .alpha(scaleFactor.coerceIn(0f, 1f))
-                .padding(5.dp)
                 .clip(RoundedCornerShape(16.dp))
         ) {
             GlideImage(
                 model = images[page],
                 contentDescription = "Image",
                 contentScale = contentScale,
-                modifier = imageModifier
+                modifier = Modifier
+                    .fillMaxSize()
                     .height(height)
+                    .clickable {
+                        if (clickable) {
+                            uiStateDispatcher.setGalleryUrls(images)
+                            navController?.navigate("${Route.Gallery.route}/${page}")
+                        }
+                    }
                     .alpha(if (pagerState.currentPage == page) 1f else 0.5f)
             )
         }

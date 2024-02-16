@@ -7,7 +7,7 @@ import com.soundhub.UiStateDispatcher
 import com.soundhub.ui.messenger.components.MessengerSearchTopBarButton
 import com.soundhub.ui.music.components.MusicSearchTopBarButton
 import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun DynamicCustomTopBarButton(

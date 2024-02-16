@@ -38,10 +38,10 @@ import com.soundhub.R
 import com.soundhub.UiStateDispatcher
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
-internal fun UserAvatar(
+internal fun ProfileUserAvatar(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
@@ -54,16 +54,14 @@ internal fun UserAvatar(
 
     val changeAvatarLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { selectedImageUri = it }
-    }
+    ) { uri -> uri?.let { selectedImageUri = it } }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.45f)
     ) {
-
+        // TODO: implement GlideImage
         Image(
             painter = avatar,
             contentDescription = "avatar",
@@ -79,7 +77,7 @@ internal fun UserAvatar(
             onDismissRequest = { isAvatarMenuExpanded = false },
             onOpenAvatarOptionClick = {
                 isAvatarMenuExpanded = false
-                /* TODO: make change avatar logic */
+                /* TODO: implement change avatar logic */
             },
             onChangeAvatarOptionClick = {
                 isAvatarMenuExpanded = false

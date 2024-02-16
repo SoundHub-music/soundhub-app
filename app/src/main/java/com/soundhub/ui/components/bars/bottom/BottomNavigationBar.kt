@@ -28,11 +28,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    // plug variable
+    val unreadMessageCount: Int = 1
     var selectedItem: Route by remember {
         mutableStateOf(Route.valueOf(currentRoute) ?: Route.Postline)
     }
@@ -54,7 +56,7 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        getNavBarItems().forEach{ item ->
+        getNavBarItems(unreadMessageCount).forEach{ item ->
             NavigationBarItem(
                 icon = item.icon,
                 selected = selectedItem == item.route,
@@ -75,7 +77,7 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-private fun getNavBarItems(): List<NavBarItem> {
+private fun getNavBarItems(unreadMessageCount: Int = 0): List<NavBarItem> {
     return listOf(
         NavBarItem(
             route = Route.Postline,
@@ -88,9 +90,10 @@ private fun getNavBarItems(): List<NavBarItem> {
         NavBarItem(
             route = Route.Messenger,
             icon = {
-                BadgedBox(badge = { Badge { Text(text = "5") } }) {
-                    Icon(Icons.Rounded.Email, contentDescription = "Messenger")
-                }
+                if (unreadMessageCount != 0)
+                    BadgedBox(badge = { Badge { Text(text = unreadMessageCount.toString()) } }) {
+                        Icon(Icons.Rounded.Email, contentDescription = "Messenger")
+                    }
             },
         ),
         NavBarItem(

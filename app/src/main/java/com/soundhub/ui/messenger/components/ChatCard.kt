@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.components.CircularUserAvatar
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 internal fun ChatCard(

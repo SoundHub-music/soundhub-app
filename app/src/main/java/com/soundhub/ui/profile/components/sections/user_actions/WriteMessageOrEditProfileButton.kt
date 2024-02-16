@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.utils.Route
+import com.soundhub.Route
 import java.util.UUID
 
 @Composable

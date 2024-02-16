@@ -12,8 +12,8 @@ import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Gender
 import com.soundhub.ui.authentication.state.RegistrationState
 import com.soundhub.utils.Constants
-import com.soundhub.utils.Route
-import com.soundhub.utils.UiEvent
+import com.soundhub.Route
+import com.soundhub.UiEvent
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -121,6 +121,7 @@ class AuthenticationViewModel @Inject constructor(
     fun setDescription(value: String) = registerState.update { it.copy(description = value) }
 
     fun logout() = viewModelScope.launch {
+        // TODO: remove password hashing
         Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[logout]: $userCreds")
         userStore.clear()
         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))

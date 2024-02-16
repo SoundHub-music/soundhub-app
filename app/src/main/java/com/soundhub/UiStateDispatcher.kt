@@ -3,8 +3,6 @@ package com.soundhub
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.datastore.UserStore
-import com.soundhub.utils.Route
-import com.soundhub.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

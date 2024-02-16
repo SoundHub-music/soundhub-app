@@ -1,30 +1,79 @@
 package com.soundhub.ui.profile.components.sections.photos
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.R
+import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.profile.components.SectionLabel
+import com.soundhub.Route
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserPhotoCarousel(photos: List<String>) {
+fun UserPhotoCarousel(
+    images: List<String>,
+    navController: NavHostController,
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+) {
     val listState = rememberLazyListState()
+    var newPhotos by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { newPhotos = it }
 
-    Column() {
-        Text(text = stringResource(id = R.string.profile_screen_photo_section_caption))
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            SectionLabel(text = stringResource(id = R.string.profile_screen_photo_section_caption))
+            FilledTonalIconButton(onClick = {
+                /* TODO: implement loading new images */
+                launcher.launch("image/*")
+            }) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "add_photo"
+                )
+            }
+        }
         LazyRow(state = listState) {
-            items(photos.size) {
+            items(images.size) { index ->
                 GlideImage(
-                    modifier = Modifier.fillMaxSize(0.25f),
-                    model = photos[it],
-                    contentDescription = null)
+                    modifier = Modifier
+                        .fillMaxSize(0.25f)
+                        .clickable {
+                            uiStateDispatcher.setGalleryUrls(images)
+                            navController.navigate("${Route.Gallery.route}/$index")
+                        },
+                    model = images[index],
+                    contentDescription = null
+                )
             }
         }
     }

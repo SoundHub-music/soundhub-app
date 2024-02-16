@@ -1,12 +1,12 @@
 package com.soundhub.ui.home
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,11 +23,12 @@ import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
-import com.soundhub.utils.Route
+import com.soundhub.Route
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -45,6 +46,7 @@ import com.soundhub.ui.messenger_chat.MessengerChatScreen
 import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.utils.Constants
+import java.util.UUID
 
 
 @Composable
@@ -181,9 +183,19 @@ fun HomeScreen(
             composable(
                 route = "${Route.Profile.route}/{${Constants.PROFILE_NAV_ARG}}",
                 arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
-            ) {
-                Text(text = "not implemented")
-                // TODO: profile routing
+            ) { entry ->
+                val context = LocalContext.current
+                runCatching {
+                    val userId = UUID.fromString(entry.arguments?.getString(Constants.PROFILE_NAV_ARG))
+                    ProfileScreen(navController = navController, userId = userId)
+                }
+                    .onFailure {
+                        Toast.makeText(
+                            context,
+                            stringResource(id = R.string.toast_user_profile_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             }
 
             composable(Route.Settings.route) {
@@ -193,10 +205,14 @@ fun HomeScreen(
                 }
             }
 
-            composable(Route.Gallery.route) {
+            composable(
+                route = "${Route.Gallery.route}/{${Constants.GALLERY_NAV_ARG}}",
+                arguments = listOf(navArgument(Constants.GALLERY_NAV_ARG) {NavType.StringType})
+            ) { entry ->
                 topBarTitle = null
                 val images = uiStateDispatcher.uiState.collectAsState().value.galleryUrls
-                GalleryScreen(images = images)
+                val initialPage = entry.arguments?.getString(Constants.GALLERY_NAV_ARG)?.toInt() ?: 0
+                GalleryScreen(images = images, initialPage = initialPage)
             }
         }
     }

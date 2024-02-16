@@ -64,6 +64,7 @@
 <!--    profile screen string constants-->
     <string name="profile_screen_photo_section_caption">Фотографии</string>
     <string name="profile_screen_friend_section_caption">Друзья</string>
+    <string name="profile_screen_favorite_genres_section_caption">Любимые жанры</string>
 
 <!--    menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
@@ -75,4 +76,6 @@
     <string name="chat_menu_search">Поиск</string>
     <string name="chat_menu_delete_history">Удалить историю</string>
 
+<!--    toast error messages-->
+    <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
 </resources>

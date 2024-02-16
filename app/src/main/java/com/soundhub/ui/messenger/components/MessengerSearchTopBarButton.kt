@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.UiStateDispatcher
-import com.soundhub.utils.UiEvent
+import com.soundhub.UiEvent
 
 @Composable
 fun MessengerSearchTopBarButton(

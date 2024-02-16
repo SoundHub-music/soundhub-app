@@ -1,4 +1,4 @@
-package com.soundhub.utils
+package com.soundhub
 
 sealed class UiEvent {
     object PopBackStack: UiEvent()
@@ -8,6 +8,7 @@ sealed class UiEvent {
                     "route: ${route.route}\n}"
         }
     }
+
     data class ShowToast(
         val message: String,
         val action: String? = null
@@ -15,4 +16,5 @@ sealed class UiEvent {
 
     object SearchButtonClick: UiEvent()
     object Loading: UiEvent()
+    data class Error(val message: String = ""): UiEvent()
 }

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.UiStateDispatcher
 import com.soundhub.data.datastore.UserStore
-import com.soundhub.utils.UiEvent
+import com.soundhub.UiEvent
 
 @Composable
 fun TransparentSearchTextField(

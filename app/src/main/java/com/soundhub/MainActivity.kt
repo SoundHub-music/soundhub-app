@@ -18,7 +18,6 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
 import com.soundhub.utils.Constants
-import com.soundhub.utils.UiEvent
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

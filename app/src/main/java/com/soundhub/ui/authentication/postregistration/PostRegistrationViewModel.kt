@@ -7,7 +7,7 @@ import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.utils.UiEvent
+import com.soundhub.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

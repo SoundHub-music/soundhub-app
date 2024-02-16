@@ -45,23 +45,22 @@ import com.soundhub.ui.components.onBottomSheetButtonClick
 @Composable
 fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel()) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
-    val scope: CoroutineScope = rememberCoroutineScope()
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        SheetState(
+        bottomSheetState = SheetState(
             skipPartiallyExpanded = false,
             density = LocalDensity.current,
             initialValue = SheetValue.Hidden
         )
     )
 
-    LaunchedEffect(scaffoldState) {
+    LaunchedEffect(key1 = scaffoldState.bottomSheetState.currentValue) {
         Log.d("scaffold_state", scaffoldState.bottomSheetState.currentValue.toString())
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .paint(backgroundImage, contentScale = ContentScale.Crop),
+            .paint(painter = backgroundImage, contentScale = ContentScale.Crop),
     ) {
         Column(
             Modifier.fillMaxSize(),
@@ -73,22 +72,7 @@ fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                FilledTonalButton(
-                    modifier = Modifier
-                        .padding(bottom = 20.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(),
-                    onClick = { scope.launch { onBottomSheetButtonClick(scaffoldState)} }
-                ) {
-                    Text(
-                        text = stringResource(R.string.lets_start_login_btn),
-                        fontFamily = FontFamily(Font(R.font.nunito_bold)),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-
+                StartButton(scaffoldState)
                 BottomSheet(
                     scaffoldState = scaffoldState,
                     sheetContent = {
@@ -96,9 +80,31 @@ fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel(
                             isBottomSheetHidden = !scaffoldState.bottomSheetState.isVisible,
                             authViewModel = authViewModel
                         )
-                    }
+                    },
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun StartButton(scaffoldState: BottomSheetScaffoldState) {
+    val scope: CoroutineScope = rememberCoroutineScope()
+
+    FilledTonalButton(
+        modifier = Modifier
+            .padding(bottom = 20.dp)
+            .height(50.dp),
+        colors = ButtonDefaults.buttonColors(),
+        onClick = { scope.launch { onBottomSheetButtonClick(scaffoldState)} }
+    ) {
+        Text(
+            text = stringResource(R.string.lets_start_login_btn),
+            fontFamily = FontFamily(Font(R.font.nunito_bold)),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }

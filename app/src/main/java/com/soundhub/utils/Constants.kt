@@ -1,9 +1,11 @@
 package com.soundhub.utils
 
+import com.soundhub.Route
+
 object Constants {
     const val PASSWORD_MIN_LENGTH: Int = 6
     const val EMAIL_MASK: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
-    const val DYNAMIC_PART_ROUTE: String = """/\{[^}]*\}"""
+    const val DYNAMIC_PART_ROUTE_MASK: String = """/\{[^}]*\}"""
 
     const val DB_USERS: String = "users"
 
@@ -30,7 +32,7 @@ object Constants {
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
     const val CHAT_NAV_ARG = "chatId"
-    const val GALLERY_NAV_ARG = "urls"
+    const val GALLERY_NAV_ARG = "imageIndex"
 
     val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
         Route.Postline.route,
@@ -38,7 +40,7 @@ object Constants {
         Route.Messenger.route
     )
 
-    val ROUTE_WITHOUT_TOP_APP_BAR: List<String> = listOf(
+    val ROUTES_WITHOUT_TOP_APP_BAR: List<String> = listOf(
         Route.Authentication.route,
         Route.Authentication.ChooseGenres.route,
         Route.Authentication.ChooseArtists.route,

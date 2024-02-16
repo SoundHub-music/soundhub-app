@@ -11,10 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -30,10 +29,11 @@ fun PagerPaginationDots(modifier: Modifier = Modifier, sliderState: PagerState) 
                     .width(10.dp)
                     .height(10.dp)
                     .padding(2.dp)
-                    .clip(CircleShape)
                     .background(
-                        if (sliderState.currentPage == index)
-                            Color.White else Color.Gray
+                        color = if (sliderState.currentPage == index)
+                            MaterialTheme.colorScheme.secondaryContainer
+                        else MaterialTheme.colorScheme.onBackground,
+                        shape = CircleShape
                     ),
             )
         }

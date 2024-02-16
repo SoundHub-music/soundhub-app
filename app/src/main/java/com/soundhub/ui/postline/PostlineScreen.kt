@@ -1,16 +1,21 @@
 package com.soundhub.ui.postline
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.soundhub.UiEvent
+import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Post
+import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.postline.components.PostCard
 
@@ -18,11 +23,12 @@ import com.soundhub.ui.postline.components.PostCard
 fun PostLineScreen(
     modifier: Modifier = Modifier,
     postLineViewModel: PostlineViewModel = hiltViewModel(),
-    navController: NavHostController
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    navController: NavHostController,
 ) {
+    val uiEvent: UiEvent? by uiStateDispatcher.uiEvent.collectAsState(initial = null)
     val posts = listOf(
         Post(
-            id = 1,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -33,7 +39,6 @@ fun PostLineScreen(
             )
         ),
         Post(
-            id = 2,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -41,7 +46,6 @@ fun PostLineScreen(
             imageContent = listOf("https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg")
         ),
         Post(
-            id = 3,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -49,7 +53,6 @@ fun PostLineScreen(
             imageContent = emptyList()
         ),
         Post(
-            id = 4,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -57,7 +60,6 @@ fun PostLineScreen(
             imageContent = emptyList()
         ),
         Post(
-            id = 5,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -65,7 +67,6 @@ fun PostLineScreen(
             imageContent = emptyList()
         ),
         Post(
-            id = 6,
             postAuthor = "Billie Eilish",
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
@@ -76,18 +77,20 @@ fun PostLineScreen(
     )
 
     ContentContainer {
-        if (posts.isEmpty())
+        if (uiEvent == UiEvent.Loading)
+            CircleLoader()
+        else if (posts.isEmpty())
             Text(text = "Здесь все ещё пусто :(")
         else LazyColumn(
-            modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             items(items = posts, key = { it.id }) { post ->
                 PostCard(
                     postAuthor = post.postAuthor,
                     publishDate = post.publishDate,
                     textContent = post.textContent,
-                    imageContent = post.imageContent ?: emptyList(),
+                    imageContent = post.imageContent,
                     avatarUrl = post.avatar,
                     navController = navController
                 )

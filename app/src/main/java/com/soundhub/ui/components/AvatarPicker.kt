@@ -77,7 +77,9 @@ fun CircularAvatar(
             Image(
                 painter = painterResource(id = R.drawable.user),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
             )
         else
             GlideImage(

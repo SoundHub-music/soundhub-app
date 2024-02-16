@@ -13,9 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -34,15 +34,18 @@ fun AppHeader(
     actionButton: @Composable () -> Unit,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel()
 ) {
-    val isSearchBarActive = uiStateDispatcher.uiState.collectAsState().value.isSearchBarActive
-    val inputValue = uiStateDispatcher.uiState.collectAsState().value.searchBarText
+    val uiState by uiStateDispatcher.uiState.collectAsState()
+    val isSearchBarActive = uiState.isSearchBarActive
+    val inputValue = uiState.searchBarText
 
     Row(
         modifier = modifier
             .height(60.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+            )
             .shadow(
                 elevation = 4.dp,
                 spotColor = Color(0x40000000),
@@ -65,22 +68,27 @@ fun AppHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Image(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .height(40.dp),
-                    painter = painterResource(id = R.drawable.soundhub_logo),
-                    contentDescription = "app logo"
-                )
-                if (pageName != null)
-                    Text(
-                        text = pageName,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                    )
-            }
+            AppLogoWithPageName(pageName)
             actionButton()
         }
+    }
+}
+
+@Composable
+private fun AppLogoWithPageName(pageName: String?) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Image(
+            modifier = Modifier
+                .width(40.dp)
+                .height(40.dp),
+            painter = painterResource(id = R.drawable.soundhub_logo),
+            contentDescription = "app logo"
+        )
+        if (pageName != null)
+            Text(
+                text = pageName,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+            )
     }
 }

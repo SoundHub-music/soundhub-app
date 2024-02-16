@@ -34,7 +34,7 @@ data class User(
     @ColumnInfo("gender")
     override var gender: Gender = Gender.Unknown,
 
-    @ColumnInfo
+    @ColumnInfo("avatarUrl")
     override var avatarUrl: String? = null,
 
     @ColumnInfo("email")

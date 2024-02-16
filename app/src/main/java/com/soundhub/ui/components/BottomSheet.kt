@@ -1,5 +1,6 @@
 package com.soundhub.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +35,7 @@ fun BottomSheet(
         modifier = modifier,
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
-        sheetContent = { sheetContent() }
+        sheetContent = { sheetContent() },
     ) { content() }
 
     if (!scaffoldState.bottomSheetState.isVisible)
@@ -43,7 +44,8 @@ fun BottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 suspend fun onBottomSheetButtonClick(scaffoldState: BottomSheetScaffoldState) {
-    if (!scaffoldState.bottomSheetState.isVisible || scaffoldState.bottomSheetState.hasPartiallyExpandedState)
+    Log.d("bottom_sheet", scaffoldState.bottomSheetState.currentValue.toString())
+    if (!scaffoldState.bottomSheetState.isVisible)
         scaffoldState.bottomSheetState.expand()
     else scaffoldState.bottomSheetState.hide()
 }
@@ -66,11 +68,9 @@ fun BottomSheetPreview() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Button(onClick = {
-                coroutineScope.launch { onBottomSheetButtonClick(scaffoldState) }
-            }) {
-                Text("Click me")
-            }
+            Button(
+                onClick = { coroutineScope.launch { onBottomSheetButtonClick(scaffoldState) } }
+            ) { Text("Click me") }
         }
    }, scaffoldState = scaffoldState)
 }

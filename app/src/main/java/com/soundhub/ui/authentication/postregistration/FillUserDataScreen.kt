@@ -22,7 +22,7 @@ import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun FillUserDataScreen(

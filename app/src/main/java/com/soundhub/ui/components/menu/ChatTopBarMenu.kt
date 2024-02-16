@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun ChatTopBarMenu(

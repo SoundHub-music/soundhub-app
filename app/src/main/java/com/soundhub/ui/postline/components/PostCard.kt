@@ -2,6 +2,7 @@ package com.soundhub.ui.postline.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,11 +47,9 @@ fun PostCard(
     navController: NavHostController
 ) {
     Card(
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = Color.White,
-            disabledContentColor = Color.Red
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -64,11 +63,12 @@ fun PostCard(
         PostHeader(
             postAuthor = postAuthor,
             publishDate = publishDate,
-            avatarUrl = avatarUrl
+            avatarUrl = avatarUrl,
+            navController = navController
         )
-
-        PostImages(images = imageContent, navController = navController)
         PostContent(textContent = textContent)
+        PostImages(images = imageContent, navController = navController)
+        BottomCardPanel()
     }
 }
 
@@ -77,11 +77,12 @@ private fun PostHeader(
     modifier: Modifier = Modifier,
     avatarUrl: String?,
     postAuthor: String,
-    publishDate: String
+    publishDate: String,
+    navController: NavHostController
 ) {
     // row with author avatar, author name and publish date
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -90,6 +91,9 @@ private fun PostHeader(
             contentDescription = postAuthor,
             modifier = Modifier
                 .size(40.dp)
+                .clickable {
+                    /* TODO: implement redirect to the user profile */
+                }
         )
 
         Column {
@@ -118,13 +122,13 @@ private fun PostImages(
     images: List<String>,
     navController: NavHostController
 ) {
-    val sliderState = rememberPagerState(initialPage = 0, pageCount = {images.size})
+    val sliderState = rememberPagerState(initialPage = 0, pageCount = { images.size })
 
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ImageHorizontalPager(
                 navController = navController,
                 pagerState = sliderState,
@@ -136,23 +140,21 @@ private fun PostImages(
 }
 
 @Composable
-private fun PostContent(textContent: String) {
-    var isFavorite: Boolean by rememberSaveable { mutableStateOf(false) }
-    Row(
-        modifier = Modifier.padding(
-            start = 16.dp, end = 16.dp,
-            top = 10.dp, bottom = 10.dp
-        )
-    ) { Text(text = textContent) }
+private fun PostContent(modifier: Modifier = Modifier, textContent: String) {
+    Row(modifier = modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+        Text(text = textContent)
+    }
+}
 
+@Composable
+private fun BottomCardPanel() {
+    var isFavorite: Boolean by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 8.dp, bottom = 8.dp),
+            .padding(end = 8.dp, bottom = 8.dp, top = 8.dp),
         horizontalArrangement = Arrangement.End
-    ) {
-        LikeButton(isFavorite = isFavorite) { isFavorite = it }
-    }
+    ) { LikeButton(isFavorite = isFavorite) { isFavorite = it } }
 }
 
 @Composable

@@ -5,7 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.UiStateDispatcher
 import com.soundhub.utils.Constants
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 internal fun TopAppBarBuilder(
@@ -15,7 +15,7 @@ internal fun TopAppBarBuilder(
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
 ) {
 
-    when (Regex(Constants.DYNAMIC_PART_ROUTE).replace(currentRoute ?: "", "")) {
+    when (Regex(Constants.DYNAMIC_PART_ROUTE_MASK).replace(currentRoute ?: "", "")) {
         Route.Messenger.Chat.staticDestination -> { ChatTopAppBar(navController) }
         in Constants.ROUTES_WITH_CUSTOM_TOP_APP_BAR -> {
             // custom top app bar
@@ -26,7 +26,7 @@ internal fun TopAppBarBuilder(
                 uiStateDispatcher = uiStateDispatcher
             )
         }
-        in Constants.ROUTE_WITHOUT_TOP_APP_BAR -> {}
+        in Constants.ROUTES_WITHOUT_TOP_APP_BAR -> {}
         else -> { DefaultTopAppBar(topBarTitle, navController) }
     }
 }

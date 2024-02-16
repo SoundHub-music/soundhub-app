@@ -6,7 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun PostlineNotificationTopBarButton(navController: NavHostController) {

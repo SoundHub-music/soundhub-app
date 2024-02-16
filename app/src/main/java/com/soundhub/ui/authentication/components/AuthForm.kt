@@ -151,7 +151,7 @@ fun AuthForm(
                 .height(50.dp),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(),
-            onClick = { authViewModel.authAction() },
+            onClick = authViewModel::authAction,
             enabled = Validator.validateAuthForm(authFormState)
         ) {
             Text(

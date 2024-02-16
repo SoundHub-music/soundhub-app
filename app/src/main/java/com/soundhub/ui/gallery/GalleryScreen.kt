@@ -12,9 +12,10 @@ import androidx.compose.ui.layout.ContentScale
 fun GalleryScreen(
     modifier: Modifier = Modifier,
     images: List<String> = emptyList(),
+    initialPage: Int = 0
 ) {
     val pagerState = rememberPagerState(
-        initialPage = 0,
+        initialPage = initialPage,
         pageCount = { images.size }
     )
 

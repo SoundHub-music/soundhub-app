@@ -13,14 +13,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.menu.ChatTopBarMenu
 import com.soundhub.utils.Constants
-import com.soundhub.utils.Route
+import com.soundhub.Route
 
 @Composable
 fun TopBarActions(navController: NavHostController) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    val dynamicPartRegex = Regex(Constants.DYNAMIC_PART_ROUTE)
+    val dynamicPartRegex = Regex(Constants.DYNAMIC_PART_ROUTE_MASK)
     val staticRoute: String = dynamicPartRegex.replace(currentRoute ?: "", "")
     val isMenuExpanded = rememberSaveable {
         mutableStateOf(false)
