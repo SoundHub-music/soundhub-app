@@ -12,10 +12,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -34,21 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.ui.components.BottomSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.soundhub.ui.authentication.components.AuthForm
 import com.soundhub.ui.authentication.components.LoginScreenLogo
-import com.soundhub.ui.components.onBottomSheetButtonClick
+import com.soundhub.ui.components.BottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel()) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = SheetState(
-            skipPartiallyExpanded = false,
-            density = LocalDensity.current,
+        bottomSheetState = rememberStandardBottomSheetState(
+            skipHiddenState = false,
             initialValue = SheetValue.Hidden
         )
     )
@@ -72,7 +69,7 @@ fun AuthenticationScreen(authViewModel: AuthenticationViewModel = hiltViewModel(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                StartButton(scaffoldState)
+                StartButton(scaffoldState = scaffoldState)
                 BottomSheet(
                     scaffoldState = scaffoldState,
                     sheetContent = {
@@ -97,7 +94,7 @@ private fun StartButton(scaffoldState: BottomSheetScaffoldState) {
             .padding(bottom = 20.dp)
             .height(50.dp),
         colors = ButtonDefaults.buttonColors(),
-        onClick = { scope.launch { onBottomSheetButtonClick(scaffoldState)} }
+        onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } }
     ) {
         Text(
             text = stringResource(R.string.lets_start_login_btn),
