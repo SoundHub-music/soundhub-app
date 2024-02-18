@@ -9,11 +9,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.soundhub.Route
 
 @Composable
-internal fun WritePostButton(modifier: Modifier = Modifier) {
+internal fun WritePostButton(
+    modifier: Modifier = Modifier,
+    navController: NavHostController
+) {
     FilledTonalIconButton(
-        onClick = { /* TODO: write create post page */ },
+        onClick = { navController.navigate(Route.CreatePost.route) },
         shape = RoundedCornerShape(10.dp),
         modifier = modifier.size(48.dp)
     ) {

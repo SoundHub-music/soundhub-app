@@ -28,6 +28,8 @@
     <string name="screen_title_messenger">Мессенджер</string>
     <string name="screen_title_edit_profile">Изменить профиль</string>
     <string name="screen_title_notifications">Уведомления</string>
+    <string name="screen_title_create_post">Новый пост</string>
+    <string name="screen_title_friends">Друзья</string>
 
 <!--    button titles-->
     <string name="edit_profile_btn_content">Редактировать профиль</string>

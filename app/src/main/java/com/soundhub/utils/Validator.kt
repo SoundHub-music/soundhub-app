@@ -6,7 +6,7 @@ import com.soundhub.ui.authentication.state.RegistrationState
 sealed class Validator {
     companion object {
         fun validateEmail(text: String): Boolean {
-            val mask: String = Constants.EMAIL_MASK
+            val mask: String = Constants.EMAIL_REGEX
             if (text.isEmpty()) return true
             return text.matches(mask.toRegex())
         }

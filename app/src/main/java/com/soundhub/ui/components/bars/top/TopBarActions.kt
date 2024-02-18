@@ -20,13 +20,9 @@ fun TopBarActions(navController: NavHostController) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    val dynamicPartRegex = Regex(Constants.DYNAMIC_PART_ROUTE_MASK)
-    val staticRoute: String = dynamicPartRegex.replace(currentRoute ?: "", "")
-    val isMenuExpanded = rememberSaveable {
-        mutableStateOf(false)
-    }
+    val isMenuExpanded = rememberSaveable { mutableStateOf(false) }
 
-    when (staticRoute) {
+    when (currentRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
                 /* TODO: write logic for saving changes */
@@ -34,7 +30,7 @@ fun TopBarActions(navController: NavHostController) {
             }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
 
-        Route.Messenger.Chat.staticDestination -> {
+        Route.Messenger.Chat().route -> {
             IconButton(onClick = {
                 isMenuExpanded.value = !isMenuExpanded.value
             }) {

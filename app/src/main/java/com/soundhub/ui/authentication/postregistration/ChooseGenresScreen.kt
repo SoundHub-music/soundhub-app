@@ -22,9 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +54,7 @@ fun ChooseGenresScreen(
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -65,11 +62,8 @@ fun ChooseGenresScreen(
                     .fillMaxWidth()
                     .padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
                 text = stringResource(id = R.string.screen_title_choose_genres),
-                style = TextStyle(
-                    fontSize = 32.sp,
-                    fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
+                fontSize = 32.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
 
             if (isLoading) CircleLoader()
@@ -98,16 +92,15 @@ fun ChooseGenresScreen(
         FloatingNextButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = {
-                if (chosenGenres.isNotEmpty())
-                    authViewModel.onPostRegisterNextButtonClick(Route.Authentication.ChooseGenres)
-                else Toast.makeText(
-                    context,
-                    floatingBtnWarningText,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        )
+                .padding(16.dp)
+        ) {
+            if (chosenGenres.isNotEmpty())
+                authViewModel.onPostRegisterNextButtonClick(Route.Authentication.ChooseGenres)
+            else Toast.makeText(
+                context,
+                floatingBtnWarningText,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

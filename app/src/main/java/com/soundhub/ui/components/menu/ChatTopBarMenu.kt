@@ -42,7 +42,7 @@ fun ChatTopBarMenu(
             },
             onClick = {
                 /* TODO: finish the logic */
-                navController.navigate("${Route.Profile}/$chatId")
+                navController.navigate(Route.Profile(chatId).route)
             }
         )
 

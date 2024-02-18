@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.components.CircularUserAvatar
+import com.soundhub.ui.components.CircularAvatar
 import com.soundhub.ui.messenger_chat.ChatViewModel
 import java.time.LocalDateTime
 
@@ -67,7 +67,7 @@ private fun InterlocutorDetails() {
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.padding(end = 10.dp)
     ) {
-        CircularUserAvatar(chatItem = null)
+        CircularAvatar(modifier = Modifier.size(40.dp))
 
         // user name and online status
         Column {

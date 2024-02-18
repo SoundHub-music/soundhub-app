@@ -4,8 +4,8 @@ import com.soundhub.Route
 
 object Constants {
     const val PASSWORD_MIN_LENGTH: Int = 6
-    const val EMAIL_MASK: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
-    const val DYNAMIC_PART_ROUTE_MASK: String = """/\{[^}]*\}"""
+    const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
+    const val NAV_ARG_REGEX: String = """\{[^}]*\}"""
 
     const val DB_USERS: String = "users"
 
@@ -29,11 +29,6 @@ object Constants {
 
     const val DATE_FORMAT = "yyyy-MM-dd"
 
-    const val POST_REGISTER_NAV_ARG = "postAuthId"
-    const val PROFILE_NAV_ARG = "userId"
-    const val CHAT_NAV_ARG = "chatId"
-    const val GALLERY_NAV_ARG = "imageIndex"
-
     val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
         Route.Postline.route,
         Route.Music.route,
@@ -45,13 +40,36 @@ object Constants {
         Route.Authentication.ChooseGenres.route,
         Route.Authentication.ChooseArtists.route,
         Route.Authentication.FillUserData.route,
-        Route.Profile.route
+        Route.Profile().route
     )
 
     val ROUTES_WITH_BOTTOM_BAR: List<String> = listOf(
-        Route.Profile.route,
+        Route.Profile().route,
         Route.Postline.route,
         Route.Music.route,
         Route.Messenger.route
     )
+
+    // routes
+    const val AUTHENTICATION_ROUTE = "authentication"
+    const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
+    const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
+    const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
+
+    const val POST_REGISTER_NAV_ARG = "postAuthId"
+    const val PROFILE_NAV_ARG = "userId"
+    const val CHAT_NAV_ARG = "chatId"
+    const val GALLERY_NAV_ARG = "imageIndex"
+
+    const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
+    const val POSTLINE_ROUTE = "postline"
+    const val MUSIC_ROUTE = "music"
+    const val MESSENGER_ROUTE = "messenger"
+    const val MESSENGER_CHAT_ROUTE = "$MESSENGER_ROUTE/chat/{$CHAT_NAV_ARG}"
+    const val SETTINGS_ROUTE = "settings"
+    const val NOTIFICATIONS_ROUTE = "notifications"
+    const val EDIT_USER_DATA_ROUTE = "edit-data"
+    const val CREATE_POST_ROUTE = "create-post"
+    const val GALLERY_ROUTE = "gallery"
+    const val FRIEND_LIST_ROUTE = "friends"
 }

@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.UiEvent
 import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Post
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.postline.components.PostCard
@@ -29,7 +30,7 @@ fun PostLineScreen(
     val uiEvent: UiEvent? by uiStateDispatcher.uiEvent.collectAsState(initial = null)
     val posts = listOf(
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billie", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,
@@ -39,35 +40,35 @@ fun PostLineScreen(
             )
         ),
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billy", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = listOf("https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg")
         ),
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billy", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billy", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billy", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = "Billie Eilish",
+            postAuthor = User(firstName = "Billy", lastName = "Elish"),
             publishDate = "20 minutes ago",
             textContent = "sdfksofsopgsrgk",
             avatar = null,

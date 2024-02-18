@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.bars.bottom
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,18 +30,24 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
+import com.soundhub.data.datastore.UserPreferences
+import java.util.UUID
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(
+    navController: NavController,
+    userCreds: UserPreferences? = null
+) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     // plug variable
-    val unreadMessageCount: Int = 1
-    var selectedItem: Route by remember {
-        mutableStateOf(Route.valueOf(currentRoute) ?: Route.Postline)
+    val unreadMessageCount = 1
+    var selectedItem: String by remember {
+        mutableStateOf(currentRoute ?: Route.Postline.route)
     }
 
-    LaunchedEffect(currentRoute) {
-        selectedItem = Route.valueOf(currentRoute) ?: Route.Postline
+    LaunchedEffect(key1 = currentRoute) {
+        Log.d("chosen_page", selectedItem)
+        selectedItem = currentRoute ?: Route.Postline.route
     }
 
 
@@ -56,13 +63,16 @@ fun BottomNavigationBar(navController: NavController) {
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        getNavBarItems(unreadMessageCount).forEach{ item ->
+        getNavBarItems(
+            unreadMessageCount = unreadMessageCount,
+            userId = userCreds?.id
+        ).forEach{ item ->
             NavigationBarItem(
                 icon = item.icon,
                 selected = selectedItem == item.route,
                 onClick = {
                     selectedItem = item.route
-                    navController.navigate(item.route.route) {
+                    navController.navigate(item.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                             inclusive = true
@@ -77,18 +87,21 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-private fun getNavBarItems(unreadMessageCount: Int = 0): List<NavBarItem> {
+private fun getNavBarItems(
+    unreadMessageCount: Int = 0,
+    userId: UUID?
+): List<NavBarItem> {
     return listOf(
         NavBarItem(
-            route = Route.Postline,
+            route = Route.Postline.route,
             icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
         ),
         NavBarItem(
-            route = Route.Music,
+            route = Route.Music.route,
             icon = { Icon(Icons.Rounded.QueueMusic, contentDescription = "Music") },
         ),
         NavBarItem(
-            route = Route.Messenger,
+            route = Route.Messenger.route,
             icon = {
                 if (unreadMessageCount != 0)
                     BadgedBox(badge = { Badge { Text(text = unreadMessageCount.toString()) } }) {
@@ -97,14 +110,14 @@ private fun getNavBarItems(unreadMessageCount: Int = 0): List<NavBarItem> {
             },
         ),
         NavBarItem(
-            route = Route.Profile,
+            route = Route.Profile(userId?.toString()).route,
             icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
         )
     )
 }
 
 data class NavBarItem(
-    val route: Route = Route.Postline,
+    val route: String = Route.Postline.route,
     val icon: @Composable () -> Unit,
     val label: String? = "",
 )

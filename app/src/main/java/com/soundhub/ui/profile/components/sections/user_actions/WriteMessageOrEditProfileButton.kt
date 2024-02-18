@@ -48,9 +48,8 @@ internal fun WriteMessageOrEditProfileButton(
             if (isOriginProfile)
                 navController.navigate(Route.EditUserData.route)
             else navController.navigate(
-                Route.Messenger.Chat(
-                /* temporary random id */
-                UUID.randomUUID().toString()).route
+                // TODO: remove random UUID
+                Route.Messenger.Chat(UUID.randomUUID().toString()).route
             )
         }
     ) {

@@ -41,7 +41,7 @@ internal fun ChatList(
     var sortedChats by rememberSaveable { mutableStateOf(chats) }
 
     LaunchedEffect(key1 = searchBarText) {
-        Log.d("search", searchBarText)
+        Log.d("search_text", searchBarText)
         sortedChats = if (searchBarText.isNotEmpty()) {
             chats.filter {
                 searchBarText.lowercase() in it.firstName.lowercase() ||

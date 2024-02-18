@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.edit_profile.EditUserProfileScreen
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
+import com.soundhub.ui.create_post.CreatePostScreen
 import com.soundhub.ui.friends.FriendListScreen
 import com.soundhub.ui.gallery.GalleryScreen
 import com.soundhub.ui.messenger_chat.MessengerChatScreen
@@ -62,6 +64,10 @@ fun HomeScreen(
     val userCreds: State<UserPreferences?> = authViewModel.userCreds.collectAsState(initial = null)
     var topBarTitle: String? by rememberSaveable { mutableStateOf(null) }
 
+    LaunchedEffect(currentRoute) {
+        Log.d("current_route", currentRoute.toString())
+    }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -76,7 +82,7 @@ fun HomeScreen(
         },
         bottomBar = {
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
-                BottomNavigationBar(navController)
+                BottomNavigationBar(navController = navController, userCreds = userCreds.value)
         }
     ) {
         NavHost(
@@ -98,18 +104,18 @@ fun HomeScreen(
                     "${Route.Authentication.route}/${entry.arguments?.getString(Constants.POST_REGISTER_NAV_ARG)}"
 
                 Log.d("nested_auth_route", nestedRoute)
-                when (Route.valueOf(nestedRoute)) {
-                    is Route.Authentication.ChooseGenres -> ChooseGenresScreen(
+                when ("${Route.Authentication}/$nestedRoute") {
+                    Route.Authentication.ChooseGenres.route -> ChooseGenresScreen(
                         authViewModel = authViewModel,
                         navController = navController
                     )
 
-                    is Route.Authentication.ChooseArtists -> ChooseArtistsScreen(
+                    Route.Authentication.ChooseArtists.route -> ChooseArtistsScreen(
                         authViewModel = authViewModel,
                         navController = navController
                     )
 
-                    is Route.Authentication.FillUserData -> FillUserDataScreen(
+                    Route.Authentication.FillUserData.route -> FillUserDataScreen(
                         authViewModel = authViewModel,
                         navController = navController
                     )
@@ -140,7 +146,7 @@ fun HomeScreen(
             }
 
             composable(
-                route = Route.Messenger.Chat("{${Constants.CHAT_NAV_ARG}}").route,
+                route = Route.Messenger.Chat().route,
                 arguments = listOf(navArgument(Constants.CHAT_NAV_ARG) {NavType.StringType})
             ) { entry ->
                 val chatId = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
@@ -148,20 +154,27 @@ fun HomeScreen(
                 MessengerChatScreen(chatId = chatId)
             }
 
-            composable(Route.Profile.route) {
-                if (userCreds.value?.id != null) {
-                    topBarTitle = null
-                    ProfileScreen(
-                        authViewModel = authViewModel,
-                        navController = navController,
-                        userCreds = userCreds.value
-                    )
+            composable(
+                route = Route.Profile().route,
+                arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
+            ) { entry ->
+                val context = LocalContext.current
+                runCatching {
+                    val userId = UUID.fromString(entry.arguments?.getString(Constants.PROFILE_NAV_ARG))
+                    ProfileScreen(navController = navController, userId = userId)
                 }
+                    .onFailure {
+                        Toast.makeText(
+                            context,
+                            stringResource(id = R.string.toast_user_profile_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
             }
 
             composable(Route.FriendList.route) {
                 if (userCreds.value?.id != null) {
-                    topBarTitle = "Друзья"
+                    topBarTitle = stringResource(id = R.string.screen_title_friends)
                     FriendListScreen()
                 }
             }
@@ -180,24 +193,6 @@ fun HomeScreen(
                 }
             }
 
-            composable(
-                route = "${Route.Profile.route}/{${Constants.PROFILE_NAV_ARG}}",
-                arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
-            ) { entry ->
-                val context = LocalContext.current
-                runCatching {
-                    val userId = UUID.fromString(entry.arguments?.getString(Constants.PROFILE_NAV_ARG))
-                    ProfileScreen(navController = navController, userId = userId)
-                }
-                    .onFailure {
-                        Toast.makeText(
-                            context,
-                            stringResource(id = R.string.toast_user_profile_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-            }
-
             composable(Route.Settings.route) {
                 if (userCreds.value?.id != null) {
                     topBarTitle = stringResource(id = R.string.screen_title_settings)
@@ -213,6 +208,11 @@ fun HomeScreen(
                 val images = uiStateDispatcher.uiState.collectAsState().value.galleryUrls
                 val initialPage = entry.arguments?.getString(Constants.GALLERY_NAV_ARG)?.toInt() ?: 0
                 GalleryScreen(images = images, initialPage = initialPage)
+            }
+
+            composable(Route.CreatePost.route) {
+                topBarTitle = stringResource(id = R.string.screen_title_create_post)
+                CreatePostScreen()
             }
         }
     }

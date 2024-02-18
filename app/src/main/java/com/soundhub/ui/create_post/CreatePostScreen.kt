@@ -1,9 +1,9 @@
-package com.soundhub.ui.friends
+package com.soundhub.ui.create_post
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun FriendListScreen() {
+fun CreatePostScreen() {
     Text("not implemented")
 }

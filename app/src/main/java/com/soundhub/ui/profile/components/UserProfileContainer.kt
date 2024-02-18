@@ -45,9 +45,7 @@ fun UserProfileContainer(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-            .background(
-                MaterialTheme.colorScheme.primaryContainer
-            )
+            .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Column(
             modifier = Modifier

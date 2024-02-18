@@ -24,12 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.soundhub.Route
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.CircularAvatar
 import com.soundhub.ui.components.buttons.LikeButton
 import com.soundhub.ui.components.pagination.PagerPaginationDots
@@ -39,7 +42,7 @@ import com.soundhub.ui.theme.borderColor
 @Composable
 fun PostCard(
     modifier: Modifier = Modifier,
-    postAuthor: String,
+    postAuthor: User,
     publishDate: String,
     avatarUrl: String? = null,
     imageContent: List<String> = emptyList(),
@@ -76,10 +79,11 @@ fun PostCard(
 private fun PostHeader(
     modifier: Modifier = Modifier,
     avatarUrl: String?,
-    postAuthor: String,
+    postAuthor: User,
     publishDate: String,
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     // row with author avatar, author name and publish date
     Row(
         modifier = modifier
@@ -88,17 +92,17 @@ private fun PostHeader(
     ) {
         CircularAvatar(
             imageUrl = avatarUrl,
-            contentDescription = postAuthor,
+            contentDescription = "${postAuthor.firstName} ${postAuthor.lastName}".trim(),
             modifier = Modifier
                 .size(40.dp)
                 .clickable {
-                    /* TODO: implement redirect to the user profile */
+                    navController.navigate(Route.Profile(postAuthor.id.toString()).route)
                 }
         )
 
         Column {
             Text(
-                text = postAuthor,
+                text = "${postAuthor.firstName} ${postAuthor.lastName}".trim(),
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -163,7 +167,7 @@ fun PostCardPreview() {
     val navController = rememberNavController()
 
     PostCard(
-        postAuthor = "Billie Eilish",
+        postAuthor = User(firstName = "Billy", lastName = "Elish"),
         publishDate = "20 minutes ago",
         textContent = "This is an example of PostCard",
         navController = navController

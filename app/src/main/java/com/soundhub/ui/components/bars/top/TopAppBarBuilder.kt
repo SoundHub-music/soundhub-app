@@ -14,9 +14,8 @@ internal fun TopAppBarBuilder(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
 ) {
-
-    when (Regex(Constants.DYNAMIC_PART_ROUTE_MASK).replace(currentRoute ?: "", "")) {
-        Route.Messenger.Chat.staticDestination -> { ChatTopAppBar(navController) }
+    when (currentRoute) {
+        Route.Messenger.Chat().route -> ChatTopAppBar(navController = navController)
         in Constants.ROUTES_WITH_CUSTOM_TOP_APP_BAR -> {
             // custom top app bar
             CustomTopAppBar(

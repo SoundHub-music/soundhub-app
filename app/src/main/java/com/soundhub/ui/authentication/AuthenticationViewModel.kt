@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.mindrot.jbcrypt.BCrypt
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import javax.inject.Inject
@@ -107,11 +106,17 @@ class AuthenticationViewModel @Inject constructor(
     }
 
 
-    fun setGender(value: String) = registerState.update {
+    fun setGender(value: String) {
         try {
-            it.copy(gender = Gender.valueOf(value))
-        } catch (exception: IllegalArgumentException) {
-            it.copy(gender = Gender.Unknown)
+            registerState.update {
+                it.copy(gender = Gender.valueOf(value))
+            }
+        }
+        catch (e: IllegalArgumentException) {
+            Log.e("set_gender_error", e.message ?: "error")
+            registerState.update {
+                it.copy(gender = Gender.Unknown)
+            }
         }
     }
 
@@ -129,12 +134,10 @@ class AuthenticationViewModel @Inject constructor(
 
     fun authAction() {
         if (authFormState.value.isRegisterForm) {
-            val salt = BCrypt.gensalt()
-            val hashedPassword = BCrypt.hashpw(authFormState.value.password, salt)
             registerState.update {
                 it.copy(
                     email = authFormState.value.email,
-                    password = BCrypt.hashpw(hashedPassword, salt)
+                    password = authFormState.value.password
                 )
             }
             onEvent(AuthEvent.OnChooseGenres)
@@ -152,7 +155,6 @@ class AuthenticationViewModel @Inject constructor(
             is Route.Authentication.FillUserData ->
                 if (Validator.validateRegistrationState(registerState.value))
                     onEvent(AuthEvent.OnRegister(User(registerState.value)))
-
             else -> Unit
         }
     }
@@ -160,9 +162,7 @@ class AuthenticationViewModel @Inject constructor(
     private fun onEvent(event: AuthEvent) {
         when (event) {
             is AuthEvent.OnLogin -> viewModelScope.launch {
-                val salt = BCrypt.gensalt()
-                val hashedPassword = BCrypt.hashpw(event.password, salt)
-                val user: User? = authRepository.login(event.email, hashedPassword)
+                val user: User? = authRepository.login(event.email, event.password)
                 if (user != null) {
                     userStore.saveUser(user)
                     uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))

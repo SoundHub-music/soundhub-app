@@ -21,7 +21,7 @@ internal fun ProfileButtonsRow(
             modifier = Modifier.weight(1f)
         )
         if (isOriginProfile)
-            WritePostButton()
+            WritePostButton(navController = navController)
         else
             SendFriendRequestButton()
     }
