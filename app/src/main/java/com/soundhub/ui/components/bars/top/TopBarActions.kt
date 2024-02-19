@@ -25,7 +25,7 @@ fun TopBarActions(navController: NavHostController) {
     when (currentRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
-                /* TODO: write logic for saving changes */
+                /* TODO: implement logic for saving changes */
                 navController.popBackStack()
             }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }

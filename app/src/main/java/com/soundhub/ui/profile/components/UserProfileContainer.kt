@@ -73,13 +73,13 @@ fun UserProfileContainer(
             // friend list with fake data
             FriendMiniatureList(
                 friendList = listOf(
-                    FriendItem(null),
-                    FriendItem(null),
-                    FriendItem(null),
-                    FriendItem(null),
-                    FriendItem(null),
-                    FriendItem(null),
-                    FriendItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
+                    FriendMiniatureItem(null),
                 ),
                 navController = navController
             )
@@ -123,10 +123,10 @@ internal fun SectionLabel(text: String) {
     )
 }
 
-data class FriendItem(
+data class FriendMiniatureItem(
     val avatarUrl: String?
 )
-private fun getUserLocation(city: String?, country: String?): String {
+fun getUserLocation(city: String?, country: String?): String {
     return if ((city == null && country == null) || (city!!.isEmpty() && country!!.isEmpty())) ""
     else if (country!!.isNotEmpty() && city.isEmpty()) country
     else "$country, $city"

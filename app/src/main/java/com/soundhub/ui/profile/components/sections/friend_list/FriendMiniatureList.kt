@@ -19,12 +19,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.components.CircularAvatar
-import com.soundhub.ui.profile.components.FriendItem
+import com.soundhub.ui.profile.components.FriendMiniatureItem
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.Route
 
 @Composable
-fun FriendMiniatureList(friendList: List<FriendItem>, navController: NavHostController) {
+fun FriendMiniatureList(friendList: List<FriendMiniatureItem>, navController: NavHostController) {
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         modifier = Modifier.clickable { navController.navigate(Route.FriendList.route) }

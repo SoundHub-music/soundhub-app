@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,11 +51,10 @@ fun ChooseArtistsScreen(
                     .fillMaxWidth()
                     .padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
                 text = stringResource(id = R.string.screen_title_choose_artists),
-                style = TextStyle(
-                    fontSize = 32.sp,
-                    fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
+                fontSize = 32.sp,
+                lineHeight = 42.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontWeight = FontWeight.ExtraBold
             )
 
             LazyVerticalGrid(

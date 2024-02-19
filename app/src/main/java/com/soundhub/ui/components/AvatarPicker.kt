@@ -70,7 +70,7 @@ fun CircularAvatar(
     contentDescription: String? = null
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier.size(40.dp),
         contentAlignment = Alignment.Center
     ) {
         if (imageUrl == null)

@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.bars.top
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -14,10 +15,10 @@ internal fun TopAppBarBuilder(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
 ) {
+    Log.d("current_route:TopAppBarBuilder", currentRoute.toString())
+    Log.d("choose-genres", Route.Authentication.withNavArg)
     when (currentRoute) {
-        Route.Messenger.Chat().route -> ChatTopAppBar(navController = navController)
         in Constants.ROUTES_WITH_CUSTOM_TOP_APP_BAR -> {
-            // custom top app bar
             CustomTopAppBar(
                 topBarTitle = topBarTitle,
                 currentRoute = currentRoute,
@@ -26,6 +27,7 @@ internal fun TopAppBarBuilder(
             )
         }
         in Constants.ROUTES_WITHOUT_TOP_APP_BAR -> {}
+        Route.Messenger.Chat().route -> ChatTopAppBar(navController = navController)
         else -> { DefaultTopAppBar(topBarTitle, navController) }
     }
 }

@@ -104,7 +104,7 @@ fun HomeScreen(
                     "${Route.Authentication.route}/${entry.arguments?.getString(Constants.POST_REGISTER_NAV_ARG)}"
 
                 Log.d("nested_auth_route", nestedRoute)
-                when ("${Route.Authentication}/$nestedRoute") {
+                when (nestedRoute) {
                     Route.Authentication.ChooseGenres.route -> ChooseGenresScreen(
                         authViewModel = authViewModel,
                         navController = navController

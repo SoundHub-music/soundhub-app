@@ -36,10 +36,11 @@ object Constants {
     )
 
     val ROUTES_WITHOUT_TOP_APP_BAR: List<String> = listOf(
+        Route.Authentication.withNavArg,
         Route.Authentication.route,
-        Route.Authentication.ChooseGenres.route,
-        Route.Authentication.ChooseArtists.route,
-        Route.Authentication.FillUserData.route,
+//        Route.Authentication.ChooseGenres.route,
+//        Route.Authentication.ChooseArtists.route,
+//        Route.Authentication.FillUserData.route,
         Route.Profile().route
     )
 
@@ -50,17 +51,17 @@ object Constants {
         Route.Messenger.route
     )
 
-    // routes
-    const val AUTHENTICATION_ROUTE = "authentication"
-    const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
-    const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
-    const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
 
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
     const val CHAT_NAV_ARG = "chatId"
     const val GALLERY_NAV_ARG = "imageIndex"
 
+    // routes
+    const val AUTHENTICATION_ROUTE = "authentication"
+    const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
+    const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
+    const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
     const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
     const val POSTLINE_ROUTE = "postline"
     const val MUSIC_ROUTE = "music"

@@ -4,6 +4,7 @@ import com.soundhub.utils.Constants
 
 sealed class Route(var route: String) {
     object Authentication: Route(route = Constants.AUTHENTICATION_ROUTE) {
+        val withNavArg = "$route/{${Constants.POST_REGISTER_NAV_ARG}}"
         object ChooseGenres: Route(route = Constants.CHOOSE_GENRES_ROUTE)
         object ChooseArtists: Route(route = Constants.CHOOSE_ARTISTS_ROUTE)
         object FillUserData: Route(route = Constants.FILL_DATA_REGISTRATION_ROUTE)

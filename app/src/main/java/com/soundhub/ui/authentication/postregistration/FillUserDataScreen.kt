@@ -38,12 +38,11 @@ fun FillUserDataScreen(
     ) {
        Column(
            modifier = Modifier
-               .padding(top = 20.dp, bottom = 20.dp, start = 16.dp, end = 16.dp)
+               .padding(vertical = 20.dp, horizontal = 16.dp)
        ) {
            Text(
                text = stringResource(id = R.string.screen_title_fill_user_data),
                fontWeight = FontWeight.Black,
-               fontFamily = FontFamily(Font(R.font.nunito_black)),
                fontSize = 32.sp,
                lineHeight = 42.sp
            )
