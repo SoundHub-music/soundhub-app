@@ -6,12 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.data.datastore.UserPreferences
+import java.util.UUID
 
 @Composable
 internal fun ProfileButtonsRow(
     isOriginProfile: Boolean,
-    user: UserPreferences?,
+    user: UUID?,
     navController: NavHostController
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {

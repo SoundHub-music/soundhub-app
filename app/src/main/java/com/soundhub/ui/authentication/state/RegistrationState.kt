@@ -15,10 +15,9 @@ data class RegistrationState(
     override var country: String? = "",
     override var birthday: LocalDate? = null,
     override var city: String? = "",
-    override var languages: List<String> = emptyList(),
     override var description: String? = "",
-    var token: String? = null,
 
+    // TODO: separate form valid states from this state
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,
     override var isBirthdayValid: Boolean = true,

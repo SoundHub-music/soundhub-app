@@ -1,5 +1,6 @@
 package com.soundhub.ui.profile.components.sections.user_actions
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +39,7 @@ internal fun UserNameWithDescription(user: UserPreferences? = null) {
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             fontSize = 28.sp,
-            modifier = Modifier
+            modifier = Modifier.clickable { isDescriptionButtonChecked = !isDescriptionButtonChecked }
         )
 
         IconToggleButton(
@@ -46,8 +47,7 @@ internal fun UserNameWithDescription(user: UserPreferences? = null) {
             onCheckedChange = { isDescriptionButtonChecked = it },
         ) {
             Icon(
-                imageVector =
-                if (isDescriptionButtonChecked) Icons.Rounded.KeyboardArrowUp
+                imageVector = if (isDescriptionButtonChecked) Icons.Rounded.KeyboardArrowUp
                 else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = "expand_description",
                 modifier = Modifier.size(35.dp)
@@ -55,5 +55,5 @@ internal fun UserNameWithDescription(user: UserPreferences? = null) {
         }
     }
     if (isDescriptionButtonChecked)
-        UserDescriptionBlock(user)
+        UserDescriptionBlock(user = user)
 }

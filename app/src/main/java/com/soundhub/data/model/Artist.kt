@@ -4,5 +4,7 @@ import java.util.UUID
 
 data class Artist(
     val id: UUID = UUID.randomUUID(),
-    val name: String
+    val name: String,
+    val description: String = "",
+    val albums: List<Album> = emptyList()
 )

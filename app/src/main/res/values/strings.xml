@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SoundHub</string>
 
-<!--    authentication page strings-->
+    <!--    authentication page strings-->
     <string name="lets_start_login_btn">Давайте начнем</string>
     <string name="get_account_switch_label">Стать частью сообщества</string>
     <string name="email_placeholder">example@mail.com</string>
@@ -10,18 +10,18 @@
     <string name="password_label">Пароль</string>
     <string name="email_label">Email</string>
 
-<!--    authentication button names-->
+    <!--    authentication button names-->
     <string name="auth_button_login_name">Войти</string>
     <string name="auth_button_register_name">Зарегистрироваться</string>
 
 
-<!--    validation strings-->
+    <!--    validation strings-->
     <string name="invalid_email">Некорректный адрес</string>
     <string name="passwords_mismatch">Пароли не совпадают</string>
     <string name="invalid_password">Пароль меньше 6 символов</string>
     <string name="title_activity_login">LoginActivity</string>
 
-<!--    page titles-->
+    <!--    page titles-->
     <string name="screen_title_postline">Главная</string>
     <string name="screen_title_settings">Настройки</string>
     <string name="screen_title_music">Музыка</string>
@@ -31,16 +31,16 @@
     <string name="screen_title_create_post">Новый пост</string>
     <string name="screen_title_friends">Друзья</string>
 
-<!--    button titles-->
+    <!--    button titles-->
     <string name="edit_profile_btn_content">Редактировать профиль</string>
     <string name="write_message_btn_content">Написать сообщение</string>
 
-<!--    postregistration page titles-->
+    <!--    postregistration page titles-->
     <string name="screen_title_choose_genres">Выберите жанры</string>
     <string name="screen_title_choose_artists">Выберите исполнителей</string>
     <string name="screen_title_fill_user_data">Пришло время знакомиться!</string>
 
-<!--    user data form field placeholders-->
+    <!--    user data form field placeholders-->
     <string name="text_field_name_label">Имя</string>
     <string name="text_field_last_name_label">Фамилия</string>
     <string name="text_field_description_placeholder">Расскажите о себе</string>
@@ -54,7 +54,7 @@
 
     <string name="btn_description_back">Назад</string>
 
-<!--    user data form error messages-->
+    <!--    user data form error messages-->
     <string name="userform_firstname_error_message">Имя не может быть пустым</string>
     <string name="userform_lastname_error_message">Фамилия не может быть пустой</string>
     <string name="userform_birthday_error_message">Дата рождения должна быть задана</string>
@@ -63,21 +63,22 @@
     <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
 
 
-<!--    profile screen string constants-->
+    <!--    profile screen string constants-->
     <string name="profile_screen_photo_section_caption">Фотографии</string>
     <string name="profile_screen_friend_section_caption">Друзья</string>
     <string name="profile_screen_favorite_genres_section_caption">Любимые жанры</string>
 
-<!--    menu actions-->
+    <!--    menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
     <string name="menu_action_change_avatar">Обновить аватар</string>
 
 
-<!--    chat menu actions-->
+    <!--    chat menu actions-->
     <string name="chat_menu_open_profile">Открыть профиль</string>
     <string name="chat_menu_search">Поиск</string>
     <string name="chat_menu_delete_history">Удалить историю</string>
 
-<!--    toast error messages-->
+    <!--    toast error messages-->
     <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
+    <string name="message_input_placeholder">Ваше сообщение</string>
 </resources>

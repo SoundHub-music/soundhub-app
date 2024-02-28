@@ -2,8 +2,8 @@ package com.soundhub.data.model
 
 import java.util.UUID
 
-data class Genre(
+data class Track(
     val id: UUID = UUID.randomUUID(),
-    val name: String? = null,
-    val pictureURL: String? = null
+    val title: String = "",
+    val duration: Int
 )

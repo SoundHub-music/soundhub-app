@@ -44,7 +44,7 @@ import com.soundhub.ui.components.bars.top.TopAppBarBuilder
 import com.soundhub.ui.create_post.CreatePostScreen
 import com.soundhub.ui.friends.FriendListScreen
 import com.soundhub.ui.gallery.GalleryScreen
-import com.soundhub.ui.messenger_chat.MessengerChatScreen
+import com.soundhub.ui.messenger.chat.MessengerChatScreen
 import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.utils.Constants

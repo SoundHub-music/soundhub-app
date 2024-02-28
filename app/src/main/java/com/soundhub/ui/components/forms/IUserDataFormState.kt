@@ -10,7 +10,6 @@ interface IUserDataFormState {
     var country: String?
     var birthday: LocalDate?
     var city: String?
-    var languages: List<String>
     var description: String?
 
     var isFirstNameValid: Boolean

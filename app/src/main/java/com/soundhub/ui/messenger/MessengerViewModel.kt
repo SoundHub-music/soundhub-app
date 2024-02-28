@@ -6,4 +6,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MessengerViewModel @Inject constructor(): ViewModel() {
+
 }

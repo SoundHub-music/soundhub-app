@@ -16,7 +16,6 @@ interface IUser {
     var country: String?
     var birthday: LocalDate?
     var city: String?
-    var languages: List<String>
     var description: String?
     var gender: Gender
     var avatarUrl: String?
@@ -58,9 +57,6 @@ data class User(
     @ColumnInfo("password")
     var password: String? = null,
 
-    @ColumnInfo("languages")
-    override var languages: List<String> = emptyList(),
-
     @ColumnInfo("description")
     override var description: String? = "",
 
@@ -76,7 +72,6 @@ data class User(
         country = registerState?.country ?: ""
         birthday = registerState?.birthday
         city = registerState?.city ?: ""
-        languages = registerState?.languages ?: emptyList()
         description = registerState?.description ?: ""
     }
 }

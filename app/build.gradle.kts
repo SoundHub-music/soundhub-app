@@ -34,8 +34,6 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
 
         // Set API keys in BuildConfig
-        buildConfigField("String", "SERVER_API", properties.getProperty("SERVER_API"))
-        buildConfigField("String", "MOCKOON_API", properties.getProperty("MOCKOON_API"))
         buildConfigField("String", "COUNTRIES_API", properties.getProperty("COUNTRIES_API"))
         buildConfigField("String", "MUSICBRAINZ_API", properties.getProperty("MUSICBRAINZ_API"))
     }
@@ -83,7 +81,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("androidx.compose.ui:ui-text-android:1.6.1")
+    implementation("androidx.compose.ui:ui-text-android:1.6.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.annotation:annotation:1.7.1")
@@ -103,8 +101,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     //Dagger - Hilt
-    kapt("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.google.dagger:hilt-android:2.50")
     annotationProcessor("com.google.dagger:hilt-compiler:2.50")

@@ -37,7 +37,8 @@ fun FavoriteGenresSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
-            maxItemsInEachRow = 3
+            maxItemsInEachRow = 3,
+
         ) {
             genreList.forEach { genre ->
                 genre.name?.let {
@@ -53,11 +54,11 @@ fun FavoriteGenresSection(
     
             if (isOriginProfile) IconButton(
                 onClick = {
-                    /* TODO: make adding favorite genre logic */
+                    /* TODO: implement adding favorite genre logic */
                     navController.navigate(Route.Authentication.ChooseGenres.route)
                 },
                 modifier = Modifier.size(40.dp)
-            ) { Icon(Icons.Rounded.Add, contentDescription = null) }
+            ) { Icon(Icons.Rounded.Add, contentDescription = "add genre button") }
         }
     }
 }

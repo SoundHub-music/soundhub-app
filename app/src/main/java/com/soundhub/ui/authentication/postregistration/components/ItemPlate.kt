@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -51,16 +50,14 @@ fun ItemPlate(
 
     if (isItemChosen)
         itemBoxModifier = itemBoxModifier
-            .border(width = 5.dp, color = Color.White, shape = RoundedCornerShape(16.dp))
+            .border(width = 5.dp, color = MaterialTheme.colorScheme.primary)
 
     Column (
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box (
-            modifier = itemBoxModifier
-        ) {
+        Box (modifier = itemBoxModifier) {
             Image(
                 painter = icon,
                 contentDescription = "icon",

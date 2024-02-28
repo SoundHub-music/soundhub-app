@@ -11,7 +11,6 @@ import com.soundhub.UiStateDispatcher
 @Composable
 fun CustomTopAppBar(
     topBarTitle: String?,
-    currentRoute: String?,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
     navController: NavHostController
 ) {
@@ -20,8 +19,7 @@ fun CustomTopAppBar(
             modifier = Modifier.padding(0.dp),
             pageName = topBarTitle,
             actionButton = {
-                DynamicCustomTopBarButton(
-                    currentRoute = currentRoute,
+                TopBarActions(
                     navController = navController,
                     uiStateDispatcher = uiStateDispatcher
                 )

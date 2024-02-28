@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,21 +31,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.Route
+import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.CircularAvatar
 import com.soundhub.ui.components.buttons.LikeButton
 import com.soundhub.ui.components.pagination.PagerPaginationDots
 import com.soundhub.ui.gallery.ImageHorizontalPager
 import com.soundhub.ui.theme.borderColor
+import com.soundhub.utils.DateFormatter
+import java.time.LocalDateTime
 
 @Composable
 fun PostCard(
     modifier: Modifier = Modifier,
-    postAuthor: User,
-    publishDate: String,
-    avatarUrl: String? = null,
-    imageContent: List<String> = emptyList(),
-    textContent: String,
+    post: Post,
     navController: NavHostController
 ) {
     Card(
@@ -64,14 +62,14 @@ fun PostCard(
         border = BorderStroke(1.dp, borderColor)
     ) {
         PostHeader(
-            postAuthor = postAuthor,
-            publishDate = publishDate,
-            avatarUrl = avatarUrl,
+            postAuthor = post.author,
+            publishDate = post.publishDate,
+            avatarUrl = post.avatar,
             navController = navController
         )
-        PostContent(textContent = textContent)
-        PostImages(images = imageContent, navController = navController)
-        BottomCardPanel()
+        PostContent(textContent = post.content)
+        PostImages(images = post.imageContent, navController = navController)
+        BottomCardPanel(likes = post.likes)
     }
 }
 
@@ -80,10 +78,9 @@ private fun PostHeader(
     modifier: Modifier = Modifier,
     avatarUrl: String?,
     postAuthor: User,
-    publishDate: String,
+    publishDate: LocalDateTime,
     navController: NavHostController
 ) {
-    val context = LocalContext.current
     // row with author avatar, author name and publish date
     Row(
         modifier = modifier
@@ -109,7 +106,7 @@ private fun PostHeader(
                 letterSpacing = 0.15.sp
             )
             Text(
-                text = publishDate,
+                text = DateFormatter.getRelativeDate(publishDate),
                 fontSize = 16.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Medium,
@@ -145,31 +142,37 @@ private fun PostImages(
 
 @Composable
 private fun PostContent(modifier: Modifier = Modifier, textContent: String) {
-    Row(modifier = modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+    Row(modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
         Text(text = textContent)
     }
 }
 
 @Composable
-private fun BottomCardPanel() {
+private fun BottomCardPanel(likes: Int) {
     var isFavorite: Boolean by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(end = 8.dp, bottom = 8.dp, top = 8.dp),
         horizontalArrangement = Arrangement.End
-    ) { LikeButton(isFavorite = isFavorite) { isFavorite = it } }
+    ) {
+        if (likes > 0)
+            Text(text = likes.toString())
+        LikeButton(isFavorite = isFavorite) { isFavorite = it }
+    }
 }
 
 @Composable
 @Preview(name = "PostCard")
 fun PostCardPreview() {
     val navController = rememberNavController()
+    val post = Post(
+        author = User(firstName = "Billy", lastName = "Elish"),
+        content = "This is an example of PostCard"
+    )
 
     PostCard(
-        postAuthor = User(firstName = "Billy", lastName = "Elish"),
-        publishDate = "20 minutes ago",
-        textContent = "This is an example of PostCard",
+        post = post,
         navController = navController
     )
 }

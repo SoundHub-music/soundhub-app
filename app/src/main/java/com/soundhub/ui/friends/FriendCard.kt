@@ -14,8 +14,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,10 +30,10 @@ fun FriendCard(
 ) {
     ElevatedCard(
         modifier = modifier,
-        shape = RectangleShape,
+        shape = RoundedCornerShape(5.dp),
         colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.onBackground,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
             disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
         )
@@ -60,7 +58,7 @@ fun FriendCard(
                     text = getUserLocation(city = user?.city, country = user?.country),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.ExtraLight,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Left,
                 )
 

@@ -25,18 +25,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.ui.messenger.MessengerViewModel
 import java.util.UUID
 
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    userCreds: UserPreferences? = null
+    userCreds: UserPreferences? = null,
+    messengerViewModel: MessengerViewModel = hiltViewModel()
 ) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     // plug variable

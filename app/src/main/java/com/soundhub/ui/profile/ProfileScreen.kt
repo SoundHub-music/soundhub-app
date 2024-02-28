@@ -37,7 +37,7 @@ fun ProfileScreen(
         )
 
         UserProfileContainer(
-            user = userCreds,
+            user = userId,
             navController = navController
         )
     }

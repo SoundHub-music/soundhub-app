@@ -12,7 +12,6 @@ data class EditDataFormState(
     override var country: String? = "",
     override var birthday: LocalDate? = null,
     override var city: String? = "",
-    override var languages: List<String> = emptyList(),
     override var description: String? = "",
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,
@@ -27,7 +26,6 @@ data class EditDataFormState(
             country = user.country
             birthday = user.birthday
             city = user.city
-            languages = user.languages
             description = user.description
         }
     }

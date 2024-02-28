@@ -26,7 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.components.CircularAvatar
-import com.soundhub.ui.messenger_chat.ChatViewModel
+import com.soundhub.ui.messenger.chat.ChatViewModel
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)

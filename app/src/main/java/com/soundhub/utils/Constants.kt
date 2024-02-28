@@ -26,6 +26,7 @@ object Constants {
     const val LOG_USER_CREDS_TAG = "user_creds"
     const val LOG_REGISTER_STATE = "registration_state"
     const val LOG_CURRENT_ROUTE = "current_route"
+    const val LOG_SEARCH_TEXT = "search_text"
 
     const val DATE_FORMAT = "yyyy-MM-dd"
 
@@ -38,9 +39,6 @@ object Constants {
     val ROUTES_WITHOUT_TOP_APP_BAR: List<String> = listOf(
         Route.Authentication.withNavArg,
         Route.Authentication.route,
-//        Route.Authentication.ChooseGenres.route,
-//        Route.Authentication.ChooseArtists.route,
-//        Route.Authentication.FillUserData.route,
         Route.Profile().route
     )
 
@@ -52,6 +50,7 @@ object Constants {
     )
 
 
+    // nav arguments
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
     const val CHAT_NAV_ARG = "chatId"

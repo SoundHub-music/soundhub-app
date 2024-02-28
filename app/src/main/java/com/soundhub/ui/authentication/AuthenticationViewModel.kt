@@ -152,9 +152,18 @@ class AuthenticationViewModel @Inject constructor(
         when (currentRoute) {
             is Route.Authentication.ChooseGenres -> onEvent(AuthEvent.OnChooseArtists)
             is Route.Authentication.ChooseArtists -> onEvent(AuthEvent.OnFillUserData)
-            is Route.Authentication.FillUserData ->
+            is Route.Authentication.FillUserData -> {
+                registerState.update {
+                    it.copy(
+                        isFirstNameValid = it.firstName?.isNotEmpty() ?: false,
+                        isLastNameValid = it.lastName?.isNotEmpty() ?: false,
+                        isBirthdayValid = it.birthday != null
+                    )
+                }
+
                 if (Validator.validateRegistrationState(registerState.value))
                     onEvent(AuthEvent.OnRegister(User(registerState.value)))
+            }
             else -> Unit
         }
     }

@@ -19,6 +19,8 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.postline.components.PostCard
+import java.time.LocalDateTime
+import java.time.Month
 
 @Composable
 fun PostLineScreen(
@@ -30,9 +32,9 @@ fun PostLineScreen(
     val uiEvent: UiEvent? by uiStateDispatcher.uiEvent.collectAsState(initial = null)
     val posts = listOf(
         Post(
-            postAuthor = User(firstName = "Billie", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billie", lastName = "Elish"),
+            publishDate = LocalDateTime.now(),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = listOf(
                 "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8fDA%3D",
@@ -40,37 +42,37 @@ fun PostLineScreen(
             )
         ),
         Post(
-            postAuthor = User(firstName = "Billy", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billy", lastName = "Elish"),
+            publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = listOf("https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg")
         ),
         Post(
-            postAuthor = User(firstName = "Billy", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billy", lastName = "Elish"),
+            publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 26, 12, 11),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = User(firstName = "Billy", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billy", lastName = "Elish"),
+            publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = User(firstName = "Billy", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billy", lastName = "Elish"),
+            publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         ),
         Post(
-            postAuthor = User(firstName = "Billy", lastName = "Elish"),
-            publishDate = "20 minutes ago",
-            textContent = "sdfksofsopgsrgk",
+            author = User(firstName = "Billy", lastName = "Elish"),
+            publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
+            content = "sdfksofsopgsrgk",
             avatar = null,
             imageContent = emptyList()
         )
@@ -88,12 +90,8 @@ fun PostLineScreen(
         ) {
             items(items = posts, key = { it.id }) { post ->
                 PostCard(
-                    postAuthor = post.postAuthor,
-                    publishDate = post.publishDate,
-                    textContent = post.textContent,
-                    imageContent = post.imageContent,
-                    avatarUrl = post.avatar,
-                    navController = navController
+                    navController = navController,
+                    post = post
                 )
             }
         }

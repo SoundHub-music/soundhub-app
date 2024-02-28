@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
+import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val authViewModel: AuthenticationViewModel by viewModels()
+    private val messengerViewModel: MessengerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

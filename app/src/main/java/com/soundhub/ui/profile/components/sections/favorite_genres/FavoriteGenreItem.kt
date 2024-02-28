@@ -30,10 +30,12 @@ fun FavoriteGenreItem(genreName: String, genreColor: Color, modifier: Modifier =
                 .padding(8.dp)
                 .fillMaxWidth(),
             text = genreName,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 20.sp,
             fontSize = 14.sp,
+            maxLines = 1,
             textAlign = TextAlign.Center,
-            overflow = TextOverflow.Visible
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

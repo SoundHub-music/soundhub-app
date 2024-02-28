@@ -2,7 +2,6 @@ package com.soundhub.di
 
 import android.app.Application
 import androidx.room.Room
-import com.google.gson.GsonBuilder
 import com.soundhub.BuildConfig
 import com.soundhub.data.RoomUserDatabase
 import com.soundhub.data.datastore.UserStore
@@ -72,17 +71,17 @@ object AppModule {
             .build()
     }
 
-    @Provides
-    @Singleton
-    @Named("user_api")
-    fun providesUserApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val gson = GsonBuilder().setLenient().create()
-        return Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVER_API)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-    }
+//    @Provides
+//    @Singleton
+//    @Named("user_api")
+//    fun providesUserApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+//        val gson = GsonBuilder().setLenient().create()
+//        return Retrofit.Builder()
+//            .baseUrl(BuildConfig.SERVER_API)
+//            .client(okHttpClient)
+//            .addConverterFactory(GsonConverterFactory.create(gson))
+//            .build()
+//    }
 
     @Provides
     @Singleton
