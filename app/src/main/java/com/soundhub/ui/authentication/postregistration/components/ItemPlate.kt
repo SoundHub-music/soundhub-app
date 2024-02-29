@@ -81,5 +81,5 @@ fun ItemPlate(
 @Preview
 @Composable
 fun ItemPlatePreview() {
-    ItemPlate(caption = "Rap", icon = painterResource(id = R.drawable.item))
+    ItemPlate(caption = "Rap", icon = painterResource(id = R.drawable.musical_note))
 }

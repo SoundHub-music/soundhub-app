@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
@@ -26,9 +27,13 @@ class MainActivity : ComponentActivity() {
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val authViewModel: AuthenticationViewModel by viewModels()
     private val messengerViewModel: MessengerViewModel by viewModels()
+    private val splashScreenViewModel: SplashScreenViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val splashScreen = installSplashScreen()
+
+        splashScreen.setKeepOnScreenCondition{ splashScreenViewModel.isLoading.value }
         setContent {
             SoundHubTheme {
                 Surface(
