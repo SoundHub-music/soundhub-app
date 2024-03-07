@@ -11,6 +11,8 @@ interface IUserDataFormState {
     var birthday: LocalDate?
     var city: String?
     var description: String?
+    var avatarURL: String?
+    var languages: List<String>
 
     var isFirstNameValid: Boolean
     var isLastNameValid: Boolean

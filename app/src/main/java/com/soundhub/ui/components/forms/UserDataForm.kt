@@ -3,12 +3,18 @@ package com.soundhub.ui.components.forms
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -29,6 +35,7 @@ import com.soundhub.utils.Constants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserDataForm(
     formState: State<IUserDataFormState>,
@@ -39,9 +46,11 @@ fun UserDataForm(
     onGenderChange: (String) -> Unit = {},
     onCountryChange: (String) -> Unit = {},
     onCityChange: (String) -> Unit = {},
+    onLanguagesChange: (List<String>) -> Unit = {},
     userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 ) {
     var avatarUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var languageText by rememberSaveable { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -53,9 +62,9 @@ fun UserDataForm(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = formState.value.firstName ?: "",
+            onValueChange = onFirstNameChange,
             singleLine = true,
             label = { Text(text = stringResource(id = R.string.text_field_name_label)) },
-            onValueChange = onFirstNameChange,
             isError = !formState.value.isFirstNameValid,
             supportingText = {
                 if (!formState.value.isFirstNameValid)
@@ -94,6 +103,40 @@ fun UserDataForm(
                 value = formState.value.city ?: "",
                 onValueChange = onCityChange
             )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = stringResource(id = R.string.text_field_languages)) },
+                singleLine = true,
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        onLanguagesChange(formState.value.languages + languageText)
+                        languageText = ""
+                    }
+                ),
+                value = languageText,
+                onValueChange = { languageText = it },
+            )
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                formState.value.languages.forEach { lang ->
+                    SuggestionChip(
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        ),
+                        onClick = {
+                            onLanguagesChange(formState.value.languages.filter { it != lang })
+                        },
+                        label = { Text(text = lang) }
+                    )
+                }
+            }
+        }
 
         DatePicker(
             modifier = Modifier.fillMaxWidth(),

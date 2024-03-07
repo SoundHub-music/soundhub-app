@@ -8,14 +8,17 @@ import java.time.LocalDate
 data class EditDataFormState(
     override var firstName: String? = "",
     override var lastName: String? = "",
-    override var gender: Gender = Gender.Unknown,
+    override var gender: Gender = Gender.UNKNOWN,
     override var country: String? = "",
     override var birthday: LocalDate? = null,
     override var city: String? = "",
     override var description: String? = "",
+    override var avatarURL: String? = null,
+    override var languages: List<String> = emptyList(),
+
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,
-    override var isBirthdayValid: Boolean = true
+    override var isBirthdayValid: Boolean = true,
 
 ): IUserDataFormState {
     constructor(user: User?): this() {
@@ -27,6 +30,7 @@ data class EditDataFormState(
             birthday = user.birthday
             city = user.city
             description = user.description
+            languages = user.languages
         }
     }
 }

@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.AuthRepository
 import com.soundhub.ui.authentication.state.AuthFormState
 import com.soundhub.UiStateDispatcher
 import com.soundhub.data.model.Gender
@@ -14,11 +13,21 @@ import com.soundhub.ui.authentication.state.RegistrationState
 import com.soundhub.utils.Constants
 import com.soundhub.Route
 import com.soundhub.UiEvent
+import com.soundhub.data.model.ApiResult
+import com.soundhub.data.api.LogoutRequestBody
+import com.soundhub.data.api.LogoutResponse
+import com.soundhub.data.api.RefreshTokenRequestBody
+import com.soundhub.data.api.SignInRequestBody
+import com.soundhub.data.api.RegisterRequestBody
+import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
@@ -30,6 +39,7 @@ import javax.inject.Inject
 class AuthenticationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val uiStateDispatcher: UiStateDispatcher,
+    private val userRepository: UserRepository,
     private val userStore: UserStore
 ) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userStore.getCreds()
@@ -42,7 +52,11 @@ class AuthenticationViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userInstance.update { userStore.getUser().firstOrNull() }
+            userCreds.collect { creds ->
+                if (creds.accessToken != null) {
+                    userInstance.value = getCurrentUser().firstOrNull()
+                }
+            }
         }
     }
 
@@ -50,6 +64,7 @@ class AuthenticationViewModel @Inject constructor(
         super.onCleared()
         Log.d("auth_viewmodel", "vm cleared")
     }
+
 
     fun resetAuthFormState() = viewModelScope.launch {
         authFormState.update { AuthFormState() }
@@ -115,7 +130,7 @@ class AuthenticationViewModel @Inject constructor(
         catch (e: IllegalArgumentException) {
             Log.e("set_gender_error", e.message ?: "error")
             registerState.update {
-                it.copy(gender = Gender.Unknown)
+                it.copy(gender = Gender.UNKNOWN)
             }
         }
     }
@@ -125,11 +140,33 @@ class AuthenticationViewModel @Inject constructor(
     fun setCity(value: String) = registerState.update { it.copy(city = value) }
     fun setDescription(value: String) = registerState.update { it.copy(description = value) }
 
+    fun setLanguages(languages: List<String>) = registerState.update {
+        it.copy(languages = languages)
+    }
+
+    fun setLanguages(language: String) = registerState.update {
+        it.copy(languages = it.languages + language)
+    }
+
     fun logout() = viewModelScope.launch {
-        // TODO: remove password hashing
         Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[logout]: $userCreds")
-        userStore.clear()
-        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+        val tokens = userCreds.firstOrNull()
+        val logoutResponse: ApiResult<LogoutResponse> = authRepository.logout(
+            LogoutRequestBody(
+                accessToken = tokens?.accessToken,
+                refreshToken = tokens?.refreshToken
+            )
+        )
+        when (logoutResponse) {
+            is ApiResult.Success -> {
+                userStore.clear()
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+            }
+            is ApiResult.Error -> {
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast("Ошибка!"))
+                return@launch
+            }
+        }
     }
 
     fun authAction() {
@@ -141,7 +178,7 @@ class AuthenticationViewModel @Inject constructor(
                 )
             }
             onEvent(AuthEvent.OnChooseGenres)
-        } else onEvent(AuthEvent.OnLogin(authFormState.value.email, authFormState.value.password))
+        } else onEvent(AuthEvent.OnSignIn(authFormState.value.email, authFormState.value.password))
     }
 
     fun onPostRegisterNextButtonClick(currentRoute: Route) {
@@ -168,22 +205,65 @@ class AuthenticationViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getCurrentUser(): Flow<User?> = flow {
+        val creds = userCreds.firstOrNull()
+        val currentUserResponse: ApiResult<User?> = userRepository.getCurrentUser(creds?.accessToken)
+
+        when (currentUserResponse) {
+            is ApiResult.Success -> { emit(currentUserResponse.data) }
+            is ApiResult.Error -> {
+                if (currentUserResponse.code == 401) {
+                    val newCreds: ApiResult<UserPreferences?> = authRepository.refreshToken(
+                        RefreshTokenRequestBody(creds?.refreshToken)
+                    )
+                    userStore.updateCreds(newCreds.data)
+                    getCurrentUser()
+                }
+            }
+        }
+
+    }
+
+    private suspend fun onSignInEvent(event: AuthEvent.OnSignIn) {
+        try {
+            uiStateDispatcher.sendUiEvent(UiEvent.Loading(true))
+            val signInResponse: ApiResult<UserPreferences?> = authRepository.signIn(
+                SignInRequestBody(
+                    email = event.email,
+                    password = event.password
+                )
+            )
+
+            Log.d("sign_in_response", signInResponse.toString())
+
+            when (signInResponse) {
+                is ApiResult.Success -> {
+                    userStore.updateCreds(signInResponse.data)
+                    val currentUser: User? = getCurrentUser().firstOrNull()
+
+
+                    userInstance.update { currentUser }
+                    uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                }
+                is ApiResult.Error -> {
+                    uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(signInResponse.message ?: ""))
+                    return
+                }
+            }
+        }
+        catch (e: Exception) {
+            uiStateDispatcher.sendUiEvent(UiEvent.ShowToast("Произошла критическая ошибка: ${e.message}"))
+        }
+        finally {
+            uiStateDispatcher.sendUiEvent(UiEvent.Loading(false))
+        }
+    }
+
     private fun onEvent(event: AuthEvent) {
         when (event) {
-            is AuthEvent.OnLogin -> viewModelScope.launch {
-                val user: User? = authRepository.login(event.email, event.password)
-                if (user != null) {
-                    userStore.saveUser(user)
-                    uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
-                    uiStateDispatcher.sendUiEvent(
-                        UiEvent.ShowToast(
-                            message = "You successfully logged in!\n" +
-                                    "Your data: {email: ${event.email}, password: ${event.password}}"
-                        )
-                    )
-                } else uiStateDispatcher.sendUiEvent(UiEvent.ShowToast("Неверный логин или пароль"))
+            is AuthEvent.OnSignIn -> viewModelScope.launch(Dispatchers.IO) {
+                onSignInEvent(event)
             }
-
 
             is AuthEvent.OnRegister -> viewModelScope.launch {
                 uiStateDispatcher.sendUiEvent(
@@ -191,9 +271,21 @@ class AuthenticationViewModel @Inject constructor(
                         message = "You successfully signed up!\nYour data email: ${event.user.email}}",
                     )
                 )
-                authRepository.register(event.user)
-                userStore.saveUser(event.user)
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                val requestBody = RegisterRequestBody(registerState.value)
+                val registerResponse: ApiResult<UserPreferences?> = authRepository.signUp(requestBody)
+                Log.d("register_response", registerResponse.data.toString())
+
+                when (registerResponse) {
+                    is ApiResult.Success -> {
+                        userStore.updateCreds(registerResponse.data)
+                        userInstance.update { event.user }
+                        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                    }
+
+                    is ApiResult.Error -> {
+                        UiEvent.ShowToast("${registerResponse.code}: ${registerResponse.message}")
+                    }
+                }
             }
 
             is AuthEvent.OnChooseGenres ->

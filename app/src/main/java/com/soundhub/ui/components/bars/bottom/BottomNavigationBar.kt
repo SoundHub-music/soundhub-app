@@ -1,6 +1,5 @@
 package com.soundhub.ui.components.bars.bottom
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,28 +29,20 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.MessengerViewModel
 import java.util.UUID
 
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    userCreds: UserPreferences? = null,
+    user: User? = null,
     messengerViewModel: MessengerViewModel = hiltViewModel()
 ) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     // plug variable
     val unreadMessageCount = 1
-    var selectedItem: String by remember {
-        mutableStateOf(currentRoute ?: Route.Postline.route)
-    }
-
-    LaunchedEffect(key1 = currentRoute) {
-        Log.d("chosen_page", selectedItem)
-        selectedItem = currentRoute ?: Route.Postline.route
-    }
-
+    var selectedItem: String by remember { mutableStateOf(currentRoute ?: Route.Postline.route) }
 
     NavigationBar(
         modifier = Modifier
@@ -68,7 +58,7 @@ fun BottomNavigationBar(
     ) {
         getNavBarItems(
             unreadMessageCount = unreadMessageCount,
-            userId = userCreds?.id
+            userId = user?.id
         ).forEach{ item ->
             NavigationBarItem(
                 icon = item.icon,
@@ -122,5 +112,4 @@ private fun getNavBarItems(
 data class NavBarItem(
     val route: String = Route.Postline.route,
     val icon: @Composable () -> Unit,
-    val label: String? = "",
 )

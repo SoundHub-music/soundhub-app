@@ -19,7 +19,11 @@ sealed class Route(var route: String) {
     }
 
     object Postline: Route(route = Constants.POSTLINE_ROUTE)
-    object Music: Route(route = Constants.MUSIC_ROUTE)
+    object Music: Route(route = Constants.MUSIC_ROUTE) {
+        object NewOfTheWeek: Route(route = Constants.MUSIC_NEW_OF_THE_WEEK)
+        object NewOfTheMonth: Route(route = Constants.MUSIC_NEW_OF_THE_MONTH)
+        object RecommendMusic: Route(route = Constants.MUSIC_RECOMMENDATIONS)
+    }
     object FriendList: Route(route = Constants.FRIEND_LIST_ROUTE)
     object Gallery: Route(route = Constants.GALLERY_ROUTE)
 

@@ -1,6 +1,5 @@
 package com.soundhub.ui.profile.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,8 +13,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -24,29 +23,24 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.Genre
+import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
 import com.soundhub.ui.profile.components.sections.photos.UserPhotoCarousel
 import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonsRow
 import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
-import java.util.UUID
 
 
 @Composable
 fun UserProfileContainer(
-    user: UUID?,
+    user: User?,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val userCreds = authViewModel.userCreds.collectAsState(initial = null).value
-    val isOriginProfile: Boolean = userCreds?.id?.toString()?.equals(user?.toString()) ?: false
-    val userLocation: String = getUserLocation(userCreds?.city, userCreds?.country)
-
-    LaunchedEffect(user) {
-        Log.d("user_creds", userCreds?.id.toString())
-        Log.d("user_param", user.toString())
-    }
+    val authorizedUser by authViewModel.userInstance.collectAsState()
+    val isOriginProfile: Boolean = authorizedUser?.id?.toString() == user?.id?.toString()
+    val userLocation: String = getUserLocation(user?.city, user?.country)
 
     Box(
         modifier = Modifier
@@ -61,7 +55,7 @@ fun UserProfileContainer(
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             Column {
-                UserNameWithDescription(userCreds)
+                UserNameWithDescription(user)
                 // user location
                 if (userLocation.isNotEmpty())
                     Text(

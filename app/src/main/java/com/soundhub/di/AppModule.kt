@@ -1,17 +1,19 @@
 package com.soundhub.di
 
 import android.app.Application
-import androidx.room.Room
+import com.google.gson.GsonBuilder
 import com.soundhub.BuildConfig
-import com.soundhub.data.RoomUserDatabase
 import com.soundhub.data.datastore.UserStore
-import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.api.AuthApi
 import com.soundhub.UiStateDispatcher
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.MusicRepository
+import com.soundhub.data.api.UserApi
+import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.implementations.AuthRepositoryImpl
-import com.soundhub.utils.Constants
-import com.soundhub.utils.CustomLoggingInterceptor
+import com.soundhub.data.repository.UserRepository
+import com.soundhub.data.repository.implementations.UserRepositoryImpl
+import com.soundhub.utils.converters.LocalDateAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +22,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDate
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -28,60 +31,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesUserDatabase(app: Application): RoomUserDatabase {
-        return Room.databaseBuilder(
-            app,
-            RoomUserDatabase::class.java,
-            Constants.DB_USERS
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun providesUiEventDispatcher(
-        userStore: UserStore,
-    ): UiStateDispatcher {
-        return UiStateDispatcher(userStore)
-    }
-
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(db: RoomUserDatabase): AuthRepository {
-        return AuthRepositoryImpl(db.dao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserDataStore(app: Application): UserStore {
-        return UserStore(app)
-    }
-
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .addInterceptor(CustomLoggingInterceptor())
-            .build()
-    }
-
-//    @Provides
-//    @Singleton
-//    @Named("user_api")
-//    fun providesUserApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
-//        val gson = GsonBuilder().setLenient().create()
-//        return Retrofit.Builder()
-//            .baseUrl(BuildConfig.SERVER_API)
-//            .client(okHttpClient)
-//            .addConverterFactory(GsonConverterFactory.create(gson))
-//            .build()
-//    }
+    fun providesUiEventDispatcher(): UiStateDispatcher = UiStateDispatcher()
 
     @Provides
     @Singleton
@@ -102,6 +52,62 @@ object AppModule {
             .baseUrl(BuildConfig.MUSICBRAINZ_API)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("soundhub_api")
+    fun providesSoundHubApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+            .create()
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.SOUNDHUB_API)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuthApi(@Named("soundhub_api") retrofit: Retrofit): AuthApi {
+        return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuthRepository(authApi: AuthApi): AuthRepository {
+        return AuthRepositoryImpl(authApi)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserApi(@Named("soundhub_api") retrofit: Retrofit): UserApi {
+        return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserRepository(userApi: UserApi): UserRepository {
+        return UserRepositoryImpl(userApi)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserDataStore(app: Application): UserStore {
+        return UserStore(app)
+    }
+
+    @Provides
+    @Singleton
+    fun providesOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 

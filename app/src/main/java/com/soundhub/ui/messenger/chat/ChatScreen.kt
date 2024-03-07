@@ -29,30 +29,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.messenger.chat.components.MessageBoxContainer
-import com.soundhub.ui.messenger.chat.components.MessageInputBox
+import com.soundhub.ui.messenger.chat.components.input_box.MessageInputBox
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDate
 
 @Composable
-fun MessengerChatScreen(
+fun ChatScreen(
     chatId: String? = null,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
     val messages = chatViewModel.messages.collectAsState().value
-//    val messages = listOf(
-//        Message(content = "fgsrsg", timestamp = LocalDateTime.of(2024, Month.DECEMBER, 15, 12, 12)),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//        Message(content = "fgsrsg"),
-//    )
     val lazyListState = rememberLazyListState()
     val itemIndex by remember {
         derivedStateOf { lazyListState.firstVisibleItemIndex }
@@ -67,7 +54,7 @@ fun MessengerChatScreen(
         modifier = Modifier
             .paint(painter = backgroundImage, contentScale = ContentScale.Crop)
             .background(Color.Transparent)
-            .padding(start = 5.dp, end = 5.dp, bottom = 10.dp),
+            .padding(start = 5.dp, end = 5.dp, bottom = 10.dp, top = 10.dp),
     ) {
         Column(verticalArrangement = Arrangement.SpaceBetween) {
             MessageBoxContainer(
@@ -103,7 +90,7 @@ private fun MessageDateChip(date: LocalDate) {
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                text = DateFormatter.getStringMonthAndDay(date),
+                text = DateFormatter.getStringDate(date),
             )
         }
     }

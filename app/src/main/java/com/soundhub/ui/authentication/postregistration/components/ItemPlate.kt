@@ -50,7 +50,11 @@ fun ItemPlate(
 
     if (isItemChosen)
         itemBoxModifier = itemBoxModifier
-            .border(width = 5.dp, color = MaterialTheme.colorScheme.primary)
+            .border(
+                width = 5.dp,
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(16.dp)
+            )
 
     Column (
         modifier = modifier,

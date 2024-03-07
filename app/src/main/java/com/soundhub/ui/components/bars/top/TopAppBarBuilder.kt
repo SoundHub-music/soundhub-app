@@ -24,6 +24,10 @@ internal fun TopAppBarBuilder(
         }
         Route.Messenger.Chat().route -> ChatTopAppBar(navController = navController)
         in Constants.ROUTES_WITHOUT_TOP_APP_BAR -> {}
-        else -> { DefaultTopAppBar(topBarTitle, navController) }
+        else -> { DefaultTopAppBar(
+            topBarTitle = topBarTitle,
+            navController = navController,
+            uiStateDispatcher = uiStateDispatcher
+        ) }
     }
 }

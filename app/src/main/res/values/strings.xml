@@ -5,7 +5,7 @@
     <string name="lets_start_login_btn">Давайте начнем</string>
     <string name="get_account_switch_label">Стать частью сообщества</string>
     <string name="email_placeholder">example@mail.com</string>
-    <string name="password_placeholder">Ваш пароль. Не менее 6 символов</string>
+    <string name="password_placeholder">Ваш пароль. Не менее 8 символов</string>
     <string name="repeat_password_label">Повторите пароль</string>
     <string name="password_label">Пароль</string>
     <string name="email_label">Email</string>
@@ -18,7 +18,7 @@
     <!--    validation strings-->
     <string name="invalid_email">Некорректный адрес</string>
     <string name="passwords_mismatch">Пароли не совпадают</string>
-    <string name="invalid_password">Пароль меньше 6 символов</string>
+    <string name="invalid_password">Пароль меньше 8 символов</string>
     <string name="title_activity_login">LoginActivity</string>
 
     <!--    page titles-->
@@ -51,6 +51,7 @@
     <string name="text_field_country_label">Страна</string>
     <string name="text_field_city">Город</string>
     <string name="text_field_birthdate">Дата рождения</string>
+    <string name="text_field_languages">Языки</string>
 
     <string name="btn_description_back">Назад</string>
 
@@ -62,11 +63,12 @@
 
     <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
 
-
     <!--    profile screen string constants-->
     <string name="profile_screen_photo_section_caption">Фотографии</string>
     <string name="profile_screen_friend_section_caption">Друзья</string>
     <string name="profile_screen_favorite_genres_section_caption">Любимые жанры</string>
+    <string name="profile_screen_user_birthday">День рождения: </string>
+    <string name="profile_screen_user_description">О себе: </string>
 
     <!--    menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
@@ -81,4 +83,35 @@
     <!--    toast error messages-->
     <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
     <string name="message_input_placeholder">Ваше сообщение</string>
+
+    <!--    settings menu items-->
+    <string name="dark_theme_settings">Темная тема</string>
+    <string name="account_settings">Аккаунт</string>
+    <string name="appearance_settings">Внешний вид</string>
+    <string name="notification_settings">Уведомления</string>
+    <string name="about_app_settings">О приложении</string>
+
+    <!--    empty messenger strings-->
+    <string name="empty_messenger_screen">У вас еще нет истории переписок</string>
+    <string name="empty_messenger_screen_button">Написать другу</string>
+
+    <string name="music_main_page">Главная</string>
+    <string name="music_library_page">Библиотека</string>
+
+    <!--    music section titles-->
+    <string name="music_recommendation_section_title">Подобрано для вас</string>
+    <string name="music_friend_music_section_title">Что слушают твои друзья</string>
+
+    <!--    music recommendation plate titles-->
+    <string name="music_new_of_the_week">Новинки недели</string>
+    <string name="music_new_of_the_month">Новинки месяца</string>
+    <string name="music_recommendations">Неизведанное вами</string>
+
+    <!--    library page items-->
+    <string name="music_library_page_playlists">Плейлисты</string>
+    <string name="music_library_page_albums">Альбомы</string>
+    <string name="music_library_page_favorites">Любимое</string>
+    <string name="music_libray_page_artists">Исполнители</string>
+
+    <string name="music_auth_service_text">Получить доступ к своей библиотеке</string>
 </resources>

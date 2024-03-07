@@ -6,6 +6,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,6 +18,7 @@ import com.soundhub.utils.Constants
 import com.soundhub.Route
 import com.soundhub.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
+import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
 
 @Composable
@@ -27,6 +29,10 @@ fun TopBarActions(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val isMenuExpanded = rememberSaveable { mutableStateOf(false) }
+    val uiState by uiStateDispatcher.uiState.collectAsState()
+
+    val isSearchBarActive = uiState.isSearchBarActive
+    val searchBarText = uiState.searchBarText
 
     when (currentRoute) {
         Route.EditUserData.route -> {
@@ -38,7 +44,13 @@ fun TopBarActions(
 
         Route.Postline.route -> PostlineNotificationTopBarButton(navController)
         in listOf(Route.Music.route, Route.Messenger.route, Route.FriendList.route) -> {
-            SearchButton(uiStateDispatcher)
+            if (isSearchBarActive)
+                TransparentSearchTextField(
+                    value = searchBarText,
+                    onValueChange = uiStateDispatcher::updateSearchBarText,
+                    uiStateDispatcher = uiStateDispatcher
+                )
+            else SearchButton(uiStateDispatcher)
         }
 
         Route.Messenger.Chat().route -> {

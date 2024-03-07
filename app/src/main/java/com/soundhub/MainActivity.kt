@@ -19,7 +19,9 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
 import com.soundhub.ui.messenger.MessengerViewModel
+import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.utils.Constants
+import com.soundhub.viewmodels.SplashScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private val authViewModel: AuthenticationViewModel by viewModels()
     private val messengerViewModel: MessengerViewModel by viewModels()
     private val splashScreenViewModel: SplashScreenViewModel by viewModels()
+    private val chatViewModel: ChatViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
 
                                 is UiEvent.PopBackStack -> navController.popBackStack()
                                 is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
+                                is UiEvent.Loading -> uiStateDispatcher.setLoading(event.isLoading)
                                 else -> Unit
                             }
                         }
@@ -81,7 +85,9 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(
                         navController = navController,
                         authViewModel = authViewModel,
-                        uiStateDispatcher = uiStateDispatcher
+                        uiStateDispatcher = uiStateDispatcher,
+                        chatViewModel = chatViewModel,
+                        messengerViewModel = messengerViewModel
                     )
                 }
             }

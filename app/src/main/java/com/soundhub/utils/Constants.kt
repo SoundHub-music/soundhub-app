@@ -3,24 +3,14 @@ package com.soundhub.utils
 import com.soundhub.Route
 
 object Constants {
-    const val PASSWORD_MIN_LENGTH: Int = 6
+    const val PASSWORD_MIN_LENGTH: Int = 8
     const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
     const val NAV_ARG_REGEX: String = """\{[^}]*\}"""
 
-    const val DB_USERS: String = "users"
-
     // datastore identifiers
     const val DATASTORE_USER_CREDS = "user_creds"
-    const val DATASTORE_USER_FIRST_NAME = "user_first_name"
-    const val DATASTORE_USER_LASTNAME = "user_last_name"
-    const val DATASTORE_USER_ID = "user_id"
-    const val DATASTORE_USER_COUNTRY = "user_country"
-    const val DATASTORE_USER_CITY = "user_city"
-    const val DATASTORE_USER_EMAIL = "user_email"
-    const val DATASTORE_USER_DESCRIPTION = "user_description"
-    /* TODO: make datastore saving logic for user languages */
-    const val DATASTORE_USER_LANGUAGES = "user_languages"
-    const val DATASTORE_SESSION_TOKEN = "user_session_token"
+    const val DATASTORE_ACCESS_TOKEN = "user_access_token"
+    const val DATASTORE_REFRESH_TOKEN = "user_refresh_token"
 
     const val LOG_CURRENT_EVENT_TAG = "current_event"
     const val LOG_USER_CREDS_TAG = "user_creds"
@@ -54,22 +44,32 @@ object Constants {
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
     const val CHAT_NAV_ARG = "chatId"
-    const val GALLERY_NAV_ARG = "imageIndex"
+    const val GALLERY_INITIAL_PAGE_NAV_ARG = "imageIndex"
 
     // routes
+    // authentication routes
     const val AUTHENTICATION_ROUTE = "authentication"
     const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
     const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
     const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
+
+
     const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
     const val POSTLINE_ROUTE = "postline"
     const val MUSIC_ROUTE = "music"
+
+    // messenger routes
     const val MESSENGER_ROUTE = "messenger"
     const val MESSENGER_CHAT_ROUTE = "$MESSENGER_ROUTE/chat/{$CHAT_NAV_ARG}"
+
     const val SETTINGS_ROUTE = "settings"
     const val NOTIFICATIONS_ROUTE = "notifications"
     const val EDIT_USER_DATA_ROUTE = "edit-data"
     const val CREATE_POST_ROUTE = "create-post"
     const val GALLERY_ROUTE = "gallery"
     const val FRIEND_LIST_ROUTE = "friends"
+
+    const val MUSIC_NEW_OF_THE_WEEK = "new-of-the-week"
+    const val MUSIC_NEW_OF_THE_MONTH = "new-of-the-month"
+    const val MUSIC_RECOMMENDATIONS = "recommend-music"
 }

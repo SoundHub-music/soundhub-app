@@ -80,7 +80,7 @@ fun PostLineScreen(
     )
 
     ContentContainer {
-        if (uiEvent == UiEvent.Loading)
+        if (uiEvent is UiEvent.Loading)
             CircleLoader()
         else if (posts.isEmpty())
             Text(text = "Здесь все ещё пусто :(")

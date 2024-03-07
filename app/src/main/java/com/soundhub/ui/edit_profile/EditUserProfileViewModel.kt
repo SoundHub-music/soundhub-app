@@ -1,32 +1,22 @@
 package com.soundhub.ui.edit_profile
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.soundhub.data.datastore.UserStore
 import com.soundhub.data.model.Gender
+import com.soundhub.data.model.User
 import com.soundhub.ui.edit_profile.state.EditDataFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class EditUserProfileViewModel @Inject constructor(
-    userStore: UserStore
-): ViewModel() {
+class EditUserProfileViewModel @Inject constructor(): ViewModel() {
     var formState = MutableStateFlow(EditDataFormState())
         private set
 
-    init {
-        viewModelScope.launch {
-            formState.update { EditDataFormState(userStore.getUser().firstOrNull()) }
-        }
-    }
-
+    fun setUser(user: User?) = formState.update { EditDataFormState(user) }
     fun onFirstNameChange(value: String) = formState.update {
         it.copy(firstName = value)
     }
@@ -48,7 +38,7 @@ class EditUserProfileViewModel @Inject constructor(
             it.copy(gender = Gender.valueOf(value))
         }
         catch (e: IllegalArgumentException) {
-            it.copy(gender = Gender.Unknown)
+            it.copy(gender = Gender.UNKNOWN)
         }
     }
 

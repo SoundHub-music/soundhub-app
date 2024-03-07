@@ -21,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.model.User
 
 @Composable
-internal fun UserNameWithDescription(user: UserPreferences? = null) {
+internal fun UserNameWithDescription(user: User? = null) {
     var isDescriptionButtonChecked: Boolean by rememberSaveable {
         mutableStateOf(false)
     }

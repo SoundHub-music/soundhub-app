@@ -1,0 +1,5 @@
+package com.soundhub.data.enums
+
+enum class ApiStatus {
+    SUCCESS, ERROR, LOADING
+}

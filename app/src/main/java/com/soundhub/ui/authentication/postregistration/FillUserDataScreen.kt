@@ -53,7 +53,8 @@ fun FillUserDataScreen(
                 onGenderChange = authViewModel::setGender,
                 onDescriptionChange = authViewModel::setDescription,
                 onCountryChange = authViewModel::setCountry,
-                onCityChange = authViewModel::setCity
+                onCityChange = authViewModel::setCity,
+                onLanguagesChange = authViewModel::setLanguages
             )
         }
 

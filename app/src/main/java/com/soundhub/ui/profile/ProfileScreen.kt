@@ -11,17 +11,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.profile.components.sections.avatar.ProfileUserAvatar
 import com.soundhub.ui.profile.components.UserProfileContainer
-import java.util.UUID
 
 @Composable
 fun ProfileScreen(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     navController: NavHostController,
     userCreds: UserPreferences? = null,
-    userId: UUID? = null,
+    user: User? = null,
 ) {
     Column(
         modifier = Modifier
@@ -37,7 +37,7 @@ fun ProfileScreen(
         )
 
         UserProfileContainer(
-            user = userId,
+            user = user,
             navController = navController
         )
     }

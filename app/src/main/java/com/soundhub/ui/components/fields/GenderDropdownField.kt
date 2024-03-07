@@ -27,9 +27,9 @@ fun GenderDropdownField(
 ) {
     var isGenderDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     val genders: Map<String, String> = mapOf(
-        Gender.Male.name to stringResource(id = R.string.gender_item_male),
-        Gender.Female.name to stringResource(id = R.string.gender_item_female),
-        Gender.Unknown.name to stringResource(id = R.string.gender_item_unknown)
+        Gender.MALE.name to stringResource(id = R.string.gender_item_male),
+        Gender.FEMALE.name to stringResource(id = R.string.gender_item_female),
+        Gender.UNKNOWN.name to stringResource(id = R.string.gender_item_unknown)
     )
 
     ExposedDropdownMenuBox(

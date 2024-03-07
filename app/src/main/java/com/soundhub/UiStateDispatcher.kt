@@ -2,7 +2,6 @@ package com.soundhub
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.datastore.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -15,31 +14,19 @@ import javax.inject.Inject
 data class UIState(
     var isSearchBarActive: Boolean = false,
     var searchBarText: String = "",
-    var galleryUrls: List<String> = emptyList()
+    var galleryImageUrls: List<String> = emptyList(),
+    var isLoading: Boolean = false
 )
 
 @HiltViewModel
 class UiStateDispatcher @Inject constructor(
-    private val userDataStore: UserStore
+//    private val userDataStore: UserStore
 ) : ViewModel() {
     private var _uiEvent = Channel<UiEvent>()
     val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     var uiState = MutableStateFlow(UIState())
         private set
-
-    init {
-        viewModelScope.launch {
-            userDataStore.getCreds().collect { creds ->
-                // TODO: change id to session token
-                if (creds.id != null) {
-                    sendUiEvent(UiEvent.Navigate(Route.Postline))
-                } else {
-                    sendUiEvent(UiEvent.Navigate(Route.Authentication))
-                }
-            }
-        }
-    }
 
     fun clearState() = uiState.update { UIState() }
 
@@ -56,8 +43,10 @@ class UiStateDispatcher @Inject constructor(
     }
 
     fun setGalleryUrls(value: List<String>) = uiState.update {
-        it.copy(galleryUrls = value)
+        it.copy(galleryImageUrls = value)
     }
+
+    fun setLoading(value: Boolean) = uiState.update { it.copy(isLoading = value) }
 
     fun sendUiEvent(event: UiEvent) = viewModelScope.launch { _uiEvent.send(event) }
 }

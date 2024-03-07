@@ -15,6 +15,6 @@ sealed class UiEvent {
     ): UiEvent()
 
     object SearchButtonClick: UiEvent()
-    object Loading: UiEvent()
+    data class Loading(val isLoading: Boolean = false): UiEvent()
     data class Error(val message: String = ""): UiEvent()
 }

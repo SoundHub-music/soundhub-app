@@ -50,8 +50,10 @@ class DateFormatter {
             }
         }
 
-        fun getStringMonthAndDay(date: LocalDate): String {
-            return "${date.dayOfMonth} ${russianLocaleMonths[date.month]}"
+        fun getStringDate(date: LocalDate, includeYear: Boolean = false): String {
+            var stringDate = "${date.dayOfMonth} ${russianLocaleMonths[date.month]}"
+            if (includeYear) stringDate += " ${date.year}"
+            return stringDate
         }
 
 
