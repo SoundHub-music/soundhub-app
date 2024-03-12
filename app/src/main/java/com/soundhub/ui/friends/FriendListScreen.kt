@@ -1,30 +1,59 @@
 package com.soundhub.ui.friends
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.soundhub.UiStateDispatcher
+import androidx.navigation.NavHostController
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.containers.ContentContainer
+import com.soundhub.ui.friends.components.UserFriendsPage
+import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.utils.SearchUtils
+import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FriendListScreen(
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
+    val tabs = listOf(
+        FriendListPage.MAIN,
+        FriendListPage.RECOMMENDATIONS
+    )
+
+    val scope = rememberCoroutineScope()
+    val selectedTabState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { tabs.size }
+    )
+
     val friends = listOf(
         User(
             firstName = "Alexey",
@@ -59,20 +88,43 @@ fun FriendListScreen(
     }
 
     ContentContainer {
-        LazyColumn(
-            modifier = Modifier
-        ) {
-            items(items = filteredFriendList, key = { it.id }) {user ->
-                FriendCard(user = user)
-                HorizontalDivider(thickness = 1.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            PrimaryTabRow(
+                selectedTabIndex = selectedTabState.currentPage,
+            ) {
+                tabs.forEachIndexed { index, tab ->
+                    Tab(
+                        selected = index == selectedTabState.currentPage,
+                        onClick = {
+                            scope.launch { selectedTabState.animateScrollToPage(index) }
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(id = tab.titleId),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                fontFamily = FontFamily.SansSerif
+                            )
+                        }
+                    )
+                }
+            }
+
+            HorizontalPager(
+                state = selectedTabState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                // TODO: implement dynamic friend list depending on the selected tab
+                val userList = filteredFriendList
+
+                UserFriendsPage(
+                    friendList = userList,
+                    navController = navController,
+                    chosenPage = tabs[page]
+                )
+
             }
         }
     }
-}
-
-
-@Composable
-@Preview(showBackground = true)
-fun FriendListScreenPreview() {
-    FriendListScreen()
 }

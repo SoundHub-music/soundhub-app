@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,20 +16,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
 import com.soundhub.Route
+import com.soundhub.ui.states.RegistrationState
 
 @Composable
 fun FillUserDataScreen(
     modifier: Modifier = Modifier,
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    navController: NavHostController
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
-    val registerState = authViewModel.registerState.collectAsState()
+    val registerState: State<RegistrationState> = registrationViewModel
+        .registerState.collectAsState()
 
     Box(
         modifier = modifier
@@ -47,14 +47,14 @@ fun FillUserDataScreen(
 
             UserDataForm(
                 formState = registerState,
-                onFirstNameChange = authViewModel::setFirstName,
-                onLastNameChange = authViewModel::setLastName,
-                onBirthdayChange = authViewModel::setBirthday,
-                onGenderChange = authViewModel::setGender,
-                onDescriptionChange = authViewModel::setDescription,
-                onCountryChange = authViewModel::setCountry,
-                onCityChange = authViewModel::setCity,
-                onLanguagesChange = authViewModel::setLanguages
+                onFirstNameChange = registrationViewModel::setFirstName,
+                onLastNameChange = registrationViewModel::setLastName,
+                onBirthdayChange = registrationViewModel::setBirthday,
+                onGenderChange = registrationViewModel::setGender,
+                onDescriptionChange = registrationViewModel::setDescription,
+                onCountryChange = registrationViewModel::setCountry,
+                onCityChange = registrationViewModel::setCity,
+                onLanguagesChange = registrationViewModel::setLanguages
             )
         }
 
@@ -62,6 +62,9 @@ fun FillUserDataScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
-        ) { authViewModel.onPostRegisterNextButtonClick(Route.Authentication.FillUserData) }
+        ) {
+            registrationViewModel
+            .onPostRegisterNextBtnClick(Route.Authentication.FillUserData)
+        }
     }
 }

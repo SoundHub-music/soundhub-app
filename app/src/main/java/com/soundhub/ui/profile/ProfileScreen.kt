@@ -10,17 +10,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.profile.components.sections.avatar.ProfileUserAvatar
+import com.soundhub.ui.profile.components.sections.avatar.UserProfileAvatar
 import com.soundhub.ui.profile.components.UserProfileContainer
 
 @Composable
 fun ProfileScreen(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     navController: NavHostController,
-    userCreds: UserPreferences? = null,
     user: User? = null,
 ) {
     Column(
@@ -30,10 +28,10 @@ fun ProfileScreen(
         // negative indent provides an overlay of the content on the avatar
         verticalArrangement = Arrangement.spacedBy((-30).dp)
     ) {
-        ProfileUserAvatar(
+        UserProfileAvatar(
             navController = navController,
             authViewModel = authViewModel,
-            userCreds = userCreds
+            user = user
         )
 
         UserProfileContainer(

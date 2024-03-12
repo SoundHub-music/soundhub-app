@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 

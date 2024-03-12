@@ -12,57 +12,56 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.utils.Constants
-import com.soundhub.viewmodels.SplashScreenViewModel
+import com.soundhub.ui.viewmodels.SplashScreenViewModel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val uiStateDispatcher: UiStateDispatcher by viewModels()
+    private val registrationViewModel: RegistrationViewModel by viewModels()
+    private val splashScreenViewModel: SplashScreenViewModel by viewModels()
     private val authViewModel: AuthenticationViewModel by viewModels()
     private val messengerViewModel: MessengerViewModel by viewModels()
-    private val splashScreenViewModel: SplashScreenViewModel by viewModels()
+    private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val splashScreen = installSplashScreen()
-
+        val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition{ splashScreenViewModel.isLoading.value }
+
         setContent {
-            SoundHubTheme {
+            SoundHubTheme(dynamicColor = false) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface
                 ) {
                     val navController: NavHostController = rememberNavController()
                     val context = LocalContext.current
+                    val uiEventState = uiStateDispatcher.uiEvent
 
                     navController.addOnDestinationChangedListener { _, _, _ ->
                         uiStateDispatcher.setSearchBarActive(false)
                     }
 
-                    LaunchedEffect(key1 = authViewModel.registerState) {
-                        authViewModel.registerState.collect {
-                            Log.d("register_state", authViewModel.registerState.value.toString())
-                        }
-                    }
-
-                    LaunchedEffect(key1 = uiStateDispatcher.uiEvent) {
-                        uiStateDispatcher.uiEvent.collect { event ->
+                    LaunchedEffect(key1 = uiEventState) {
+                        uiEventState.collect { event ->
                             Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
                             when (event) {
                                 is UiEvent.ShowToast -> Toast.makeText(
                                     context,
-                                    event.message,
+                                    event.uiText.getString(context),
                                     Toast.LENGTH_SHORT
                                 ).show()
 
@@ -76,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
                                 is UiEvent.PopBackStack -> navController.popBackStack()
                                 is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
-                                is UiEvent.Loading -> uiStateDispatcher.setLoading(event.isLoading)
+                                is UiEvent.UpdateCurrentUser -> authViewModel.setCurrentUser(event.user)
                                 else -> Unit
                             }
                         }
@@ -87,10 +86,23 @@ class MainActivity : ComponentActivity() {
                         authViewModel = authViewModel,
                         uiStateDispatcher = uiStateDispatcher,
                         chatViewModel = chatViewModel,
-                        messengerViewModel = messengerViewModel
+                        messengerViewModel = messengerViewModel,
+                        registrationViewModel = registrationViewModel
                     )
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("MainActivity", "onDestroy: user has closed the app")
+        // TODO: implement setting offline user status
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("MainActivity", "onStop: user has minimized the app")
+        // TODO: implement setting offline user status after a certain time
     }
 }

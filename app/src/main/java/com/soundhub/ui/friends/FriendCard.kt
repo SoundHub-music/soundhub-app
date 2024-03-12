@@ -9,29 +9,39 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.soundhub.R
+import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.CircularAvatar
+import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.profile.components.getUserLocation
 
 @Composable
 fun FriendCard(
     modifier: Modifier = Modifier,
-    user: User? = null
+    navController: NavHostController,
+    user: User,
+    chosenPage: FriendListPage
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(5.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.onBackground,
@@ -40,39 +50,55 @@ fun FriendCard(
         )
     ) {
         Row(
-            modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CircularAvatar(
-                imageUrl = user?.avatarUrl,
-                modifier = Modifier.size(72.dp)
-            )
-            Column(modifier = Modifier) {
-                Text(
-                    text = "${user?.firstName} ${user?.lastName}".trim(),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp,
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularAvatar(
+                    imageUrl = user.avatarUrl,
+                    modifier = Modifier.size(64.dp)
                 )
-
-                Text(
-                    text = getUserLocation(city = user?.city, country = user?.country),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraLight,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Left,
-                )
-
-                TextButton(
-                    onClick = { /*TODO*/ },
-                    shape = RoundedCornerShape(5.dp),
-                    modifier = Modifier
-                ) {
+                Column(modifier = Modifier) {
                     Text(
-                        text = "Написать сообщение",
-                        fontSize = 10.sp,
+                        text = "${user.firstName} ${user.lastName}".trim(),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                    )
+
+                    Text(
+                        text = when (chosenPage) {
+                            FriendListPage.MAIN ->
+                                getUserLocation(city = user.city, country = user.country)
+                            FriendListPage.RECOMMENDATIONS ->
+                                // TODO: implement the logic of determining user similarity
+                                stringResource(R.string.friends_recommendation_page_card_caption, 98)
+                        },
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraLight,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Left,
                     )
                 }
+
+            }
+            FilledTonalIconButton(
+                onClick = {
+                    navController.navigate(Route.Messenger.Chat(user.id.toString()).route)
+                },
+                shape = RoundedCornerShape(5.dp),
+                modifier = Modifier,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
+                    contentDescription = "send message"
+                )
             }
         }
     }
@@ -81,6 +107,7 @@ fun FriendCard(
 @Composable
 @Preview
 fun FriendCardPreview() {
+    val navController = rememberNavController()
     val user = User(
         firstName = "Alexey",
         lastName = "Zaycev",
@@ -88,5 +115,9 @@ fun FriendCardPreview() {
         country = "Russia",
         city = "Novosibirsk"
     )
-    FriendCard(user = user)
+    FriendCard(
+        user = user,
+        navController = navController,
+        chosenPage = FriendListPage.MAIN
+    )
 }

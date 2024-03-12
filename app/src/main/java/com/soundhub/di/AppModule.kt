@@ -3,16 +3,24 @@ package com.soundhub.di
 import android.app.Application
 import com.google.gson.GsonBuilder
 import com.soundhub.BuildConfig
-import com.soundhub.data.datastore.UserStore
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.api.AuthApi
-import com.soundhub.UiStateDispatcher
+import com.soundhub.data.api.ChatApi
+import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.data.api.CountryApi
+import com.soundhub.data.api.MusicApi
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.api.UserApi
 import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.implementations.AuthRepositoryImpl
 import com.soundhub.data.repository.UserRepository
+import com.soundhub.data.repository.implementations.ChatRepositoryImpl
+import com.soundhub.data.repository.implementations.CountryRepositoryImpl
+import com.soundhub.data.repository.implementations.MusicRepositoryImpl
 import com.soundhub.data.repository.implementations.UserRepositoryImpl
+import com.soundhub.utils.Constants
 import com.soundhub.utils.converters.LocalDateAdapter
 import dagger.Module
 import dagger.Provides
@@ -35,7 +43,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named("country_api")
+    fun providesUserDataStore(app: Application): UserCredsStore {
+        return UserCredsStore(app)
+    }
+
+    @Provides
+    @Singleton
+    @Named(Constants.COUNTRIES_API_LABEL)
     fun providesCountryApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.COUNTRIES_API)
@@ -46,7 +60,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named("musicbrainz_api")
+    @Named(Constants.MUSIC_API_LABEL)
     fun providesMusicBrainzRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.MUSICBRAINZ_API)
@@ -57,7 +71,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named("soundhub_api")
+    @Named(Constants.SOUNDHUB_API_LABEL)
     fun providesSoundHubApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val gson = GsonBuilder()
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
@@ -72,8 +86,32 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAuthApi(@Named("soundhub_api") retrofit: Retrofit): AuthApi {
+    fun providesAuthApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): UserApi {
+        return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesCountryApi(@Named(Constants.COUNTRIES_API_LABEL) retrofit: Retrofit): CountryApi {
+        return retrofit.create(CountryApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesMusicApi(@Named(Constants.MUSIC_API_LABEL) retrofit: Retrofit): MusicApi {
+        return retrofit.create(MusicApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesChatApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): ChatApi {
+        return retrofit.create(ChatApi::class.java)
     }
 
     @Provides
@@ -82,11 +120,6 @@ object AppModule {
         return AuthRepositoryImpl(authApi)
     }
 
-    @Provides
-    @Singleton
-    fun providesUserApi(@Named("soundhub_api") retrofit: Retrofit): UserApi {
-        return retrofit.create(UserApi::class.java)
-    }
 
     @Provides
     @Singleton
@@ -96,8 +129,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUserDataStore(app: Application): UserStore {
-        return UserStore(app)
+    fun providesCountryRepository(countryApi: CountryApi): CountryRepository {
+        return CountryRepositoryImpl(countryApi)
+    }
+
+    @Provides
+    @Singleton
+    fun providesChatRepository(chatApi: ChatApi): ChatRepository {
+        return ChatRepositoryImpl(chatApi)
+    }
+
+    @Provides
+    @Singleton
+    fun providesMusicRepository(musicApi: MusicApi): MusicRepository {
+        return MusicRepositoryImpl(musicApi)
     }
 
     @Provides
@@ -110,17 +155,4 @@ object AppModule {
             .addInterceptor(loggingInterceptor)
             .build()
     }
-
-    @Provides
-    @Singleton
-    fun providesCountryRepository(@Named("country_api") retrofit: Retrofit): CountryRepository {
-        return retrofit.create(CountryRepository::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun providesMusicRepository(@Named("musicbrainz_api") retrofit: Retrofit): MusicRepository {
-        return retrofit.create(MusicRepository::class.java)
-    }
-
 }

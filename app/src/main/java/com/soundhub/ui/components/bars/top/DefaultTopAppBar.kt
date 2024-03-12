@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

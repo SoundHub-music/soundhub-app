@@ -3,7 +3,7 @@ package com.soundhub.ui.edit_profile
 import androidx.lifecycle.ViewModel
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
-import com.soundhub.ui.edit_profile.state.EditDataFormState
+import com.soundhub.ui.states.UserFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -13,10 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditUserProfileViewModel @Inject constructor(): ViewModel() {
-    var formState = MutableStateFlow(EditDataFormState())
+    var formState = MutableStateFlow(UserFormState())
         private set
 
-    fun setUser(user: User?) = formState.update { EditDataFormState(user) }
+    fun setUser(user: User?) = formState.update { UserFormState(user) }
     fun onFirstNameChange(value: String) = formState.update {
         it.copy(firstName = value)
     }

@@ -1,6 +1,7 @@
 package com.soundhub.ui.authentication.components
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -10,21 +11,21 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,18 +42,21 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.state.AuthFormState
+import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.states.AuthFormState
+import com.soundhub.ui.components.CircleLoader
 import com.soundhub.utils.Validator
 
 @Composable
 fun AuthForm(
     isBottomSheetHidden: Boolean,
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val density: Density = LocalDensity.current
     val context: Context = LocalContext.current
 
-    val authFormState = authViewModel.authFormState.collectAsState().value
+    val authFormState by authViewModel.authFormState.collectAsState()
     var buttonFormText: String = getButtonFormText(authFormState.isRegisterForm, context)
 
     // if bottom sheet is hidden typed data are deleted
@@ -62,6 +66,10 @@ fun AuthForm(
     // it works every time when isRegisterForm variable is changed
     LaunchedEffect(key1 = authFormState.isRegisterForm) {
         buttonFormText = getButtonFormText(authFormState.isRegisterForm, context)
+    }
+
+    LaunchedEffect(key1 = authFormState) {
+        Log.d("AuthForm", "state: $authFormState")
     }
 
     Column(
@@ -89,7 +97,6 @@ fun AuthForm(
             placeholder = { Text(stringResource(R.string.email_placeholder)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
-
 
         // password field
         OutlinedTextField(
@@ -138,10 +145,16 @@ fun AuthForm(
                 .height(50.dp),
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(),
-            onClick = authViewModel::authAction,
+            onClick = {
+                if (authFormState.isRegisterForm)
+                    registrationViewModel.signUp(authFormState)
+                else authViewModel.signIn()
+            },
             enabled = Validator.validateAuthForm(authFormState)
         ) {
-            Text(
+            if (authFormState.isLoading)
+                CircleLoader(modifier = Modifier.size(24.dp))
+            else Text(
                 text = buttonFormText,
                 fontFamily = FontFamily(Font(R.font.nunito_bold)),
                 fontSize = 14.sp,
@@ -164,23 +177,6 @@ private fun ErrorPasswordFieldMessage(authFormState: AuthFormState) {
                 text = stringResource(id = R.string.passwords_mismatch),
                 color = MaterialTheme.colorScheme.error
             )
-    }
-}
-
-@Composable
-private fun AuthFormSwitch(isRegisterForm: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Switch(
-            checked = isRegisterForm,
-            onCheckedChange = onCheckedChange
-        )
-        Text(
-            text = stringResource(R.string.get_account_switch_label),
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 

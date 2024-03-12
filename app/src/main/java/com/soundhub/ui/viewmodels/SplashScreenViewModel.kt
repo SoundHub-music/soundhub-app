@@ -1,4 +1,4 @@
-package com.soundhub.viewmodels
+package com.soundhub.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

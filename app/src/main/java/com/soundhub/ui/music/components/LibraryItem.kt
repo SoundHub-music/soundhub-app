@@ -41,12 +41,12 @@ internal fun LibraryItem(
         shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
             .clickable { navController.navigate(route) }
             .shadow(
                 elevation = 10.dp,
                 shape = RoundedCornerShape(16.dp)
-            ),
+            )
+            .clip(RoundedCornerShape(10.dp)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )

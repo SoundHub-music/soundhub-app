@@ -20,36 +20,31 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.Genre
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.postregistration.components.ItemPlate
+import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.Route
 
 @Composable
 fun ChooseGenresScreen(
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    navController: NavHostController
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
-    val postRegistrationViewModel: PostRegistrationViewModel = hiltViewModel()
-    val genres: List<Genre> = postRegistrationViewModel.genres.collectAsState().value
-    val chosenGenres: List<Genre> = postRegistrationViewModel.chosenGenres.collectAsState().value
-    val isLoading: Boolean = postRegistrationViewModel.isLoading.collectAsState().value
+    val genres: List<Genre> = registrationViewModel.genres.collectAsState().value
+    val chosenGenres: List<Genre> = registrationViewModel.chosenGenres.collectAsState().value
+    val isLoading: Boolean = registrationViewModel.isLoading.collectAsState().value
 
     val context = LocalContext.current
-    val floatingBtnWarningText: String = stringResource(id = R.string.choose_genres_warning)
+    val toastWarningText: String = stringResource(id = R.string.choose_genres_warning)
 
     LaunchedEffect(key1 = chosenGenres) {
-        Log.d("chosen_genres", chosenGenres.toString())
+        Log.d("ChooseGenresScreen", "chosen genres: $chosenGenres")
     }
 
     Box(
@@ -57,7 +52,10 @@ fun ChooseGenresScreen(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,16 +72,16 @@ fun ChooseGenresScreen(
                 columns = GridCells.Adaptive(minSize = 100.dp),
                 contentPadding = PaddingValues(all = 10.dp),
                 content = {
-                    itemsIndexed(genres) { _, plate ->
-                        ItemPlate(
+                    itemsIndexed(genres) { _, genre ->
+                        MusicItemPlate(
                             modifier = Modifier.padding(bottom = 20.dp),
-                            caption = plate.name ?: "",
-                            icon = painterResource(id = R.drawable.musical_note),
+                            caption = genre.name ?: "",
+                            thumbnailUrl = genre.pictureURL,
                             onClick = { isChosen ->
                                 if (isChosen) {
-                                    postRegistrationViewModel.setChosenGenres(plate)
-                                } else postRegistrationViewModel.setChosenGenres(
-                                    chosenGenres.filter { it.id != plate.id }
+                                    registrationViewModel.setChosenGenres(genre)
+                                } else registrationViewModel.setChosenGenres(
+                                    chosenGenres.filter { it.id != genre.id }
                                 )
                             }
                         )
@@ -98,10 +96,11 @@ fun ChooseGenresScreen(
                 .padding(16.dp)
         ) {
             if (chosenGenres.isNotEmpty())
-                authViewModel.onPostRegisterNextButtonClick(Route.Authentication.ChooseGenres)
+                registrationViewModel
+                    .onPostRegisterNextBtnClick(Route.Authentication.ChooseGenres)
             else Toast.makeText(
                 context,
-                floatingBtnWarningText,
+                toastWarningText,
                 Toast.LENGTH_SHORT
             ).show()
         }

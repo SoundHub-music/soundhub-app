@@ -8,11 +8,13 @@ import retrofit2.http.Path
 
 interface UserApi {
     @GET("users/currentUser")
-    suspend fun getCurrentUser(@Header("Authorization") accessToken: String): Response<User?>
+    suspend fun getCurrentUser(
+        @Header("Authorization") accessToken: String
+    ): Response<User?>
 
     @GET("users/{userId}")
     suspend fun getUserById(
-        @Path("userId") id: String,
+        @Path("userId") id: String?,
         @Header("Authorization") accessToken: String?
     ): Response<User?>
 }

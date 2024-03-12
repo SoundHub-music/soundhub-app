@@ -20,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -30,12 +29,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.R
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ItemPlate(
+fun MusicItemPlate(
     modifier: Modifier = Modifier,
-    caption: String, icon: Painter,
+    caption: String,
+    thumbnailUrl: String? = null,
     onClick: (Boolean) -> Unit = {}
 ) {
     var isItemChosen by rememberSaveable { mutableStateOf(false) }
@@ -62,12 +65,17 @@ fun ItemPlate(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box (modifier = itemBoxModifier) {
-            Image(
-                painter = icon,
-                contentDescription = "icon",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .fillMaxSize()
+            if (thumbnailUrl == null)
+                Image(
+                    painter = painterResource(id = R.drawable.musical_note),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            else GlideImage(
+                model = thumbnailUrl,
+                contentDescription = caption
             )
         }
         Text(
@@ -85,5 +93,5 @@ fun ItemPlate(
 @Preview
 @Composable
 fun ItemPlatePreview() {
-    ItemPlate(caption = "Rap", icon = painterResource(id = R.drawable.musical_note))
+    MusicItemPlate(caption = "Rap")
 }

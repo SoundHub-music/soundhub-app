@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.Route
 import kotlin.math.absoluteValue
 

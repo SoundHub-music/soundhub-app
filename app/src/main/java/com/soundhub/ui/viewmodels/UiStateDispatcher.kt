@@ -1,34 +1,29 @@
-package com.soundhub
+package com.soundhub.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.UiEvent
+import com.soundhub.ui.states.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UIState(
-    var isSearchBarActive: Boolean = false,
-    var searchBarText: String = "",
-    var galleryImageUrls: List<String> = emptyList(),
-    var isLoading: Boolean = false
-)
+
 
 @HiltViewModel
-class UiStateDispatcher @Inject constructor(
-//    private val userDataStore: UserStore
-) : ViewModel() {
-    private var _uiEvent = Channel<UiEvent>()
-    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
+class UiStateDispatcher @Inject constructor() : ViewModel() {
+    private var _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: Flow<UiEvent> = _uiEvent.asSharedFlow()
 
-    var uiState = MutableStateFlow(UIState())
+    var uiState = MutableStateFlow(UiState())
         private set
 
-    fun clearState() = uiState.update { UIState() }
+    fun clearState() = uiState.update { UiState() }
 
     fun toggleSearchBarActive() = uiState.update {
         it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")
@@ -46,7 +41,7 @@ class UiStateDispatcher @Inject constructor(
         it.copy(galleryImageUrls = value)
     }
 
-    fun setLoading(value: Boolean) = uiState.update { it.copy(isLoading = value) }
-
-    fun sendUiEvent(event: UiEvent) = viewModelScope.launch { _uiEvent.send(event) }
+    fun sendUiEvent(event: UiEvent) = viewModelScope.launch {
+        _uiEvent.emit(event)
+    }
 }

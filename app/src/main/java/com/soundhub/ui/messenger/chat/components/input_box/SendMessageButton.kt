@@ -28,7 +28,6 @@ fun SendMessageButton(
     IconButton(
         enabled = messageContent.value.isNotEmpty(),
         onClick = {
-        /*TODO: implement logic for sending messages */
         chatViewModel.sendMessage(Message(
             content = messageContent.value,
             sender = authorizedUser

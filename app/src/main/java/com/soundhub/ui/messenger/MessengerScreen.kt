@@ -24,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
@@ -37,7 +37,8 @@ import com.soundhub.utils.SearchUtils
 fun MessengerScreen(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    messengerViewModel: MessengerViewModel = hiltViewModel()
 ) {
     val authorizedUser: User? = authViewModel.userInstance.collectAsState().value
     val chats: List<Chat> = listOf(

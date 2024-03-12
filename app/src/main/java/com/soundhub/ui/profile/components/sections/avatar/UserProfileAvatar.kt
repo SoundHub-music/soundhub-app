@@ -35,17 +35,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.UiStateDispatcher
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.Route
+import com.soundhub.data.model.User
 
 @Composable
-internal fun ProfileUserAvatar(
+internal fun UserProfileAvatar(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    userCreds: UserPreferences?
+    user: User? = null
 ) {
     // temporary avatar
     val avatar: Painter = painterResource(id = R.drawable.header)

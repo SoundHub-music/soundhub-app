@@ -15,27 +15,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.Artist
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.postregistration.components.ItemPlate
+import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.Route
 
 @Composable
 fun ChooseArtistsScreen(
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    navController: NavHostController
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val artists = emptyList<Artist>()
-    val postRegistrationViewModel: PostRegistrationViewModel = hiltViewModel()
 
     Box(
         modifier = Modifier
@@ -59,14 +54,14 @@ fun ChooseArtistsScreen(
                 contentPadding = PaddingValues(all = 10.dp),
                 content = {
                     itemsIndexed(artists) { _, artist ->
-                        ItemPlate(
+                        MusicItemPlate(
                             modifier = Modifier.padding(bottom = 20.dp),
                             caption = artist.name,
-                            icon = painterResource(id = R.drawable.musical_note),
+                            thumbnailUrl = artist.thumbnailUrl,
                             onClick = { isChosen ->
                                 if (isChosen)
-                                    postRegistrationViewModel.setChosenArtists(artist)
-                                else postRegistrationViewModel.setChosenArtists(
+                                    registrationViewModel.setChosenArtists(artist)
+                                else registrationViewModel.setChosenArtists(
                                      artists.filter { it.id != artist.id }.toMutableList()
                                 )
                             }
@@ -80,7 +75,8 @@ fun ChooseArtistsScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            onClick = { authViewModel.onPostRegisterNextButtonClick(Route.Authentication.ChooseArtists) }
+            onClick = { registrationViewModel
+                .onPostRegisterNextBtnClick(Route.Authentication.ChooseArtists) }
         )
     }
 }

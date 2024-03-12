@@ -1,6 +1,5 @@
 package com.soundhub.ui.messenger.components
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -66,7 +65,6 @@ internal fun ChatCard(
                 shape = RoundedCornerShape(12.dp),
             )
             .clickable {
-                Log.d("chat", Route.Messenger.Chat(chat?.id.toString()).route)
                 navController.navigate(Route.Messenger.Chat(chat?.id.toString()).route)
             }
     ) {

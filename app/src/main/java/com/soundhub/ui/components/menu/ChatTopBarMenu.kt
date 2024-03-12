@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.menu
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -26,6 +28,9 @@ fun ChatTopBarMenu(
     chatId: String?,
     navController: NavHostController
 ) {
+    val profileErrorMessage: String = stringResource(id = R.string.toast_user_profile_error)
+    val context = LocalContext.current
+
     DropdownMenu(
         expanded = menuState.value,
         onDismissRequest = { menuState.value = false }
@@ -41,8 +46,15 @@ fun ChatTopBarMenu(
                 }
             },
             onClick = {
-                /* TODO: finish the logic */
-                navController.navigate(Route.Profile(chatId).route)
+                if (chatId != null)
+                    navController.navigate(Route.Profile(chatId).route)
+                else Toast
+                    .makeText(
+                        context,
+                        profileErrorMessage,
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
             }
         )
 
@@ -56,7 +68,7 @@ fun ChatTopBarMenu(
                     Text(text = stringResource(id = R.string.chat_menu_search))
                 }
             },
-            onClick = { /* TODO: make search message logic */ }
+            onClick = { /* TODO: implement search message logic */ }
         )
 
         DropdownMenuItem(
@@ -77,7 +89,7 @@ fun ChatTopBarMenu(
                     )
                 }
             },
-            onClick = { /* TODO: make delete history logic */ }
+            onClick = { /* TODO: implement delete history logic */ }
         )
     }
 }

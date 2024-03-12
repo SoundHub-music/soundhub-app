@@ -24,12 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
@@ -69,7 +72,7 @@ fun PostCard(
         )
         PostContent(textContent = post.content)
         PostImages(images = post.imageContent, navController = navController)
-        BottomCardPanel(likes = post.likes)
+        PostBottomPanel(post)
     }
 }
 
@@ -148,17 +151,27 @@ private fun PostContent(modifier: Modifier = Modifier, textContent: String) {
 }
 
 @Composable
-private fun BottomCardPanel(likes: Int) {
+private fun PostBottomPanel(post: Post) {
     var isFavorite: Boolean by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(end = 8.dp, bottom = 8.dp, top = 8.dp),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        if (likes > 0)
-            Text(text = likes.toString())
-        LikeButton(isFavorite = isFavorite) { isFavorite = it }
+        if (post.likes > 0)
+            Text(
+                text = post.likes.toString(),
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily(Font(R.font.nunito_bold_italic))
+            )
+        LikeButton(isFavorite = isFavorite) {
+            isFavorite = it
+            if (isFavorite)
+                post.likes += 1
+            else post.likes -= 1
+        }
     }
 }
 

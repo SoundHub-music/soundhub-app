@@ -10,5 +10,5 @@ data class Post(
     val content: String = "",
     val imageContent: List<String> = emptyList(),
     val avatar: String? = null,
-    val likes: Int = 0
+    var likes: Int = 0
 )

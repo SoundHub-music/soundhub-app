@@ -39,7 +39,7 @@ fun CountryDropdownField(
 
     LaunchedEffect(key1 = isLoading, key2 = countries) {
         filteredCountries = countries
-        Log.d("countries", countries.toString())
+        Log.d("CountryDropdownField", "countries: $countries")
     }
 
     ExposedDropdownMenuBox(

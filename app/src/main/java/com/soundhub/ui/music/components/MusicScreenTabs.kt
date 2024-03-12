@@ -38,7 +38,7 @@ internal fun MusicScreenTabs(
         stringResource(id = R.string.music_library_page)
     )
 
-    val pagerState: PagerState = rememberPagerState(
+    val selectedTabState: PagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { tabs.size }
     )
@@ -47,12 +47,12 @@ internal fun MusicScreenTabs(
         modifier = modifier
     ) {
         PrimaryTabRow(
-            selectedTabIndex = pagerState.currentPage,
+            selectedTabIndex = selectedTabState.currentPage,
             modifier = Modifier
         ) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
-                    selected = pagerState.currentPage == index,
+                    selected = selectedTabState.currentPage == index,
                     text = {
                         Text(
                             text = tab,
@@ -60,21 +60,19 @@ internal fun MusicScreenTabs(
                             fontSize = 20.sp,
                             lineHeight = 20.sp,
                             letterSpacing = 2.5.sp,
-                            color = if (index == pagerState.currentPage) MaterialTheme.colorScheme.onBackground
+                            color = if (index == selectedTabState.currentPage) MaterialTheme.colorScheme.onBackground
                             else Color.Gray
                         )
                     },
                     onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
+                        scope.launch { selectedTabState.animateScrollToPage(index) }
                     }
                 )
             }
         }
 
         HorizontalPager(
-            state = pagerState,
+            state = selectedTabState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 10.dp)

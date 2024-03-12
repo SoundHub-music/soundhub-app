@@ -1,91 +1,100 @@
 package com.soundhub.data.repository.implementations
 
 import android.util.Log
+import com.google.gson.Gson
 import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.model.ApiResult
+import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.AuthApi
-import com.soundhub.data.api.LogoutRequestBody
-import com.soundhub.data.api.LogoutResponse
-import com.soundhub.data.api.RefreshTokenRequestBody
-import com.soundhub.data.api.RegisterRequestBody
-import com.soundhub.data.api.SignInRequestBody
+import com.soundhub.data.api.requests.RefreshTokenRequestBody
+import com.soundhub.data.api.requests.RegisterRequestBody
+import com.soundhub.data.api.requests.SignInRequestBody
+import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.repository.AuthRepository
+import com.soundhub.utils.Constants
 import retrofit2.Response
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(private val authApi: AuthApi): AuthRepository {
-    override suspend fun signIn(body: SignInRequestBody): ApiResult<UserPreferences?> {
+class AuthRepositoryImpl @Inject constructor(
+    private val authApi: AuthApi
+): AuthRepository {
+    override suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?> {
         try {
             val signInResponse: Response<UserPreferences> = authApi.signIn(body)
-            Log.d("sign_in_response", signInResponse.toString())
+            Log.d("AuthRepository", "signIn[1]: $signInResponse")
 
             if (!signInResponse.isSuccessful) {
-                return ApiResult.Error(
-                    message = signInResponse.message(),
-                    code = signInResponse.code()
-                )
+                val errorBody: ErrorResponse? = Gson()
+                    .fromJson(signInResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                Log.d("AuthRepository", "signIn[2]: ${errorBody.toString()}")
+                return HttpResult.Error(errorBody = errorBody)
             }
 
-            return ApiResult.Success(data = signInResponse.body())
+            return HttpResult.Success(body = signInResponse.body())
         }
         catch (e: Exception) {
-            Log.e("AuthRepository[signIn]", e.message.toString())
-            return ApiResult.Error(message = e.message)
+            Log.e("AuthRepository", "signIn[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(errorBody = ErrorResponse(detail = e.message))
         }
 
     }
 
-    override suspend fun signUp(body: RegisterRequestBody): ApiResult<UserPreferences?> {
+    override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?> {
         try {
             val signUpResponse = authApi.signUp(body)
+            Log.d("AuthRepository", "signUp[1]: $signUpResponse")
+
             if (!signUpResponse.isSuccessful) {
-                return ApiResult.Error(
-                    message = signUpResponse.message(),
-                    code = signUpResponse.code()
-                )
+                val errorBody: ErrorResponse? = Gson()
+                    .fromJson(signUpResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                Log.d("AuthRepository", "signUp[2]: ${errorBody.toString()}")
+                return HttpResult.Error(errorBody = errorBody)
             }
 
-            return ApiResult.Success(data = signUpResponse.body())
+            return HttpResult.Success(body = signUpResponse.body())
         }
         catch (e: Exception) {
-            Log.e("AuthRepository[signUp]", e.message.toString())
-            return ApiResult.Error(
-                message = e.message
-            )
+            Log.e("AuthRepository", "signUp[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(errorBody = ErrorResponse(e.message))
         }
     }
 
-    override suspend fun logout(body: LogoutRequestBody): ApiResult<LogoutResponse> {
+    override suspend fun logout(token: String?): HttpResult<LogoutResponse> {
         try {
-            val logoutResponse: Response<LogoutResponse> = authApi.logout(body)
+            val logoutResponse: Response<LogoutResponse> = authApi.logout("Bearer $token")
+            Log.d("AuthRepository", "logout[1]: $logoutResponse")
+
             if (!logoutResponse.isSuccessful) {
-                return ApiResult.Error(
-                    message = logoutResponse.message(),
-                    code = logoutResponse.code()
-                )
+                val errorBody: ErrorResponse? = Gson()
+                    .fromJson(logoutResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                Log.d("AuthRepository", "logout[2]: ${errorBody.toString()}")
+                return HttpResult.Error(errorBody = errorBody)
             }
-            return ApiResult.Success(data = logoutResponse.body())
+            return HttpResult.Success(body = logoutResponse.body())
         }
         catch (e: Exception) {
-            Log.e("AuthRepository[logout]", e.message.toString())
-            return ApiResult.Error(message = e.message)
+            Log.e("AuthRepository", "logout[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(errorBody = ErrorResponse(detail = e.message))
         }
     }
 
-    override suspend fun refreshToken(body: RefreshTokenRequestBody): ApiResult<UserPreferences?> {
+    override suspend fun refreshToken(body: RefreshTokenRequestBody): HttpResult<UserPreferences?> {
         try {
-            val refreshTokenResponse = authApi.refreshToken(body)
-            if (!refreshTokenResponse.isSuccessful)
-                return ApiResult.Error(
-                    message = refreshTokenResponse.message(),
-                    code = refreshTokenResponse.code()
-                )
+            val refreshTokenResponse: Response<UserPreferences> = authApi.refreshToken(body)
+            Log.d("AuthRepository", "refreshToken[1]: ${refreshTokenResponse.raw()}")
 
-            return ApiResult.Success(data = refreshTokenResponse.body())
+            if (!refreshTokenResponse.isSuccessful) {
+                val errorBody: ErrorResponse? = Gson()
+                    .fromJson(refreshTokenResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                Log.d("AuthRepository", "refreshToken[2]: ${errorBody.toString()}")
+                return HttpResult.Error(errorBody = errorBody)
+            }
+
+            return HttpResult.Success(body = refreshTokenResponse.body())
         }
         catch (e: Exception) {
-            Log.e("AuthRepository[refreshToken]", e.message.toString())
-            return ApiResult.Error(message = e.message)
+            Log.e("AuthRepository", "refreshToken[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(errorBody = ErrorResponse(detail = e.message))
         }
     }
 

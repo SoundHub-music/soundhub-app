@@ -1,6 +1,9 @@
 package com.soundhub.utils
 
+import com.google.gson.reflect.TypeToken
 import com.soundhub.Route
+import com.soundhub.data.api.responses.ErrorResponse
+import java.lang.reflect.Type
 
 object Constants {
     const val PASSWORD_MIN_LENGTH: Int = 8
@@ -72,4 +75,13 @@ object Constants {
     const val MUSIC_NEW_OF_THE_WEEK = "new-of-the-week"
     const val MUSIC_NEW_OF_THE_MONTH = "new-of-the-month"
     const val MUSIC_RECOMMENDATIONS = "recommend-music"
+
+    // response error body type
+    val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>(){}.type
+
+    // named injections for di
+    const val SOUNDHUB_API_LABEL = "soundhub_api"
+    const val MUSIC_API_LABEL = "musicbrainz_api"
+    const val COUNTRIES_API_LABEL = "countries_api"
+
 }

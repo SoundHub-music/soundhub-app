@@ -1,5 +1,6 @@
 package com.soundhub.ui.messenger.chat
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,10 +41,14 @@ fun ChatScreen(
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
-    val messages = chatViewModel.messages.collectAsState().value
+    val messages by chatViewModel.messages.collectAsState(initial = emptyList())
     val lazyListState = rememberLazyListState()
     val itemIndex by remember {
         derivedStateOf { lazyListState.firstVisibleItemIndex }
+    }
+
+    LaunchedEffect(key1 = messages) {
+        Log.d("ChatScreen", messages.toString())
     }
 
     if (messages.isNotEmpty()) {

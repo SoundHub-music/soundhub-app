@@ -42,10 +42,8 @@ fun AvatarPicker(
         CircularAvatar(
             modifier = Modifier
                 .size(150.dp)
-//                .clip(CircleShape)
-//                .background(Color.Gray)
                 .clickable { launcher.launch("image/*") },
-            imageUrl = selectedImageUri.toString()
+            imageUrl = selectedImageUri?.toString()
         )
     }
 }

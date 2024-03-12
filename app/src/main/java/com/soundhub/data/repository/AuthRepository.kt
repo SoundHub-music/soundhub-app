@@ -1,16 +1,15 @@
 package com.soundhub.data.repository
 
+import com.soundhub.data.api.requests.RefreshTokenRequestBody
+import com.soundhub.data.api.requests.RegisterRequestBody
+import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.model.ApiResult
-import com.soundhub.data.api.LogoutRequestBody
-import com.soundhub.data.api.LogoutResponse
-import com.soundhub.data.api.RefreshTokenRequestBody
-import com.soundhub.data.api.RegisterRequestBody
-import com.soundhub.data.api.SignInRequestBody
+import com.soundhub.data.api.responses.HttpResult
+import com.soundhub.data.api.responses.LogoutResponse
 
 interface AuthRepository {
-    suspend fun signIn(body: SignInRequestBody): ApiResult<UserPreferences?>
-    suspend fun signUp(body: RegisterRequestBody): ApiResult<UserPreferences?>
-    suspend fun logout(body: LogoutRequestBody): ApiResult<LogoutResponse>
-    suspend fun refreshToken(body: RefreshTokenRequestBody): ApiResult<UserPreferences?>
+    suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?>
+    suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?>
+    suspend fun logout(token: String?): HttpResult<LogoutResponse>
+    suspend fun refreshToken(body: RefreshTokenRequestBody): HttpResult<UserPreferences?>
 }

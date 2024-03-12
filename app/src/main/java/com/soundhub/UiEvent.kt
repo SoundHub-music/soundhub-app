@@ -1,7 +1,11 @@
 package com.soundhub
 
+import com.soundhub.data.model.User
+import com.soundhub.utils.UiText
+
 sealed class UiEvent {
     object PopBackStack: UiEvent()
+    object SearchButtonClick: UiEvent()
     data class Navigate(val route: Route): UiEvent() {
         override fun toString(): String {
             return "Route{\n" +
@@ -9,12 +13,6 @@ sealed class UiEvent {
         }
     }
 
-    data class ShowToast(
-        val message: String,
-        val action: String? = null
-    ): UiEvent()
-
-    object SearchButtonClick: UiEvent()
-    data class Loading(val isLoading: Boolean = false): UiEvent()
-    data class Error(val message: String = ""): UiEvent()
+    data class ShowToast(val uiText: UiText): UiEvent()
+    data class UpdateCurrentUser(val user: User): UiEvent()
 }

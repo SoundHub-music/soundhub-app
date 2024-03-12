@@ -53,7 +53,7 @@ fun MessageInputBox(
             modifier = Modifier.weight(1f)
         )
         Row {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { /*TODO: implement emoji panel */ }) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_emoji_emotions_24),
                     contentDescription = "emoji",
@@ -64,7 +64,8 @@ fun MessageInputBox(
                 messageContent = messageContent,
                 messageCount = messages.size,
                 lazyListState = lazyListState,
-                authorizedUser = authorizedUser
+                authorizedUser = authorizedUser,
+                chatViewModel = chatViewModel
             )
         }
     }

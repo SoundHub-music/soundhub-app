@@ -16,7 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.menu.ChatTopBarMenu
 import com.soundhub.utils.Constants
 import com.soundhub.Route
-import com.soundhub.UiStateDispatcher
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
@@ -37,7 +37,7 @@ fun TopBarActions(
     when (currentRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
-                /* TODO: implement logic for saving changes */
+                /* TODO: implement logic for saving user data changes */
                 navController.popBackStack()
             }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }

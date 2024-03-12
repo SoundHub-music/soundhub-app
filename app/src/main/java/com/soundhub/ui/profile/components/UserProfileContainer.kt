@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,8 +44,10 @@ fun UserProfileContainer(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+            )
     ) {
         Column(
             modifier = Modifier
@@ -115,20 +116,13 @@ fun UserProfileContainer(
     }
 }
 
-@Composable
-internal fun SectionLabel(text: String) {
-    Text(
-        text = text,
-        color = MaterialTheme.colorScheme.onPrimaryContainer,
-        fontWeight = FontWeight.Medium
-    )
-}
-
-data class FriendMiniatureItem(
-    val avatarUrl: String?
-)
 fun getUserLocation(city: String?, country: String?): String {
     return if ((city == null && country == null) || (city!!.isEmpty() && country!!.isEmpty())) ""
     else if (country!!.isNotEmpty() && city.isEmpty()) country
     else "$country, $city"
 }
+
+
+data class FriendMiniatureItem(
+    val avatarUrl: String?
+)

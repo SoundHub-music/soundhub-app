@@ -1,6 +1,6 @@
 package com.soundhub.data.model
 
-import com.soundhub.ui.authentication.state.RegistrationState
+import com.soundhub.ui.states.RegistrationState
 import java.time.LocalDate
 import java.util.UUID
 
@@ -15,11 +15,12 @@ data class User(
     var birthday: LocalDate? = null,
     var city: String? = "",
     var description: String? = "",
-    var languages: List<String> = emptyList()
-
+    var languages: List<String> = emptyList(),
+    var friends: List<User> = emptyList(),
+    var favoriteGenres: List<Genre> = emptyList(),
+    var favoriteArtists: List<Artist> = emptyList()
 ) {
     constructor(registerState: RegistrationState?) : this() {
-        id = registerState?.id ?: UUID.randomUUID()
         email = registerState?.email ?: ""
         firstName = registerState?.firstName ?: ""
         lastName = registerState?.lastName ?: ""

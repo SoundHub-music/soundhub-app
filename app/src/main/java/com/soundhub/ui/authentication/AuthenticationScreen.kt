@@ -18,8 +18,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,20 +33,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.UIState
-import com.soundhub.UiStateDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.soundhub.ui.authentication.components.AuthForm
 import com.soundhub.ui.authentication.components.LoginScreenLogo
+import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
 import com.soundhub.ui.components.BottomSheet
-import com.soundhub.ui.components.CircleLoader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    registrationViewModel: RegistrationViewModel = hiltViewModel(),
 ) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -58,10 +54,11 @@ fun AuthenticationScreen(
         )
     )
 
-    val uiState by uiStateDispatcher.uiState.collectAsState()
-
     LaunchedEffect(key1 = scaffoldState.bottomSheetState.currentValue) {
-        Log.d("scaffold_state", scaffoldState.bottomSheetState.currentValue.toString())
+        Log.d(
+            "AuthenticationScreen",
+            "scaffold_state: ${scaffoldState.bottomSheetState.currentValue}"
+        )
     }
 
     Box(
@@ -79,15 +76,13 @@ fun AuthenticationScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                StartButton(
-                    scaffoldState = scaffoldState,
-                    uiState = uiState
-                )
+                StartButton(scaffoldState = scaffoldState)
                 BottomSheet(
                     scaffoldState = scaffoldState,
                     sheetContent = {
                         AuthForm(
                             isBottomSheetHidden = !scaffoldState.bottomSheetState.isVisible,
+                            registrationViewModel = registrationViewModel,
                             authViewModel = authViewModel
                         )
                     }
@@ -99,7 +94,7 @@ fun AuthenticationScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StartButton(scaffoldState: BottomSheetScaffoldState, uiState: UIState) {
+private fun StartButton(scaffoldState: BottomSheetScaffoldState) {
     val scope: CoroutineScope = rememberCoroutineScope()
 
     FilledTonalButton(
@@ -109,9 +104,7 @@ private fun StartButton(scaffoldState: BottomSheetScaffoldState, uiState: UIStat
         colors = ButtonDefaults.buttonColors(),
         onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } }
     ) {
-        if (uiState.isLoading)
-            CircleLoader()
-        else Text(
+        Text(
             text = stringResource(R.string.lets_start_login_btn),
             fontFamily = FontFamily(Font(R.font.nunito_bold)),
             fontSize = 14.sp,

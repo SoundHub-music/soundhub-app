@@ -3,10 +3,8 @@ package com.soundhub.ui.authentication.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,11 +27,13 @@ fun LoginScreenLogo(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 30.dp, bottom = 30.dp),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.spacedBy(
+            space = 10.dp,
+            alignment = Alignment.CenterHorizontally
+        ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(painter = appLogo, contentDescription = "app logo")
-        Spacer(modifier = Modifier.width(10.dp))
+        Image(painter = appLogo, contentDescription = "SoundHub App logo")
         Text(
             text = stringResource(R.string.app_name),
             color = Color.White,
