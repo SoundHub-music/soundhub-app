@@ -17,6 +17,7 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
+import com.soundhub.domain.usecases.GetImageUseCase
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,12 +36,15 @@ class AuthenticationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val uiStateDispatcher: UiStateDispatcher,
     private val userRepository: UserRepository,
-    private val userCredsStore: UserCredsStore
+    private val userCredsStore: UserCredsStore,
+    private val getImageUseCase: GetImageUseCase
 ) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     var userInstance = MutableStateFlow<User?>(null)
         private set
     var authFormState = MutableStateFlow(AuthFormState())
+        private set
+    var currentUserAvatar = MutableStateFlow<File?>(null)
         private set
 
     private val getAuthorizedUserAttempts = MutableStateFlow(0)
@@ -49,8 +54,22 @@ class AuthenticationViewModel @Inject constructor(
             userCreds.collect { creds ->
                 if (!creds.accessToken.isNullOrEmpty()) {
                     userInstance.value = getCurrentUser().firstOrNull()
+
+                    if (userInstance.value?.avatarUrl != null) {
+                        val avatar = getImageUseCase(
+                            accessToken = creds.accessToken,
+                            fileName = userInstance.value?.avatarUrl,
+                            folderName = "avatars"
+                        )
+                        Log.d("avatar", avatar?.name.toString())
+
+                        currentUserAvatar.value = avatar
+
+                        Log.d("currentUserAvatar", currentUserAvatar.value.toString())
+                    }
                 }
             }
+
         }
     }
 
@@ -115,7 +134,7 @@ class AuthenticationViewModel @Inject constructor(
                 userCredsStore.updateCreds(newCredsResponse.body)
                 uiStateDispatcher.sendUiEvent(
                     UiEvent.ShowToast(
-                        UiText.DynamicString(currentUserError.errorBody?.detail)
+                        UiText.DynamicString(currentUserError.errorBody?.detail ?: "")
                     )
                 )
                 getAuthorizedUserAttempts.update { 0 }

@@ -3,7 +3,6 @@ package com.soundhub.data.api.requests
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
-import com.soundhub.ui.states.RegistrationState
 import java.time.LocalDate
 
 data class RegisterRequestBody(
@@ -20,22 +19,4 @@ data class RegisterRequestBody(
     var languages: List<String> = emptyList(),
     var favoriteGenres: List<Genre> = emptyList(),
     var favoriteArtists: List<Artist> = emptyList()
-) {
-    constructor(registerState: RegistrationState) : this() {
-        this.email = registerState.email
-        this.password = registerState.password
-        this.firstName = registerState.firstName ?: ""
-        this.lastName = registerState.lastName ?: ""
-        this.birthday = registerState.birthday
-        this.city = registerState.city
-        this.country = registerState.country
-        this.gender = registerState.gender
-        this.avatarUrl = registerState.avatarURL
-        this.description = registerState.description
-        this.languages = registerState.languages
-        this.favoriteGenres = registerState.favoriteGenres
-        this.favoriteArtists = registerState.favoriteArtists
-    }
-
-}
-
+)

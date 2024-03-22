@@ -1,7 +1,6 @@
 package com.soundhub.ui.authentication.postregistration
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -95,14 +94,15 @@ fun ChooseGenresScreen(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            if (chosenGenres.isNotEmpty())
+            // TODO: uncomment empty list check
+//            if (chosenGenres.isNotEmpty())
                 registrationViewModel
                     .onPostRegisterNextBtnClick(Route.Authentication.ChooseGenres)
-            else Toast.makeText(
-                context,
-                toastWarningText,
-                Toast.LENGTH_SHORT
-            ).show()
+//            else Toast.makeText(
+//                context,
+//                toastWarningText,
+//                Toast.LENGTH_SHORT
+//            ).show()
         }
     }
 }

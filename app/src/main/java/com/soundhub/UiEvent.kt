@@ -4,8 +4,8 @@ import com.soundhub.data.model.User
 import com.soundhub.utils.UiText
 
 sealed class UiEvent {
-    object PopBackStack: UiEvent()
-    object SearchButtonClick: UiEvent()
+    data object PopBackStack: UiEvent()
+    data object SearchButtonClick: UiEvent()
     data class Navigate(val route: Route): UiEvent() {
         override fun toString(): String {
             return "Route{\n" +
@@ -14,5 +14,6 @@ sealed class UiEvent {
     }
 
     data class ShowToast(val uiText: UiText): UiEvent()
-    data class UpdateCurrentUser(val user: User): UiEvent()
+    data object UpdateUser: UiEvent()
+    data class UpdateUserInstance(val user: User): UiEvent()
 }

@@ -23,7 +23,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 fun DefaultTopAppBar(
     topBarTitle: String?,
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
 ) {
     val isSearchBarActive = uiStateDispatcher
         .uiState
@@ -33,8 +33,7 @@ fun DefaultTopAppBar(
 
     TopAppBar(
         title = {
-            if (!isSearchBarActive)
-                Text(text = topBarTitle ?: "")
+            if (!isSearchBarActive) Text(text = topBarTitle ?: "")
         },
         navigationIcon = {
             if (!isSearchBarActive)
@@ -46,6 +45,8 @@ fun DefaultTopAppBar(
                     )
                 }
         },
-        actions = { TopBarActions(navController = navController) }
+        actions = { TopBarActions(
+            navController = navController,
+        ) }
     )
 }

@@ -54,7 +54,8 @@ fun FillUserDataScreen(
                 onDescriptionChange = registrationViewModel::setDescription,
                 onCountryChange = registrationViewModel::setCountry,
                 onCityChange = registrationViewModel::setCity,
-                onLanguagesChange = registrationViewModel::setLanguages
+                onLanguagesChange = registrationViewModel::setLanguages,
+                onAvatarChange = registrationViewModel::setAvatar
             )
         }
 

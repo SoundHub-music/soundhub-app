@@ -1,23 +1,33 @@
 package com.soundhub.data.repository.implementations
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.api.responses.HttpResult
+import com.google.gson.GsonBuilder
 import com.soundhub.data.api.AuthApi
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.LogoutResponse
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.repository.FileRepositoryUtils
 import com.soundhub.utils.Constants
+import com.soundhub.utils.MediaTypes
+import com.soundhub.utils.converters.LocalDateAdapter
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
+import java.io.File
+import java.time.LocalDate
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val authApi: AuthApi
-): AuthRepository {
+    private val authApi: AuthApi,
+    private val context: Context
+): AuthRepository, FileRepositoryUtils {
     override suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?> {
         try {
             val signInResponse: Response<UserPreferences> = authApi.signIn(body)
@@ -41,7 +51,20 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?> {
         try {
-            val signUpResponse = authApi.signUp(body)
+            val gson = GsonBuilder()
+                .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+                .create()
+
+            val tempFile: File? = createTempMediaFile(
+                imageUri = body.avatarUrl,
+                context = context
+            )
+
+            val avatarFormData = getImageFormData(tempFile, context)
+            val requestBody = gson.toJson(body)
+                .toRequestBody(MediaTypes.JSON.type.toMediaTypeOrNull())
+
+            val signUpResponse = authApi.signUp(requestBody, avatarFormData)
             Log.d("AuthRepository", "signUp[1]: $signUpResponse")
 
             if (!signUpResponse.isSuccessful) {
@@ -97,5 +120,4 @@ class AuthRepositoryImpl @Inject constructor(
             return HttpResult.Error(errorBody = ErrorResponse(detail = e.message))
         }
     }
-
 }

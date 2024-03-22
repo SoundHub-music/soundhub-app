@@ -37,6 +37,7 @@ android {
         buildConfigField("String", "COUNTRIES_API", properties.getProperty("COUNTRIES_API"))
         buildConfigField("String", "MUSICBRAINZ_API", properties.getProperty("MUSICBRAINZ_API"))
         buildConfigField("String", "SOUNDHUB_API", properties.getProperty("SOUNDHUB_API"))
+        buildConfigField("String", "SOUNDHUB_API_ADDRESS", properties.getProperty("SOUNDHUB_API_ADDRESS"))
     }
 
 
@@ -62,7 +63,7 @@ android {
         viewBinding = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -92,6 +93,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
@@ -103,19 +105,17 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1") // If using coroutines with the SDK
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     // Dagger - Hilt
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("com.google.dagger:hilt-android:2.50")
-    annotationProcessor("com.google.dagger:hilt-compiler:2.50")
-    kapt("com.google.dagger:hilt-android-compiler:2.44.2")
+    implementation("com.google.dagger:hilt-android:2.51")
+    ksp("com.google.dagger:hilt-compiler:2.51")
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
 
     // Glide
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     implementation("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    ksp("com.github.bumptech.glide:ksp:4.14.2")
 
     // Datastore preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -131,6 +131,10 @@ dependencies {
 
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // MapStruct
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 }
 
 

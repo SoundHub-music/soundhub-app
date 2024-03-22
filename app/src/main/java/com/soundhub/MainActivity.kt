@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.edit_profile.EditUserProfileViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
 import com.soundhub.ui.messenger.MessengerViewModel
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private val messengerViewModel: MessengerViewModel by viewModels()
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
+    private val editUserProfileViewModel: EditUserProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,8 +77,8 @@ class MainActivity : ComponentActivity() {
 
                                 is UiEvent.PopBackStack -> navController.popBackStack()
                                 is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
-                                is UiEvent.UpdateCurrentUser -> authViewModel.setCurrentUser(event.user)
-                                else -> Unit
+                                is UiEvent.UpdateUser -> editUserProfileViewModel.updateUser()
+                                is UiEvent.UpdateUserInstance -> authViewModel.setCurrentUser(event.user)
                             }
                         }
                     }

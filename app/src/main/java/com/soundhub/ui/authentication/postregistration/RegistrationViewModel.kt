@@ -1,5 +1,6 @@
 package com.soundhub.ui.authentication.postregistration
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,6 @@ import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.UiEvent
-import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
@@ -19,10 +19,12 @@ import com.soundhub.ui.states.RegistrationState
 import com.soundhub.utils.Constants
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
+import com.soundhub.utils.mappers.UserMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.mapstruct.factory.Mappers
 import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import javax.inject.Inject
@@ -59,7 +61,7 @@ class RegistrationViewModel @Inject constructor(
                 .onFailure {
                     uiStateDispatcher.sendUiEvent(
                         UiEvent.ShowToast(UiText.DynamicString(
-                            it.errorBody?.detail ?: it.throwable?.message
+                            it.errorBody?.detail ?: it.throwable?.message ?: ""
                         ))
                     )
                 }
@@ -118,7 +120,11 @@ class RegistrationViewModel @Inject constructor(
     fun setDescription(value: String) = registerState.update { it.copy(description = value) }
 
     fun setLanguages(languages: List<String>) = registerState.update {
-        it.copy(languages = languages)
+        it.copy(languages = languages.toMutableList())
+    }
+
+    fun setAvatar(avatarUrl: Uri?) = registerState.update {
+        it.copy(avatarUrl = avatarUrl?.path)
     }
 
     fun onPostRegisterNextBtnClick(currentRoute: Route) {
@@ -138,8 +144,11 @@ class RegistrationViewModel @Inject constructor(
                     )
                 }
 
-                if (Validator.validateRegistrationState(registerState.value))
-                    onEvent(RegistrationEvent.OnRegister(User(registerState.value)))
+                if (Validator.validateRegistrationState(registerState.value)) {
+                    val userMapper: UserMapper = Mappers.getMapper(UserMapper::class.java)
+                    val user: User = userMapper.fromRegistrationState(registerState.value)
+                    onEvent(RegistrationEvent.OnRegister(user))
+                }
             }
             else -> Unit
         }
@@ -159,11 +168,13 @@ class RegistrationViewModel @Inject constructor(
     private fun onEvent(event: RegistrationEvent) {
         when (event) {
             is RegistrationEvent.OnRegister -> viewModelScope.launch {
+                val userMapper: UserMapper = Mappers.getMapper(UserMapper::class.java)
+                val registerRequestBody = userMapper.registerStateToRegisterRequestBody(registerState.value)
                 authRepository
-                    .signUp(RegisterRequestBody(registerState.value))
+                    .signUp(registerRequestBody)
                     .onSuccess {
                         userCredsStore.updateCreds(it.body)
-                        uiStateDispatcher.sendUiEvent(UiEvent.UpdateCurrentUser(event.user))
+                        uiStateDispatcher.sendUiEvent(UiEvent.UpdateUserInstance(event.user))
                         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
                     }
                     .onFailure {

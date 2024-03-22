@@ -1,6 +1,7 @@
 package com.soundhub.ui.components.forms
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,16 +12,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
+import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.AvatarPicker
 import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.CountryDropdownField
@@ -36,14 +41,33 @@ fun UserDataForm(
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onBirthdayChange: (LocalDate?) -> Unit = {},
+    onAvatarChange: (Uri?) -> Unit = {},
     onDescriptionChange: (String) -> Unit = {},
     onGenderChange: (String) -> Unit = {},
     onCountryChange: (String) -> Unit = {},
     onCityChange: (String) -> Unit = {},
     onLanguagesChange: (List<String>) -> Unit = {},
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
     userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 ) {
-    var avatarUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val userCreds: UserPreferences? by authViewModel.userCreds
+        .collectAsState(initial = null)
+
+    LaunchedEffect(true) {
+        avatarUri.value = userDataFormViewModel.getAvatar(
+            accessToken = userCreds?.accessToken,
+            avatarUrl = formState.value.avatarUrl
+        )?.toUri()
+    }
+
+    LaunchedEffect(key1 = avatarUri) {
+        Log.d("UserDataForm", "chosen photo: $avatarUri")
+    }
+
+    LaunchedEffect(key1 = avatarUri.value) {
+        onAvatarChange(avatarUri.value)
+    }
 
     Column(
         modifier = Modifier
@@ -51,7 +75,8 @@ fun UserDataForm(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        AvatarPicker { avatarUri = it }
+        AvatarPicker(imageUriState = avatarUri)
+
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = formState.value.firstName ?: "",
@@ -102,20 +127,21 @@ fun UserDataForm(
             onLanguagesChange = onLanguagesChange
         )
 
-        DatePicker(
-            modifier = Modifier.fillMaxWidth(),
-            value = if (formState.value.birthday != null) formState.value.birthday.toString() else "",
-            label = stringResource(id = R.string.text_field_birthdate),
-            onValueChange = { value ->
-                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
-                onBirthdayChange(date)
-            },
-            isError = !formState.value.isBirthdayValid,
-            supportingText = {
-                if (!formState.value.isBirthdayValid)
-                    Text(text = stringResource(id = R.string.userform_birthday_error_message))
-            }
-        )
+        if (formState.value.birthday != null)
+            DatePicker(
+                modifier = Modifier.fillMaxWidth(),
+                value = formState.value.birthday.toString(),
+                label = stringResource(id = R.string.text_field_birthdate),
+                onValueChange = { value ->
+                    val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
+                    onBirthdayChange(date)
+                },
+                isError = !formState.value.isBirthdayValid,
+                supportingText = {
+                    if (!formState.value.isBirthdayValid)
+                        Text(text = stringResource(id = R.string.userform_birthday_error_message))
+                }
+            )
 
         OutlinedTextField(
             modifier = Modifier

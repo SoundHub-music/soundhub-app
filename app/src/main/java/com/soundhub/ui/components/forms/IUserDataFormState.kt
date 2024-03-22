@@ -2,8 +2,10 @@ package com.soundhub.ui.components.forms
 
 import com.soundhub.data.model.Gender
 import java.time.LocalDate
+import java.util.UUID
 
 interface IUserDataFormState {
+    var id: UUID
     var firstName: String?
     var lastName: String?
     var gender: Gender
@@ -11,8 +13,8 @@ interface IUserDataFormState {
     var birthday: LocalDate?
     var city: String?
     var description: String?
-    var avatarURL: String?
-    var languages: List<String>
+    var avatarUrl: String?
+    var languages: MutableList<String>
 
     var isFirstNameValid: Boolean
     var isLastNameValid: Boolean

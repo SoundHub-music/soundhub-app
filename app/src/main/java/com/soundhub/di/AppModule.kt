@@ -1,6 +1,7 @@
 package com.soundhub.di
 
 import android.app.Application
+import android.content.Context
 import com.google.gson.GsonBuilder
 import com.soundhub.BuildConfig
 import com.soundhub.data.datastore.UserCredsStore
@@ -8,23 +9,29 @@ import com.soundhub.data.api.AuthApi
 import com.soundhub.data.api.ChatApi
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.api.CountryApi
+import com.soundhub.data.api.FileApi
 import com.soundhub.data.api.MusicApi
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.api.UserApi
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.ChatRepository
+import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.implementations.AuthRepositoryImpl
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.data.repository.implementations.ChatRepositoryImpl
 import com.soundhub.data.repository.implementations.CountryRepositoryImpl
+import com.soundhub.data.repository.implementations.FileRepositoryImpl
 import com.soundhub.data.repository.implementations.MusicRepositoryImpl
 import com.soundhub.data.repository.implementations.UserRepositoryImpl
+import com.soundhub.domain.usecases.GetImageUseCase
+import com.soundhub.domain.usecases.UpdateUserUseCase
 import com.soundhub.utils.Constants
 import com.soundhub.utils.converters.LocalDateAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -98,6 +105,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesFileApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): FileApi {
+        return retrofit.create(FileApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun providesCountryApi(@Named(Constants.COUNTRIES_API_LABEL) retrofit: Retrofit): CountryApi {
         return retrofit.create(CountryApi::class.java)
     }
@@ -116,15 +129,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAuthRepository(authApi: AuthApi): AuthRepository {
-        return AuthRepositoryImpl(authApi)
+    fun providesAuthRepository(authApi: AuthApi, @ApplicationContext context: Context): AuthRepository {
+        return AuthRepositoryImpl(authApi, context)
     }
 
 
     @Provides
     @Singleton
-    fun providesUserRepository(userApi: UserApi): UserRepository {
-        return UserRepositoryImpl(userApi)
+    fun providesUserRepository(userApi: UserApi, @ApplicationContext context: Context): UserRepository {
+        return UserRepositoryImpl(userApi, context)
     }
 
     @Provides
@@ -137,6 +150,15 @@ object AppModule {
     @Singleton
     fun providesChatRepository(chatApi: ChatApi): ChatRepository {
         return ChatRepositoryImpl(chatApi)
+    }
+
+    @Provides
+    @Singleton
+    fun providesFileRepository(
+        fileApi: FileApi,
+        @ApplicationContext context: Context
+    ): FileRepository {
+        return FileRepositoryImpl(fileApi, context)
     }
 
     @Provides
@@ -154,5 +176,17 @@ object AppModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesUpdateUserUseCase(userRepository: UserRepository): UpdateUserUseCase {
+        return UpdateUserUseCase(userRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase {
+        return GetImageUseCase(fileRepository)
     }
 }

@@ -1,10 +1,11 @@
 package com.soundhub.data.model
 
-import com.soundhub.ui.states.RegistrationState
+import com.google.gson.annotations.SerializedName
 import java.time.LocalDate
 import java.util.UUID
 
 data class User(
+    @SerializedName("id")
     var id: UUID = UUID.randomUUID(),
     var gender: Gender = Gender.UNKNOWN,
     var avatarUrl: String? = null,
@@ -12,21 +13,19 @@ data class User(
     var firstName: String? = "",
     var lastName: String? = "",
     var country: String? = "",
+
+    @SerializedName("birthday")
     var birthday: LocalDate? = null,
     var city: String? = "",
     var description: String? = "",
-    var languages: List<String> = emptyList(),
-    var friends: List<User> = emptyList(),
-    var favoriteGenres: List<Genre> = emptyList(),
-    var favoriteArtists: List<Artist> = emptyList()
-) {
-    constructor(registerState: RegistrationState?) : this() {
-        email = registerState?.email ?: ""
-        firstName = registerState?.firstName ?: ""
-        lastName = registerState?.lastName ?: ""
-        country = registerState?.country ?: ""
-        birthday = registerState?.birthday
-        city = registerState?.city ?: ""
-        description = registerState?.description ?: ""
-    }
-}
+    var languages: MutableList<String> = mutableListOf(),
+
+    @SerializedName("friends")
+    var friends: MutableList<User> = mutableListOf(),
+
+    @SerializedName("favoriteGenres")
+    var favoriteGenres: MutableList<Genre> = mutableListOf(),
+
+    @SerializedName("favoriteArtists")
+    var favoriteArtists: MutableList<Artist> = mutableListOf()
+)

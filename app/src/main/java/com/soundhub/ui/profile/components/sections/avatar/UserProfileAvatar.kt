@@ -4,11 +4,11 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,21 +35,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.R
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.Route
 import com.soundhub.data.model.User
+import com.soundhub.utils.MediaTypes
+import java.io.File
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun UserProfileAvatar(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
     user: User? = null
 ) {
-    // temporary avatar
-    val avatar: Painter = painterResource(id = R.drawable.header)
+    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
+    val userAvatar: File? by authViewModel.currentUserAvatar.collectAsState()
     var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var isAvatarMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -61,14 +65,18 @@ internal fun UserProfileAvatar(
             .fillMaxWidth()
             .fillMaxHeight(0.45f)
     ) {
-        // TODO: implement GlideImage
-        Image(
-            painter = avatar,
-            contentDescription = "avatar",
+        if (userAvatar == null)
+            Image(
+                painter = defaultAvatar,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        else GlideImage(
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .matchParentSize()
-                .clickable { isAvatarMenuExpanded = !isAvatarMenuExpanded }
+            model = userAvatar,
+            contentDescription = "${user?.firstName} ${user?.lastName}".trim()
         )
 
         AvatarDropdownMenu(
@@ -81,7 +89,7 @@ internal fun UserProfileAvatar(
             },
             onChangeAvatarOptionClick = {
                 isAvatarMenuExpanded = false
-                changeAvatarLauncher.launch("image/*")
+                changeAvatarLauncher.launch(MediaTypes.IMAGE_ALL.type)
             }
         )
 

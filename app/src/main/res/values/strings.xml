@@ -71,6 +71,7 @@
     <string name="profile_screen_friend_section_caption">Друзья</string>
     <string name="profile_screen_favorite_genres_section_caption">Любимые жанры</string>
     <string name="profile_screen_user_birthday">День рождения: </string>
+    <string name="profile_screen_user_languages">Языки: </string>
     <string name="profile_screen_user_description">О себе: </string>
 
     <!--    menu actions-->

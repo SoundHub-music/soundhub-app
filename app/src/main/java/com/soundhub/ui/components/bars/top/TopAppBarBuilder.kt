@@ -14,25 +14,25 @@ internal fun TopAppBarBuilder(
     topBarTitle: String?,
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    chatViewModel: ChatViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel = hiltViewModel(),
 ) {
     when (currentRoute) {
-        in Constants.ROUTES_WITH_CUSTOM_TOP_APP_BAR -> {
+        in Constants.ROUTES_WITH_CUSTOM_TOP_APP_BAR ->
             CustomTopAppBar(
                 topBarTitle = topBarTitle,
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher
             )
-        }
+
         Route.Messenger.Chat().route -> ChatTopAppBar(
             navController = navController,
             chatViewModel = chatViewModel
         )
         in Constants.ROUTES_WITHOUT_TOP_APP_BAR -> {}
-        else -> { DefaultTopAppBar(
+        else -> DefaultTopAppBar(
             topBarTitle = topBarTitle,
             navController = navController,
-            uiStateDispatcher = uiStateDispatcher
-        ) }
+            uiStateDispatcher = uiStateDispatcher,
+        )
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +26,8 @@ import com.soundhub.ui.components.CircularAvatar
 
 @Composable
 internal fun UserCardSettings(authViewModel: AuthenticationViewModel = hiltViewModel()) {
-    val authorizedUser = authViewModel.userInstance.collectAsState().value
+    val authorizedUser by authViewModel.userInstance.collectAsState()
+    val userAvatar by authViewModel.currentUserAvatar.collectAsState()
 
     Box(
         modifier = Modifier
@@ -41,7 +43,10 @@ internal fun UserCardSettings(authViewModel: AuthenticationViewModel = hiltViewM
                verticalAlignment = Alignment.CenterVertically,
                horizontalArrangement = Arrangement.spacedBy(10.dp)
            ) {
-               CircularAvatar(modifier = Modifier.size(64.dp))
+               CircularAvatar(
+                   modifier = Modifier.size(64.dp),
+                   imageUrl = userAvatar?.absolutePath
+               )
                Text(
                    text = "${authorizedUser?.firstName} ${authorizedUser?.lastName}".trim(),
                    fontWeight = FontWeight.Bold,

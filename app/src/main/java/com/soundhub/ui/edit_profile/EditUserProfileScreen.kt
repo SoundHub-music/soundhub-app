@@ -12,8 +12,8 @@ import com.soundhub.ui.components.forms.UserDataForm
 @Composable
 fun EditUserProfileScreen(
     authorizedUser: User?,
+    authViewModel: AuthenticationViewModel = hiltViewModel(),
     editUserProfileViewModel: EditUserProfileViewModel = hiltViewModel(),
-    authViewModel: AuthenticationViewModel = hiltViewModel()
 ) {
     LaunchedEffect(true) {
         editUserProfileViewModel.setUser(authorizedUser)
@@ -23,12 +23,16 @@ fun EditUserProfileScreen(
 
     UserDataForm(
         formState = formState,
+        authViewModel = authViewModel,
         onFirstNameChange = editUserProfileViewModel::onFirstNameChange,
         onLastNameChange = editUserProfileViewModel::onLastNameChange,
         onBirthdayChange = editUserProfileViewModel::onBirthdateChange,
         onDescriptionChange = editUserProfileViewModel::onDescriptionChange,
         onGenderChange = editUserProfileViewModel::onGenderChange,
-        onCountryChange = editUserProfileViewModel::onCountryChange
+        onCountryChange = editUserProfileViewModel::onCountryChange,
+        onCityChange = editUserProfileViewModel::onCityChange,
+        onAvatarChange = editUserProfileViewModel::onAvatarChange,
+        onLanguagesChange = editUserProfileViewModel::onLanguagesChange
     )
 }
 

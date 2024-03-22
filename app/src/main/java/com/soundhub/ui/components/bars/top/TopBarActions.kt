@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.menu.ChatTopBarMenu
 import com.soundhub.utils.Constants
 import com.soundhub.Route
+import com.soundhub.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
@@ -24,7 +25,7 @@ import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
 @Composable
 fun TopBarActions(
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -37,7 +38,7 @@ fun TopBarActions(
     when (currentRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
-                /* TODO: implement logic for saving user data changes */
+                uiStateDispatcher.sendUiEvent(UiEvent.UpdateUser)
                 navController.popBackStack()
             }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
@@ -63,6 +64,13 @@ fun TopBarActions(
                 navController = navController,
                 chatId = currentBackStackEntry?.arguments?.getString(Constants.CHAT_NAV_ARG)
             )
+        }
+
+        Route.CreatePost.route -> {
+            IconButton(onClick = {
+                /* TODO: implement logic for saving user data changes */
+                navController.popBackStack()
+            }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
 
         else -> {}
