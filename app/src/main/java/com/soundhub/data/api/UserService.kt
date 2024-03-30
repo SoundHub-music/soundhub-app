@@ -12,10 +12,10 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-interface UserApi {
+interface UserService {
     @GET(ApiEndpoints.SoundHub.currentUser)
     suspend fun getCurrentUser(
-        @Header("Authorization") accessToken: String
+        @Header("Authorization") accessToken: String?
     ): Response<User?>
 
     @GET(ApiEndpoints.SoundHub.getUserById)

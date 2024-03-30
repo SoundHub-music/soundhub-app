@@ -31,8 +31,7 @@ fun PostLineScreen(
     val postlineUiState by postLineViewModel.postsUiState.collectAsState()
 
     ContentContainer(contentAlignment = Alignment.Center) {
-        if (postlineUiState.isLoading)
-            CircleLoader(modifier = Modifier.size(72.dp))
+        if (postlineUiState.isLoading) CircleLoader(modifier = Modifier.size(72.dp))
         else if (postlineUiState.posts.isEmpty())
             Text(text = stringResource(id = R.string.empty_postline_screen))
         else {

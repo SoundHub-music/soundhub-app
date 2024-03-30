@@ -1,6 +1,7 @@
 package com.soundhub.ui.authentication.postregistration
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,25 +27,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.data.model.Genre
 import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.Route
+import com.soundhub.data.enums.ApiStatus
+import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun ChooseGenresScreen(
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
-    val genres: List<Genre> = registrationViewModel.genres.collectAsState().value
-    val chosenGenres: List<Genre> = registrationViewModel.chosenGenres.collectAsState().value
-    val isLoading: Boolean = registrationViewModel.isLoading.collectAsState().value
+    val genreState: GenreUiState by registrationViewModel.genreUiState.collectAsState()
+    val isLoading: Boolean by registrationViewModel.genreUiState
+        .map { it.status == ApiStatus.LOADING }
+        .collectAsState(initial = true)
 
     val context = LocalContext.current
     val toastWarningText: String = stringResource(id = R.string.choose_genres_warning)
 
-    LaunchedEffect(key1 = chosenGenres) {
-        Log.d("ChooseGenresScreen", "chosen genres: $chosenGenres")
+    LaunchedEffect(key1 = genreState.chosenGenres) {
+        Log.d("ChooseGenresScreen", "chosen genres: ${genreState.chosenGenres}")
     }
 
     Box(
@@ -71,18 +76,20 @@ fun ChooseGenresScreen(
                 columns = GridCells.Adaptive(minSize = 100.dp),
                 contentPadding = PaddingValues(all = 10.dp),
                 content = {
-                    itemsIndexed(genres) { _, genre ->
+                    itemsIndexed(genreState.genres) { _, genre ->
                         MusicItemPlate(
                             modifier = Modifier.padding(bottom = 20.dp),
                             caption = genre.name ?: "",
-                            thumbnailUrl = genre.pictureURL,
+                            thumbnailUrl = genre.pictureUrl,
                             onClick = { isChosen ->
                                 if (isChosen) {
                                     registrationViewModel.setChosenGenres(genre)
                                 } else registrationViewModel.setChosenGenres(
-                                    chosenGenres.filter { it.id != genre.id }
+                                    genreState.chosenGenres.filter { it.id != genre.id }
                                 )
-                            }
+                            },
+                            width = 90.dp,
+                            height = 90.dp
                         )
                     }
                 }
@@ -94,15 +101,14 @@ fun ChooseGenresScreen(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            // TODO: uncomment empty list check
-//            if (chosenGenres.isNotEmpty())
+            if (genreState.chosenGenres.isNotEmpty())
                 registrationViewModel
                     .onPostRegisterNextBtnClick(Route.Authentication.ChooseGenres)
-//            else Toast.makeText(
-//                context,
-//                toastWarningText,
-//                Toast.LENGTH_SHORT
-//            ).show()
+            else Toast.makeText(
+                context,
+                toastWarningText,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }

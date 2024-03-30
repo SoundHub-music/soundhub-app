@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
@@ -35,7 +36,9 @@ fun MessageInputBox(
 ) {
     val messageContent = rememberSaveable { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
-    val authorizedUser by authViewModel.userInstance.collectAsState()
+    val authorizedUser: UserState by authViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
 
     Row(
         modifier = modifier
@@ -64,7 +67,7 @@ fun MessageInputBox(
                 messageContent = messageContent,
                 messageCount = messages.size,
                 lazyListState = lazyListState,
-                authorizedUser = authorizedUser,
+                authorizedUser = authorizedUser.current,
                 chatViewModel = chatViewModel
             )
         }

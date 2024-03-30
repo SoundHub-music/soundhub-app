@@ -28,9 +28,9 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.messenger.components.ChatList
-import com.soundhub.utils.Constants
 import com.soundhub.utils.SearchUtils
 
 @Composable
@@ -40,7 +40,10 @@ fun MessengerScreen(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     messengerViewModel: MessengerViewModel = hiltViewModel()
 ) {
-    val authorizedUser: User? = authViewModel.userInstance.collectAsState().value
+    val authorizedUser: UserState by authViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
+
     val chats: List<Chat> = listOf(
         Chat(
             lastMessage = "last message",
@@ -49,7 +52,7 @@ fun MessengerScreen(
                     firstName = "Alexey",
                     lastName = "Zaycev"
                 ),
-                authorizedUser
+                authorizedUser.current
             )
         ),
 
@@ -60,7 +63,7 @@ fun MessengerScreen(
                     firstName = "Nikolay",
                     lastName = "Shein"
                 ),
-                authorizedUser
+                authorizedUser.current
             )
         ),
 
@@ -72,7 +75,7 @@ fun MessengerScreen(
                     firstName = "Gennadiy",
                     lastName = "Bukin"
                 ),
-                authorizedUser
+                authorizedUser.current
             )
         )
     )
@@ -81,10 +84,11 @@ fun MessengerScreen(
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
 
     LaunchedEffect(key1 = searchBarText) {
-        Log.d(Constants.LOG_SEARCH_TEXT, searchBarText)
+        Log.d("MessengerScreen", "searchbar text: $searchBarText")
         filteredChats = if (searchBarText.isNotEmpty()) {
             chats.filter {
-                val otherUser: User? = it.participants.first { user -> user?.id != authorizedUser?.id }
+                val otherUser: User? = it.participants
+                    .first { user -> user?.id != authorizedUser.current?.id }
                SearchUtils.compareWithUsername(otherUser, searchBarText)
             }
         } else chats

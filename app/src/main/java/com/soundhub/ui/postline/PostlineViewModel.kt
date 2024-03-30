@@ -27,7 +27,7 @@ class PostlineViewModel @Inject constructor() : ViewModel() {
                 Post(
                     author = User(firstName = "Billie", lastName = "Elish"),
                     publishDate = LocalDateTime.now(),
-                    content = "sdfksofsopgsrgk",
+                    content = "reprimique aliquet sodales enim luctus",
                     avatar = null,
                     imageContent = listOf(
                         "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8fDA%3D",
@@ -37,35 +37,35 @@ class PostlineViewModel @Inject constructor() : ViewModel() {
                 Post(
                     author = User(firstName = "Billy", lastName = "Elish"),
                     publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "sdfksofsopgsrgk",
+                    content = "litora ultrices petentium ancillae feugait eruditi justo viverra in quis",
                     avatar = null,
                     imageContent = listOf("https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg")
                 ),
                 Post(
                     author = User(firstName = "Billy", lastName = "Elish"),
                     publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 26, 12, 11),
-                    content = "sdfksofsopgsrgk",
+                    content = "commune pri ubique iudicabit turpis eleifend accumsan adipisci partiendo urbanitas viris vehicula putent ei quas sed at consetetur offendit suscipiantur esse luctus feugait ullamcorper est",
                     avatar = null,
                     imageContent = emptyList()
                 ),
                 Post(
                     author = User(firstName = "Billy", lastName = "Elish"),
                     publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "sdfksofsopgsrgk",
+                    content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
                     avatar = null,
                     imageContent = emptyList()
                 ),
                 Post(
                     author = User(firstName = "Billy", lastName = "Elish"),
                     publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "sdfksofsopgsrgk",
+                    content = "aenean ornatus adversarium doming sumo natoque ultricies reformidans contentiones recteque omnesque postulant omittantur homero decore rutrum egestas vis signiferumque quaeque partiendo eget elementum consectetur invidunt melius sapientem tation fabellas equidem errem idque efficitur his euismod utroque augue his necessitatibus aliquam vestibulum purus tincidunt in iriure mei duo vulputate dicat tamquam",
                     avatar = null,
                     imageContent = emptyList()
                 ),
                 Post(
                     author = User(firstName = "Billy", lastName = "Elish"),
                     publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "sdfksofsopgsrgk",
+                    content = "honcus maiorum molestie antiopam postulant salutatus",
                     avatar = null,
                     imageContent = emptyList()
                 )

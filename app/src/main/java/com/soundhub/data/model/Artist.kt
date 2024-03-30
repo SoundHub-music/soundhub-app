@@ -1,13 +1,13 @@
 package com.soundhub.data.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.UUID
 
 data class Artist(
-    @SerializedName("id")
-    val id: UUID = UUID.randomUUID(),
+    val id: Int = 0,
     val name: String,
     val description: String = "",
+    var genres: List<String> = emptyList(),
+    var styles: List<String> = emptyList(),
 
     @SerializedName("albums")
     val albums: List<Album> = emptyList(),

@@ -2,9 +2,9 @@ package com.soundhub.utils
 
 sealed class ApiEndpoints {
     object SoundHub {
-        const val authEndpoint: String = "auth"
-        const val usersEndpoint: String = "users"
-        const val userIdDynamicParam: String = "{userId}"
+        private const val authEndpoint: String = "auth"
+        private const val usersEndpoint: String = "users"
+        private const val userIdDynamicParam: String = "{userId}"
 
         const val signUp: String = "$authEndpoint/sign-up"
         const val signIn: String = "$authEndpoint/sign-in"
@@ -21,10 +21,16 @@ sealed class ApiEndpoints {
     }
 
     object Music {
-        const val genreEndpoint: String = "genre"
-        const val artistEndpoint: String = "artist"
+        const val releaseIdDynamicParam = "releaseId"
+        const val artistIdDynamicParam = "artistId"
+        const val artistEndpoint: String = "artists"
+        const val releaseEndpoint: String = "releases"
 
-        const val allGenres: String = "$genreEndpoint/all"
+        const val databaseSearch: String = "database/search"
+
+        const val artists: String = "$artistEndpoint/{$artistIdDynamicParam}"
+        const val releases: String = "$releaseEndpoint/{$releaseIdDynamicParam}"
+        const val artistReleases = "$artists/releases"
     }
 
     object Files {

@@ -1,4 +1,4 @@
-package com.soundhub.ui.states
+package com.soundhub.ui.authentication.states
 
 data class AuthFormState(
     val isRegisterForm: Boolean = false,

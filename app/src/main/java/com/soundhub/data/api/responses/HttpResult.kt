@@ -9,7 +9,7 @@ sealed class HttpResult<T>(val status: ApiStatus) {
     ): HttpResult<T>(status = ApiStatus.SUCCESS)
 
     data class Error<T>(
-        val errorBody: ErrorResponse? = null,
+        val errorBody: ErrorResponse,
         val throwable: Exception? = null
     ): HttpResult<T>(status = ApiStatus.ERROR)
 
@@ -20,6 +20,12 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 
     suspend fun onFailure(callback: suspend (Error<T>) -> Unit): HttpResult<T> {
         if (this is Error) callback(this)
+        return this
+    }
+
+    suspend fun finally(callback: suspend (HttpResult<T>) -> Unit): HttpResult<T> {
+        if (this is Success || this is Error)
+            callback(this)
         return this
     }
 }

@@ -22,11 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.components.CircularAvatar
 
 @Composable
 internal fun UserCardSettings(authViewModel: AuthenticationViewModel = hiltViewModel()) {
-    val authorizedUser by authViewModel.userInstance.collectAsState()
+    val authorizedUser: UserState by authViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
     val userAvatar by authViewModel.currentUserAvatar.collectAsState()
 
     Box(
@@ -48,7 +51,8 @@ internal fun UserCardSettings(authViewModel: AuthenticationViewModel = hiltViewM
                    imageUrl = userAvatar?.absolutePath
                )
                Text(
-                   text = "${authorizedUser?.firstName} ${authorizedUser?.lastName}".trim(),
+                   text = "${authorizedUser.current?.firstName} ${authorizedUser.current?.lastName}"
+                       .trim(),
                    fontWeight = FontWeight.Bold,
                    fontSize = 18.sp,
                    lineHeight = 32.sp

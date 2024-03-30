@@ -43,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
-import com.soundhub.ui.states.AuthFormState
+import com.soundhub.ui.authentication.states.AuthFormState
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.utils.Validator
 
@@ -147,7 +147,7 @@ fun AuthForm(
             colors = ButtonDefaults.buttonColors(),
             onClick = {
                 if (authFormState.isRegisterForm)
-                    registrationViewModel.signUp(authFormState)
+                    registrationViewModel.onSignUpButtonClick(authFormState)
                 else authViewModel.signIn()
             },
             enabled = Validator.validateAuthForm(authFormState)

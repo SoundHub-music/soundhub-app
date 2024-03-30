@@ -20,7 +20,7 @@ import com.soundhub.R
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
 import com.soundhub.Route
-import com.soundhub.ui.states.RegistrationState
+import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 
 @Composable
 fun FillUserDataScreen(

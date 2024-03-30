@@ -5,8 +5,9 @@ import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
-import com.soundhub.ui.states.RegistrationState
+import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 import com.soundhub.ui.states.UserFormState
+import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
 import org.junit.Test
 import org.junit.Assert.*
@@ -94,7 +95,8 @@ class UserMapperTest {
 
     @Test
     fun getRegisterRequestBody() {
-        val result: RegisterRequestBody = mapper.registerStateToRegisterRequestBody(registerState)
+        val regMapper = Mappers.getMapper(RegisterDataMapper::class.java)
+        val result: RegisterRequestBody = regMapper.registerStateToRegisterRequestBody(registerState)
         assertEquals(registerRequestBody, result)
     }
 }

@@ -1,8 +1,7 @@
 package com.soundhub.utils.mappers
 
-import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.model.User
-import com.soundhub.ui.states.RegistrationState
+import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 import com.soundhub.ui.states.UserFormState
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -14,5 +13,4 @@ interface UserMapper {
     fun fromRegistrationState(state: RegistrationState): User
     fun toFormState(user: User?): UserFormState
     fun mergeUserWithFormState(state: UserFormState, @MappingTarget user: User?): User
-    fun registerStateToRegisterRequestBody(registrationState: RegistrationState?): RegisterRequestBody
 }

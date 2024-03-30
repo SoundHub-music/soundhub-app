@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -39,12 +40,14 @@ fun MusicItemPlate(
     modifier: Modifier = Modifier,
     caption: String,
     thumbnailUrl: String? = null,
-    onClick: (Boolean) -> Unit = {}
+    onClick: (Boolean) -> Unit = {},
+    width: Dp = 72.dp,
+    height: Dp = 72.dp
 ) {
     var isItemChosen by rememberSaveable { mutableStateOf(false) }
     var itemBoxModifier: Modifier = Modifier
-        .width(72.dp)
-        .height(72.dp)
+        .width(width)
+        .height(height)
         .clip(shape = RoundedCornerShape(16.dp))
         .clickable {
             isItemChosen = !isItemChosen
@@ -65,17 +68,18 @@ fun MusicItemPlate(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box (modifier = itemBoxModifier) {
-            if (thumbnailUrl == null)
+            if (thumbnailUrl.isNullOrEmpty())
                 Image(
                     painter = painterResource(id = R.drawable.musical_note),
                     contentDescription = "icon",
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                 )
             else GlideImage(
                 model = thumbnailUrl,
-                contentDescription = caption
+                contentDescription = caption,
+                contentScale = ContentScale.Crop,
             )
         }
         Text(

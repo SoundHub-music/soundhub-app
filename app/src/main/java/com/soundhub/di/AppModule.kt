@@ -5,15 +5,16 @@ import android.content.Context
 import com.google.gson.GsonBuilder
 import com.soundhub.BuildConfig
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.api.AuthApi
-import com.soundhub.data.api.ChatApi
+import com.soundhub.data.api.AuthService
+import com.soundhub.data.api.ChatService
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.data.api.CountryApi
-import com.soundhub.data.api.FileApi
-import com.soundhub.data.api.MusicApi
+import com.soundhub.data.api.CountryService
+import com.soundhub.data.api.FileService
+import com.soundhub.data.api.LastFmService
+import com.soundhub.data.api.MusicService
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.data.api.UserApi
+import com.soundhub.data.api.UserService
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.FileRepository
@@ -50,13 +51,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUserDataStore(app: Application): UserCredsStore {
-        return UserCredsStore(app)
-    }
+    fun providesUserDataStore(app: Application): UserCredsStore = UserCredsStore(app)
 
     @Provides
     @Singleton
-    @Named(Constants.COUNTRIES_API_LABEL)
+    @Named(Constants.COUNTRIES_API_RETROFIT)
     fun providesCountryApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.COUNTRIES_API)
@@ -67,10 +66,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named(Constants.MUSIC_API_LABEL)
-    fun providesMusicBrainzRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named(Constants.MUSIC_API_RETROFIT)
+    fun providesMusicApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.MUSICBRAINZ_API)
+            .baseUrl(BuildConfig.DISCOGS_API)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -78,7 +77,18 @@ object AppModule {
 
     @Provides
     @Singleton
-    @Named(Constants.SOUNDHUB_API_LABEL)
+    @Named(Constants.LAST_FM_API_RETROFIT)
+    fun providesLastFmRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.LAST_FM_API)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named(Constants.SOUNDHUB_API_RETROFIT)
     fun providesSoundHubApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val gson = GsonBuilder()
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
@@ -93,79 +103,85 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAuthApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): AuthApi {
-        return retrofit.create(AuthApi::class.java)
-    }
+    fun providesLastFmApi(
+        @Named(Constants.LAST_FM_API_RETROFIT) retrofit: Retrofit
+    ): LastFmService = retrofit.create(LastFmService::class.java)
 
     @Provides
     @Singleton
-    fun providesUserApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): UserApi {
-        return retrofit.create(UserApi::class.java)
-    }
+    fun providesAuthApi(
+        @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
+    ): AuthService = retrofit.create(AuthService::class.java)
 
     @Provides
     @Singleton
-    fun providesFileApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): FileApi {
-        return retrofit.create(FileApi::class.java)
-    }
+    fun providesUserApi(
+        @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
+    ): UserService = retrofit.create(UserService::class.java)
 
     @Provides
     @Singleton
-    fun providesCountryApi(@Named(Constants.COUNTRIES_API_LABEL) retrofit: Retrofit): CountryApi {
-        return retrofit.create(CountryApi::class.java)
-    }
+    fun providesFileApi(
+        @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
+    ): FileService = retrofit.create(FileService::class.java)
 
     @Provides
     @Singleton
-    fun providesMusicApi(@Named(Constants.MUSIC_API_LABEL) retrofit: Retrofit): MusicApi {
-        return retrofit.create(MusicApi::class.java)
-    }
+    fun providesCountryApi(
+        @Named(Constants.COUNTRIES_API_RETROFIT) retrofit: Retrofit
+    ): CountryService = retrofit.create(CountryService::class.java)
 
     @Provides
     @Singleton
-    fun providesChatApi(@Named(Constants.SOUNDHUB_API_LABEL) retrofit: Retrofit): ChatApi {
-        return retrofit.create(ChatApi::class.java)
-    }
+    fun providesMusicApi(
+        @Named(Constants.MUSIC_API_RETROFIT) retrofit: Retrofit
+    ): MusicService = retrofit.create(MusicService::class.java)
 
     @Provides
     @Singleton
-    fun providesAuthRepository(authApi: AuthApi, @ApplicationContext context: Context): AuthRepository {
-        return AuthRepositoryImpl(authApi, context)
-    }
+    fun providesChatApi(
+        @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
+    ): ChatService = retrofit.create(ChatService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesAuthRepository(
+        authService: AuthService,
+        @ApplicationContext context: Context
+    ): AuthRepository = AuthRepositoryImpl(authService, context)
 
 
     @Provides
     @Singleton
-    fun providesUserRepository(userApi: UserApi, @ApplicationContext context: Context): UserRepository {
-        return UserRepositoryImpl(userApi, context)
-    }
+    fun providesUserRepository(
+        userService: UserService,
+        @ApplicationContext context: Context
+    ): UserRepository = UserRepositoryImpl(userService, context)
 
     @Provides
     @Singleton
-    fun providesCountryRepository(countryApi: CountryApi): CountryRepository {
-        return CountryRepositoryImpl(countryApi)
-    }
+    fun providesCountryRepository(countryService: CountryService): CountryRepository =
+        CountryRepositoryImpl(countryService)
 
     @Provides
     @Singleton
-    fun providesChatRepository(chatApi: ChatApi): ChatRepository {
-        return ChatRepositoryImpl(chatApi)
-    }
+    fun providesChatRepository(chatService: ChatService): ChatRepository =
+        ChatRepositoryImpl(chatService)
 
     @Provides
     @Singleton
     fun providesFileRepository(
-        fileApi: FileApi,
+        fileService: FileService,
         @ApplicationContext context: Context
-    ): FileRepository {
-        return FileRepositoryImpl(fileApi, context)
-    }
+    ): FileRepository = FileRepositoryImpl(fileService, context)
 
     @Provides
     @Singleton
-    fun providesMusicRepository(musicApi: MusicApi): MusicRepository {
-        return MusicRepositoryImpl(musicApi)
-    }
+    fun providesMusicRepository(
+        musicService: MusicService,
+        lastFmService: LastFmService,
+        @ApplicationContext context: Context
+    ): MusicRepository = MusicRepositoryImpl(musicService, lastFmService, context)
 
     @Provides
     @Singleton
@@ -180,13 +196,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUpdateUserUseCase(userRepository: UserRepository): UpdateUserUseCase {
-        return UpdateUserUseCase(userRepository)
-    }
+    fun providesUpdateUserUseCase(userRepository: UserRepository): UpdateUserUseCase =
+        UpdateUserUseCase(userRepository)
 
     @Provides
     @Singleton
-    fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase {
-        return GetImageUseCase(fileRepository)
-    }
+    fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase =
+        GetImageUseCase(fileRepository)
 }

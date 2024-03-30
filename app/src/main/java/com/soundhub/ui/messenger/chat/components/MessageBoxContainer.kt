@@ -7,11 +7,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.data.model.Message
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 
 @Composable
 fun MessageBoxContainer(
@@ -20,7 +22,9 @@ fun MessageBoxContainer(
     authenticationViewModel: AuthenticationViewModel = hiltViewModel(),
     lazyListState: LazyListState
 ) {
-    val user = authenticationViewModel.userInstance.collectAsState().value
+    val user: UserState by authenticationViewModel
+        .userInstance.collectAsState(initial = UserState())
+
     LazyColumn(
         state = lazyListState,
         modifier = modifier
@@ -31,7 +35,7 @@ fun MessageBoxContainer(
             MessageBox(
                 modifier = Modifier,
                 messageData = message,
-                isOwnMessage = message.sender?.id == user?.id
+                isOwnMessage = message.sender?.id == user.current?.id
             )
         }
     }

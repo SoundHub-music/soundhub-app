@@ -1,4 +1,4 @@
-package com.soundhub.ui.states
+package com.soundhub.ui.authentication.postregistration.states
 
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender
@@ -19,9 +19,9 @@ data class RegistrationState(
     override var city: String? = "",
     override var description: String? = "",
     override var avatarUrl: String? = null,
-    override var languages: MutableList<String> = mutableListOf(),
-    var favoriteGenres: MutableList<Genre> = mutableListOf(),
-    var favoriteArtists: MutableList<Artist> = mutableListOf(),
+    override var languages: List<String> = emptyList(),
+    var favoriteGenres: List<Genre> = emptyList(),
+    var favoriteArtists: List<Artist> = emptyList(),
 
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,

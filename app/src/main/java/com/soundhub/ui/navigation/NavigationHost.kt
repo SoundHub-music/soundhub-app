@@ -1,6 +1,8 @@
 package com.soundhub.ui.navigation
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
@@ -25,9 +28,11 @@ import androidx.navigation.navArgument
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationScreen
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
@@ -61,16 +66,19 @@ fun NavigationHost(
     chatViewModel: ChatViewModel,
     messengerViewModel: MessengerViewModel,
     editUserProfileViewModel: EditUserProfileViewModel,
-    topBarTitle: MutableState<String?>
+    topBarTitle: MutableState<String?>,
+    authorizedUser: UserState,
 ) {
     var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
 
-    val authorizedUser: User? by authViewModel.userInstance.collectAsState(initial = null)
     val userCreds: UserPreferences? by authViewModel.userCreds.collectAsState(initial = null)
     val userViewModel: UserViewModel = hiltViewModel()
 
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
+
+    val context: Context = LocalContext.current
+    val authErrorMessage: String = stringResource(id = R.string.toast_authorization_error)
 
     LaunchedEffect(key1 = currentRoute) {
         Log.d("HomeScreen", "current_route: $currentRoute")
@@ -79,11 +87,15 @@ fun NavigationHost(
     }
 
     LaunchedEffect(key1 = userCreds?.accessToken) {
+        if (authorizedUser.current == null && authorizedUser.status == ApiStatus.ERROR)
+            Toast.makeText(
+                context, authErrorMessage, Toast.LENGTH_SHORT
+            ).show()
+
         startDestination = if (
-            userCreds?.accessToken != null &&
-            userCreds!!.accessToken?.isNotEmpty() == true
-        ) Route.Postline.route
-        else Route.Authentication.route
+           userCreds?.accessToken.isNullOrEmpty()
+        ) Route.Authentication.route
+        else Route.Postline.route
     }
 
     NavHost(
@@ -181,26 +193,32 @@ fun NavigationHost(
             route = Route.Profile().route,
             arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
         ) { entry ->
-            val userId = entry.arguments?.getString(Constants.PROFILE_NAV_ARG) ?: ""
-            val user: MutableState<User?> = remember { mutableStateOf(null) }
-            Log.d("UserProfile", "userId: $userId")
+            if (authorizedUser.current != null) {
+                val userId = entry.arguments?.getString(Constants.PROFILE_NAV_ARG) ?: ""
+                val user: MutableState<User?> = remember { mutableStateOf(null) }
+                Log.d("UserProfile", "userId: $userId")
 
-            LaunchedEffect(key1 = true) {
-                if (userId == authorizedUser?.id?.toString())
-                    user.value = authorizedUser
-                else user.value = userViewModel.getUserById(userId).firstOrNull()
-            }
+                LaunchedEffect(key1 = true) {
+                    if (userId == authorizedUser.current.id.toString())
+                        user.value = authorizedUser.current
+                    else user.value = userViewModel
+                        .getUserById(userId)
+                        .firstOrNull()
+                }
 
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                ProfileScreen(
-                    navController = navController,
-                    authViewModel = authViewModel,
-                    user = user.value
-                )
+                ScreenContainer(
+                    userCreds = userCreds,
+                    navController = navController
+                ) {
+                    ProfileScreen(
+                        navController = navController,
+                        authViewModel = authViewModel,
+                        user = user.value
+                    )
+                }
             }
+            // TODO: fix switching navigation animation
+            else navController.navigate(Route.Postline.route)
         }
 
         composable(Route.FriendList.route) {
@@ -234,7 +252,7 @@ fun NavigationHost(
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_edit_profile)
                 EditUserProfileScreen(
-                    authorizedUser = authorizedUser,
+                    authorizedUser = authorizedUser.current,
                     editUserProfileViewModel = editUserProfileViewModel,
                     authViewModel = authViewModel
                 )

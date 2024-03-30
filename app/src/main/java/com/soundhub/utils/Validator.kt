@@ -1,7 +1,7 @@
 package com.soundhub.utils
 
-import com.soundhub.ui.states.AuthFormState
-import com.soundhub.ui.states.RegistrationState
+import com.soundhub.ui.authentication.states.AuthFormState
+import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 
 sealed class Validator {
     companion object {

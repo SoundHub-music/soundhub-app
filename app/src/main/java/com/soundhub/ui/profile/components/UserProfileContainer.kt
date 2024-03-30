@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
 import com.soundhub.ui.profile.components.sections.photos.UserPhotoCarousel
@@ -37,8 +37,12 @@ fun UserProfileContainer(
     authViewModel: AuthenticationViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val authorizedUser by authViewModel.userInstance.collectAsState()
-    val isOriginProfile: Boolean = authorizedUser?.id?.toString() == user?.id?.toString()
+    val authorizedUser: UserState by authViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
+    val isOriginProfile: Boolean = authorizedUser
+        .current?.id?.toString() == user?.id?.toString()
+
     val userLocation: String = getUserLocation(user?.city, user?.country)
 
     Box(
@@ -88,15 +92,7 @@ fun UserProfileContainer(
 
             // genres list with fake data
             FavoriteGenresSection(
-                genreList = listOf(
-                    Genre(name = "pop rock"),
-                    Genre(name = "alternative rock"),
-                    Genre(name = "jazz"),
-                    Genre(name = "pop"),
-                    Genre(name = "hip-hop"),
-                    Genre(name = "punk-rock"),
-                    Genre(name = "post-hardcore")
-                ),
+                genreList = user?.favoriteGenres ?: emptyList(),
                 isOriginProfile = isOriginProfile,
                 navController = navController
             )

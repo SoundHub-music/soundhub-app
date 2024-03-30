@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.UiEvent
 import com.soundhub.ui.states.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,6 @@ import javax.inject.Inject
 class UiStateDispatcher @Inject constructor() : ViewModel() {
     private var _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: Flow<UiEvent> = _uiEvent.asSharedFlow()
-
     var uiState = MutableStateFlow(UiState())
         private set
 
@@ -41,7 +41,7 @@ class UiStateDispatcher @Inject constructor() : ViewModel() {
         it.copy(galleryImageUrls = value)
     }
 
-    fun sendUiEvent(event: UiEvent) = viewModelScope.launch {
+    suspend fun sendUiEvent(event: UiEvent) = viewModelScope.launch(Dispatchers.IO) {
         _uiEvent.emit(event)
-    }
+    }.join()
 }

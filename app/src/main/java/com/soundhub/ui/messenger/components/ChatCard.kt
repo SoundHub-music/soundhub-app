@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import com.soundhub.Route
 import com.soundhub.data.model.Chat
 import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.components.CircularAvatar
 
 @Composable
@@ -42,8 +44,10 @@ internal fun ChatCard(
 ) {
     var lastMessageModifier: Modifier = Modifier
     val hasUnreadMessages: Boolean = (chat?.unreadMessageCount ?: 0) > 0
-    val authorizedUser = authenticationViewModel.userInstance.collectAsState().value
-    val interlocutor = chat?.participants?.first { it?.id != authorizedUser?.id }
+    val authorizedUser by authenticationViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
+    val interlocutor = chat?.participants?.first { it?.id != authorizedUser.current?.id }
 
     if (hasUnreadMessages)
         lastMessageModifier = Modifier

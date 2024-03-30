@@ -4,7 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.BuildConfig
-import com.soundhub.data.api.FileApi
+import com.soundhub.R
+import com.soundhub.data.api.FileService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.repository.FileRepository
@@ -19,7 +20,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class FileRepositoryImpl @Inject constructor(
-    private val fileApi: FileApi,
+    private val fileService: FileService,
     private val context: Context
 ): FileRepository {
     override suspend fun getFile(
@@ -28,9 +29,11 @@ class FileRepositoryImpl @Inject constructor(
         accessToken: String?
     ): HttpResult<File> {
         try {
+            // TODO: remove this shit after deploying backend on server
             val fileNameWithServerIp = fileNameUrl
                 ?.replace("localhost", BuildConfig.SOUNDHUB_API_ADDRESS)
-            val response: Response<ResponseBody> = fileApi.getFile(
+
+            val response: Response<ResponseBody> = fileService.getFile(
                 accessToken = "Bearer $accessToken",
                 fileName = "$fileNameWithServerIp?folderName=$folderName"
             )
@@ -38,11 +41,14 @@ class FileRepositoryImpl @Inject constructor(
             Log.d("FileRepository", "getFile[1]: response is $response")
 
             if (!response.isSuccessful) {
-                val error: ErrorResponse? = Gson()
+                val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                return HttpResult.Error(
-                    errorBody = error
-                )
+                    ?: ErrorResponse(
+                        status = response.code(),
+                        detail = context.getString(R.string.toast_file_loading_error)
+                    )
+
+                return HttpResult.Error(errorBody = errorBody)
             }
 
             val file: File = withContext(Dispatchers.IO) {
@@ -65,7 +71,10 @@ class FileRepositoryImpl @Inject constructor(
         }
         catch (e: Exception) {
             Log.e("FileRepository", "getFile[3]: ${e.stackTraceToString()}")
-            return HttpResult.Error(throwable = e)
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
         }
     }
 }

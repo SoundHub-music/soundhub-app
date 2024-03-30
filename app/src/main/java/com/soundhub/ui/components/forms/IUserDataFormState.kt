@@ -14,7 +14,7 @@ interface IUserDataFormState {
     var city: String?
     var description: String?
     var avatarUrl: String?
-    var languages: MutableList<String>
+    var languages: List<String>
 
     var isFirstNameValid: Boolean
     var isLastNameValid: Boolean

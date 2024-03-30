@@ -1,6 +1,7 @@
 package com.soundhub.utils
 
 import com.google.gson.reflect.TypeToken
+import com.soundhub.BuildConfig
 import com.soundhub.Route
 import com.soundhub.data.api.responses.ErrorResponse
 import java.lang.reflect.Type
@@ -16,10 +17,6 @@ object Constants {
     const val DATASTORE_REFRESH_TOKEN = "user_refresh_token"
 
     const val LOG_CURRENT_EVENT_TAG = "current_event"
-    const val LOG_USER_CREDS_TAG = "user_creds"
-    const val LOG_REGISTER_STATE = "registration_state"
-    const val LOG_CURRENT_ROUTE = "current_route"
-    const val LOG_SEARCH_TEXT = "search_text"
 
     const val DATE_FORMAT = "yyyy-MM-dd"
 
@@ -59,6 +56,7 @@ object Constants {
 
     const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
     const val POSTLINE_ROUTE = "postline"
+
     const val MUSIC_ROUTE = "music"
 
     // messenger routes
@@ -80,8 +78,12 @@ object Constants {
     val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>(){}.type
 
     // named injections for di
-    const val SOUNDHUB_API_LABEL = "soundhub_api"
-    const val MUSIC_API_LABEL = "musicbrainz_api"
-    const val COUNTRIES_API_LABEL = "countries_api"
+    const val SOUNDHUB_API_RETROFIT = "soundhub_api"
+    const val MUSIC_API_RETROFIT = "music_api"
+    const val COUNTRIES_API_RETROFIT = "countries_api"
+    const val LAST_FM_API_RETROFIT = "lastfm_api"
+
+
+    const val DISCOGS_AUTHORIZATION = "Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 
 }

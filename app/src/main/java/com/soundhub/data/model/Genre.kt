@@ -7,5 +7,5 @@ data class Genre(
     @SerializedName("id")
     val id: UUID = UUID.randomUUID(),
     val name: String? = null,
-    val pictureURL: String? = null
+    val pictureUrl: String? = null
 )

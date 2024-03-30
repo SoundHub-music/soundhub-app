@@ -19,7 +19,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.data.model.User
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
@@ -44,7 +44,9 @@ fun HomeScreen(
     val currentRoute: String? = navBackStackEntry?.destination?.route
     val topBarTitle: MutableState<String?> = rememberSaveable { mutableStateOf(null) }
 
-    val authorizedUser: User? by authViewModel.userInstance.collectAsState(initial = null)
+    val authorizedUser: UserState by authViewModel
+        .userInstance
+        .collectAsState(initial = UserState())
     val userAvatar by authViewModel.currentUserAvatar.collectAsState()
 
     LaunchedEffect(key1 = userAvatar) {
@@ -68,7 +70,7 @@ fun HomeScreen(
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
                 BottomNavigationBar(
                     navController = navController,
-                    user = authorizedUser
+                    user = authorizedUser.current
                 )
         }
     ) {
@@ -81,7 +83,8 @@ fun HomeScreen(
            chatViewModel = chatViewModel,
            messengerViewModel = messengerViewModel,
            editUserProfileViewModel = editUserProfileViewModel,
-           topBarTitle = topBarTitle
+           topBarTitle = topBarTitle,
+           authorizedUser = authorizedUser
        )
     }
 }

@@ -65,6 +65,7 @@
     <string name="userform_invalid_birthday_error_message">Некорректная дата рождения</string>
 
     <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
+    <string name="choose_artist_warning">Сначала выберите хотя бы одного исполнителя</string>
 
     <!--    profile screen string constants-->
     <string name="profile_screen_photo_section_caption">Фотографии</string>
@@ -88,6 +89,12 @@
     <string name="toast_authorization_error">Ошибка авторизации</string>
     <string name="toast_critical_error">Произошла критическая ошибка: %s</string>
     <string name="toast_no_internet_connection">Нет подключения к интернету</string>
+    <string name="toast_register_error">Ошибка регистрации пользователя</string>
+    <string name="toast_logout_error">Ошибка выхода из аккаунта</string>
+    <string name="toast_fetch_user_data_error">Ошибка получения данных пользователя</string>
+    <string name="toast_file_loading_error">Ошибка загрузки файла</string>
+    <string name="toast_common_error">Произошла ошибка</string>
+    <string name="toast_update_error">Ошибка обновления данных</string>
 
     <string name="message_input_placeholder">Ваше сообщение</string>
 
@@ -124,4 +131,9 @@
 
     <!--    friend page strings-->
     <string name="friends_recommendation_page_card_caption">На %d%% похожие предпочтения</string>
+
+    <!--    create post strings-->
+    <string name="create_post_field_placeholder">
+        Поделитесь своими мыслями…
+    </string>
 </resources>

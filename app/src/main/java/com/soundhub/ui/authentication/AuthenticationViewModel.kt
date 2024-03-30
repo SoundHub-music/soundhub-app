@@ -6,18 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.User
-import com.soundhub.ui.states.AuthFormState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.Constants
 import com.soundhub.Route
 import com.soundhub.UiEvent
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.HttpResult
-import com.soundhub.data.api.responses.LogoutResponse
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.GetImageUseCase
+import com.soundhub.ui.authentication.states.AuthFormState
+import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,7 @@ class AuthenticationViewModel @Inject constructor(
     private val getImageUseCase: GetImageUseCase
 ) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    var userInstance = MutableStateFlow<User?>(null)
+    var userInstance: MutableStateFlow<UserState> = MutableStateFlow(UserState())
         private set
     var authFormState = MutableStateFlow(AuthFormState())
         private set
@@ -53,23 +53,20 @@ class AuthenticationViewModel @Inject constructor(
         viewModelScope.launch {
             userCreds.collect { creds ->
                 if (!creds.accessToken.isNullOrEmpty()) {
-                    userInstance.value = getCurrentUser().firstOrNull()
-
-                    if (userInstance.value?.avatarUrl != null) {
-                        val avatar = getImageUseCase(
-                            accessToken = creds.accessToken,
-                            fileName = userInstance.value?.avatarUrl,
-                            folderName = "avatars"
-                        )
-                        Log.d("avatar", avatar?.name.toString())
-
-                        currentUserAvatar.value = avatar
-
-                        Log.d("currentUserAvatar", currentUserAvatar.value.toString())
+                    getCurrentUser().collect { currentUser ->
+                        val status = if (currentUser != null) ApiStatus.SUCCESS
+                            else ApiStatus.ERROR
+                        userInstance.update {
+                            it.copy(
+                                current = currentUser,
+                                status = status
+                            )
+                        }
                     }
+                    loadAuthenticatedUserAvatar()
                 }
+                else userInstance.update { it.copy(status = ApiStatus.ERROR) }
             }
-
         }
     }
 
@@ -78,6 +75,17 @@ class AuthenticationViewModel @Inject constructor(
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
+    private suspend fun loadAuthenticatedUserAvatar() {
+        if (userInstance.value.current?.avatarUrl != null) {
+            val avatar = getImageUseCase(
+                accessToken = userCreds.firstOrNull()?.accessToken,
+                fileName = userInstance.value.current?.avatarUrl,
+                folderName = "avatars"
+            )
+            Log.d("AuthenticationViewModel", "user avatar: ${avatar?.name.toString()}")
+            currentUserAvatar.value = avatar
+        }
+    }
 
     fun resetAuthFormState() = authFormState.update { AuthFormState() }
 
@@ -105,16 +113,19 @@ class AuthenticationViewModel @Inject constructor(
         it.copy(isRegisterForm = value)
     }
 
-    fun setCurrentUser(user: User) = userInstance.update { user }
+    fun setCurrentUser(user: User) = userInstance.update {
+        it.copy(current = user)
+    }
 
 
     fun logout() = viewModelScope.launch {
-        Log.d(Constants.LOG_USER_CREDS_TAG, "AuthenticationViewModel[logout]: $userCreds")
+        Log.d("AuthenticationViewModel", "logout: $userCreds")
         val tokens = userCreds.firstOrNull()
-        val logoutResponse: HttpResult<LogoutResponse> = authRepository.logout(tokens?.accessToken ?: "")
-        logoutResponse.onFailure {
+        authRepository
+            .logout(tokens?.accessToken)
+            .onFailure {
             uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(
-                UiText.DynamicString(it.errorBody?.detail ?: "")
+                UiText.DynamicString(it.errorBody.detail ?: "")
             ))
         }
 
@@ -126,25 +137,35 @@ class AuthenticationViewModel @Inject constructor(
         userRepository.getCurrentUser(creds?.accessToken)
         .onSuccess { emit(it.body) }
         .onFailure { currentUserError ->
-            val newCreds: HttpResult<UserPreferences?> = authRepository.refreshToken(
-                RefreshTokenRequestBody(creds?.refreshToken)
+            tryRefreshToken(
+                error = currentUserError,
+                userCreds = creds
             )
+        }
+    }
 
-            newCreds.onSuccess { newCredsResponse ->
-                userCredsStore.updateCreds(newCredsResponse.body)
-                uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(
-                        UiText.DynamicString(currentUserError.errorBody?.detail ?: "")
-                    )
+    private suspend fun tryRefreshToken(
+        error: HttpResult.Error<User?>,
+        userCreds: UserPreferences?
+    ): Flow<User?> = flow {
+        val newCreds: HttpResult<UserPreferences?> = authRepository.refreshToken(
+            RefreshTokenRequestBody(userCreds?.refreshToken)
+        )
+
+        newCreds.onSuccess { newCredsResponse ->
+            userCredsStore.updateCreds(newCredsResponse.body)
+            uiStateDispatcher.sendUiEvent(
+                UiEvent.ShowToast(
+                    UiText.DynamicString(error.errorBody.detail ?: "")
                 )
-                getAuthorizedUserAttempts.update { 0 }
+            )
+            getAuthorizedUserAttempts.update { 0 }
 
-            }.onFailure {
-                getAuthorizedUserAttempts.update { it + 1 }
-                if (getAuthorizedUserAttempts.value > 1) {
-                    uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
-                    emit(null)
-                }
+        }.onFailure {
+            getAuthorizedUserAttempts.update { it + 1 }
+            if (getAuthorizedUserAttempts.value > 1) {
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+                emit(null)
             }
         }
     }
@@ -156,19 +177,24 @@ class AuthenticationViewModel @Inject constructor(
                 email = authFormState.value.email,
                 password = authFormState.value.password
             ))
-            .onSuccess {
-                userCredsStore.updateCreds(it.body)
-                val currentUser: User? = getCurrentUser().firstOrNull()
+            .onSuccess { response ->
+                userCredsStore.updateCreds(response.body)
+                val currentUser: User? = getCurrentUser()
+                    .firstOrNull()
 
-                userInstance.update { currentUser }
+                userInstance.update {
+                    it.copy(
+                        current = currentUser,
+                        status = ApiStatus.SUCCESS
+                    )
+                }
                 uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
             }
             .onFailure {
                 uiStateDispatcher.sendUiEvent(
                     UiEvent.ShowToast(
                         UiText.DynamicString(
-                            it.errorBody?.detail ?:
-                            it.throwable?.message ?: ""
+                            it.errorBody.detail ?: ""
                         )
                     )
                 )

@@ -127,21 +127,20 @@ fun UserDataForm(
             onLanguagesChange = onLanguagesChange
         )
 
-        if (formState.value.birthday != null)
-            DatePicker(
-                modifier = Modifier.fillMaxWidth(),
-                value = formState.value.birthday.toString(),
-                label = stringResource(id = R.string.text_field_birthdate),
-                onValueChange = { value ->
-                    val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
-                    onBirthdayChange(date)
-                },
-                isError = !formState.value.isBirthdayValid,
-                supportingText = {
-                    if (!formState.value.isBirthdayValid)
-                        Text(text = stringResource(id = R.string.userform_birthday_error_message))
-                }
-            )
+        DatePicker(
+            modifier = Modifier.fillMaxWidth(),
+            value = formState.value.birthday?.toString() ?: "",
+            label = stringResource(id = R.string.text_field_birthdate),
+            onValueChange = { value ->
+                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
+                onBirthdayChange(date)
+            },
+            isError = !formState.value.isBirthdayValid,
+            supportingText = {
+                if (!formState.value.isBirthdayValid)
+                    Text(text = stringResource(id = R.string.userform_birthday_error_message))
+            }
+        )
 
         OutlinedTextField(
             modifier = Modifier

@@ -9,11 +9,10 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
@@ -27,6 +26,7 @@ import com.soundhub.utils.Constants
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,10 +38,20 @@ class MainActivity : ComponentActivity() {
     private val chatViewModel: ChatViewModel by viewModels()
     private val editUserProfileViewModel: EditUserProfileViewModel by viewModels()
 
+    private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val splashScreen: SplashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition{ splashScreenViewModel.isLoading.value }
+
+        val uiEventState = uiStateDispatcher.uiEvent
+
+        lifecycleScope.launch {
+            uiEventState.collect { event ->
+                handleUiEvent(event, navController)
+            }
+        }
 
         setContent {
             SoundHubTheme(dynamicColor = false) {
@@ -49,38 +59,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface
                 ) {
-                    val navController: NavHostController = rememberNavController()
-                    val context = LocalContext.current
-                    val uiEventState = uiStateDispatcher.uiEvent
-
+                    navController = rememberNavController()
                     navController.addOnDestinationChangedListener { _, _, _ ->
                         uiStateDispatcher.setSearchBarActive(false)
-                    }
-
-                    LaunchedEffect(key1 = uiEventState) {
-                        uiEventState.collect { event ->
-                            Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
-                            when (event) {
-                                is UiEvent.ShowToast -> Toast.makeText(
-                                    context,
-                                    event.uiText.getString(context),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                                is UiEvent.Navigate -> {
-                                    Log.d(
-                                        Constants.LOG_CURRENT_ROUTE,
-                                        "MainActivity[onCreate]: ${event.route.route}"
-                                    )
-                                    navController.navigate(event.route.route)
-                                }
-
-                                is UiEvent.PopBackStack -> navController.popBackStack()
-                                is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
-                                is UiEvent.UpdateUser -> editUserProfileViewModel.updateUser()
-                                is UiEvent.UpdateUserInstance -> authViewModel.setCurrentUser(event.user)
-                            }
-                        }
                     }
 
                     HomeScreen(
@@ -93,6 +74,29 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private fun handleUiEvent(event: UiEvent, navController: NavHostController) {
+        Log.d(Constants.LOG_CURRENT_EVENT_TAG, "MainActivity[onCreate]: $event")
+        when (event) {
+            is UiEvent.ShowToast -> {
+                if (event.uiText.getString(this).isNotEmpty())
+                    Toast.makeText(
+                        this, event.uiText.getString(this), Toast.LENGTH_SHORT
+                    ).show()
+            }
+
+            is UiEvent.Navigate -> navController
+                .navigate(event.route.route)
+            is UiEvent.PopBackStack -> navController
+                .popBackStack()
+            is UiEvent.SearchButtonClick -> uiStateDispatcher
+                .toggleSearchBarActive()
+            is UiEvent.UpdateUser -> editUserProfileViewModel
+                .updateUser()
+            is UiEvent.UpdateUserInstance -> authViewModel
+                .setCurrentUser(event.user)
         }
     }
 

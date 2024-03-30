@@ -20,7 +20,7 @@ fun FloatingNextButton(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         containerColor = MaterialTheme.colorScheme.primary,
-        modifier = modifier,
+        modifier = modifier
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.ArrowForward,

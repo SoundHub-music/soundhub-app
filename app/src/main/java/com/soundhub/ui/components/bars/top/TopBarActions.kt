@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -21,6 +22,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
+import kotlinx.coroutines.launch
 
 @Composable
 fun TopBarActions(
@@ -34,12 +36,15 @@ fun TopBarActions(
 
     val isSearchBarActive = uiState.isSearchBarActive
     val searchBarText = uiState.searchBarText
+    val coroutineScope = rememberCoroutineScope()
 
     when (currentRoute) {
         Route.EditUserData.route -> {
             IconButton(onClick = {
-                uiStateDispatcher.sendUiEvent(UiEvent.UpdateUser)
-                navController.popBackStack()
+                coroutineScope.launch {
+                    uiStateDispatcher.sendUiEvent(UiEvent.UpdateUser)
+                    navController.popBackStack()
+                }
             }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
 
@@ -64,13 +69,6 @@ fun TopBarActions(
                 navController = navController,
                 chatId = currentBackStackEntry?.arguments?.getString(Constants.CHAT_NAV_ARG)
             )
-        }
-
-        Route.CreatePost.route -> {
-            IconButton(onClick = {
-                /* TODO: implement logic for saving user data changes */
-                navController.popBackStack()
-            }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
         }
 
         else -> {}

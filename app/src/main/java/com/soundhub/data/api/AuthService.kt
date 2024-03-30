@@ -14,7 +14,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
-interface AuthApi {
+interface AuthService {
     @POST(ApiEndpoints.SoundHub.signUp)
     @Multipart
     suspend fun signUp(

@@ -15,7 +15,7 @@ data class UserFormState(
     override var city: String? = null,
     override var description: String? = "",
     override var avatarUrl: String? = null,
-    override var languages: MutableList<String> = mutableListOf(),
+    override var languages: List<String> = emptyList(),
     var email: String? = "",
 
     override var isFirstNameValid: Boolean = true,

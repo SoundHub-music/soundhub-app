@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.UiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun TransparentSearchTextField(
@@ -41,6 +43,7 @@ fun TransparentSearchTextField(
         .value
         .isSearchBarActive
 
+    val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(key1 = isSearchBarActive) {
         if (isSearchBarActive) focusRequester.requestFocus()
@@ -64,7 +67,11 @@ fun TransparentSearchTextField(
             )
         },
         trailingIcon = {
-            IconButton(onClick = { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }) {
+            IconButton(onClick = {
+                coroutineScope.launch {
+                    uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
+                }
+            }) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "close search bar button")
             }
        },
