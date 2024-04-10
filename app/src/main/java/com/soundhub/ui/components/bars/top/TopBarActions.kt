@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.menu.ChatTopBarMenu
@@ -27,7 +26,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TopBarActions(
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route

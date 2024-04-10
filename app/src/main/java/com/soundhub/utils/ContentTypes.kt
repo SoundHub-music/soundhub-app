@@ -1,6 +1,6 @@
 package com.soundhub.utils
 
-enum class MediaTypes(val type: String) {
+enum class ContentTypes(val type: String) {
     IMAGE_ALL("image/*"),
     JSON("application/json")
 }

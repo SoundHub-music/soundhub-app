@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -43,8 +42,8 @@ import com.soundhub.ui.components.BottomSheet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    registrationViewModel: RegistrationViewModel = hiltViewModel(),
+    authViewModel: AuthenticationViewModel,
+    registrationViewModel: RegistrationViewModel,
 ) {
     val backgroundImage: Painter = painterResource(R.drawable.login_page_background)
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(

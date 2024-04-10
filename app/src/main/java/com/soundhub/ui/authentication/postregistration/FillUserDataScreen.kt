@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
@@ -25,7 +24,7 @@ import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 @Composable
 fun FillUserDataScreen(
     modifier: Modifier = Modifier,
-    registrationViewModel: RegistrationViewModel = hiltViewModel()
+    registrationViewModel: RegistrationViewModel 
 ) {
     val registerState: State<RegistrationState> = registrationViewModel
         .registerState.collectAsState()
@@ -55,7 +54,7 @@ fun FillUserDataScreen(
                 onCountryChange = registrationViewModel::setCountry,
                 onCityChange = registrationViewModel::setCity,
                 onLanguagesChange = registrationViewModel::setLanguages,
-                onAvatarChange = registrationViewModel::setAvatar
+                onAvatarChange = registrationViewModel::setAvatar,
             )
         }
 

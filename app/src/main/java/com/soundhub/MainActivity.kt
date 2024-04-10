@@ -9,10 +9,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.ui.authentication.AuthenticationViewModel
@@ -60,8 +64,27 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.surface
                 ) {
                     navController = rememberNavController()
-                    navController.addOnDestinationChangedListener { _, _, _ ->
+                    navController.addOnDestinationChangedListener { controller, destination, _ ->
+                        val backStackEntry: NavBackStackEntry? = controller.currentBackStackEntry
+                        val navArguments: Bundle? = backStackEntry?.arguments
+                        var argument: String?
+                        var route: String? = destination.route
+
+                        navArguments?.let { args ->
+                            argument = args.getString(Constants.PROFILE_NAV_ARG)
+                                ?: args.getString(Constants.CHAT_NAV_ARG)
+                                ?: ""
+                            route = route?.replace(Regex("\\{([^{}]+)\\}"), argument!!)
+                        }
+
+                        uiStateDispatcher.setCurrentRoute(route)
                         uiStateDispatcher.setSearchBarActive(false)
+                    }
+
+                    val currentRoute by uiStateDispatcher.currentRoute.collectAsState()
+
+                    LaunchedEffect(key1 = currentRoute) {
+                        Log.d("MainActivity", "current route: $currentRoute")
                     }
 
                     HomeScreen(
@@ -70,7 +93,8 @@ class MainActivity : ComponentActivity() {
                         uiStateDispatcher = uiStateDispatcher,
                         chatViewModel = chatViewModel,
                         messengerViewModel = messengerViewModel,
-                        registrationViewModel = registrationViewModel
+                        registrationViewModel = registrationViewModel,
+                        editUserProfileViewModel = editUserProfileViewModel
                     )
                 }
             }

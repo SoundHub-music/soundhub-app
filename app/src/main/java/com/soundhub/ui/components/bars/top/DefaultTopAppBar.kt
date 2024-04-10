@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -23,7 +22,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 fun DefaultTopAppBar(
     topBarTitle: String?,
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher
 ) {
     val isSearchBarActive = uiStateDispatcher
         .uiState
@@ -47,6 +46,7 @@ fun DefaultTopAppBar(
         },
         actions = { TopBarActions(
             navController = navController,
+            uiStateDispatcher = uiStateDispatcher
         ) }
     )
 }

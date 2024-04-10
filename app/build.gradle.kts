@@ -3,10 +3,11 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
     id("com.google.devtools.ksp")
+    id("kotlinx-serialization")
+    kotlin("kapt")
+    id("kotlin-kapt")
 }
 
 
@@ -16,6 +17,10 @@ android {
 
     buildFeatures {
         buildConfig = true
+    }
+
+    hilt {
+        enableAggregatingTask = true
     }
 
     defaultConfig {
@@ -34,12 +39,6 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
 
         // Set API keys in BuildConfig
-        buildConfigField("String", "COUNTRIES_API", properties.getProperty("COUNTRIES_API"))
-        buildConfigField("String", "SOUNDHUB_API", properties.getProperty("SOUNDHUB_API"))
-        buildConfigField("String", "LAST_FM_API", properties.getProperty("LAST_FM_API"))
-        buildConfigField("String", "SOUNDHUB_API_ADDRESS", properties.getProperty("SOUNDHUB_API_ADDRESS"))
-
-        buildConfigField("String", "DISCOGS_API", properties.getProperty("DISCOGS_API"))
         buildConfigField("String", "DISCOGS_KEY", properties.getProperty("DISCOGS_KEY"))
         buildConfigField("String", "DISCOGS_SECRET", properties.getProperty("DISCOGS_SECRET"))
         buildConfigField("String", "LAST_FM_API_KEY", properties.getProperty("LAST_FM_API_KEY"))
@@ -83,12 +82,12 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.04.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.ui:ui-text-android:1.6.4")
+    implementation("androidx.compose.ui:ui-text-android:1.6.5")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.annotation:annotation:1.7.1")
@@ -100,9 +99,28 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+
+    // For Robolectric tests.
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptTest("com.google.dagger:hilt-android-compiler:2.44.2")
+    // ...with Java.
+    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44.2")
+
+
+    // For instrumented tests.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44.2")
+    // ...with Java.
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.44.2")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.4")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.5")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

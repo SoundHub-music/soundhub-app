@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,23 +18,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.ui.messenger.chat.ChatState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
 fun MessageInputBox(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
-    chatViewModel: ChatViewModel = hiltViewModel(),
-    authViewModel: AuthenticationViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel,
+    authViewModel: AuthenticationViewModel
 ) {
     val messageContent = rememberSaveable { mutableStateOf("") }
-    val messages by chatViewModel.messages.collectAsState()
+    val chatState: ChatState by chatViewModel.chatState.collectAsState()
     val authorizedUser: UserState by authViewModel
         .userInstance
         .collectAsState(initial = UserState())
@@ -65,7 +63,7 @@ fun MessageInputBox(
             }
             SendMessageButton(
                 messageContent = messageContent,
-                messageCount = messages.size,
+                messageCount = chatState.messages.size,
                 lazyListState = lazyListState,
                 authorizedUser = authorizedUser.current,
                 chatViewModel = chatViewModel
@@ -74,8 +72,8 @@ fun MessageInputBox(
     }
 }
 
-@Composable
-@Preview
-fun ChatInputBlockPreview() {
-    MessageInputBox(lazyListState = rememberLazyListState())
-}
+//@Composable
+//@Preview
+//fun ChatInputBlockPreview() {
+//    MessageInputBox(lazyListState = rememberLazyListState())
+//}

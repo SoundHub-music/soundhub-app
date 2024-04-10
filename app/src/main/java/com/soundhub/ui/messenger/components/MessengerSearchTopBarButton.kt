@@ -7,14 +7,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.UiEvent
 import kotlinx.coroutines.launch
 
 @Composable
 fun MessengerSearchTopBarButton(
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher 
 ) {
     val coroutineScope = rememberCoroutineScope()
     IconButton(onClick = {
@@ -31,5 +30,5 @@ fun MessengerSearchTopBarButton(
 @Composable
 @Preview(name = "MessengerSearchButton", showBackground = true)
 fun MessengerSearchTopBarButtonPreview() {
-    MessengerSearchTopBarButton()
+    MessengerSearchTopBarButton(UiStateDispatcher())
 }

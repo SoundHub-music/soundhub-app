@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -31,13 +30,14 @@ import com.soundhub.ui.components.fields.TransparentSearchTextField
 @Composable
 fun CustomTopAppBar(
     topBarTitle: String?,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController
 ) {
     topBarTitle?.let {
         AppHeader(
             modifier = Modifier.padding(0.dp),
             pageName = topBarTitle,
+            uiStateDispatcher = uiStateDispatcher,
             actionButton = {
                 TopBarActions(
                     navController = navController,
@@ -53,7 +53,7 @@ private fun AppHeader(
     pageName: String?,
     modifier: Modifier = Modifier,
     actionButton: @Composable () -> Unit,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher 
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState()
     val isSearchBarActive = uiState.isSearchBarActive
@@ -80,7 +80,8 @@ private fun AppHeader(
             TransparentSearchTextField(
                 value = inputValue,
                 onValueChange = uiStateDispatcher::updateSearchBarText,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier.padding(horizontal = 10.dp),
+                uiStateDispatcher = uiStateDispatcher
             )
         else Row(
             modifier = Modifier

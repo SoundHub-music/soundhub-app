@@ -37,7 +37,7 @@ class AuthenticationViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val userRepository: UserRepository,
     private val userCredsStore: UserCredsStore,
-    private val getImageUseCase: GetImageUseCase
+    private val getImageUseCase: GetImageUseCase,
 ) : ViewModel() {
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     var userInstance: MutableStateFlow<UserState> = MutableStateFlow(UserState())
@@ -47,26 +47,15 @@ class AuthenticationViewModel @Inject constructor(
     var currentUserAvatar = MutableStateFlow<File?>(null)
         private set
 
-    private val getAuthorizedUserAttempts = MutableStateFlow(0)
+    private val authAttemptCount = MutableStateFlow(0)
+
+    companion object {
+        private const val MAX_REFRESH_TOKEN_ATTEMPT_COUNT = 2
+    }
 
     init {
         viewModelScope.launch {
-            userCreds.collect { creds ->
-                if (!creds.accessToken.isNullOrEmpty()) {
-                    getCurrentUser().collect { currentUser ->
-                        val status = if (currentUser != null) ApiStatus.SUCCESS
-                            else ApiStatus.ERROR
-                        userInstance.update {
-                            it.copy(
-                                current = currentUser,
-                                status = status
-                            )
-                        }
-                    }
-                    loadAuthenticatedUserAvatar()
-                }
-                else userInstance.update { it.copy(status = ApiStatus.ERROR) }
-            }
+            userCreds.collect { initializeUser(it) }
         }
     }
 
@@ -74,6 +63,24 @@ class AuthenticationViewModel @Inject constructor(
         super.onCleared()
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
+
+    private suspend fun initializeUser(creds: UserPreferences?) {
+        if (!creds?.accessToken.isNullOrEmpty()) {
+            getCurrentUser().collect { currentUser ->
+                val status = if (currentUser != null) ApiStatus.SUCCESS
+                else ApiStatus.ERROR
+                userInstance.update {
+                    it.copy(
+                        current = currentUser,
+                        status = status
+                    )
+                }
+            }
+            loadAuthenticatedUserAvatar()
+        }
+        else userInstance.update { it.copy(status = ApiStatus.ERROR) }
+    }
+
 
     private suspend fun loadAuthenticatedUserAvatar() {
         if (userInstance.value.current?.avatarUrl != null) {
@@ -117,19 +124,17 @@ class AuthenticationViewModel @Inject constructor(
         it.copy(current = user)
     }
 
-
     fun logout() = viewModelScope.launch {
         Log.d("AuthenticationViewModel", "logout: $userCreds")
         val tokens = userCreds.firstOrNull()
         authRepository
             .logout(tokens?.accessToken)
             .onFailure {
-            uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(
-                UiText.DynamicString(it.errorBody.detail ?: "")
-            ))
-        }
-
-        userCredsStore.clear()
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(
+                    UiText.DynamicString(it.errorBody.detail ?: "")
+                ))
+            }
+            .finally { userCredsStore.clear() }
     }
 
     private suspend fun getCurrentUser(): Flow<User?> = flow {
@@ -147,31 +152,31 @@ class AuthenticationViewModel @Inject constructor(
     private suspend fun tryRefreshToken(
         error: HttpResult.Error<User?>,
         userCreds: UserPreferences?
-    ): Flow<User?> = flow {
-        val newCreds: HttpResult<UserPreferences?> = authRepository.refreshToken(
+    ) {
+        authRepository.refreshToken(
             RefreshTokenRequestBody(userCreds?.refreshToken)
-        )
-
-        newCreds.onSuccess { newCredsResponse ->
+        ).onSuccess { newCredsResponse ->
             userCredsStore.updateCreds(newCredsResponse.body)
+            initializeUser(userCreds)
             uiStateDispatcher.sendUiEvent(
                 UiEvent.ShowToast(
                     UiText.DynamicString(error.errorBody.detail ?: "")
                 )
             )
-            getAuthorizedUserAttempts.update { 0 }
+            authAttemptCount.update { 0 }
 
         }.onFailure {
-            getAuthorizedUserAttempts.update { it + 1 }
-            if (getAuthorizedUserAttempts.value > 1) {
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
-                emit(null)
-            }
+            authAttemptCount.update { it + 1 }
+            if (authAttemptCount.value <= MAX_REFRESH_TOKEN_ATTEMPT_COUNT)
+                tryRefreshToken(error, userCreds)
+            else uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
         }
     }
 
     fun signIn() = viewModelScope.launch(Dispatchers.IO) {
         authFormState.update { it.copy(isLoading = true) }
+        userInstance.update { it.copy(status = ApiStatus.LOADING) }
+
         authRepository.signIn(
             SignInRequestBody(
                 email = authFormState.value.email,

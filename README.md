@@ -4,7 +4,25 @@
 Социальная сеть SoundHub позволяет пользователям подписываться на новости музыкантов и следить за их публикациями и предлагает ему похожих исполнителей.
 Предусмотрена интеграция музыкальных сервисов, таких как *Spotify*, *Яндекс.Музыка*, *Last.FM* для загрузки плейлистов и треков пользователя.
 
-Для корректной работы приложения также необходимо развернуть backend-часть (более подробная информация появится позже)
+Для успешной сборки проекта необходимо включить некоторые константы в файл `local.properties` в корне проекта, а именно:
+```
+DISCOGS_KEY="Discogs key"
+DISCOGS_SECRET="Discogs secret"
+
+LAST_FM_API_KEY="last fm api key"
+LAST_FM_SHARED_SECRET="last fm shared secret"
+```
+Также в файле `Constants.kt` указать адрес сервера приложения
+```kotlin
+object Constants {
+    //...
+    const val SOUNDHUB_API = "address-to-backend/api/v1/"
+    // Константа используется в случае использования сервера на локальной машине
+    const val SOUNDHUB_API_ADDRESS = "address-to-backend"
+}
+```
+
+Все необходимые [Discogs](https://www.discogs.com/ru/applications/edit) и [Last.FM](https://www.last.fm/api/accounts?suspend=1) ключи можно получить при регистрации приложения API
 
 [SoundHub API](https://github.com/LilYxa/soundhub-api)
 # Участники проекта

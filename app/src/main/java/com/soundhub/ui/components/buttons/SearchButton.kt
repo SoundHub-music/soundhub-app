@@ -6,13 +6,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 
 @Composable
-fun SearchButton(uiStateDispatcher: UiStateDispatcher = hiltViewModel()) {
+fun SearchButton(uiStateDispatcher: UiStateDispatcher) {
     val coroutineScope = rememberCoroutineScope()
     IconButton(onClick = {
         coroutineScope.launch {

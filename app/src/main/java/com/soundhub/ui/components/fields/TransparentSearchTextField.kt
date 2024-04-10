@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.UiEvent
 import kotlinx.coroutines.launch
@@ -35,7 +34,7 @@ fun TransparentSearchTextField(
     modifier: Modifier = Modifier,
     value: String = "",
     onValueChange: (String) -> Unit = {},
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher 
 ) {
     val isSearchBarActive = uiStateDispatcher
         .uiState

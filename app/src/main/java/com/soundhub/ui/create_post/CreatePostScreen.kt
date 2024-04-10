@@ -11,32 +11,37 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
+import com.soundhub.ui.authentication.states.UserState
+import kotlinx.coroutines.launch
 
 @Composable
-fun CreatePostScreen() {
-    var postContent by remember { mutableStateOf("") }
+fun CreatePostScreen(
+    createPostViewModel: CreatePostViewModel = hiltViewModel(),
+    user: UserState?,
+) {
+    val postState by createPostViewModel.postState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         contentAlignment = Alignment.BottomEnd
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxSize(),
-            value = postContent,
-            onValueChange = { postContent = it },
+            value = postState.content,
+            onValueChange = { createPostViewModel.setContent(it) },
             placeholder = {
                 Text(
-                    text = stringResource(
-                        id = R.string.create_post_field_placeholder
-                    ),
+                    text = stringResource(id = R.string.create_post_field_placeholder),
                     fontSize = 20.sp
                 )
             }
@@ -46,7 +51,11 @@ fun CreatePostScreen() {
         FloatingActionButton(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             modifier = Modifier.padding(10.dp),
-            onClick = { /*TODO*/ }
+            onClick = {
+                coroutineScope.launch {
+                    createPostViewModel.createPost(author = user?.current,)
+                }
+            }
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.Send,

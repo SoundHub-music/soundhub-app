@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.User
@@ -35,12 +34,11 @@ import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.utils.SearchUtils
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FriendListScreen(
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher,
+    authViewModel: AuthenticationViewModel,
     navController: NavHostController
 ) {
     val tabs = listOf(

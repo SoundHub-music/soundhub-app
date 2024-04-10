@@ -24,30 +24,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.soundhub.Route
 import com.soundhub.data.model.Chat
+import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.components.CircularAvatar
+import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
 internal fun ChatCard(
     chat: Chat?,
     navController: NavHostController,
-    authenticationViewModel: AuthenticationViewModel = hiltViewModel()
+    authenticationViewModel: AuthenticationViewModel,
+    chatViewModel: ChatViewModel
 ) {
     var lastMessageModifier: Modifier = Modifier
     val hasUnreadMessages: Boolean = (chat?.unreadMessageCount ?: 0) > 0
     val authorizedUser by authenticationViewModel
         .userInstance
         .collectAsState(initial = UserState())
-    val interlocutor = chat?.participants?.first { it?.id != authorizedUser.current?.id }
+    val interlocutor: User? = chat?.participants?.first { it?.id != authorizedUser.current?.id }
 
     if (hasUnreadMessages)
         lastMessageModifier = Modifier
@@ -69,12 +69,12 @@ internal fun ChatCard(
                 shape = RoundedCornerShape(12.dp),
             )
             .clickable {
+                chatViewModel.setInterlocutor(interlocutor)
                 navController.navigate(Route.Messenger.Chat(chat?.id.toString()).route)
             }
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             BadgedBox(
@@ -114,9 +114,9 @@ internal fun ChatCard(
     }
 }
 
-@Composable
-@Preview(name = "ChatCard", showBackground = true)
-fun ChatCardPreview() {
-    val navController = rememberNavController()
-    ChatCard(chat = null, navController = navController)
-}
+//@Composable
+//@Preview(name = "ChatCard", showBackground = true)
+//fun ChatCardPreview() {
+//    val navController = rememberNavController()
+//    ChatCard(chat = null, navController = navController)
+//}

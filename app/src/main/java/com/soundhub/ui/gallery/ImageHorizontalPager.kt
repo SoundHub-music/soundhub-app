@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -31,7 +30,7 @@ fun ImageHorizontalPager(
     pagerState: PagerState,
     images: List<String>,
     navController: NavHostController? = null,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher,
     contentScale: ContentScale = ContentScale.Crop,
     height: Dp = 300.dp,
     clickable: Boolean = true

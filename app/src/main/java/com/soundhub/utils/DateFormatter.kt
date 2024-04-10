@@ -32,6 +32,7 @@ class DateFormatter {
         fun getRelativeDate(dateTime: LocalDateTime): String {
             val now = LocalDateTime.now()
             return when {
+                // if datetime is today
                 now.dayOfYear == dateTime.dayOfYear && now.year == dateTime.year -> {
                     val timeDifference: Int
                     if (now.hour > dateTime.hour) {
@@ -44,10 +45,15 @@ class DateFormatter {
                 }
                 now.isEqual(dateTime) -> "Сейчас"
                 else -> {
-                    val time: String = "${dateTime.hour}:${dateTime.minute}"
-                    "${dateTime.dayOfMonth} ${russianLocaleMonths[dateTime.month]} в $time"
+                    val time = "${dateTime.hour}:${getTwoDigitMinuteString(dateTime.minute)}"
+                    return "${dateTime.dayOfMonth} ${russianLocaleMonths[dateTime.month]} в $time"
                 }
             }
+        }
+
+        private fun getTwoDigitMinuteString(minutes: Int): String {
+            return if (minutes < 10) "0$minutes"
+            else minutes.toString()
         }
 
         fun getStringDate(date: LocalDate, includeYear: Boolean = false): String {

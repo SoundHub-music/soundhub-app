@@ -1,6 +1,5 @@
 package com.soundhub.ui.authentication.postregistration.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,11 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.request.ImageRequest
 import com.soundhub.R
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MusicItemPlate(
     modifier: Modifier = Modifier,
@@ -68,19 +69,22 @@ fun MusicItemPlate(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box (modifier = itemBoxModifier) {
-            if (thumbnailUrl.isNullOrEmpty())
-                Image(
-                    painter = painterResource(id = R.drawable.musical_note),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
-            else GlideImage(
-                model = thumbnailUrl,
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(thumbnailUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = caption,
                 contentScale = ContentScale.Crop,
-            )
+            ) {
+                val state = painter.state
+                if (state is AsyncImagePainter.State.Error || state is AsyncImagePainter.State.Loading)
+                    SubcomposeAsyncImageContent(
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        painter = painterResource(id = R.drawable.musical_note)
+                    )
+            }
         }
         Text(
            text = caption,

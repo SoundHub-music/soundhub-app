@@ -1,7 +1,6 @@
 package com.soundhub.ui.components.forms
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,8 +47,8 @@ fun UserDataForm(
     onCityChange: (String) -> Unit = {},
     onLanguagesChange: (List<String>) -> Unit = {},
     authViewModel: AuthenticationViewModel = hiltViewModel(),
-    userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 ) {
+    val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val userCreds: UserPreferences? by authViewModel.userCreds
         .collectAsState(initial = null)
@@ -59,10 +58,6 @@ fun UserDataForm(
             accessToken = userCreds?.accessToken,
             avatarUrl = formState.value.avatarUrl
         )?.toUri()
-    }
-
-    LaunchedEffect(key1 = avatarUri) {
-        Log.d("UserDataForm", "chosen photo: $avatarUri")
     }
 
     LaunchedEffect(key1 = avatarUri.value) {

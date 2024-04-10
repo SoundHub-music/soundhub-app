@@ -2,7 +2,6 @@ package com.soundhub.data.repository.implementations
 
 import android.content.Context
 import android.util.Log
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.soundhub.R
 import com.soundhub.data.api.AuthService
@@ -14,30 +13,33 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.repository.AuthRepository
-import com.soundhub.data.repository.FileRepositoryUtils
+import com.soundhub.utils.HttpFileUtils
 import com.soundhub.utils.Constants
-import com.soundhub.utils.MediaTypes
+import com.soundhub.utils.ContentTypes
 import com.soundhub.utils.converters.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.io.File
 import java.time.LocalDate
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
     private val context: Context
-): AuthRepository, FileRepositoryUtils {
+): AuthRepository {
+    private val gson = GsonBuilder()
+        .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+        .create()
+
     override suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?> {
         try {
             val signInResponse: Response<UserPreferences> = authService.signIn(body)
             Log.d("AuthRepository", "signIn[1]: $signInResponse")
 
             if (!signInResponse.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
+                val errorBody: ErrorResponse = gson
                     .fromJson(signInResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
                         status = signInResponse.code(),
@@ -62,19 +64,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?> {
         try {
-            val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-                .create()
-            var tempFile: File? = null
-
-            if (!body.avatarUrl.isNullOrEmpty())
-                tempFile = createTempMediaFile(
-                    imageUri = body.avatarUrl,
-                    context = context
-                )
-            val avatarFormData: MultipartBody.Part? = getImageFormData(tempFile, context)
+            val avatarFormData: MultipartBody.Part? = HttpFileUtils.prepareMediaFormData(body.avatarUrl, context)
             val requestBody: RequestBody = gson.toJson(body)
-                .toRequestBody(MediaTypes.JSON.type.toMediaTypeOrNull())
+                .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
             val signUpResponse = authService.signUp(requestBody, avatarFormData)
             Log.d("AuthRepository", "signUp[1]: $signUpResponse")
@@ -108,7 +100,7 @@ class AuthRepositoryImpl @Inject constructor(
             Log.d("AuthRepository", "logout[1]: $logoutResponse")
 
             if (!logoutResponse.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
+                val errorBody: ErrorResponse = gson
                     .fromJson(logoutResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
                         status = logoutResponse.code(),
@@ -135,7 +127,7 @@ class AuthRepositoryImpl @Inject constructor(
             Log.d("AuthRepository", "refreshToken[1]: ${refreshTokenResponse.raw()}")
 
             if (!refreshTokenResponse.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
+                val errorBody: ErrorResponse = gson
                     .fromJson(refreshTokenResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
                         status = refreshTokenResponse.code(),

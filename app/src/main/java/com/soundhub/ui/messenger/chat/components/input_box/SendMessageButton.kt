@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.chat.ChatViewModel
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SendMessageButton(
-    chatViewModel: ChatViewModel = hiltViewModel(),
+    chatViewModel: ChatViewModel,
     messageContent: MutableState<String>,
     messageCount: Int,
     lazyListState: LazyListState,

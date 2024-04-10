@@ -11,7 +11,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,12 +32,12 @@ import com.soundhub.utils.Constants
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
-    chatViewModel: ChatViewModel = hiltViewModel(),
-    registrationViewModel: RegistrationViewModel = hiltViewModel(),
-    messengerViewModel: MessengerViewModel = hiltViewModel(),
-    editUserProfileViewModel: EditUserProfileViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel,
+    uiStateDispatcher: UiStateDispatcher,
+    chatViewModel: ChatViewModel,
+    registrationViewModel: RegistrationViewModel,
+    messengerViewModel: MessengerViewModel,
+    editUserProfileViewModel: EditUserProfileViewModel 
 ) {
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
@@ -70,7 +69,9 @@ fun HomeScreen(
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
                 BottomNavigationBar(
                     navController = navController,
-                    user = authorizedUser.current
+                    messengerViewModel = messengerViewModel,
+                    user = authorizedUser.current,
+                    uiStateDispatcher = uiStateDispatcher
                 )
         }
     ) {

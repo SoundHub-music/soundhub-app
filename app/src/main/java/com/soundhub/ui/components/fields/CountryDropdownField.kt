@@ -17,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.data.model.Country
 import com.soundhub.ui.components.forms.IUserDataFormState
@@ -29,7 +28,7 @@ import java.util.Locale
 fun CountryDropdownField(
     formState: State<IUserDataFormState>,
     onCountryChange: (String) -> Unit = {},
-    userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
+    userDataFormViewModel: UserDataFormViewModel 
 ) {
     var isCountryDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 

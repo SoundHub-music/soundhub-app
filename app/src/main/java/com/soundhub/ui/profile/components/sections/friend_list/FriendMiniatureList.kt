@@ -31,7 +31,7 @@ fun FriendMiniatureList(friendList: List<FriendMiniatureItem>, navController: Na
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
 
             SectionLabel(text = stringResource(id = R.string.profile_screen_friend_section_caption))
@@ -39,7 +39,7 @@ fun FriendMiniatureList(friendList: List<FriendMiniatureItem>, navController: Na
                 text = "${friendList.size}",
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.nunito_bold)),
-                fontSize = 10.sp
+                fontSize = 14.sp
             )
         }
         Row(

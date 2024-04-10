@@ -17,9 +17,9 @@ object Constants {
     const val DATASTORE_REFRESH_TOKEN = "user_refresh_token"
 
     const val LOG_CURRENT_EVENT_TAG = "current_event"
-
     const val DATE_FORMAT = "yyyy-MM-dd"
 
+    // route lists constants
     val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
         Route.Postline.route,
         Route.Music.route,
@@ -39,7 +39,6 @@ object Constants {
         Route.Messenger.route
     )
 
-
     // nav arguments
     const val POST_REGISTER_NAV_ARG = "postAuthId"
     const val PROFILE_NAV_ARG = "userId"
@@ -52,7 +51,6 @@ object Constants {
     const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
     const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
     const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
-
 
     const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
     const val POSTLINE_ROUTE = "postline"
@@ -78,12 +76,16 @@ object Constants {
     val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>(){}.type
 
     // named injections for di
-    const val SOUNDHUB_API_RETROFIT = "soundhub_api"
-    const val MUSIC_API_RETROFIT = "music_api"
     const val COUNTRIES_API_RETROFIT = "countries_api"
+    const val SOUNDHUB_API_RETROFIT = "soundhub_api"
     const val LAST_FM_API_RETROFIT = "lastfm_api"
+    const val MUSIC_API_RETROFIT = "music_api"
 
+    const val COUNTRIES_API = "https://restcountries.com/v3.1/"
+    const val SOUNDHUB_API = "http://192.168.1.39:8080/api/v1/"
+    const val LAST_FM_API = "https://ws.audioscrobbler.com/"
+    const val DISCOGS_API = "https://api.discogs.com/"
+    const val SOUNDHUB_API_HOSTNAME="192.168.1.39"
 
     const val DISCOGS_AUTHORIZATION = "Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
-
 }

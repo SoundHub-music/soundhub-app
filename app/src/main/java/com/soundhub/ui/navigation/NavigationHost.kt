@@ -47,6 +47,7 @@ import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.messenger.chat.ChatScreen
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.music.MusicScreen
+import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
@@ -89,7 +90,9 @@ fun NavigationHost(
     LaunchedEffect(key1 = userCreds?.accessToken) {
         if (authorizedUser.current == null && authorizedUser.status == ApiStatus.ERROR)
             Toast.makeText(
-                context, authErrorMessage, Toast.LENGTH_SHORT
+                context,
+                authErrorMessage,
+                Toast.LENGTH_SHORT
             ).show()
 
         startDestination = if (
@@ -143,7 +146,8 @@ fun NavigationHost(
                 topBarTitle.value = stringResource(id = R.string.screen_title_postline)
                 PostLineScreen(
                     navController = navController,
-                    uiStateDispatcher = uiStateDispatcher
+                    uiStateDispatcher = uiStateDispatcher,
+                    currentUser = authorizedUser.current
                 )
             }
         }
@@ -154,7 +158,10 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_music)
-                MusicScreen(navController = navController)
+                MusicScreen(
+                    navController = navController,
+                    musicViewModel = MusicViewModel()
+                )
             }
         }
 
@@ -168,7 +175,8 @@ fun NavigationHost(
                     navController = navController,
                     authViewModel = authViewModel,
                     uiStateDispatcher = uiStateDispatcher,
-                    messengerViewModel = messengerViewModel
+                    messengerViewModel = messengerViewModel,
+                    chatViewModel = chatViewModel
                 )
             }
         }
@@ -184,7 +192,8 @@ fun NavigationHost(
                 val chatId = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
                 ChatScreen(
                     chatId = chatId,
-                    chatViewModel = chatViewModel
+                    chatViewModel = chatViewModel,
+                    authViewModel = authViewModel
                 )
             }
         }
@@ -195,13 +204,13 @@ fun NavigationHost(
         ) { entry ->
             if (authorizedUser.current != null) {
                 val userId = entry.arguments?.getString(Constants.PROFILE_NAV_ARG) ?: ""
-                val user: MutableState<User?> = remember { mutableStateOf(null) }
+                var user: User? by remember { mutableStateOf(null) }
                 Log.d("UserProfile", "userId: $userId")
 
                 LaunchedEffect(key1 = true) {
-                    if (userId == authorizedUser.current.id.toString())
-                        user.value = authorizedUser.current
-                    else user.value = userViewModel
+                    user = if (userId == authorizedUser.current.id.toString())
+                        authorizedUser.current
+                    else userViewModel
                         .getUserById(userId)
                         .firstOrNull()
                 }
@@ -213,12 +222,13 @@ fun NavigationHost(
                     ProfileScreen(
                         navController = navController,
                         authViewModel = authViewModel,
-                        user = user.value
+                        uiStateDispatcher = uiStateDispatcher,
+                        user = user
                     )
                 }
             }
             // TODO: fix switching navigation animation
-            else navController.navigate(Route.Postline.route)
+//            else navController.navigate(Route.Postline.route)
         }
 
         composable(Route.FriendList.route) {
@@ -279,8 +289,14 @@ fun NavigationHost(
             ) {
                 topBarTitle.value = null
                 val images = uiStateDispatcher.uiState.collectAsState().value.galleryImageUrls
-                val initialPage = entry.arguments?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)?.toInt() ?: 0
-                GalleryScreen(images = images, initialPage = initialPage)
+                val initialPage = entry.arguments
+                    ?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
+                    ?.toInt() ?: 0
+                GalleryScreen(
+                    images = images,
+                    initialPage = initialPage,
+                    uiStateDispatcher = uiStateDispatcher
+                )
             }
         }
 
@@ -290,7 +306,7 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
-                CreatePostScreen()
+                CreatePostScreen(user = authorizedUser)
             }
         }
     }

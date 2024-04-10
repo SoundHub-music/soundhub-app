@@ -1,7 +1,8 @@
 package com.soundhub.data.api
 
-import com.soundhub.data.api.responses.DiscogsReleaseResponse
-import com.soundhub.data.api.responses.DiscogsResponse
+import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
+import com.soundhub.data.api.responses.discogs.release.DiscogsReleaseResponse
+import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.utils.ApiEndpoints
 import com.soundhub.utils.Constants
 import retrofit2.Response
@@ -12,7 +13,7 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface MusicService {
-    @GET(ApiEndpoints.Music.databaseSearch)
+    @GET(ApiEndpoints.Music.DATABASE_SEARCH)
     @Headers("Authorization: ${Constants.DISCOGS_AUTHORIZATION}")
     suspend fun searchData(
         @Query("q") query: String? = null,
@@ -41,21 +42,21 @@ interface MusicService {
     @Headers("Authorization: ${Constants.DISCOGS_AUTHORIZATION}")
     suspend fun getDataFromUrl(@Url url: String): Response<DiscogsResponse>
 
-    @GET(ApiEndpoints.Music.artists)
+    @GET(ApiEndpoints.Music.ARTISTS)
     suspend fun getArtistById(
-        @Path(ApiEndpoints.Music.artistIdDynamicParam) artistId: Int
-    ): Response<DiscogsResponse>
+        @Path(ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM) artistId: Int
+    ): Response<DiscogsArtistResponse>
 
-    @GET(ApiEndpoints.Music.artistReleases)
+    @GET(ApiEndpoints.Music.ARTIST_RELEASES)
     suspend fun getArtistReleases(
-        @Path(ApiEndpoints.Music.artistIdDynamicParam) artistId: Int,
+        @Path(ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM) artistId: Int,
         @Query("sort") sortType: String? = null,
         @Query("sort_order") sortOrder: String? = null
     ): Response<DiscogsResponse>
 
-    @GET(ApiEndpoints.Music.releases)
+    @GET(ApiEndpoints.Music.RELEASES)
     suspend fun getReleaseById(
-        @Path(ApiEndpoints.Music.releaseIdDynamicParam)
+        @Path(ApiEndpoints.Music.RELEASE_ID_DYNAMIC_PARAM)
         releaseId: Int
     ): Response<DiscogsReleaseResponse>
 }

@@ -23,7 +23,12 @@ class UiStateDispatcher @Inject constructor() : ViewModel() {
     var uiState = MutableStateFlow(UiState())
         private set
 
+    var currentRoute: MutableStateFlow<String?> = MutableStateFlow(null)
+        private set
+
     fun clearState() = uiState.update { UiState() }
+
+    fun setCurrentRoute(route: String?) = currentRoute.update { route }
 
     fun toggleSearchBarActive() = uiState.update {
         it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")

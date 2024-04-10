@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.components.buttons.FloatingNextButton
@@ -35,7 +34,7 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun ChooseArtistsScreen(
-    registrationViewModel: RegistrationViewModel = hiltViewModel()
+    registrationViewModel: RegistrationViewModel 
 ) {
     val artistState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
     val isLoading: Boolean by registrationViewModel.artistUiState

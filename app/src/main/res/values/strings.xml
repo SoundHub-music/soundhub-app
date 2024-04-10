@@ -74,6 +74,7 @@
     <string name="profile_screen_user_birthday">День рождения: </string>
     <string name="profile_screen_user_languages">Языки: </string>
     <string name="profile_screen_user_description">О себе: </string>
+    <string name="profile_screen_user_posts">Посты</string>
 
     <!--    menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
@@ -136,4 +137,6 @@
     <string name="create_post_field_placeholder">
         Поделитесь своими мыслями…
     </string>
+
+    <string name="post_created_successfully">Пост успешно создан</string>
 </resources>

@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -37,7 +36,7 @@ import com.soundhub.Route
 fun UserPhotoCarousel(
     images: List<String>,
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher 
 ) {
     val listState = rememberLazyListState()
     var newPhotos by remember { mutableStateOf<List<Uri>>(emptyList()) }

@@ -1,7 +1,6 @@
 package com.soundhub.data.repository.implementations
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -10,24 +9,23 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.User
 import com.soundhub.data.api.UserService
 import com.soundhub.data.api.responses.ErrorResponse
-import com.soundhub.data.repository.FileRepositoryUtils
+import com.soundhub.utils.HttpFileUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.Constants
-import com.soundhub.utils.MediaTypes
+import com.soundhub.utils.ContentTypes
 import com.soundhub.utils.converters.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.io.File
 import java.time.LocalDate
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userService: UserService,
     private val context: Context
-): UserRepository, FileRepositoryUtils {
+): UserRepository {
     override suspend fun getUserById(id: String?, accessToken: String?): HttpResult<User?> {
         try {
             val response: Response<User?> = userService.getUserById(id, accessToken)
@@ -91,21 +89,9 @@ class UserRepositoryImpl @Inject constructor(
                 .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
                 .create()
 
-            var tempFile: File? = null
-
-            if (!user?.avatarUrl.isNullOrEmpty()) {
-                tempFile = createTempMediaFile(
-                    imageUri = Uri.parse(user?.avatarUrl).path,
-                    context = context
-                )
-            }
-
-            Log.d("UserRepository", "user: ${user.toString()}")
-            Log.d("UserRepository", "updateUserById[0]: $tempFile")
-
-            val avatarFormData: MultipartBody.Part? = getImageFormData(tempFile, context)
+            val avatarFormData: MultipartBody.Part? = HttpFileUtils.prepareMediaFormData(user?.avatarUrl, context)
             val userRequestBody: RequestBody = gson.toJson(user)
-                .toRequestBody(MediaTypes.JSON.type.toMediaTypeOrNull())
+                .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
             val response: Response<User> = userService.updateUserById(
                 id = user?.id?.toString(),

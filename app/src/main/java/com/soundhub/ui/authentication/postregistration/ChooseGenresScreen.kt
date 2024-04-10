@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.components.CircleLoader
@@ -37,7 +36,7 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun ChooseGenresScreen(
-    registrationViewModel: RegistrationViewModel = hiltViewModel()
+    registrationViewModel: RegistrationViewModel 
 ) {
     val genreState: GenreUiState by registrationViewModel.genreUiState.collectAsState()
     val isLoading: Boolean by registrationViewModel.genreUiState

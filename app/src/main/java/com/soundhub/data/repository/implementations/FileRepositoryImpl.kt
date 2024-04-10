@@ -3,7 +3,6 @@ package com.soundhub.data.repository.implementations
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.BuildConfig
 import com.soundhub.R
 import com.soundhub.data.api.FileService
 import com.soundhub.data.api.responses.ErrorResponse
@@ -31,7 +30,7 @@ class FileRepositoryImpl @Inject constructor(
         try {
             // TODO: remove this shit after deploying backend on server
             val fileNameWithServerIp = fileNameUrl
-                ?.replace("localhost", BuildConfig.SOUNDHUB_API_ADDRESS)
+                ?.replace("localhost", Constants.SOUNDHUB_API_HOSTNAME)
 
             val response: Response<ResponseBody> = fileService.getFile(
                 accessToken = "Bearer $accessToken",

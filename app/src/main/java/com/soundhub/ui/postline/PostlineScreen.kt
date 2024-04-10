@@ -16,33 +16,39 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
-import com.soundhub.ui.postline.components.PostCard
+import com.soundhub.ui.postline.components.post_card.PostCard
+import com.soundhub.ui.viewmodels.PostViewModel
 
 @Composable
 fun PostLineScreen(
     modifier: Modifier = Modifier,
-    postLineViewModel: PostlineViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher = hiltViewModel(),
+    postViewModel: PostViewModel = hiltViewModel(),
+    uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController,
+    currentUser: User?
 ) {
-    val postlineUiState by postLineViewModel.postsUiState.collectAsState()
+    val postUiState by postViewModel.postUiState.collectAsState()
 
     ContentContainer(contentAlignment = Alignment.Center) {
-        if (postlineUiState.isLoading) CircleLoader(modifier = Modifier.size(72.dp))
-        else if (postlineUiState.posts.isEmpty())
+        if (postUiState.isLoading) CircleLoader(modifier = Modifier.size(72.dp))
+        else if (postUiState.posts.isEmpty())
             Text(text = stringResource(id = R.string.empty_postline_screen))
         else {
             LazyColumn(
                 modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(items = postlineUiState.posts, key = { it.id }) { post ->
+                items(items = postUiState.posts, key = { it.id }) { post ->
                     PostCard(
                         navController = navController,
-                        post = post
+                        post = post,
+                        uiStateDispatcher = uiStateDispatcher,
+                        currentUser = currentUser,
+                        postViewModel = postViewModel
                     )
                 }
             }

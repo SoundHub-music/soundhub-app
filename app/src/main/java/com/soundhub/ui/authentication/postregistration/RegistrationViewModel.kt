@@ -60,12 +60,11 @@ class RegistrationViewModel @Inject constructor(
                 genreUiState.update {
                     it.copy(
                         status = successResponse.status,
-                        genres = successResponse
-                            .body
-                            ?.topTags
-                            ?.tag
-                            ?.map { tag -> Genre(name = tag.name) }
-                            ?: emptyList()
+                        genres = successResponse.body ?: emptyList()
+//                            ?.topTags
+//                            ?.tag
+//                            ?.map { tag -> Genre(name = tag.name) }
+//                            ?: emptyList()
                     )
                 }
             }
@@ -146,7 +145,7 @@ class RegistrationViewModel @Inject constructor(
     }
 
     fun setAvatar(avatarUrl: Uri?) = registerState.update {
-        it.copy(avatarUrl = avatarUrl?.path)
+        it.copy(avatarUrl = avatarUrl?.toString())
     }
 
     fun onPostRegisterNextBtnClick(currentRoute: Route) {

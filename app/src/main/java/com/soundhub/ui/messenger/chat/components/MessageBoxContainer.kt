@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.data.model.Message
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
@@ -19,7 +18,7 @@ import com.soundhub.ui.authentication.states.UserState
 fun MessageBoxContainer(
     modifier: Modifier = Modifier,
     messages: List<Message> = emptyList(),
-    authenticationViewModel: AuthenticationViewModel = hiltViewModel(),
+    authenticationViewModel: AuthenticationViewModel,
     lazyListState: LazyListState
 ) {
     val user: UserState by authenticationViewModel

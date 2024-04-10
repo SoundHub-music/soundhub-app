@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,22 +24,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.components.CircularAvatar
+import com.soundhub.ui.messenger.chat.ChatState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import java.time.LocalDateTime
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopAppBar(
     navController: NavHostController,
-    chatViewModel: ChatViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel,
+    uiStateDispatcher: UiStateDispatcher
 ) {
     TopAppBar(
         modifier = Modifier.padding(5.dp),
-        title = { InterlocutorDetails() },
+        title = { InterlocutorDetails(chatViewModel) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
@@ -47,15 +50,21 @@ fun ChatTopAppBar(
                 )
             }
         },
-        actions = { TopBarActions(navController = navController) }
+        actions = { TopBarActions(
+            navController = navController,
+            uiStateDispatcher = uiStateDispatcher
+        ) }
     )
 }
 
 @Composable
-private fun InterlocutorDetails() {
+private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
+    // TODO: edit InterlocutorDetails
     // temporary variables
-    val friendName = "Alex Merser"
-    val lastOnline = LocalDateTime.of(2024, 2, 10, 15, 10)
+    val chatState: ChatState by chatViewModel.chatState.collectAsState()
+    val friendName = "${chatState.interlocutor?.firstName} ${chatState.interlocutor?.lastName}"
+        .trim()
+
     val isOnline = false
     val indicator = painterResource(
         id = if (isOnline) R.drawable.online_indicator

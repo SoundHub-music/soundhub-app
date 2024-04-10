@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
@@ -50,8 +49,8 @@ import com.soundhub.utils.Validator
 @Composable
 fun AuthForm(
     isBottomSheetHidden: Boolean,
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
-    registrationViewModel: RegistrationViewModel = hiltViewModel()
+    authViewModel: AuthenticationViewModel,
+    registrationViewModel: RegistrationViewModel 
 ) {
     val density: Density = LocalDensity.current
     val context: Context = LocalContext.current

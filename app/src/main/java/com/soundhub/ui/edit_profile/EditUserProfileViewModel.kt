@@ -53,12 +53,14 @@ class EditUserProfileViewModel @Inject constructor(
     }
 
     fun updateUser() = viewModelScope.launch {
-        isLoading.value = true
+        isLoading.update { true }
         val userMapper: UserMapper = Mappers.getMapper(UserMapper::class.java)
-        currentUser.value = userMapper.mergeUserWithFormState(
-            formState.value,
-            currentUser.value
-        )
+        currentUser.update {
+            userMapper.mergeUserWithFormState(
+                formState.value,
+                currentUser.value
+            )
+        }
 
         Log.d("EditUserProfileViewModel", "current user after update: ${currentUser.value}")
 
@@ -75,27 +77,28 @@ class EditUserProfileViewModel @Inject constructor(
                 uiStateDispatcher.sendUiEvent(UiEvent
                     .ShowToast(UiText.DynamicString("update error")))
             }
-
-        isLoading.value = true
+            .finally {
+                isLoading.update { false }
+            }
     }
 
-    fun onFirstNameChange(value: String) = formState.update {
+    fun setFirstName(value: String) = formState.update {
         it.copy(firstName = value)
     }
 
-    fun onLastNameChange(value: String) = formState.update {
+    fun setLastName(value: String) = formState.update {
         it.copy(lastName = value)
     }
 
-    fun onBirthdateChange(value: LocalDate?) = formState.update {
+    fun setBirthday(value: LocalDate?) = formState.update {
         it.copy(birthday = value)
     }
 
-    fun onDescriptionChange(value: String) = formState.update {
+    fun setDescription(value: String) = formState.update {
         it.copy(description = value)
     }
 
-    fun onGenderChange(value: String) = formState.update {
+    fun setGender(value: String) = formState.update {
         try {
             it.copy(gender = Gender.valueOf(value))
         }
@@ -104,19 +107,19 @@ class EditUserProfileViewModel @Inject constructor(
         }
     }
 
-    fun onCountryChange(value: String) = formState.update {
+    fun setCountry(value: String) = formState.update {
         it.copy(country = value)
     }
 
-    fun onCityChange(value: String) = formState.update {
+    fun setCity(value: String) = formState.update {
         it.copy(city = value)
     }
 
-    fun onAvatarChange(avatarUri: Uri?) = formState.update {
+    fun setAvatar(avatarUri: Uri?) = formState.update {
         it.copy(avatarUrl = avatarUri?.toString())
     }
 
-    fun onLanguagesChange(languages: List<String>) = formState.update {
-        it.copy(languages = languages.toMutableList())
+    fun setLanguages(languages: List<String>) = formState.update {
+        it.copy(languages = languages)
     }
 }

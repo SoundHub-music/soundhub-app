@@ -5,16 +5,17 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.soundhub.R
-import com.soundhub.data.api.GenreResponse
-import com.soundhub.data.api.LastFmService
+import com.soundhub.data.api.GenreService
 import com.soundhub.data.api.MusicService
-import com.soundhub.data.api.responses.DiscogsEntityResponse
-import com.soundhub.data.api.responses.DiscogsResponse
+import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
+import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
+import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
 import com.soundhub.data.model.Artist
+import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Track
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
@@ -26,14 +27,12 @@ import javax.inject.Inject
 
 class MusicRepositoryImpl @Inject constructor(
     private val musicService: MusicService,
-    private val lastFmService: LastFmService,
+    private val genreService: GenreService,
     private val context: Context
 ): MusicRepository {
-    override suspend fun getAllGenres(countPerPage: Int): HttpResult<GenreResponse> {
+    override suspend fun getAllGenres(countPerPage: Int): HttpResult<List<Genre>> {
         try {
-            val response: Response<GenreResponse> = lastFmService.getMusicTags(
-                countPerPage = countPerPage
-            )
+            val response: Response<List<Genre>> = genreService.getAllGenres()
             Log.d("MusicRepository", "getAllGenres[1]: $response")
 
             if (!response.isSuccessful) {
@@ -93,8 +92,7 @@ class MusicRepositoryImpl @Inject constructor(
                 )
             }
 
-            val responseResult: List<DiscogsEntityResponse> = response.body()
-                ?.results ?: emptyList()
+            val responseResult: List<DiscogsEntityResponse> = response.body()?.results ?: emptyList()
             loadDataToArtistState(responseResult, artistState)
 
             return HttpResult.Success(body = null)
@@ -128,7 +126,42 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getArtistById(artistId: Int): HttpResult<Artist?> {
-        TODO("Not yet implemented")
+        try {
+            val response: Response<DiscogsArtistResponse> = musicService
+                .getArtistById(artistId = artistId)
+            Log.d("MusicRepository", "getArtistById[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorBody: ErrorResponse = Gson()
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(
+                        status = response.code(),
+                        detail = context.getString(R.string.toast_logout_error)
+                    )
+
+                Log.d("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
+                return HttpResult.Error(errorBody = errorBody)
+            }
+
+            val body = response.body()
+            var result: Artist? = null
+            body?.let {
+                result = Artist(
+                    id = it.id,
+                    name = it.name,
+                    thumbnailUrl = it.images[0].uri
+                )
+            }
+
+            return HttpResult.Success(body = result)
+        }
+        catch (e: Exception) {
+            Log.e("ChatRepository", "getAllChatsByCurrentUser[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
     }
 
     // TODO: find out where to apply it
@@ -198,7 +231,7 @@ class MusicRepositoryImpl @Inject constructor(
                     desiredArtist = Artist(
                         id = artist.id,
                         name = artist.title,
-                        thumbnailUrl = artist.cover_image
+                        thumbnailUrl = artist.coverImage
                     )
             }
 

@@ -27,8 +27,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
+import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.messenger.chat.components.MessageBoxContainer
 import com.soundhub.ui.messenger.chat.components.input_box.MessageInputBox
@@ -38,21 +38,22 @@ import java.time.LocalDate
 @Composable
 fun ChatScreen(
     chatId: String? = null,
-    chatViewModel: ChatViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel,
+    authViewModel: AuthenticationViewModel
 ) {
     val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
-    val messages by chatViewModel.messages.collectAsState(initial = emptyList())
+    val chatState: ChatState by chatViewModel.chatState.collectAsState()
     val lazyListState = rememberLazyListState()
     val itemIndex by remember {
         derivedStateOf { lazyListState.firstVisibleItemIndex }
     }
 
-    LaunchedEffect(key1 = messages) {
-        Log.d("ChatScreen", messages.toString())
+    LaunchedEffect(key1 = chatState.messages) {
+        Log.d("ChatScreen", chatState.messages.toString())
     }
 
-    if (messages.isNotEmpty()) {
-        val message = messages[itemIndex]
+    if (chatState.messages.isNotEmpty()) {
+        val message = chatState.messages[itemIndex]
         MessageDateChip(date = message.timestamp.toLocalDate())
     }
 
@@ -64,16 +65,17 @@ fun ChatScreen(
     ) {
         Column(verticalArrangement = Arrangement.SpaceBetween) {
             MessageBoxContainer(
-                messages = messages,
+                messages = chatState.messages,
                 lazyListState = lazyListState,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                authenticationViewModel = authViewModel
             )
             MessageInputBox(
                 lazyListState = lazyListState,
                 modifier = Modifier,
-                chatViewModel = chatViewModel
+                chatViewModel = chatViewModel,
+                authViewModel = authViewModel
             )
-
         }
     }
 }

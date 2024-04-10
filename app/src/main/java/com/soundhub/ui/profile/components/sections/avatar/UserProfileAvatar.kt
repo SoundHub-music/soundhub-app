@@ -33,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -41,18 +40,19 @@ import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.Route
 import com.soundhub.data.model.User
-import com.soundhub.utils.MediaTypes
+import com.soundhub.utils.ContentTypes
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun UserProfileAvatar(
     navController: NavHostController,
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
+    authViewModel: AuthenticationViewModel,
     user: User? = null
 ) {
     val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
     val userAvatar: File? by authViewModel.currentUserAvatar.collectAsState()
+
     var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var isAvatarMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -89,7 +89,7 @@ internal fun UserProfileAvatar(
             },
             onChangeAvatarOptionClick = {
                 isAvatarMenuExpanded = false
-                changeAvatarLauncher.launch(MediaTypes.IMAGE_ALL.type)
+                changeAvatarLauncher.launch(ContentTypes.IMAGE_ALL.type)
             }
         )
 

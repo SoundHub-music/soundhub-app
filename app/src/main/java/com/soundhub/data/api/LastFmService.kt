@@ -12,7 +12,27 @@ interface LastFmService {
         @Query("api_key") apiKey: String = BuildConfig.LAST_FM_API_KEY,
         @Query("num_res") countPerPage: Int = 10
     ): Response<GenreResponse>
+
+    @GET("2.0/?method=tag.gettopartists&format=json")
+    suspend fun getArtistsByTag(
+        @Query("api_key") apiKey: String = BuildConfig.LAST_FM_API_KEY,
+        @Query("tag") tag: String,
+    ): Response<ArtistsByTagResponse>
 }
+
+data class ArtistsByTagResponse(
+    @SerializedName("topartists")
+    val topArtists: TopArtists
+)
+
+data class TopArtists(
+    @SerializedName("artist")
+    val artist: List<LastFmArtist>
+)
+
+data class LastFmArtist(
+    val name: String
+)
 
 data class GenreResponse(
     @SerializedName("toptags")

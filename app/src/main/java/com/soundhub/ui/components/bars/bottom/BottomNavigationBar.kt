@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.bars.bottom
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,30 +20,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.MessengerViewModel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
     user: User? = null,
-    messengerViewModel: MessengerViewModel = hiltViewModel()
+    messengerViewModel: MessengerViewModel,
+    uiStateDispatcher: UiStateDispatcher
 ) {
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentRoute by uiStateDispatcher.currentRoute.collectAsState()
     // plug variable
     val unreadMessageCount = 1
-    var selectedItem: String by remember { mutableStateOf(currentRoute ?: Route.Postline.route) }
+    var selectedItem: String by remember {
+        mutableStateOf(currentRoute ?: Route.Postline.route)
+    }
+
+    LaunchedEffect(key1 = selectedItem) {
+        Log.d("BottomNavigationBar", selectedItem)
+    }
 
     NavigationBar(
         modifier = Modifier
@@ -60,6 +69,7 @@ fun BottomNavigationBar(
             unreadMessageCount = unreadMessageCount,
             userId = user?.id
         ).forEach{ item ->
+            Log.d("BottomNavigationBar", "item: $item")
             NavigationBarItem(
                 icon = item.icon,
                 selected = selectedItem == item.route,
