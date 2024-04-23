@@ -2,7 +2,7 @@ package com.soundhub.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.states.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 
 @HiltViewModel
@@ -48,5 +47,5 @@ class UiStateDispatcher @Inject constructor() : ViewModel() {
 
     suspend fun sendUiEvent(event: UiEvent) = viewModelScope.launch(Dispatchers.IO) {
         _uiEvent.emit(event)
-    }.join()
+    }
 }

@@ -21,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.soundhub.ui.components.icons.QueueMusic
@@ -38,19 +38,23 @@ import java.util.UUID
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    user: User? = null,
+    user: User,
     messengerViewModel: MessengerViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
     val currentRoute by uiStateDispatcher.currentRoute.collectAsState()
-    // plug variable
-    val unreadMessageCount = 1
-    var selectedItem: String by remember {
+    val unreadMessageCount = messengerViewModel
+        .messengerUiState
+        .collectAsState()
+        .value
+        .unreadMessagesTotal
+
+    val selectedItemState: MutableState<String> = remember {
         mutableStateOf(currentRoute ?: Route.Postline.route)
     }
 
-    LaunchedEffect(key1 = selectedItem) {
-        Log.d("BottomNavigationBar", selectedItem)
+    LaunchedEffect(key1 = selectedItemState) {
+        Log.d("BottomNavigationBar", selectedItemState.value)
     }
 
     NavigationBar(
@@ -67,32 +71,38 @@ fun BottomNavigationBar(
     ) {
         getNavBarItems(
             unreadMessageCount = unreadMessageCount,
-            userId = user?.id
-        ).forEach{ item ->
-            Log.d("BottomNavigationBar", "item: $item")
+            userId = user.id
+        ).forEach { menuItem ->
+            Log.d("BottomNavigationBar", "menuItem: $menuItem")
             NavigationBarItem(
-                icon = item.icon,
-                selected = selectedItem == item.route,
-                onClick = {
-                    selectedItem = item.route
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                            inclusive = true
-                        }
-
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                icon = menuItem.icon,
+                selected = selectedItemState.value == menuItem.route,
+                onClick = { onMenuItemClick(selectedItemState, menuItem, navController) }
             )
         }
     }
 }
 
+private fun onMenuItemClick(
+    selectedItemState: MutableState<String>,
+    menuItem: NavBarItem,
+    navController: NavController
+) {
+    selectedItemState.value =  menuItem.route
+    navController.navigate(menuItem.route) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+            inclusive = true
+        }
+
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
 private fun getNavBarItems(
     unreadMessageCount: Int = 0,
-    userId: UUID?
+    userId: UUID
 ): List<NavBarItem> {
     return listOf(
         NavBarItem(
@@ -110,16 +120,12 @@ private fun getNavBarItems(
                     BadgedBox(badge = { Badge { Text(text = unreadMessageCount.toString()) } }) {
                         Icon(Icons.Rounded.Email, contentDescription = "Messenger")
                     }
+                else Icon(Icons.Rounded.Email, contentDescription = "Messenger")
             },
         ),
         NavBarItem(
-            route = Route.Profile(userId?.toString()).route,
+            route = Route.Profile(userId.toString()).route,
             icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
         )
     )
 }
-
-data class NavBarItem(
-    val route: String = Route.Postline.route,
-    val icon: @Composable () -> Unit,
-)

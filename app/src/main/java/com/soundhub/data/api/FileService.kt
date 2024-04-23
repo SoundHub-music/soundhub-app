@@ -1,5 +1,6 @@
 package com.soundhub.data.api
 
+import com.soundhub.utils.HttpUtils
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -11,7 +12,7 @@ interface FileService {
     @Streaming
     @GET
     suspend fun getFile(
-        @Header("Authorization") accessToken: String,
+        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String,
         @Url fileName: String?,
     ): Response<ResponseBody>
 }

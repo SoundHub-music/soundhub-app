@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.components.CircularAvatar
-import com.soundhub.ui.messenger.chat.ChatState
+import com.soundhub.ui.components.avatar.CircularAvatar
+import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -39,7 +39,6 @@ fun ChatTopAppBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     TopAppBar(
-        modifier = Modifier.padding(5.dp),
         title = { InterlocutorDetails(chatViewModel) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
@@ -59,10 +58,8 @@ fun ChatTopAppBar(
 
 @Composable
 private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
-    // TODO: edit InterlocutorDetails
-    // temporary variables
-    val chatState: ChatState by chatViewModel.chatState.collectAsState()
-    val friendName = "${chatState.interlocutor?.firstName} ${chatState.interlocutor?.lastName}"
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val friendName = "${chatUiState.interlocutor?.firstName} ${chatUiState.interlocutor?.lastName}"
         .trim()
 
     val isOnline = false

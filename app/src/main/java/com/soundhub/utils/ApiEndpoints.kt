@@ -4,7 +4,8 @@ sealed class ApiEndpoints {
     object SoundHub {
         private const val AUTH_ENDPOINT: String = "auth"
         private const val USERS_ENDPOINT: String = "users"
-        private const val USER_ID_DYNAMIC_PARAM: String = "{userId}"
+        const val USER_ID_DYNAMIC_PARAM: String = "userId"
+        const val FRIEND_ID_DYNAMIC_PARAM: String = "friendId"
 
         const val SIGN_UP: String = "$AUTH_ENDPOINT/sign-up"
         const val SIGN_IN: String = "$AUTH_ENDPOINT/sign-in"
@@ -12,8 +13,11 @@ sealed class ApiEndpoints {
         const val REFRESH_TOKEN: String = "$AUTH_ENDPOINT/refresh"
 
         const val CURRENT_USER: String = "$USERS_ENDPOINT/currentUser"
-        const val GET_USER_BY_ID: String = "$USERS_ENDPOINT/$USER_ID_DYNAMIC_PARAM"
-        const val UPDATE_USER: String = "$USERS_ENDPOINT/update/$USER_ID_DYNAMIC_PARAM"
+        const val GET_USER_BY_ID: String = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}"
+        const val UPDATE_USER: String = "$USERS_ENDPOINT/update/{$USER_ID_DYNAMIC_PARAM}"
+        const val ADD_FRIEND: String = "$USERS_ENDPOINT/addFriend/{$FRIEND_ID_DYNAMIC_PARAM}"
+        const val DELETE_FRIEND: String = "$USERS_ENDPOINT/deleteFriend/{$FRIEND_ID_DYNAMIC_PARAM}"
+        const val GET_RECOMMENDED_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/recommendedFriends"
     }
 
     object Countries {
@@ -59,5 +63,29 @@ sealed class ApiEndpoints {
         const val GET_CHAT_BY_ID = "$CHATS_ENDPOINT/{$CHAT_ID_DYNAMIC_PARAM}"
         const val DELETE_CHAT = "$CHATS_ENDPOINT/delete/{$CHATS_ENDPOINT}"
         const val CREATE_CHAT = "$CHATS_ENDPOINT/single"
+    }
+
+    object Invites {
+        private const val INVITES_ENDPOINT = "invites"
+        const val RECIPIENT_ID_DYNAMIC_PARAM = "recipient_id"
+        const val INVITE_ID_DYNAMIC_PARAM = "invite_id"
+
+        const val CREATE_INVITE = "$INVITES_ENDPOINT/create/{$RECIPIENT_ID_DYNAMIC_PARAM}"
+        const val ACCEPT_INVITE = "$INVITES_ENDPOINT/accept/{$INVITE_ID_DYNAMIC_PARAM}"
+        const val REJECT_INVITE = "$INVITES_ENDPOINT/reject/{$INVITE_ID_DYNAMIC_PARAM}"
+        const val DELETE_INVITE = "$INVITES_ENDPOINT/{$INVITE_ID_DYNAMIC_PARAM}"
+    }
+
+    object ChatWebSocket {
+        private const val MESSAGES_ENDPOINT = "messages"
+        const val MESSAGE_DYNAMIC_ID = "messageId"
+        const val CHAT_DYNAMIC_ID = "chatId"
+
+        const val SEND_MESSAGE = "$MESSAGES_ENDPOINT/chat"
+        const val GET_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_DYNAMIC_ID}"
+        const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/{$MESSAGE_DYNAMIC_ID}"
+        const val DELETE_MESSAGE = "$MESSAGES_ENDPOINT/message/delete/{$MESSAGE_DYNAMIC_ID}"
+
+        const val MARK_MESSAGE_AS_READ = "$MESSAGES_ENDPOINT/message/read/{$MESSAGE_DYNAMIC_ID}"
     }
 }

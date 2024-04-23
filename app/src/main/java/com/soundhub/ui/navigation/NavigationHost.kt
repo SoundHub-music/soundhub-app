@@ -37,15 +37,14 @@ import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
 import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
-import com.soundhub.ui.create_post.CreatePostScreen
+import com.soundhub.ui.post_editor.PostEditorScreen
 import com.soundhub.ui.edit_profile.EditUserProfileScreen
 import com.soundhub.ui.edit_profile.EditUserProfileViewModel
-import com.soundhub.ui.friends.FriendListScreen
+import com.soundhub.ui.friends.FriendsScreen
 import com.soundhub.ui.gallery.GalleryScreen
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.messenger.chat.ChatScreen
-import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.notifications.NotificationScreen
@@ -56,6 +55,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.viewmodels.UserViewModel
 import com.soundhub.utils.Constants
 import kotlinx.coroutines.flow.firstOrNull
+import java.util.UUID
 
 @Composable
 fun NavigationHost(
@@ -64,11 +64,10 @@ fun NavigationHost(
     authViewModel: AuthenticationViewModel,
     registrationViewModel: RegistrationViewModel,
     uiStateDispatcher: UiStateDispatcher,
-    chatViewModel: ChatViewModel,
     messengerViewModel: MessengerViewModel,
     editUserProfileViewModel: EditUserProfileViewModel,
     topBarTitle: MutableState<String?>,
-    authorizedUser: UserState,
+    authorizedUser: UserState
 ) {
     var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
 
@@ -79,26 +78,19 @@ fun NavigationHost(
     val currentRoute: String? = navBackStackEntry?.destination?.route
 
     val context: Context = LocalContext.current
-    val authErrorMessage: String = stringResource(id = R.string.toast_authorization_error)
 
     LaunchedEffect(key1 = currentRoute) {
         Log.d("HomeScreen", "current_route: $currentRoute")
-        Log.d("HomeScreen", "authorized_user: ${authorizedUser.toString()}")
+        Log.d("HomeScreen", "authorized_user: $authorizedUser")
         Log.d("HomeScreen", "user_creds: ${userCreds.toString()}")
     }
 
     LaunchedEffect(key1 = userCreds?.accessToken) {
-        if (authorizedUser.current == null && authorizedUser.status == ApiStatus.ERROR)
-            Toast.makeText(
-                context,
-                authErrorMessage,
-                Toast.LENGTH_SHORT
-            ).show()
-
-        startDestination = if (
-           userCreds?.accessToken.isNullOrEmpty()
-        ) Route.Authentication.route
-        else Route.Postline.route
+        startDestination = defineStartDestination(
+            context = context,
+            authorizedUser = authorizedUser,
+            userCreds = userCreds
+        )
     }
 
     NavHost(
@@ -176,7 +168,6 @@ fun NavigationHost(
                     authViewModel = authViewModel,
                     uiStateDispatcher = uiStateDispatcher,
                     messengerViewModel = messengerViewModel,
-                    chatViewModel = chatViewModel
                 )
             }
         }
@@ -185,16 +176,21 @@ fun NavigationHost(
             route = Route.Messenger.Chat().route,
             arguments = listOf(navArgument(Constants.CHAT_NAV_ARG) { NavType.StringType})
         ) { entry ->
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                val chatId = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
-                ChatScreen(
-                    chatId = chatId,
-                    chatViewModel = chatViewModel,
-                    authViewModel = authViewModel
-                )
+            runCatching {
+                val argument: String? = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
+                val chatId: UUID = UUID.fromString(argument)
+                
+                ScreenContainer(
+                    userCreds = userCreds,
+                    navController = navController
+                ) {
+                    ChatScreen(
+                        chatId = chatId,
+                        authViewModel = authViewModel,
+                        navController = navController,
+                        uiStateDispatcher = uiStateDispatcher
+                    )
+                }
             }
         }
 
@@ -202,33 +198,39 @@ fun NavigationHost(
             route = Route.Profile().route,
             arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
         ) { entry ->
-            if (authorizedUser.current != null) {
-                val userId = entry.arguments?.getString(Constants.PROFILE_NAV_ARG) ?: ""
-                var user: User? by remember { mutableStateOf(null) }
-                Log.d("UserProfile", "userId: $userId")
+            runCatching {
+                authorizedUser.current?.let { currentUser ->
+                    val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
+                    val userId: UUID? = argument?.let { UUID.fromString(argument) }
+                    var user: User? by remember { mutableStateOf(null) }
 
-                LaunchedEffect(key1 = true) {
-                    user = if (userId == authorizedUser.current.id.toString())
-                        authorizedUser.current
-                    else userViewModel
-                        .getUserById(userId)
-                        .firstOrNull()
-                }
+                    Log.d("NavigationHost", "Profile[userId]: $userId")
 
-                ScreenContainer(
-                    userCreds = userCreds,
-                    navController = navController
-                ) {
-                    ProfileScreen(
-                        navController = navController,
-                        authViewModel = authViewModel,
-                        uiStateDispatcher = uiStateDispatcher,
-                        user = user
-                    )
+                    LaunchedEffect(key1 = true) {
+                        user = if (userId == authorizedUser.current.id)
+                            currentUser
+                        else userId?.let { userId ->
+                            userViewModel
+                                .getUserById(userId)
+                                .firstOrNull()
+                        }
+                    }
+
+                    ScreenContainer(
+                        userCreds = userCreds,
+                        navController = navController
+                    ) {
+                        ProfileScreen(
+                            navController = navController,
+                            authViewModel = authViewModel,
+                            uiStateDispatcher = uiStateDispatcher,
+                            user = user
+                        )
+                    }
                 }
+            }.onFailure {
+                Log.d("NavigationHost", "Profile: ${it.stackTraceToString()}")
             }
-            // TODO: fix switching navigation animation
-//            else navController.navigate(Route.Postline.route)
         }
 
         composable(Route.FriendList.route) {
@@ -237,10 +239,10 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_friends)
-                FriendListScreen(
+                FriendsScreen(
                     uiStateDispatcher = uiStateDispatcher,
-                    authViewModel = authViewModel,
-                    navController = navController
+                    navController = navController,
+                    authorizedUser = authorizedUser.current
                 )
             }
         }
@@ -288,10 +290,15 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = null
-                val images = uiStateDispatcher.uiState.collectAsState().value.galleryImageUrls
+                val images = uiStateDispatcher.uiState
+                    .collectAsState()
+                    .value
+                    .galleryImageUrls
+
                 val initialPage = entry.arguments
                     ?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
                     ?.toInt() ?: 0
+
                 GalleryScreen(
                     images = images,
                     initialPage = initialPage,
@@ -300,14 +307,58 @@ fun NavigationHost(
             }
         }
 
-        composable(Route.CreatePost.route) {
+        // post creating route
+        composable(route = Route.PostEditor.createPostRoute) {
             ScreenContainer(
                 userCreds = userCreds,
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
-                CreatePostScreen(user = authorizedUser)
+                PostEditorScreen(user = authorizedUser)
+            }
+        }
+
+        // post editing route
+        composable(
+            route = Route.PostEditor().route,
+            arguments = listOf(navArgument(Constants.POST_EDITOR_NAV_ARG) {
+                NavType.StringType
+            })
+        ) { entry ->
+            runCatching {
+                val postArgument = entry.arguments?.getString(Constants.POST_EDITOR_NAV_ARG)
+                val postId: UUID? = postArgument?.let { UUID.fromString(it) }
+
+                ScreenContainer(
+                    userCreds = userCreds,
+                    navController = navController
+                ) {
+                    topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
+                    PostEditorScreen(
+                        user = authorizedUser,
+                        postId = postId
+                    )
+                }
             }
         }
     }
+}
+
+private fun defineStartDestination(
+    context: Context,
+    authorizedUser: UserState,
+    userCreds: UserPreferences?
+): String {
+    val authErrorMessage: String = context.getString(R.string.toast_authorization_error)
+    if (authorizedUser.current == null && authorizedUser.status == ApiStatus.ERROR)
+        Toast.makeText(
+            context,
+            authErrorMessage,
+            Toast.LENGTH_SHORT
+        ).show()
+
+    return if (
+        userCreds?.accessToken.isNullOrEmpty()
+    ) Route.Authentication.route
+    else Route.Postline.route
 }

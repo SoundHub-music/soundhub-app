@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.ui.music.components.AuthorizedLibraryPage
-import com.soundhub.ui.music.components.UnauthorizedLibraryPage
 
 @Composable
 internal fun MusicLibraryPage(
@@ -34,7 +33,7 @@ internal fun MusicLibraryPage(
             route = Route.Music.route
         ),
         LibraryItemData(
-            title = stringResource(id = R.string.music_libray_page_artists),
+            title = stringResource(id = R.string.music_library_page_artists),
             icon = painterResource(id = R.drawable.round_artist_24),
             route = Route.Music.route
         )

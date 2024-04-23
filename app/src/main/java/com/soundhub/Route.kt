@@ -13,8 +13,7 @@ sealed class Route(var route: String) {
     data class Profile(var navArg: String? = null): Route(route = Constants.PROFILE_ROUTE) {
         init {
             navArg?.let {
-                route = Regex(Constants.NAV_ARG_REGEX)
-                    .replace(route, navArg ?: "")
+                this.route = replaceNavArgTemplate(this.route, it)
             }
         }
     }
@@ -32,8 +31,7 @@ sealed class Route(var route: String) {
         data class Chat(var navArg: String? = null): Route(route = Constants.MESSENGER_CHAT_ROUTE) {
             init {
                 navArg?.let {
-                    this.route = Regex(Constants.NAV_ARG_REGEX)
-                        .replace(this.route, navArg ?: "")
+                    this.route = replaceNavArgTemplate(route, navArg ?: "")
                 }
             }
         }
@@ -42,5 +40,28 @@ sealed class Route(var route: String) {
     data object Settings: Route(route = Constants.SETTINGS_ROUTE)
     data object Notifications: Route(route = Constants.NOTIFICATIONS_ROUTE)
     data object EditUserData: Route(route = Constants.EDIT_USER_DATA_ROUTE)
-    data object CreatePost: Route(route = Constants.CREATE_POST_ROUTE)
+    data class PostEditor(
+        var navArg: String? = null
+    ): Route(route = Constants.POST_EDITOR_ROUTE) {
+        init {
+            navArg?.let {
+                this.route = replaceNavArgTemplate(this.route, navArg!!)
+            }
+        }
+
+        companion object {
+            val createPostRoute: String = Constants
+                .POST_EDITOR_ROUTE
+                .replace(Regex("/${Constants.NAV_ARG_REGEX}"),"")
+        }
+    }
+
+    companion object {
+        private fun replaceNavArgTemplate(
+            route: String,
+            navArg: String
+        ) = Regex(Constants.NAV_ARG_REGEX)
+            .replace(route, navArg)
+    }
 }
+

@@ -2,7 +2,7 @@ package com.soundhub.ui.components.forms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Country
@@ -40,7 +40,7 @@ class UserDataFormViewModel @Inject constructor(
                 uiStateDispatcher.sendUiEvent(
                     UiEvent.ShowToast(
                         UiText.DynamicString(
-                            it.errorBody?.detail ?: it.throwable?.message ?: ""
+                            it.errorBody.detail ?: it.throwable?.message ?: ""
                         )
                     )
                 )
@@ -53,7 +53,7 @@ class UserDataFormViewModel @Inject constructor(
         return getImageUseCase(
             fileName = avatarUrl,
             accessToken = accessToken,
-            folderName = MediaFolder.Avatar.name
+            folderName = MediaFolder.Avatar.NAME
         )
     }
 }

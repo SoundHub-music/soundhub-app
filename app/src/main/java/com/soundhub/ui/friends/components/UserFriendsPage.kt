@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
-import com.soundhub.ui.friends.FriendCard
 import com.soundhub.ui.friends.enums.FriendListPage
 
 @Composable

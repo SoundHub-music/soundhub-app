@@ -4,6 +4,7 @@ import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.responses.ApiStateResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Chat
+import java.util.UUID
 
 interface ChatRepository {
     suspend fun getAllChatsByCurrentUser(
@@ -12,12 +13,12 @@ interface ChatRepository {
 
     suspend fun getChatById(
         accessToken: String?,
-        chatId: String?
+        chatId: UUID
     ): HttpResult<Chat?>
 
     suspend fun deleteChatById(
         accessToken: String?,
-        chatId: String?
+        chatId: UUID
     ): HttpResult<ApiStateResponse>
 
     suspend fun createChat(

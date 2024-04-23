@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -12,15 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Face
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -40,7 +36,7 @@ import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.Route
 import com.soundhub.data.model.User
-import com.soundhub.utils.ContentTypes
+import com.soundhub.ui.components.menu.AvatarDropdownMenu
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -53,8 +49,10 @@ internal fun UserProfileAvatar(
     val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
     val userAvatar: File? by authViewModel.currentUserAvatar.collectAsState()
 
-    var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-    var isAvatarMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
+    val isAvatarMenuExpandedState: MutableState<Boolean> = rememberSaveable {
+        mutableStateOf(false)
+    }
 
     val changeAvatarLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -69,11 +67,13 @@ internal fun UserProfileAvatar(
             Image(
                 painter = defaultAvatar,
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .clickable { isAvatarMenuExpandedState.value = true },
                 contentScale = ContentScale.Crop
             )
         else GlideImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .clickable { isAvatarMenuExpandedState.value = true },
             contentScale = ContentScale.Crop,
             model = userAvatar,
             contentDescription = "${user?.firstName} ${user?.lastName}".trim()
@@ -81,16 +81,9 @@ internal fun UserProfileAvatar(
 
         AvatarDropdownMenu(
             modifier = Modifier.align(Alignment.Center),
-            isAvatarMenuExpanded = isAvatarMenuExpanded,
-            onDismissRequest = { isAvatarMenuExpanded = false },
-            onOpenAvatarOptionClick = {
-                isAvatarMenuExpanded = false
-                /* TODO: implement change avatar logic */
-            },
-            onChangeAvatarOptionClick = {
-                isAvatarMenuExpanded = false
-                changeAvatarLauncher.launch(ContentTypes.IMAGE_ALL.type)
-            }
+            isAvatarMenuExpandedState = isAvatarMenuExpandedState,
+            onDismissRequest = { isAvatarMenuExpandedState.value = false },
+            activityResultLauncher = changeAvatarLauncher
         )
 
         Row(
@@ -102,38 +95,6 @@ internal fun UserProfileAvatar(
             IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
                 Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
             }
-        }
-    }
-}
-
-
-@Composable
-private fun AvatarDropdownMenu(
-    modifier: Modifier = Modifier,
-    isAvatarMenuExpanded: Boolean,
-    onDismissRequest: () -> Unit = {},
-    onOpenAvatarOptionClick: () -> Unit = {},
-    onChangeAvatarOptionClick: () -> Unit = {}
-) {
-    Box(
-        modifier = modifier
-    ) {
-        DropdownMenu(
-            expanded = isAvatarMenuExpanded,
-            onDismissRequest = onDismissRequest,
-            modifier = Modifier
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.menu_action_open_avatar)) },
-                leadingIcon = { Icon(imageVector = Icons.Rounded.Face, contentDescription = "open_avatar") },
-                onClick = onOpenAvatarOptionClick
-            )
-
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.menu_action_change_avatar)) },
-                leadingIcon = { Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "change_avatar") },
-                onClick = onChangeAvatarOptionClick
-            )
         }
     }
 }

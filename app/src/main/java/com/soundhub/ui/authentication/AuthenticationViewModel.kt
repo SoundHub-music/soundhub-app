@@ -8,7 +8,7 @@ import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.Route
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.HttpResult
@@ -18,6 +18,7 @@ import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.GetImageUseCase
 import com.soundhub.ui.authentication.states.AuthFormState
 import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.utils.MediaFolder
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -87,7 +88,7 @@ class AuthenticationViewModel @Inject constructor(
             val avatar = getImageUseCase(
                 accessToken = userCreds.firstOrNull()?.accessToken,
                 fileName = userInstance.value.current?.avatarUrl,
-                folderName = "avatars"
+                folderName = MediaFolder.Avatar.NAME
             )
             Log.d("AuthenticationViewModel", "user avatar: ${avatar?.name.toString()}")
             currentUserAvatar.value = avatar
@@ -130,7 +131,8 @@ class AuthenticationViewModel @Inject constructor(
         authRepository
             .logout(tokens?.accessToken)
             .onFailure {
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(
+                uiStateDispatcher.sendUiEvent(
+                    UiEvent.ShowToast(
                     UiText.DynamicString(it.errorBody.detail ?: "")
                 ))
             }
@@ -158,18 +160,20 @@ class AuthenticationViewModel @Inject constructor(
         ).onSuccess { newCredsResponse ->
             userCredsStore.updateCreds(newCredsResponse.body)
             initializeUser(userCreds)
-            uiStateDispatcher.sendUiEvent(
-                UiEvent.ShowToast(
-                    UiText.DynamicString(error.errorBody.detail ?: "")
-                )
-            )
             authAttemptCount.update { 0 }
 
         }.onFailure {
             authAttemptCount.update { it + 1 }
             if (authAttemptCount.value <= MAX_REFRESH_TOKEN_ATTEMPT_COUNT)
                 tryRefreshToken(error, userCreds)
-            else uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+            else {
+                uiStateDispatcher.sendUiEvent(
+                    UiEvent.ShowToast(
+                        UiText.DynamicString(error.errorBody.detail ?: "")
+                    )
+                )
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+            }
         }
     }
 

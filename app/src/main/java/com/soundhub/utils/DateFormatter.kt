@@ -78,5 +78,15 @@ class DateFormatter {
                 else -> "часов"
             }
         }
+
+        fun getHourAndMinuteWithSeparator(time: LocalDateTime, separator: String = ":"): String {
+            val hour = time.hour.toString()
+            var minute = time.minute.toString()
+
+            if (time.minute < 10)
+                minute = "0$minute"
+
+            return "$hour$separator$minute"
+        }
     }
 }

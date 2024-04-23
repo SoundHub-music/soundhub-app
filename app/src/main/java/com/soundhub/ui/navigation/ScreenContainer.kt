@@ -11,6 +11,6 @@ internal fun ScreenContainer(
     navController: NavHostController,
     screen: @Composable () -> Unit = {}
 ) {
-    if (userCreds?.accessToken != null) screen()
+    if (!userCreds?.accessToken.isNullOrEmpty()) screen()
     else navController.navigate(Route.Authentication.route)
 }

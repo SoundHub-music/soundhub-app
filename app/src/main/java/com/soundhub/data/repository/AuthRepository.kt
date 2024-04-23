@@ -10,6 +10,6 @@ import com.soundhub.data.api.responses.LogoutResponse
 interface AuthRepository {
     suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?>
     suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?>
-    suspend fun logout(token: String?): HttpResult<LogoutResponse>
+    suspend fun logout(accessToken: String?): HttpResult<LogoutResponse>
     suspend fun refreshToken(body: RefreshTokenRequestBody): HttpResult<UserPreferences?>
 }

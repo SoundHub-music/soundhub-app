@@ -39,7 +39,9 @@ internal fun UserNameWithDescription(user: User? = null) {
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             fontSize = 28.sp,
-            modifier = Modifier.clickable { isDescriptionButtonChecked = !isDescriptionButtonChecked }
+            modifier = Modifier.clickable {
+                isDescriptionButtonChecked = !isDescriptionButtonChecked
+            }
         )
 
         IconToggleButton(
@@ -49,11 +51,11 @@ internal fun UserNameWithDescription(user: User? = null) {
             Icon(
                 imageVector = if (isDescriptionButtonChecked) Icons.Rounded.KeyboardArrowUp
                 else Icons.Rounded.KeyboardArrowDown,
-                contentDescription = "expand_description",
+                contentDescription = "expand description",
                 modifier = Modifier.size(35.dp)
             )
         }
     }
     if (isDescriptionButtonChecked)
-        UserDescriptionBlock(user = user)
+        UserDetailsSection(user = user)
 }

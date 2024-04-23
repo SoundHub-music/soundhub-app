@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
-import com.soundhub.ui.components.CircleLoader
+import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.Route
 import com.soundhub.data.enums.ApiStatus

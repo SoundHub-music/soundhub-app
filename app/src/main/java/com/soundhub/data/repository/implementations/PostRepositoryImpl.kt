@@ -8,7 +8,7 @@ import com.soundhub.data.api.PostService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Post
-import com.soundhub.utils.HttpFileUtils
+import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.utils.Constants
 import com.soundhub.utils.ContentTypes
@@ -41,7 +41,7 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response: Response<Post?> = postService.getPostById(
                 id = postId,
-                accessToken = "Bearer $accessToken"
+                accessToken = HttpUtils.getBearerToken(accessToken)
             )
             Log.d("PostRepository", "getPostById[1]: $response")
 
@@ -74,7 +74,7 @@ class PostRepositoryImpl @Inject constructor(
         try {
             val response: Response<List<Post>> = postService.getPostsByAuthorId(
                 authorId = authorId,
-                accessToken = "Bearer $accessToken"
+                accessToken = HttpUtils.getBearerToken(accessToken)
             )
             Log.d("PostRepository", "getPostsByAuthorId[1]: $response")
 
@@ -103,14 +103,14 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun addPost(post: Post, accessToken: String?): HttpResult<Post> {
         try {
             val imagesFormDataList: List<MultipartBody.Part?> = post.images?.map {
-                HttpFileUtils.prepareMediaFormData(it, context)
+                HttpUtils.prepareMediaFormData(it, context)
             } ?: emptyList()
 
             val postRequestBody: RequestBody = gson.toJson(post)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
             val response: Response<Post> = postService.addPost(
-                accessToken = "Bearer $accessToken",
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 post = postRequestBody,
                 images = imagesFormDataList
             )
@@ -143,7 +143,7 @@ class PostRepositoryImpl @Inject constructor(
     override suspend fun toggleLike(accessToken: String?, postId: UUID): HttpResult<Post> {
         try {
             val response: Response<Post> = postService.toggleLike(
-                accessToken = "Bearer $accessToken",
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 postId = postId
             )
             Log.d("PostRepository", "toggleLike[1]: $response")
@@ -166,10 +166,10 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deletePost(accessToken: String?, postId: UUID): HttpResult<RequestBody> {
+    override suspend fun deletePost(accessToken: String?, postId: UUID): HttpResult<UUID> {
         try {
-            val response: Response<RequestBody> = postService.deletePost(
-                accessToken = "Bearer $accessToken",
+            val response: Response<UUID> = postService.deletePost(
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 postId = postId
             )
             Log.d("PostRepository", "deletePost[1]: $response")
@@ -196,8 +196,44 @@ class PostRepositoryImpl @Inject constructor(
         accessToken: String?,
         postId: UUID,
         post: Post,
-        deletedImages: List<String>
+        imagesToBeDeleted: List<String>
     ): HttpResult<Post> {
-        TODO("Not yet implemented")
+        try {
+            val imageFormData: List<MultipartBody.Part?> = post.images?.map {
+                HttpUtils.prepareMediaFormData(it, context)
+            } ?: emptyList()
+
+            val imageToDeleteFormData = imagesToBeDeleted.map {
+                HttpUtils.prepareMediaFormData(it, context)
+            }
+
+            val postRequestBody: RequestBody = gson.toJson(post)
+                .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
+
+            val response: Response<Post> = postService.updatePost(
+                accessToken = HttpUtils.getBearerToken(accessToken),
+                postId = postId,
+                post = postRequestBody,
+                images = imageFormData,
+                imagesToBeDeleted = imageToDeleteFormData
+            )
+
+            if (!response.isSuccessful) {
+                val errorBody: ErrorResponse = gson.fromJson(
+                    response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE
+                )
+
+                return HttpResult.Error(errorBody = errorBody)
+            }
+
+            return HttpResult.Success(body = response.body())
+        }
+        catch (e: Exception) {
+            Log.d("PostRepository", "updatePost[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
     }
 }

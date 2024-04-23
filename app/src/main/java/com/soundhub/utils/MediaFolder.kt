@@ -2,6 +2,6 @@ package com.soundhub.utils
 
 sealed class MediaFolder {
     object Avatar {
-        const val name: String = "avatars"
+        const val NAME: String = "avatars"
     }
 }

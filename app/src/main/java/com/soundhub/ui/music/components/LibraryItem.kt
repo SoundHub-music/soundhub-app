@@ -1,7 +1,6 @@
 package com.soundhub.ui.music.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,9 +38,9 @@ internal fun LibraryItem(
 ) {
     Card(
         shape = RoundedCornerShape(10.dp),
+        onClick = { navController.navigate(route) },
         modifier = modifier
             .fillMaxWidth()
-            .clickable { navController.navigate(route) }
             .shadow(
                 elevation = 10.dp,
                 shape = RoundedCornerShape(16.dp)

@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.soundhub.ui.components.CircularAvatar
+import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
 import java.util.UUID

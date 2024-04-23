@@ -13,10 +13,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.soundhub.ui.components.menu.ChatTopBarMenu
+import com.soundhub.ui.components.menu.ChatTopBarDropdownMenu
 import com.soundhub.utils.Constants
 import com.soundhub.Route
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
@@ -63,7 +63,7 @@ fun TopBarActions(
                 Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "options")
             }
 
-            ChatTopBarMenu(
+            ChatTopBarDropdownMenu(
                 menuState = isMenuExpanded,
                 navController = navController,
                 chatId = currentBackStackEntry?.arguments?.getString(Constants.CHAT_NAV_ARG)

@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Preview
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import kotlinx.coroutines.launch
 
 @Composable

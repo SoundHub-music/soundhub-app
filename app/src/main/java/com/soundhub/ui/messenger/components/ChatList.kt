@@ -9,20 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Chat
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.messenger.chat.ChatViewModel
-
 
 @Composable
 internal fun ChatList(
     modifier: Modifier = Modifier,
     chats: List<Chat> = emptyList(),
-    uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController,
     authViewModel: AuthenticationViewModel,
-    chatViewModel: ChatViewModel
 ) {
     LazyColumn(
         modifier = modifier
@@ -34,57 +29,8 @@ internal fun ChatList(
             ChatCard(
                 chat = chat,
                 navController = navController,
-                authenticationViewModel = authViewModel,
-                chatViewModel = chatViewModel
+                authenticationViewModel = authViewModel
             )
         }
     }
 }
-
-//@Composable
-//@Preview
-//fun ChatListPreview() {
-//    val navController = rememberNavController()
-//    val authorizedUser = User(
-//        firstName = "Test",
-//        lastName = "user"
-//    )
-//
-//    val chats = listOf(
-//        Chat(
-//            lastMessage = "last message",
-//            participants = listOf(
-//                User(
-//                    firstName = "Alexey",
-//                    lastName = "Zaycev"
-//                ),
-//                authorizedUser
-//            )
-//        ),
-//
-//        Chat(
-//            lastMessage = "last message looooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
-//            participants = listOf(
-//                User(
-//                    firstName = "Nikolay",
-//                    lastName = "Shein"
-//                ),
-//                authorizedUser
-//            )
-//        ),
-//
-//        Chat(
-//            lastMessage = "last message",
-//            unreadMessageCount = 2,
-//            participants = listOf(
-//                User(
-//                    firstName = "Gennadiy",
-//                    lastName = "Bukin"
-//                ),
-//                authorizedUser
-//            )
-//        )
-//    )
-//
-//    ChatList(chats = chats, navController = navController)
-//}

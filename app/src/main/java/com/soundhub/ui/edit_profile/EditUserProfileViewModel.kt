@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Gender
@@ -74,7 +74,8 @@ class EditUserProfileViewModel @Inject constructor(
                 }
             }
             .onFailure {
-                uiStateDispatcher.sendUiEvent(UiEvent
+                uiStateDispatcher.sendUiEvent(
+                    UiEvent
                     .ShowToast(UiText.DynamicString("update error")))
             }
             .finally {

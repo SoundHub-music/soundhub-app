@@ -13,7 +13,7 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.repository.AuthRepository
-import com.soundhub.utils.HttpFileUtils
+import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.Constants
 import com.soundhub.utils.ContentTypes
 import com.soundhub.utils.converters.LocalDateAdapter
@@ -64,7 +64,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?> {
         try {
-            val avatarFormData: MultipartBody.Part? = HttpFileUtils.prepareMediaFormData(body.avatarUrl, context)
+            val avatarFormData: MultipartBody.Part? = HttpUtils.prepareMediaFormData(body.avatarUrl, context)
             val requestBody: RequestBody = gson.toJson(body)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
@@ -94,9 +94,9 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(token: String?): HttpResult<LogoutResponse> {
+    override suspend fun logout(accessToken: String?): HttpResult<LogoutResponse> {
         try {
-            val logoutResponse: Response<LogoutResponse> = authService.logout("Bearer $token")
+            val logoutResponse: Response<LogoutResponse> = authService.logout(HttpUtils.getBearerToken(accessToken))
             Log.d("AuthRepository", "logout[1]: $logoutResponse")
 
             if (!logoutResponse.isSuccessful) {

@@ -24,11 +24,10 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
-import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonsRow
+import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonRow
 import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
 import com.soundhub.ui.profile.components.sections.wall.UserWall
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-
 
 @Composable
 fun UserProfileContainer(
@@ -40,6 +39,7 @@ fun UserProfileContainer(
     val authorizedUser: UserState by authViewModel
         .userInstance
         .collectAsState()
+
     val isOriginProfile: Boolean = authorizedUser
         .current?.id == user?.id
 
@@ -71,25 +71,15 @@ fun UserProfileContainer(
             }
 
             item {
-                ProfileButtonsRow(
+                ProfileButtonRow(
                     isOriginProfile = isOriginProfile,
                     navController = navController,
-                    user = user
                 )
             }
 
             item {
-                // friend list with fake data
                 FriendMiniatureList(
-                    friendList = listOf(
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                        FriendMiniatureItem(null),
-                    ),
+                    friendList = authorizedUser.current?.friends ?: emptyList(),
                     navController = navController
                 )
             }
@@ -115,8 +105,8 @@ fun UserProfileContainer(
 //            )
 
             item {
-                HorizontalDivider(thickness = 1.dp)
                 user?.let {
+                    HorizontalDivider(thickness = 1.dp)
                     UserWall(
                         navController = navController,
                         uiStateDispatcher = uiStateDispatcher,
@@ -128,13 +118,10 @@ fun UserProfileContainer(
     }
 }
 
-fun getUserLocation(city: String?, country: String?): String {
+internal fun getUserLocation(city: String?, country: String?): String {
     return if ((city == null && country == null) || (city!!.isEmpty() && country!!.isEmpty())) ""
     else if (country!!.isNotEmpty() && city.isEmpty()) country
     else "$country, $city"
 }
 
 
-data class FriendMiniatureItem(
-    val avatarUrl: String?
-)

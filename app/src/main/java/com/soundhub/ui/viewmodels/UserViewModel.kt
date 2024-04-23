@@ -8,8 +8,8 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,12 +19,12 @@ class UserViewModel @Inject constructor(
 ): ViewModel() {
     private var userCreds: Flow<UserPreferences?> = userCredsStore.getCreds()
 
-
-    fun getUserById(id: String): Flow<User?> = flow {
-        val creds = userCreds.firstOrNull()
-        val userResponse: HttpResult<User?> = userRepository.getUserById(id, creds?.accessToken)
-        userResponse
-            .onSuccess { emit(it.body) }
-            .onFailure { emit(null) }
+    fun getUserById(id: UUID): Flow<User?> = flow {
+        userCreds.collect { creds ->
+            val userResponse: HttpResult<User?> = userRepository.getUserById(id, creds?.accessToken)
+            userResponse
+                .onSuccess { emit(it.body) }
+                .onFailure { emit(null) }
+        }
     }
 }

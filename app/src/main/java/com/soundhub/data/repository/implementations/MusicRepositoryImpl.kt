@@ -3,7 +3,6 @@ package com.soundhub.data.repository.implementations
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.soundhub.R
 import com.soundhub.data.api.GenreService
 import com.soundhub.data.api.MusicService
@@ -36,11 +35,7 @@ class MusicRepositoryImpl @Inject constructor(
             Log.d("MusicRepository", "getAllGenres[1]: $response")
 
             if (!response.isSuccessful) {
-                val gson = GsonBuilder()
-                    .setLenient()
-                    .create()
-
-                val errorBody: ErrorResponse = gson
+                val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?:
                     ErrorResponse(

@@ -10,12 +10,15 @@ data class Message(
     val id: UUID = UUID.randomUUID(),
 
     @SerializedName("sender")
-    val sender: User? = null,
+    val sender: User?,
 
     @SerializedName("timestamp")
     val timestamp: LocalDateTime = LocalDateTime.now(),
     val content: String = "",
     val isRead: Boolean = false,
+
+    @SerializedName("chat")
+    val chat: Chat?
 ): Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

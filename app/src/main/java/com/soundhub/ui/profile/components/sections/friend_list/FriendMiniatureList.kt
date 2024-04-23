@@ -1,15 +1,20 @@
 package com.soundhub.ui.profile.components.sections.friend_list
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -18,41 +23,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.components.CircularAvatar
-import com.soundhub.ui.profile.components.FriendMiniatureItem
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.Route
+import com.soundhub.data.model.User
 
 @Composable
-fun FriendMiniatureList(friendList: List<FriendMiniatureItem>, navController: NavHostController) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        modifier = Modifier.clickable { navController.navigate(Route.FriendList.route) }
+fun FriendMiniatureList(friendList: List<User>, navController: NavHostController) {
+    ElevatedCard(
+        onClick = { navController.navigate(Route.FriendList.route) },
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-
-            SectionLabel(text = stringResource(id = R.string.profile_screen_friend_section_caption))
-            Text(
-                text = "${friendList.size}",
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.nunito_bold)),
-                fontSize = 14.sp
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy((-15).dp)
-        ) {
-            friendList.subList(0, if (friendList.size > 10) 9 else friendList.size)
-                .forEach { friend ->
-                    CircularAvatar(
-                        imageUrl = friend.avatarUrl,
-                        modifier = Modifier.size(24.dp)
-                    )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.round_groups_24),
+                    contentDescription = "friends",
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+                SectionLabel(text = stringResource(id = R.string.profile_screen_friend_section_caption))
+                Text(
+                    text = "${friendList.size}",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.nunito_bold)),
+                    fontSize = 14.sp
+                )
             }
+            FriendsMiniaturesRow(friendList = friendList)
         }
     }
+
 }

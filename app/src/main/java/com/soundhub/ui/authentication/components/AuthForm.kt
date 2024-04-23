@@ -43,7 +43,7 @@ import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
 import com.soundhub.ui.authentication.states.AuthFormState
-import com.soundhub.ui.components.CircleLoader
+import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.utils.Validator
 
 @Composable

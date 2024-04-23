@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,13 +14,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
-import com.soundhub.ui.messenger.chat.ChatState
+import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
@@ -33,10 +28,10 @@ fun MessageInputBox(
     authViewModel: AuthenticationViewModel
 ) {
     val messageContent = rememberSaveable { mutableStateOf("") }
-    val chatState: ChatState by chatViewModel.chatState.collectAsState()
-    val authorizedUser: UserState by authViewModel
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val authorizedUserState: UserState by authViewModel
         .userInstance
-        .collectAsState(initial = UserState())
+        .collectAsState()
 
     Row(
         modifier = modifier
@@ -53,27 +48,12 @@ fun MessageInputBox(
             messageContent = messageContent,
             modifier = Modifier.weight(1f)
         )
-        Row {
-            IconButton(onClick = { /*TODO: implement emoji panel */ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_emoji_emotions_24),
-                    contentDescription = "emoji",
-                    tint = colorResource(id = R.color.emoji_btn_dark)
-                )
-            }
-            SendMessageButton(
-                messageContent = messageContent,
-                messageCount = chatState.messages.size,
-                lazyListState = lazyListState,
-                authorizedUser = authorizedUser.current,
-                chatViewModel = chatViewModel
-            )
-        }
+       EmojiAndSendMessageButtonRow(
+           authorizedUserState = authorizedUserState,
+           chatUiState = chatUiState,
+           messageContent = messageContent,
+           lazyListState = lazyListState,
+           chatViewModel = chatViewModel
+       )
     }
 }
-
-//@Composable
-//@Preview
-//fun ChatInputBlockPreview() {
-//    MessageInputBox(lazyListState = rememberLazyListState())
-//}

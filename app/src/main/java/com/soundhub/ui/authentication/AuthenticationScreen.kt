@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import com.soundhub.ui.authentication.components.AuthForm
 import com.soundhub.ui.authentication.components.LoginScreenLogo
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
-import com.soundhub.ui.components.BottomSheet
+import com.soundhub.ui.components.sheets.BottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

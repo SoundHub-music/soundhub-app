@@ -29,7 +29,7 @@ import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.Route
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
-import com.soundhub.ui.components.CircleLoader
+import com.soundhub.ui.components.loaders.CircleLoader
 import kotlinx.coroutines.flow.map
 
 @Composable

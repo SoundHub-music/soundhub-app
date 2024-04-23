@@ -3,7 +3,8 @@ package com.soundhub.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.UiEvent
+import com.soundhub.R
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Post
@@ -57,7 +58,53 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    suspend fun toggleLike(postId: UUID) {
+    fun deletePostById(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
+        userCreds.collect { userCreds ->
+            postRepository.deletePost(
+                accessToken = userCreds.accessToken,
+                postId = id
+            )
+            .onSuccess { response ->
+                Log.d("PostViewModel", "deletePostById: ${response.body}")
+                postUiState.update { state ->
+                    state.copy(posts = state.posts.filter { post -> post.id != id })
+                }
+                uiStateDispatcher.sendUiEvent(
+                    UiEvent.ShowToast(UiText
+                        .StringResource(R.string.toast_post_deleted_successfully))
+                )
+            }
+            .onFailure {
+                uiStateDispatcher
+                    .sendUiEvent(
+                       UiEvent.ShowToast(UiText
+                           .StringResource(R.string.toast_delete_post_error_message))
+                )
+            }
+        }
+    }
+
+    fun updatePost(post: Post, imagesToBeDeleted: List<String> = emptyList()) =
+        viewModelScope.launch(Dispatchers.IO) {
+        userCreds.collect { creds ->
+            postRepository.updatePost(
+                accessToken = creds.accessToken,
+                postId = post.id,
+                post = post,
+                imagesToBeDeleted = imagesToBeDeleted
+            )
+            .onSuccess {
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(UiText
+                    .StringResource(R.string.toast_post_updated_successfully)))
+            }
+            .onFailure {
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(UiText
+                    .StringResource(R.string.toast_update_post_error)))
+            }
+        }
+    }
+
+    fun toggleLike(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         userCreds.collect { creds ->
             postRepository.toggleLike(
                 accessToken = creds.accessToken,
@@ -65,27 +112,32 @@ class PostViewModel @Inject constructor(
             )
             .onSuccess { response ->
                 val updatedPost = response.body
-                postUiState.update { state ->
-                    // updating liked post in posts field
-                    state.copy(
-                        posts = state.posts.map {  post ->
-                            updatedPost?.let {
-                                if (post.id == it.id) {
-                                    post.likes += updatedPost.likes
-                                    post
-                                }
-                                else post
-                            }
-                            post
-                        }
-                    )
-                }
+                updatePostInList(updatedPost)
             }
             .onFailure { response ->
                 uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(UiText.DynamicString(response.errorBody.detail ?: ""))
+                    UiEvent.ShowToast(UiText
+                        .DynamicString(response.errorBody.detail ?: ""))
                 )
             }
+        }
+    }
+
+    private fun updatePostInList(updatedPost: Post?) {
+        postUiState.update { state ->
+            // updating liked post in posts field
+            state.copy(
+                posts = state.posts.map { post ->
+                    updatedPost?.let {
+                        if (post.id == it.id) {
+                            post.likes += updatedPost.likes
+                            post
+                        }
+                        else post
+                    }
+                    post
+                }
+            )
         }
     }
 }

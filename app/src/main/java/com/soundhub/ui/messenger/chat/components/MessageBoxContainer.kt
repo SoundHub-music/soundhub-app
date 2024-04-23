@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.soundhub.data.model.Message
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.ui.messenger.chat.components.message_box.MessageBox
 
 @Composable
 fun MessageBoxContainer(

@@ -12,7 +12,9 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Chat
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.utils.Constants
+import com.soundhub.utils.HttpUtils
 import retrofit2.Response
+import java.util.UUID
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
@@ -22,7 +24,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun getAllChatsByCurrentUser(accessToken: String?): HttpResult<List<Chat>> {
         try {
             val response: Response<List<Chat>> = chatService
-                .getAllChatsByCurrentUser("Bearer $accessToken")
+                .getAllChatsByCurrentUser(HttpUtils.getBearerToken(accessToken))
             Log.d("ChatRepository", "getAllChatsByCurrentUser[1]: $response")
 
             if (!response.isSuccessful) {
@@ -47,11 +49,11 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getChatById(accessToken: String?, chatId: String?): HttpResult<Chat?> {
+    override suspend fun getChatById(accessToken: String?, chatId: UUID): HttpResult<Chat?> {
         try {
             val response: Response<Chat?> = chatService
                 .getChatById(
-                    accessToken = "Bearer $accessToken",
+                    accessToken = HttpUtils.getBearerToken(accessToken),
                     chatId = chatId
             )
 
@@ -81,12 +83,12 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun deleteChatById(
         accessToken: String?,
-        chatId: String?
+        chatId: UUID
     ): HttpResult<ApiStateResponse> {
         try {
             val response: Response<ApiStateResponse> = chatService
                 .deleteChatById(
-                    accessToken = "Bearer $accessToken",
+                    accessToken = HttpUtils.getBearerToken(accessToken),
                     chatId = chatId
             )
             Log.d("ChatRepository", "deleteChatById[1]: $response")
@@ -120,7 +122,7 @@ class ChatRepositoryImpl @Inject constructor(
         try {
             val response: Response<Chat> = chatService
                 .createChat(
-                    accessToken = "Bearer $accessToken",
+                    accessToken = HttpUtils.getBearerToken(accessToken),
                     body = body
             )
             Log.d("ChatRepository", "createChat[1]: $response")

@@ -24,7 +24,6 @@ import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
 import com.soundhub.ui.edit_profile.EditUserProfileViewModel
 import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.navigation.NavigationHost
 import com.soundhub.utils.Constants
 
@@ -34,10 +33,9 @@ fun HomeScreen(
     navController: NavHostController,
     authViewModel: AuthenticationViewModel,
     uiStateDispatcher: UiStateDispatcher,
-    chatViewModel: ChatViewModel,
     registrationViewModel: RegistrationViewModel,
     messengerViewModel: MessengerViewModel,
-    editUserProfileViewModel: EditUserProfileViewModel 
+    editUserProfileViewModel: EditUserProfileViewModel,
 ) {
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
@@ -45,8 +43,11 @@ fun HomeScreen(
 
     val authorizedUser: UserState by authViewModel
         .userInstance
-        .collectAsState(initial = UserState())
-    val userAvatar by authViewModel.currentUserAvatar.collectAsState()
+        .collectAsState()
+
+    val userAvatar by authViewModel
+        .currentUserAvatar
+        .collectAsState()
 
     LaunchedEffect(key1 = userAvatar) {
         Log.d("HomeScreen", "user_avatar: $userAvatar")
@@ -62,30 +63,30 @@ fun HomeScreen(
                 topBarTitle = topBarTitle.value,
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
-                chatViewModel = chatViewModel,
             )
         },
         bottomBar = {
+            authorizedUser.current?.let { user ->
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
                 BottomNavigationBar(
                     navController = navController,
                     messengerViewModel = messengerViewModel,
-                    user = authorizedUser.current,
+                    user = user,
                     uiStateDispatcher = uiStateDispatcher
                 )
+            }
         }
     ) {
-       NavigationHost(
+        NavigationHost(
            padding = it,
            navController = navController,
            authViewModel = authViewModel,
            registrationViewModel = registrationViewModel,
            uiStateDispatcher = uiStateDispatcher,
-           chatViewModel = chatViewModel,
            messengerViewModel = messengerViewModel,
            editUserProfileViewModel = editUserProfileViewModel,
            topBarTitle = topBarTitle,
            authorizedUser = authorizedUser
-       )
+        )
     }
 }

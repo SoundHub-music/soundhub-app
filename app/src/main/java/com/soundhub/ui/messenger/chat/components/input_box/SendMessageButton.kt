@@ -8,9 +8,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
+import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import kotlinx.coroutines.launch
 
@@ -23,13 +26,15 @@ fun SendMessageButton(
     authorizedUser: User?
 ) {
     val scope = rememberCoroutineScope()
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 
     IconButton(
         enabled = messageContent.value.isNotEmpty(),
         onClick = {
         chatViewModel.sendMessage(Message(
             content = messageContent.value,
-            sender = authorizedUser
+            sender = authorizedUser,
+            chat = chatUiState.chat
         ))
 
         messageContent.value = ""

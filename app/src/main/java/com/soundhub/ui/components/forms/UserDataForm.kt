@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.components.AvatarPicker
+import com.soundhub.ui.components.avatar.AvatarPicker
 import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.CountryDropdownField
 import com.soundhub.ui.components.fields.GenderDropdownField

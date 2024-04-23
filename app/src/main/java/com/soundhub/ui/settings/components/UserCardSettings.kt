@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.states.UserState
-import com.soundhub.ui.components.CircularAvatar
+import com.soundhub.ui.components.avatar.CircularAvatar
 
 @Composable
 internal fun UserCardSettings(authViewModel: AuthenticationViewModel) {

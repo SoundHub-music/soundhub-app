@@ -9,7 +9,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.UiEvent
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Gender

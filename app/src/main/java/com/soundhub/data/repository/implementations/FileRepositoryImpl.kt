@@ -9,6 +9,7 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.utils.Constants
+import com.soundhub.utils.HttpUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -33,7 +34,7 @@ class FileRepositoryImpl @Inject constructor(
                 ?.replace("localhost", Constants.SOUNDHUB_API_HOSTNAME)
 
             val response: Response<ResponseBody> = fileService.getFile(
-                accessToken = "Bearer $accessToken",
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 fileName = "$fileNameWithServerIp?folderName=$folderName"
             )
 

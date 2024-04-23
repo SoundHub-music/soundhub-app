@@ -8,37 +8,45 @@ data class Chat(
     @SerializedName("id")
     val id: UUID = UUID.randomUUID(),
 
-    val lastMessage: String = "",
-    val unreadMessageCount: Int = 0,
-
     @SerializedName("messages")
-    val messages: List<Message> = emptyList(),
+    var messages: List<Message> = emptyList(),
 
     @SerializedName("participants")
-    val participants: List<User?> = emptyList()
+    val participants: List<User> = emptyList(),
+    val isGroup: Boolean = false,
+    val chatName: String? = null,
+
+    @SerializedName("createdBy")
+    val createdBy: User
 ): Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as Chat
-        return id == other.id &&
-                lastMessage == other.lastMessage &&
-                unreadMessageCount == other.unreadMessageCount &&
-                messages == other.messages &&
-                participants == other.participants
+
+        if (id != other.id) return false
+        if (messages != other.messages) return false
+        if (participants != other.participants) return false
+        if (isGroup != other.isGroup) return false
+        if (chatName != other.chatName) return false
+        if (createdBy != other.createdBy) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + lastMessage.hashCode()
-        result = 31 * result + unreadMessageCount
         result = 31 * result + messages.hashCode()
         result = 31 * result + participants.hashCode()
+        result = 31 * result + isGroup.hashCode()
+        result = 31 * result + (chatName?.hashCode() ?: 0)
+        result = 31 * result + (createdBy.hashCode())
         return result
     }
 
     override fun toString(): String {
-        return "Chat(id=$id, lastMessage='$lastMessage', unreadMessageCount=$unreadMessageCount, messages=$messages, participants=$participants)"
+        return "Chat(id=$id, messages=$messages, participants=$participants, isGroup=$isGroup, chatName=$chatName, createdBy=$createdBy)"
     }
+
 }

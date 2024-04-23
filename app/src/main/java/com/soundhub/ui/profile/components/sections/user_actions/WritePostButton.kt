@@ -18,7 +18,7 @@ internal fun WritePostButton(
     navController: NavHostController
 ) {
     FilledTonalIconButton(
-        onClick = { navController.navigate(Route.CreatePost.route) },
+        onClick = { navController.navigate(Route.PostEditor.createPostRoute) },
         shape = RoundedCornerShape(10.dp),
         modifier = modifier.size(48.dp)
     ) {

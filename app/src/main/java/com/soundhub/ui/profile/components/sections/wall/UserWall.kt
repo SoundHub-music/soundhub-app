@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,9 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.components.CircleLoader
-import com.soundhub.ui.postline.components.post_card.PostCard
+import com.soundhub.ui.components.loaders.CircleLoader
+import com.soundhub.ui.components.post_card.PostCard
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.ui.states.PostUiState
 import com.soundhub.ui.viewmodels.PostViewModel
@@ -42,7 +42,8 @@ internal fun UserWall(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -59,6 +60,8 @@ internal fun UserWall(
 
         if (postUiState.isLoading)
             CircleLoader(modifier = Modifier.padding(top = 10.dp))
+        else if (postUiState.posts.isEmpty())
+            Text(text = stringResource(id = R.string.empty_postline_screen))
         else postUiState
             .posts.forEach {
             PostCard(

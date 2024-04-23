@@ -17,11 +17,11 @@ internal fun SendFriendRequestButton(modifier: Modifier = Modifier) {
             .size(48.dp),
         shape = RoundedCornerShape(10.dp),
         checked = true,
-        onCheckedChange = {},
+        onCheckedChange = { /* TODO: implement sending request logic */ },
     ) {
         Icon(
             painter = painterResource(id = R.drawable.baseline_person_add),
-            contentDescription = null
+            contentDescription = "add friend button"
         )
     }
 }
