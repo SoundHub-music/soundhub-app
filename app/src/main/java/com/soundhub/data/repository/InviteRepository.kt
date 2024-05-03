@@ -22,6 +22,11 @@ interface InviteRepository {
 
     suspend fun getAllInvites(accessToken: String?): HttpResult<List<Invite>>
 
+    suspend fun getAllInvitesBySenderId(
+        accessToken: String?,
+        senderId: UUID
+    ): HttpResult<List<Invite>>
+
     suspend fun deleteInvite(
         accessToken: String?,
         inviteId: UUID

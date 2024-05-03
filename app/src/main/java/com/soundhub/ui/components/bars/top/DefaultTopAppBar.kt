@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,15 +26,13 @@ fun DefaultTopAppBar(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher
 ) {
-    val isSearchBarActive = uiStateDispatcher
-        .uiState
-        .collectAsState()
-        .value
-        .isSearchBarActive
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val isSearchBarActive = uiState.isSearchBarActive
 
     TopAppBar(
         title = {
-            if (!isSearchBarActive) Text(text = topBarTitle ?: "")
+            if (!isSearchBarActive)
+                Text(text = topBarTitle ?: "")
         },
         navigationIcon = {
             if (!isSearchBarActive)

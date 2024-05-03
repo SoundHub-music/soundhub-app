@@ -10,9 +10,9 @@ import com.soundhub.data.api.UserService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.ContentTypes
-import com.soundhub.utils.converters.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -30,7 +30,7 @@ class UserRepositoryImpl @Inject constructor(
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
         .create()
 
-    override suspend fun getUserById(id: UUID?, accessToken: String?): HttpResult<User?> {
+    override suspend fun getUserById(accessToken: String?, id: UUID?): HttpResult<User?> {
         try {
             val response: Response<User?> = userService.getUserById(
                 id = id,
@@ -46,7 +46,7 @@ class UserRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                Log.d("UserRepository", "getUserById[2]: $errorBody")
+                Log.e("UserRepository", "getUserById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -61,27 +61,38 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUser(accessToken: String?): HttpResult<User?> {
+    override suspend fun getCurrentUser(accessToken: String): HttpResult<User?> {
         try {
-            val response: Response<User?> = userService.getCurrentUser(
+            val currentUserResponse: Response<User?> = userService.getCurrentUser(
                 accessToken = HttpUtils.getBearerToken(accessToken)
             )
-            Log.d("UserRepository", "getCurrentUser[1]: $response")
 
-            if (!response.isSuccessful) {
+            Log.d("UserRepository", "getCurrentUser[1]: $currentUserResponse")
+
+            if (!currentUserResponse.isSuccessful) {
                 val errorBody: ErrorResponse = gson
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    .fromJson(currentUserResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
-                        status = response.code(),
+                        status = currentUserResponse.code(),
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                Log.d("UserRepository", "getCurrentUser[2]: ${errorBody.toString()}")
-                response.headers()
+                Log.e("UserRepository", "getCurrentUser[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
-            return HttpResult.Success(body = response.body())
+            val user: User? = currentUserResponse.body()
+            user?.let {
+                getFriendsByUserId(
+                    accessToken = accessToken,
+                    userId = it.id
+                )
+                .onSuccess { response ->
+                    user.friends = response.body ?: emptyList()
+                }
+            }
+
+            return HttpResult.Success(body = user)
         }
         catch (e: Exception) {
             Log.e("UserRepository", "getCurrentUser[3]: ${e.stackTraceToString()}")
@@ -92,7 +103,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserById(user: User?, accessToken: String?): HttpResult<User> {
+    override suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User> {
         try {
             val avatarFormData: MultipartBody.Part? = HttpUtils
                 .prepareMediaFormData(user?.avatarUrl, context)
@@ -115,7 +126,7 @@ class UserRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_update_error)
                     )
 
-                Log.d("UserRepository", "updateUserById[2]: $errorBody")
+                Log.e("UserRepository", "updateUserById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -123,7 +134,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
         catch (e: Exception) {
-            Log.d("UserRepository", "updateUserById[3]: ${e.stackTraceToString()}")
+            Log.e("UserRepository", "updateUserById[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e
@@ -147,7 +158,7 @@ class UserRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                Log.d("UserRepository", "addFriend[2]: $errorBody")
+                Log.e("UserRepository", "addFriend[2]: $errorBody")
                 response.headers()
                 return HttpResult.Error(errorBody = errorBody)
             }
@@ -179,8 +190,7 @@ class UserRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                Log.d("UserRepository", "addFriend[2]: $errorBody")
-                response.headers()
+                Log.e("UserRepository", "addFriend[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -214,7 +224,7 @@ class UserRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                Log.d("UserRepository", "getRecommendedFriends[2]: $errorBody")
+                Log.e("UserRepository", "getRecommendedFriends[2]: $errorBody")
                 response.headers()
                 return HttpResult.Error(errorBody = errorBody)
             }
@@ -223,6 +233,37 @@ class UserRepositoryImpl @Inject constructor(
         }
         catch (e: Exception) {
             Log.e("UserRepository", "getRecommendedFriends[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
+    }
+
+    override suspend fun getFriendsByUserId(
+        accessToken: String?,
+        userId: UUID
+    ): HttpResult<List<User>> {
+        try {
+            val response: Response<List<User>> = userService.getFriendsByUserId(
+                accessToken = HttpUtils.getBearerToken(accessToken),
+                userId = userId
+            )
+            Log.e("UserRepository", "getFriendsByUserId[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorResponse: ErrorResponse = gson
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
+
+                Log.e("UserRepository", "getFriendsByUserId[2]: $errorResponse")
+                return HttpResult.Error(errorBody = errorResponse)
+            }
+
+            return HttpResult.Success(response.body())
+        }
+        catch (e: Exception) {
+            Log.e("UserRepository", "getFriendsByUserId[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

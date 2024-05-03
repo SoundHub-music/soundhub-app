@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -19,6 +19,19 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <service
+            android:name=".services.NotificationAndroidService"
+            android:exported="false"
+            android:enabled="true"
+        />
+
+        <service
+            android:name=".services.MessengerAndroidService"
+            android:exported="false"
+            android:enabled="true"
+        />
+
         <activity
             android:name=".ui.activities.MainActivity"
             android:exported="true"

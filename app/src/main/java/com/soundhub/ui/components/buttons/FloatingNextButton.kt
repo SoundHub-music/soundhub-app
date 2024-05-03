@@ -31,6 +31,6 @@ fun FloatingNextButton(
 
 @Preview
 @Composable
-fun NextButtonPreview() {
+private fun NextButtonPreview() {
     FloatingNextButton {}
 }

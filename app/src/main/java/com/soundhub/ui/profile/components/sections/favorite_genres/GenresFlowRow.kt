@@ -49,10 +49,7 @@ internal fun GenresFlowRow(
         }
 
         if (isOriginProfile) IconButton(
-            onClick = {
-                /* TODO: implement adding favorite genre logic */
-                navController.navigate(Route.Authentication.ChooseGenres.route)
-            },
+            onClick = { navController.navigate(Route.EditFavoriteGenres.route) },
             modifier = Modifier.size(40.dp)
         ) { Icon(Icons.Rounded.Add, contentDescription = "add genre button") }
     }

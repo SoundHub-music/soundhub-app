@@ -5,10 +5,11 @@ import com.soundhub.data.model.User
 import java.util.UUID
 
 interface UserRepository {
-    suspend fun getUserById(id: UUID?, accessToken: String?): HttpResult<User?>
-    suspend fun getCurrentUser(accessToken: String?): HttpResult<User?>
-    suspend fun updateUserById(user: User?, accessToken: String?): HttpResult<User>
+    suspend fun getUserById(accessToken: String?, id: UUID?): HttpResult<User?>
+    suspend fun getCurrentUser(accessToken: String): HttpResult<User?>
+    suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User>
     suspend fun addFriend(accessToken: String?, friendId: UUID): HttpResult<User>
     suspend fun deleteFriend(accessToken: String?, friendId: UUID): HttpResult<User>
     suspend fun getRecommendedFriends(accessToken: String?, userId: UUID?): HttpResult<List<User>>
+    suspend fun getFriendsByUserId(accessToken: String?, userId: UUID): HttpResult<List<User>>
 }

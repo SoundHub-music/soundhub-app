@@ -16,25 +16,25 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface AuthService {
-    @POST(ApiEndpoints.SoundHub.SIGN_UP)
+    @POST(ApiEndpoints.Authentication.SIGN_UP)
     @Multipart
     suspend fun signUp(
         @Part(value = "userData") userData: RequestBody,
         @Part file: MultipartBody.Part?
     ): Response<UserPreferences>
 
-    @POST(ApiEndpoints.SoundHub.SIGN_IN)
+    @POST(ApiEndpoints.Authentication.SIGN_IN)
     suspend fun signIn(
         @Body userData: SignInRequestBody
     ): Response<UserPreferences>
 
-    @POST(ApiEndpoints.SoundHub.LOGOUT)
+    @POST(ApiEndpoints.Authentication.LOGOUT)
     suspend fun logout(
         @Header(HttpUtils.AUTHORIZATION_HEADER)
         accessToken: String?
     ): Response<LogoutResponse>
 
-    @POST(ApiEndpoints.SoundHub.REFRESH_TOKEN)
+    @POST(ApiEndpoints.Authentication.REFRESH_TOKEN)
     suspend fun refreshToken(
         @Body refreshToken: RefreshTokenRequestBody
     ): Response<UserPreferences>

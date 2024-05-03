@@ -28,4 +28,6 @@ sealed class HttpResult<T>(val status: ApiStatus) {
             callback(this)
         return this
     }
+
+    fun getOrNull(): T? = if (this is Success) body else null
 }

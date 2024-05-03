@@ -1,12 +1,12 @@
 package com.soundhub.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
@@ -39,21 +39,22 @@ class PostViewModel @Inject constructor(
 
     fun getPostsByUser(user: User?) =
         viewModelScope.launch(Dispatchers.IO) {
-            postUiState.update { it.copy(isLoading = true) }
             user?.let { user ->
                 postRepository.getPostsByAuthorId(
                 authorId = user.id,
                 accessToken = userCreds.firstOrNull()?.accessToken
             )
             .onSuccess { response ->
-                Log.d("AuthenticationViewModel", "getCurrentUserPosts[1]: ${response.body}")
                 postUiState.update { it.copy(
                     posts = response.body?.sortedByDescending { p -> p.publishDate }
-                        ?: emptyList()
+                        ?: emptyList(),
+                    status = ApiStatus.SUCCESS
                 ) }
             }
-            .finally {
-                postUiState.update { it.copy(isLoading = false) }
+            .onFailure {
+                postUiState.update {
+                    it.copy(status = ApiStatus.ERROR)
+                }
             }
         }
     }
@@ -64,8 +65,7 @@ class PostViewModel @Inject constructor(
                 accessToken = userCreds.accessToken,
                 postId = id
             )
-            .onSuccess { response ->
-                Log.d("PostViewModel", "deletePostById: ${response.body}")
+            .onSuccess {
                 postUiState.update { state ->
                     state.copy(posts = state.posts.filter { post -> post.id != id })
                 }

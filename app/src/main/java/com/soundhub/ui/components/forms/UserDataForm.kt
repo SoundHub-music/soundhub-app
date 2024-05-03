@@ -30,7 +30,7 @@ import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.CountryDropdownField
 import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

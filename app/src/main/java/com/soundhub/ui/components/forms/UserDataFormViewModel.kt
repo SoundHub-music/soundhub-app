@@ -2,16 +2,15 @@ package com.soundhub.ui.components.forms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.data.api.responses.HttpResult
+import com.soundhub.data.dao.CountryDao
+import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.model.Country
 import com.soundhub.data.repository.CountryRepository
-import com.soundhub.domain.usecases.GetImageUseCase
+import com.soundhub.domain.usecases.file.GetImageUseCase
 import com.soundhub.utils.MediaFolder
-import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -19,34 +18,34 @@ import javax.inject.Inject
 @HiltViewModel
 class UserDataFormViewModel @Inject constructor(
     private val countryRepository: CountryRepository,
-    private val uiStateDispatcher: UiStateDispatcher,
-    private val getImageUseCase: GetImageUseCase
+    private val getImageUseCase: GetImageUseCase,
+    appDb: AppDatabase
 ): ViewModel() {
-    var countryList = MutableStateFlow<List<Country>>(emptyList())
-        private set
-
-    var isLoading = MutableStateFlow(false)
-        private set
+    val countryList = MutableStateFlow<List<Country>>(emptyList())
+    val isLoading = MutableStateFlow(false)
+    private val countryDao: CountryDao = appDb.countryDao()
 
     init {
         viewModelScope.launch {
-            isLoading.value = true
-            val response: HttpResult<List<Country>> = countryRepository.getAllCountryNames()
-            response.onSuccess { countries ->
-                countryList.value = countries.body
-                    ?.sortedBy { it.translations.rus.common } ?: emptyList()
-            }
-            .onFailure {
-                uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(
-                        UiText.DynamicString(
-                            it.errorBody.detail ?: it.throwable?.message ?: ""
-                        )
-                    )
-                )
-            }
-            isLoading.value = false
+            loadCountries()
         }
+    }
+
+    private suspend fun loadCountries() {
+        isLoading.value = true
+        var countries: List<Country> = countryDao.getCountries()
+
+        if (countries.isEmpty()) {
+            countryRepository.getAllCountryNames()
+                .onSuccess {
+                    response -> countries = response.body
+                    ?: emptyList()
+                }
+        }
+        countryList.update {
+            countries.sortedBy { it.translations.rus.common }
+        }
+        isLoading.value = false
     }
 
     suspend fun getAvatar(avatarUrl: String?, accessToken: String?): File? {

@@ -8,17 +8,21 @@ import com.soundhub.Route
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
-import com.soundhub.data.repository.MusicRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RegisterRequestBody
+import com.soundhub.data.dao.UserDao
+import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
+import com.soundhub.domain.usecases.music.LoadArtistsUseCase
+import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
 import com.soundhub.ui.authentication.postregistration.states.GenreUiState
 import com.soundhub.ui.authentication.states.AuthFormState
 import com.soundhub.ui.authentication.postregistration.states.RegistrationState
+import com.soundhub.ui.states.UiState
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import com.soundhub.utils.mappers.RegisterDataMapper
@@ -26,6 +30,8 @@ import com.soundhub.utils.mappers.UserMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
@@ -35,59 +41,34 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-    private val musicRepository: MusicRepository,
     private val uiStateDispatcher: UiStateDispatcher,
     private val authRepository: AuthRepository,
-    private val userCredsStore: UserCredsStore
+    private val userCredsStore: UserCredsStore,
+    private val loadGenresUseCase: LoadGenresUseCase,
+    private val loadArtistsUseCase: LoadArtistsUseCase,
+    appDb: AppDatabase
 ): ViewModel() {
-    var genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
-        private set
-    var artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
-        private set
-    var registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
-        private set
+    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState.asStateFlow()
+    private val userDao: UserDao = appDb.userDao()
 
+    val genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
+    val artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
+    val registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
 
-    init {
-        viewModelScope.launch {
-            loadGenres()
-        }
-    }
+    init { viewModelScope.launch { loadGenres() } }
 
     private suspend fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
-        musicRepository.getAllGenres(50)
-            .onSuccess { successResponse ->
-                genreUiState.update {
-                    it.copy(
-                        status = successResponse.status,
-                        genres = successResponse.body ?: emptyList()
-//                            ?.topTags
-//                            ?.tag
-//                            ?.map { tag -> Genre(name = tag.name) }
-//                            ?: emptyList()
-                    )
-                }
-            }
-            .onFailure {
-                it.errorBody.detail?.let { error ->
-                    uiStateDispatcher.sendUiEvent(
-                        UiEvent.ShowToast(UiText.DynamicString(error))
-                    )
-                }
-            }
+        loadGenresUseCase(
+            countPerPage = 50,
+            genreUiState = genreUiState
+        )
     }
 
     private suspend fun loadArtists() = viewModelScope.launch(Dispatchers.IO) {
-        musicRepository.loadArtistByGenresToState(
-            genres = genreUiState.value.chosenGenres.map { it.name ?: "" },
-            styles = genreUiState.value.chosenGenres.map { it.name ?: "" },
-            artistState = artistUiState
+        loadArtistsUseCase(
+            genreUiState = genreUiState,
+            artistUiState = artistUiState
         )
-        .finally { response ->
-            artistUiState.update {
-                it.copy(status = response.status)
-            }
-        }
     }
 
     override fun onCleared() {
@@ -95,15 +76,15 @@ class RegistrationViewModel @Inject constructor(
         Log.d("PostRegistrationViewModel", "viewmodel was cleared")
     }
 
-    fun setChosenGenres(list: List<Genre>) = genreUiState.update { it.copy(chosenGenres = list) }
+    fun addChosenGenre(list: List<Genre>) = genreUiState.update { it.copy(chosenGenres = list) }
 
-    fun setChosenGenres(genre: Genre) = genreUiState.update {
+    fun addChosenGenre(genre: Genre) = genreUiState.update {
         it.copy(chosenGenres =  it.chosenGenres + genre)
     }
 
-    fun setChosenArtists(list: List<Artist>) = artistUiState.update { it.copy(chosenArtists = list) }
+    fun addChosenArtist(list: List<Artist>) = artistUiState.update { it.copy(chosenArtists = list) }
 
-    fun setChosenArtists(artist: Artist) = artistUiState.update {
+    fun addChosenArtist(artist: Artist) = artistUiState.update {
         it.copy(chosenArtists = it.chosenArtists + artist)
     }
 
@@ -129,7 +110,7 @@ class RegistrationViewModel @Inject constructor(
             }
         }
         catch (e: IllegalArgumentException) {
-            Log.e("AuthViewModel", "setGender: ${e.message}")
+            Log.e("RegistrationViewModel", "setGender: ${e.message}")
             registerState.update {
                 it.copy(gender = Gender.UNKNOWN)
             }
@@ -148,43 +129,49 @@ class RegistrationViewModel @Inject constructor(
         it.copy(avatarUrl = avatarUrl?.toString())
     }
 
-    fun onPostRegisterNextBtnClick(currentRoute: Route) {
-        Log.d(
-            "RegistrationViewModel",
-            "onPostRegisterNextButtonClick: ${registerState.value}"
-        )
-        when (currentRoute) {
-            is Route.Authentication.ChooseGenres -> viewModelScope.launch(Dispatchers.IO) {
-                registerState.update {
-                    it.copy(favoriteGenres = genreUiState.value.chosenGenres)
-                }
-                loadArtists()
-                onEvent(RegistrationEvent.OnChooseArtists)
-            }
-            is Route.Authentication.ChooseArtists -> {
-                registerState.update {
-                    it.copy(favoriteArtists = artistUiState.value.chosenArtists)
-                }
-                onEvent(RegistrationEvent.OnFillUserData)
-            }
-            is Route.Authentication.FillUserData -> {
-                registerState.update {
-                    it.copy(
-                        isFirstNameValid = it.firstName?.isNotEmpty() ?: false,
-                        isLastNameValid = it.lastName?.isNotEmpty() ?: false,
-                        isBirthdayValid = it.birthday != null
-                    )
-                }
-
-                if (Validator.validateRegistrationState(registerState.value)) {
-                    val userMapper: UserMapper = Mappers.getMapper(UserMapper::class.java)
-                    val user: User = userMapper.fromRegistrationState(registerState.value)
-                    onEvent(RegistrationEvent.OnRegister(user))
-                }
-            }
+    fun onPostRegisterNextBtnClick() {
+        Log.d("RegistrationViewModel", "onPostRegisterNextButtonClick: ${registerState.value}")
+        val uiState = uiState.value
+        when (uiState.currentRoute) {
+            Route.Authentication.ChooseGenres.route -> handleChooseGenres()
+            Route.Authentication.ChooseArtists.route -> handleChooseArtists()
+            Route.Authentication.FillUserData.route -> handleFillUserData()
             else -> Unit
         }
     }
+
+    private fun handleChooseGenres() = viewModelScope.launch(Dispatchers.IO) {
+        registerState.update {
+            it.copy(favoriteGenres = genreUiState.value.chosenGenres)
+        }
+        loadArtists()
+        onEvent(RegistrationEvent.OnChooseArtists)
+    }
+
+    private fun handleChooseArtists() {
+        registerState.update {
+            it.copy(favoriteArtists = artistUiState.value.chosenArtists)
+        }
+        onEvent(RegistrationEvent.OnFillUserData)
+    }
+
+    private fun handleFillUserData() {
+        registerState.update {
+            it.copy(
+                isFirstNameValid = it.firstName?.isNotEmpty() ?: false,
+                isLastNameValid = it.lastName?.isNotEmpty() ?: false,
+                isBirthdayValid = it.birthday != null
+            )
+        }
+
+        if (Validator.validateRegistrationState(registerState.value)) {
+            val user: User = Mappers
+                .getMapper(UserMapper::class.java)
+                .fromRegistrationState(registerState.value)
+            onEvent(RegistrationEvent.OnRegister(user))
+        }
+    }
+
 
     fun onSignUpButtonClick(authForm: AuthFormState) {
         Log.d("PostRegistrationViewModel", "authForm: $authForm")
@@ -199,42 +186,47 @@ class RegistrationViewModel @Inject constructor(
 
     private fun onEvent(event: RegistrationEvent) {
         when (event) {
-            is RegistrationEvent.OnRegister -> viewModelScope.launch {
-                val registerDataMapper: RegisterDataMapper = Mappers
-                    .getMapper(RegisterDataMapper::class.java)
-
-                val registerRequestBody: RegisterRequestBody = registerDataMapper
-                    .registerStateToRegisterRequestBody(registerState.value)
-
-                authRepository
-                    .signUp(registerRequestBody)
-                    .onSuccess {
-                        userCredsStore.updateCreds(it.body)
-                        uiStateDispatcher.sendUiEvent(UiEvent.UpdateUserInstance(event.user))
-                        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
-                    }
-                    .onFailure {
-                        it.errorBody.detail?.let { error ->
-                            uiStateDispatcher.sendUiEvent(
-                                UiEvent.ShowToast(
-                                    UiText.DynamicString(error)
-                                )
-                            )
-                        }
-                    }
-            }
-
-            is RegistrationEvent.OnChooseGenres -> viewModelScope.launch {
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseGenres))
-            }
-
-            is RegistrationEvent.OnChooseArtists -> viewModelScope.launch {
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseArtists))
-            }
-
-            is RegistrationEvent.OnFillUserData -> viewModelScope.launch {
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.FillUserData))
-            }
+            is RegistrationEvent.OnRegister -> handleRegister(event)
+            is RegistrationEvent.OnChooseGenres -> handleNavigateToChooseGenres()
+            is RegistrationEvent.OnChooseArtists -> handleNavigateToChooseArtists()
+            is RegistrationEvent.OnFillUserData -> handleNavigateToFillUserData()
         }
+    }
+
+    private fun handleNavigateToChooseGenres() = viewModelScope.launch(Dispatchers.IO) {
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseGenres))
+    }
+
+    private fun handleNavigateToChooseArtists() = viewModelScope.launch {
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.ChooseArtists))
+    }
+
+    private fun handleNavigateToFillUserData() = viewModelScope.launch {
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication.FillUserData))
+    }
+
+    private fun handleRegister(event: RegistrationEvent.OnRegister) = viewModelScope.launch(Dispatchers.IO) {
+        val registerRequestBody: RegisterRequestBody = Mappers
+            .getMapper(RegisterDataMapper::class.java)
+            .registerStateToRegisterRequestBody(registerState.value)
+
+        authRepository
+            .signUp(registerRequestBody)
+            .onSuccess { response ->
+                userCredsStore.updateCreds(response.body)
+                userDao.saveUser(event.user)
+
+                uiStateDispatcher.sendUiEvent(UiEvent.UpdateUserInstance(event.user))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+            }
+            .onFailure {
+                it.errorBody.detail?.let { error ->
+                    uiStateDispatcher.sendUiEvent(
+                        UiEvent.ShowToast(
+                            UiText.DynamicString(error)
+                        )
+                    )
+                }
+            }
     }
 }

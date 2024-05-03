@@ -9,13 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
+import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
 
 @Composable
 fun UserFriendsPage(
     friendList: List<User>,
     navController: NavHostController,
-    chosenPage: FriendListPage
+    chosenPage: FriendListPage,
+    friendsViewModel: FriendsViewModel
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -25,7 +27,8 @@ fun UserFriendsPage(
             FriendCard(
                 user = user,
                 navController = navController,
-                chosenPage = chosenPage
+                chosenPage = chosenPage,
+                friendsViewModel = friendsViewModel
             )
         }
     }

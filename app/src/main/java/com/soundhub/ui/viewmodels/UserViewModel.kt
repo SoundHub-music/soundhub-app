@@ -21,7 +21,7 @@ class UserViewModel @Inject constructor(
 
     fun getUserById(id: UUID): Flow<User?> = flow {
         userCreds.collect { creds ->
-            val userResponse: HttpResult<User?> = userRepository.getUserById(id, creds?.accessToken)
+            val userResponse: HttpResult<User?> = userRepository.getUserById(creds?.accessToken, id)
             userResponse
                 .onSuccess { emit(it.body) }
                 .onFailure { emit(null) }

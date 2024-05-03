@@ -10,7 +10,7 @@ import com.soundhub.data.api.LastFmService
 import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.PostService
 import com.soundhub.data.api.UserService
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

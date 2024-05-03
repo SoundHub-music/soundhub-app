@@ -1,11 +1,13 @@
 package com.soundhub.ui.components.bars.top
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,20 +29,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.Route
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopAppBar(
     navController: NavHostController,
-    chatViewModel: ChatViewModel,
-    uiStateDispatcher: UiStateDispatcher
+    chatViewModel: ChatViewModel
 ) {
+    val chatUiState by chatViewModel.chatUiState.collectAsState()
+
     TopAppBar(
-        title = { InterlocutorDetails(chatViewModel) },
+        title = { InterlocutorDetails(
+            chatUiState = chatUiState,
+            navController = navController
+        ) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
@@ -49,19 +57,23 @@ fun ChatTopAppBar(
                 )
             }
         },
-        actions = { TopBarActions(
+        actions = { ChatTopBarActions(
             navController = navController,
-            uiStateDispatcher = uiStateDispatcher
+            chatState = chatUiState,
+            chatViewModel = chatViewModel
         ) }
     )
 }
 
 @Composable
-private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
-    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+private fun InterlocutorDetails(
+    chatUiState: ChatUiState,
+    navController: NavHostController
+) {
     val friendName = "${chatUiState.interlocutor?.firstName} ${chatUiState.interlocutor?.lastName}"
         .trim()
 
+    val interlocutor: User? = chatUiState.interlocutor
     val isOnline = false
     val indicator = painterResource(
         id = if (isOnline) R.drawable.online_indicator
@@ -71,7 +83,10 @@ private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(end = 10.dp)
+        modifier = Modifier
+            .clip(RoundedCornerShape(5.dp))
+            .clickable { onInterlocutorDetailsClick(interlocutor, navController) }
+            .padding(horizontal = 10.dp)
     ) {
         CircularAvatar(modifier = Modifier.size(40.dp))
 
@@ -90,7 +105,7 @@ private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
             ) {
                 Image(
                     painter = indicator,
-                    contentDescription = null,
+                    contentDescription = "online indicator",
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
@@ -101,4 +116,12 @@ private fun InterlocutorDetails(chatViewModel: ChatViewModel) {
             }
         }
     }
+}
+
+private fun onInterlocutorDetailsClick(
+    interlocutor: User?,
+    navController: NavHostController
+) = interlocutor?.let {
+        navController.navigate(Route.Profile
+                .getStringRouteWithNavArg(it.id.toString()))
 }

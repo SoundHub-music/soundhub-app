@@ -16,16 +16,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
-import com.soundhub.ui.edit_profile.EditUserProfileViewModel
+import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.navigation.NavigationHost
-import com.soundhub.utils.Constants
+import com.soundhub.ui.notifications.NotificationViewModel
+import com.soundhub.ui.states.UiState
+import com.soundhub.utils.constants.Constants
+import java.io.File
 
 @Composable
 fun HomeScreen(
@@ -36,18 +39,15 @@ fun HomeScreen(
     registrationViewModel: RegistrationViewModel,
     messengerViewModel: MessengerViewModel,
     editUserProfileViewModel: EditUserProfileViewModel,
+    notificationViewModel: NotificationViewModel
 ) {
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
     val topBarTitle: MutableState<String?> = rememberSaveable { mutableStateOf(null) }
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
 
-    val authorizedUser: UserState by authViewModel
-        .userInstance
-        .collectAsState()
-
-    val userAvatar by authViewModel
-        .currentUserAvatar
-        .collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
+    val userAvatar: File? = authorizedUser?.avatarImageFile
 
     LaunchedEffect(key1 = userAvatar) {
         Log.d("HomeScreen", "user_avatar: $userAvatar")
@@ -66,7 +66,7 @@ fun HomeScreen(
             )
         },
         bottomBar = {
-            authorizedUser.current?.let { user ->
+            authorizedUser?.let { user ->
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
                 BottomNavigationBar(
                     navController = navController,
@@ -78,15 +78,16 @@ fun HomeScreen(
         }
     ) {
         NavigationHost(
-           padding = it,
-           navController = navController,
-           authViewModel = authViewModel,
-           registrationViewModel = registrationViewModel,
-           uiStateDispatcher = uiStateDispatcher,
-           messengerViewModel = messengerViewModel,
-           editUserProfileViewModel = editUserProfileViewModel,
-           topBarTitle = topBarTitle,
-           authorizedUser = authorizedUser
+            padding = it,
+            navController = navController,
+            authViewModel = authViewModel,
+            registrationViewModel = registrationViewModel,
+            uiStateDispatcher = uiStateDispatcher,
+            messengerViewModel = messengerViewModel,
+            editUserProfileViewModel = editUserProfileViewModel,
+            notificationViewModel = notificationViewModel,
+            topBarTitle = topBarTitle,
+            authorizedUser = authorizedUser
         )
     }
 }

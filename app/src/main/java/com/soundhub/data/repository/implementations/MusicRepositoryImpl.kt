@@ -18,7 +18,7 @@ import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Track
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Response
@@ -87,8 +87,10 @@ class MusicRepositoryImpl @Inject constructor(
                 )
             }
 
-            val responseResult: List<DiscogsEntityResponse> = response.body()?.results ?: emptyList()
-            loadDataToArtistState(responseResult, artistState)
+            loadDataToArtistState(
+                data = response.body()?.results ?: emptyList(),
+                state = artistState
+            )
 
             return HttpResult.Success(body = null)
         }
@@ -101,16 +103,79 @@ class MusicRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchArtistByName(artistName: String): HttpResult<Artist?> {
+        try {
+            val response: Response<DiscogsResponse> = musicService.searchData(
+                query = artistName,
+                type = DiscogsSearchType.Artist.type,
+                countPerPage = 5
+            )
+            Log.d("MusicRepository", "searchArtistByName[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorBody: ErrorResponse = Gson()
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE) ?:
+                ErrorResponse(status = response.code(), detail = context.getString(R.string.toast_common_error))
+
+                Log.e("MusicRepository", "searchArtistByName[2]: $errorBody")
+                return HttpResult.Error(errorBody = errorBody)
+            }
+
+            val desiredArtist: Artist? = findArtistOrGetFirst(
+                discogsResponseList = response.body()?.results ?: emptyList(),
+                artistName = artistName
+            )
+
+            return HttpResult.Success(body = desiredArtist)
+
+        }
+
+        catch (e: Exception) {
+            Log.e("MusicRepository", "searchArtistByName[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
+    }
+
+    private fun findArtistOrGetFirst(
+        discogsResponseList: List<DiscogsEntityResponse>,
+        artistName: String
+    ): Artist? {
+        var desiredArtist: Artist? = null
+        discogsResponseList.forEach { artist ->
+            if (artist.title.lowercase() == artistName.lowercase())
+                desiredArtist = Artist(
+                    id = artist.id,
+                    name = artist.title,
+                    thumbnailUrl = artist.coverImage
+                )
+        }
+
+        if (desiredArtist == null && discogsResponseList.isNotEmpty()) {
+            val firstArtist: DiscogsEntityResponse = discogsResponseList[0]
+            desiredArtist = Artist(
+                id = firstArtist.id,
+                name = firstArtist.title,
+                thumbnailUrl = firstArtist.thumb
+            )
+        }
+
+        return desiredArtist
+    }
+
     private suspend fun loadDataToArtistState(
         data: List<DiscogsEntityResponse>,
         state: MutableStateFlow<ArtistUiState>
     ) {
         data.forEach { entity ->
-            val artistName = entity.title.split("-")[0].trim()
+            val artistName: String = entity.title
+                .split("-")[0].trim()
+
             searchArtistByName(artistName)
                 .onSuccess { artist ->
-                    artist.body?.let {
-                            artistBody ->
+                    artist.body?.let { artistBody ->
                         artistBody.genres = entity.genre ?: emptyList()
                         artistBody.styles = entity.style ?: emptyList()
                         if (artistBody.name !in state.value.artists.map { it.name })
@@ -134,7 +199,7 @@ class MusicRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_logout_error)
                     )
 
-                Log.d("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
+                Log.e("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -194,57 +259,6 @@ class MusicRepositoryImpl @Inject constructor(
             return HttpResult.Success(body = desiredArtists)
         }
         catch (e: Exception) {
-            return HttpResult.Error(
-                errorBody = ErrorResponse(detail = e.localizedMessage),
-                throwable = e
-            )
-        }
-    }
-
-    override suspend fun searchArtistByName(artistName: String): HttpResult<Artist?> {
-        try {
-            val response: Response<DiscogsResponse> = musicService.searchData(
-                query = artistName,
-                type = DiscogsSearchType.Artist.type,
-                countPerPage = 5
-            )
-            Log.d("MusicRepository", "searchArtistByName[1]: $response")
-            var desiredArtist: Artist? = null
-
-            if (!response.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE) ?:
-                    ErrorResponse(status = response.code(), detail = context.getString(R.string.toast_common_error))
-
-                Log.e("MusicRepository", "searchArtistByName[2]: $errorBody")
-                return HttpResult.Error(errorBody = errorBody)
-            }
-
-            val responseResult = response.body()?.results ?: emptyList()
-            responseResult.forEach { artist ->
-                if (artist.title.lowercase() == artistName.lowercase())
-                    desiredArtist = Artist(
-                        id = artist.id,
-                        name = artist.title,
-                        thumbnailUrl = artist.coverImage
-                    )
-            }
-
-            if (desiredArtist == null && responseResult.isNotEmpty()) {
-                val firstArtist: DiscogsEntityResponse = responseResult[0]
-                desiredArtist = Artist(
-                    id = firstArtist.id,
-                    name = firstArtist.title,
-                    thumbnailUrl = firstArtist.thumb
-                )
-            }
-
-            return HttpResult.Success(body = desiredArtist)
-
-        }
-
-        catch (e: Exception) {
-            Log.e("MusicRepository", "searchArtistByName[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

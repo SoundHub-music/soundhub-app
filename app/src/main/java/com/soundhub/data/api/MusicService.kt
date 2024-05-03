@@ -4,7 +4,7 @@ import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
 import com.soundhub.data.api.responses.discogs.release.DiscogsReleaseResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.utils.ApiEndpoints
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers

@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.Chat
-import com.soundhub.ui.authentication.AuthenticationViewModel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun ChatList(
     modifier: Modifier = Modifier,
     chats: List<Chat> = emptyList(),
     navController: NavHostController,
-    authViewModel: AuthenticationViewModel,
+    uiStateDispatcher: UiStateDispatcher
 ) {
     LazyColumn(
         modifier = modifier
@@ -29,7 +29,7 @@ internal fun ChatList(
             ChatCard(
                 chat = chat,
                 navController = navController,
-                authenticationViewModel = authViewModel
+                uiStateDispatcher = uiStateDispatcher
             )
         }
     }

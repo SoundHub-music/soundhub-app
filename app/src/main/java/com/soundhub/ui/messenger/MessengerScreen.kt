@@ -9,10 +9,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
+import com.soundhub.Route
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.Chat
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.messenger.components.ChatList
 import com.soundhub.ui.states.UiState
@@ -21,24 +21,24 @@ import com.soundhub.ui.states.UiState
 fun MessengerScreen(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher,
-    authViewModel: AuthenticationViewModel,
     messengerViewModel: MessengerViewModel
 ) {
     val messengerUiState: MessengerUiState by messengerViewModel
         .messengerUiState
         .collectAsState()
 
-    val authorizedUserState: UserState by authViewModel
-        .userInstance
-        .collectAsState()
+    val authorizedUserState: User? = messengerUiState.authorizedUser
 
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
 
-    val chats: List<Chat> = /*listOf(Chat(
-        createdBy = User(firstName = "kek", lastName = "kek")
-    ))*/messengerUiState.chats
+    val chats: List<Chat> = messengerUiState.chats
     val searchBarText: String = uiState.searchBarText
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
+
+    LaunchedEffect(key1 = uiState.currentRoute) {
+        if (uiState.currentRoute == Route.Messenger.route)
+            messengerViewModel.loadChats()
+    }
 
     LaunchedEffect(key1 = searchBarText) {
         Log.d("MessengerScreen", "searchbar text: $searchBarText")
@@ -59,7 +59,7 @@ fun MessengerScreen(
         else ChatList(
             chats = filteredChats,
             navController = navController,
-            authViewModel = authViewModel,
+            uiStateDispatcher = uiStateDispatcher
         )
     }
 }

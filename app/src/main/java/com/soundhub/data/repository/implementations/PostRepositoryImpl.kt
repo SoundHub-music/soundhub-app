@@ -10,10 +10,10 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Post
 import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.PostRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.ContentTypes
-import com.soundhub.utils.converters.LocalDateAdapter
-import com.soundhub.utils.converters.LocalDateTimeAdapter
+import com.soundhub.utils.converters.json.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -52,14 +52,15 @@ class PostRepositoryImpl @Inject constructor(
                         status = response.code(),
                         detail = response.message()
                     )
-                Log.d("PostRepository", "getPostById[2]: $errorBody")
+
+                Log.e("PostRepository", "getPostById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
             return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
-            Log.d("PostRepository", "getPostById[3]: ${e.stackTraceToString()}")
+            Log.e("PostRepository", "getPostById[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e
@@ -85,14 +86,14 @@ class PostRepositoryImpl @Inject constructor(
                         status = response.code(),
                         detail = response.message()
                     )
-                Log.d("PostRepository", "getPostsByAuthorId[2]: $errorBody")
+                Log.e("PostRepository", "getPostsByAuthorId[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
             return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
-            Log.d("PostRepository", "getPostsByAuthorId[3]: ${e.stackTraceToString()}")
+            Log.e("PostRepository", "getPostsByAuthorId[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e
@@ -125,7 +126,7 @@ class PostRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_update_error)
                     )
 
-                Log.d("PostRepository", "addPost[2]: $errorBody")
+                Log.e("PostRepository", "addPost[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -229,7 +230,7 @@ class PostRepositoryImpl @Inject constructor(
             return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
-            Log.d("PostRepository", "updatePost[3]: ${e.stackTraceToString()}")
+            Log.e("PostRepository", "updatePost[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

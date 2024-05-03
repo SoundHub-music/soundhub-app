@@ -29,6 +29,6 @@ fun MessengerSearchTopBarButton(
 
 @Composable
 @Preview(name = "MessengerSearchButton", showBackground = true)
-fun MessengerSearchTopBarButtonPreview() {
+private fun MessengerSearchTopBarButtonPreview() {
     MessengerSearchTopBarButton(UiStateDispatcher())
 }

@@ -61,4 +61,4 @@ private fun onDeletePostMenuClick(
 private fun onEditPostMenuClick(
     postId: UUID,
     navController: NavHostController
-) = navController.navigate(Route.PostEditor(postId.toString()).route)
+) = navController.navigate(Route.PostEditor.getStringRouteWithNavArg(postId.toString()))

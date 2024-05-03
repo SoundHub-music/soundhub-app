@@ -92,16 +92,23 @@
     <string name="toast_no_internet_connection">Нет подключения к интернету</string>
     <string name="toast_register_error">Ошибка регистрации пользователя</string>
     <string name="toast_logout_error">Ошибка выхода из аккаунта</string>
-    <string name="toast_fetch_user_data_error">Ошибка получения данных пользователя</string>
+    <string name="toast_fetch_user_data_error">Истекло время сессии пользователя</string>
     <string name="toast_file_loading_error">Ошибка загрузки файла</string>
     <string name="toast_common_error">Произошла ошибка</string>
     <string name="toast_update_error">Ошибка обновления данных</string>
-
     <string name="toast_delete_post_error_message">Ошибка удаления поста</string>
+
+    <string name="toast_reject_invite_error">Ошибка отклонения заявки</string>
+    <string name="toast_accept_invite_error">Ошибка принятия заявки</string>
+
     <string name="toast_post_created_successfully">Пост успешно создан</string>
     <string name="toast_post_deleted_successfully">Пост успешно удален</string>
     <string name="toast_post_updated_successfully">Пост успешно обновлен</string>
     <string name="toast_update_post_error">Ошибка обновления поста</string>
+
+    <string name="toast_invite_to_friends_was_sent_successfully">Приглашение в друзья отправлено</string>
+    <string name="toast_invite_accepted_successfully">Заявка в друзья принята</string>
+    <string name="toast_invite_rejected_successfully">Заявка в друзья отклонена</string>
 
     <string name="message_input_placeholder">Ваше сообщение</string>
 
@@ -118,6 +125,7 @@
 
     <!--    empty postline strings-->
     <string name="empty_postline_screen">Здесь всё ещё пусто :(</string>
+    <string name="empty_notification_screen">Здесь появятся ваши уведомления</string>
 
     <!--    music section titles-->
     <string name="music_recommendation_section_title">Подобрано для вас</string>

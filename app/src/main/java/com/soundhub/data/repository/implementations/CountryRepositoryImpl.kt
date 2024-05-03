@@ -7,7 +7,7 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Country
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.repository.CountryRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -22,10 +22,10 @@ class CountryRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse? = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                Log.d("CountryRepository", "getAllCountryNames[2]: ${errorBody.toString()}")
-                return HttpResult.Error(errorBody = errorBody ?: ErrorResponse(
-                    status = response.code()
-                ))
+
+                Log.e("CountryRepository", "getAllCountryNames[2]: ${errorBody.toString()}")
+                return HttpResult.Error(errorBody = errorBody
+                    ?: ErrorResponse(status = response.code()))
             }
 
             return HttpResult.Success(body = response.body())

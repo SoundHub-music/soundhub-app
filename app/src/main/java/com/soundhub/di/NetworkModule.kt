@@ -1,9 +1,9 @@
 package com.soundhub.di
 
 import com.google.gson.GsonBuilder
-import com.soundhub.utils.Constants
-import com.soundhub.utils.converters.LocalDateAdapter
-import com.soundhub.utils.converters.LocalDateTimeAdapter
+import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.converters.json.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

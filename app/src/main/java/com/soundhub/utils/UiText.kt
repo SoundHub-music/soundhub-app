@@ -2,12 +2,13 @@ package com.soundhub.utils
 
 import android.content.Context
 import androidx.annotation.StringRes
+
 sealed class UiText {
     data class DynamicString(val value: String): UiText()
     class StringResource(
         @StringRes
-        val srcId: Int,
-        vararg val args: Any?
+        var srcId: Int,
+        vararg var args: Any?
     ): UiText()
 
     fun getString(context: Context): String {

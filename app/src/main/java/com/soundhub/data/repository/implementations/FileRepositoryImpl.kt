@@ -8,7 +8,7 @@ import com.soundhub.data.api.FileService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.repository.FileRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.HttpUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -47,7 +47,7 @@ class FileRepositoryImpl @Inject constructor(
                         status = response.code(),
                         detail = context.getString(R.string.toast_file_loading_error)
                     )
-
+                Log.e("FileRepository", "getFile[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -59,7 +59,7 @@ class FileRepositoryImpl @Inject constructor(
                 )
             }
 
-            Log.d("FileRepository", "getFile[2]: tempFile is $file")
+            Log.d("FileRepository", "getFile[3]: tempFile is $file")
             
             withContext(Dispatchers.IO) {
                 FileOutputStream(file).use {
@@ -70,7 +70,7 @@ class FileRepositoryImpl @Inject constructor(
             return HttpResult.Success(body = file)
         }
         catch (e: Exception) {
-            Log.e("FileRepository", "getFile[3]: ${e.stackTraceToString()}")
+            Log.e("FileRepository", "getFile[4]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

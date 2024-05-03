@@ -1,9 +1,7 @@
 package com.soundhub.data.repository.implementations
 
-import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.R
 import com.soundhub.data.api.ChatService
 import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.responses.ApiStateResponse
@@ -11,15 +9,14 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Chat
 import com.soundhub.data.repository.ChatRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.HttpUtils
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
-    private val chatService: ChatService,
-    private val context: Context
+    private val chatService: ChatService
 ): ChatRepository {
     override suspend fun getAllChatsByCurrentUser(accessToken: String?): HttpResult<List<Chat>> {
         try {
@@ -30,12 +27,9 @@ class ChatRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_logout_error)
-                    )
+                    ?: ErrorResponse(status = response.code())
 
-                Log.d("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
+                Log.e("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = response.body())
@@ -62,12 +56,9 @@ class ChatRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_logout_error)
-                    )
+                    ?: ErrorResponse(status = response.code())
 
-                Log.d("ChatRepository", "getChatById[2]: $errorBody")
+                Log.e("ChatRepository", "getChatById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = response.body())
@@ -96,12 +87,9 @@ class ChatRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_logout_error)
-                    )
+                    ?: ErrorResponse(status = response.code())
 
-                Log.d("ChatRepository", "deleteChatById[2]: $errorBody")
+                Log.e("ChatRepository", "deleteChatById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = response.body())
@@ -130,12 +118,9 @@ class ChatRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_logout_error)
-                    )
+                    ?: ErrorResponse(status = response.code())
 
-                Log.d("ChatRepository", "createChat[2]: $errorBody")
+                Log.e("ChatRepository", "createChat[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = response.body())

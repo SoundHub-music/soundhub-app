@@ -47,7 +47,7 @@ fun AvatarPicker(
 
 @Composable
 @Preview
-fun AvatarPickerPreview() {
+private fun AvatarPickerPreview() {
     val imageUri: MutableState<Uri?> = remember { mutableStateOf(null) }
     AvatarPicker(
         imageUriState = imageUri,

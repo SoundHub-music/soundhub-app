@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.menu
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -21,12 +22,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
+import com.soundhub.data.model.User
+import com.soundhub.ui.messenger.chat.ChatUiState
+import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
 fun ChatTopBarDropdownMenu(
     menuState: MutableState<Boolean>,
-    chatId: String?,
-    navController: NavHostController
+    chatViewModel: ChatViewModel,
+    chatState: ChatUiState,
+    navController: NavHostController,
 ) {
     val profileErrorMessage: String = stringResource(id = R.string.toast_user_profile_error)
     val context = LocalContext.current
@@ -45,17 +50,12 @@ fun ChatTopBarDropdownMenu(
                     Text(text = stringResource(id = R.string.chat_menu_open_profile))
                 }
             },
-            onClick = {
-                if (chatId != null)
-                    navController.navigate(Route.Profile(chatId).route)
-                else Toast
-                    .makeText(
-                        context,
-                        profileErrorMessage,
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            }
+            onClick = { onOpenProfileClick(
+                interlocutor = chatState.interlocutor,
+                navController = navController,
+                context = context,
+                errorMessage = profileErrorMessage
+            ) }
         )
 
         DropdownMenuItem(
@@ -89,7 +89,21 @@ fun ChatTopBarDropdownMenu(
                     )
                 }
             },
-            onClick = { /* TODO: implement delete history logic */ }
+            onClick = { chatState.chat?.id?.let { chatViewModel.deleteChat(it) } }
         )
     }
+}
+
+
+private fun onOpenProfileClick(
+    interlocutor: User?,
+    navController: NavHostController,
+    context: Context,
+    errorMessage: String
+) {
+    if (interlocutor != null)
+        navController
+            .navigate(Route.Profile
+                .getStringRouteWithNavArg(interlocutor.id.toString()))
+    else Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
 }

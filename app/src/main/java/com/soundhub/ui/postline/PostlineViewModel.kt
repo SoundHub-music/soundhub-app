@@ -2,6 +2,7 @@ package com.soundhub.ui.postline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.ui.states.PostlineUiState
@@ -16,9 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostlineViewModel @Inject constructor() : ViewModel() {
-    var postsUiState: MutableStateFlow<PostlineUiState> =
-        MutableStateFlow(PostlineUiState(isLoading = true))
-        private set
+    val postsUiState: MutableStateFlow<PostlineUiState> =
+        MutableStateFlow(PostlineUiState())
 
     init {
         // TODO: implement post fetching
@@ -67,7 +67,7 @@ class PostlineViewModel @Inject constructor() : ViewModel() {
             )
             // fetching posts imitation
             delay(2000)
-            postsUiState.update { it.copy(isLoading = false, posts = posts) }
+            postsUiState.update { it.copy(status = ApiStatus.SUCCESS, posts = posts) }
         }
 
     }

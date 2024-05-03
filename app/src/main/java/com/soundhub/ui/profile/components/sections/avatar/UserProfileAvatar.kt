@@ -33,23 +33,24 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.R
-import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.menu.AvatarDropdownMenu
+import com.soundhub.ui.profile.ProfileViewModel
 import java.io.File
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 internal fun UserProfileAvatar(
     navController: NavHostController,
-    authViewModel: AuthenticationViewModel,
-    user: User? = null
+    profileViewModel: ProfileViewModel,
+    user: User?
 ) {
-    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
-    val userAvatar: File? by authViewModel.currentUserAvatar.collectAsState()
-
     var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
+    val authorizedUser: User? by profileViewModel
+        .authorizedUserState
+        .collectAsState()
+
+    val isAuthorizedUser: Boolean = authorizedUser?.id == user?.id
     val isAvatarMenuExpandedState: MutableState<Boolean> = rememberSaveable {
         mutableStateOf(false)
     }
@@ -63,38 +64,58 @@ internal fun UserProfileAvatar(
             .fillMaxWidth()
             .fillMaxHeight(0.45f)
     ) {
-        if (userAvatar == null)
-            Image(
-                painter = defaultAvatar,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth()
-                    .clickable { isAvatarMenuExpandedState.value = true },
-                contentScale = ContentScale.Crop
-            )
-        else GlideImage(
-            modifier = Modifier.fillMaxSize()
-                .clickable { isAvatarMenuExpandedState.value = true },
-            contentScale = ContentScale.Crop,
-            model = userAvatar,
-            contentDescription = "${user?.firstName} ${user?.lastName}".trim()
-        )
-
+        Avatar(isAvatarMenuExpandedState, user)
         AvatarDropdownMenu(
             modifier = Modifier.align(Alignment.Center),
             isAvatarMenuExpandedState = isAvatarMenuExpandedState,
             onDismissRequest = { isAvatarMenuExpandedState.value = false },
             activityResultLauncher = changeAvatarLauncher
         )
+        UserSettingsButton(
+            isAuthorizedUser = isAuthorizedUser,
+            navController = navController
+        )
+    }
+}
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
-                Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
-            }
+@Composable
+private fun UserSettingsButton(isAuthorizedUser: Boolean, navController: NavHostController) {
+    if (isAuthorizedUser) Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, start = 16.dp, end = 16.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
+            Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
         }
     }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+private fun Avatar(
+    isAvatarMenuExpandedState: MutableState<Boolean>,
+    user: User?
+) {
+    val userAvatar: File? = user?.avatarImageFile
+    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
+    
+    if (userAvatar == null)
+        Image(
+            painter = defaultAvatar,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isAvatarMenuExpandedState.value = true },
+            contentScale = ContentScale.Crop
+        )
+    else GlideImage(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable { isAvatarMenuExpandedState.value = true },
+        contentScale = ContentScale.Crop,
+        model = userAvatar,
+        contentDescription = "${user.firstName} ${user.lastName}".trim()
+    )
 }

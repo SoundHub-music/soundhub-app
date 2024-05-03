@@ -93,7 +93,7 @@ private fun parseLocalDate(stringDate: String, pattern: String): LocalDate {
 
 @Composable
 @Preview
-fun DatePickerPreview() {
+private fun DatePickerPreview() {
     var value by remember { mutableStateOf("") }
     DatePicker(value = value, onValueChange = { value = it })
 }

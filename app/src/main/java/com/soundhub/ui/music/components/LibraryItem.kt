@@ -81,7 +81,7 @@ internal fun LibraryItem(
 
 @Composable
 @Preview(showBackground = true)
-fun LibraryItemPreview() {
+private fun LibraryItemPreview() {
     val navController = rememberNavController()
     Box(modifier = Modifier.padding(10.dp)) {
         LibraryItem(

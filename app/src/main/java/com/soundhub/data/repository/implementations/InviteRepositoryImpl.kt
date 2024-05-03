@@ -7,7 +7,8 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Invite
 import com.soundhub.data.repository.InviteRepository
-import com.soundhub.utils.Constants
+import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.constants.Constants
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -18,7 +19,7 @@ class InviteRepositoryImpl @Inject constructor(
     override suspend fun createInvite(accessToken: String?, recipientId: UUID): HttpResult<Invite> {
         try {
             val response: Response<Invite> = inviteService.createInvite(
-                accessToken = accessToken,
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 recipientId = recipientId
             )
 
@@ -27,6 +28,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
                 Log.e("InviteRepository", "createInvite[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
             }
@@ -45,7 +47,7 @@ class InviteRepositoryImpl @Inject constructor(
     override suspend fun acceptInvite(accessToken: String?, inviteId: UUID): HttpResult<Invite> {
         try {
             val response: Response<Invite> = inviteService.acceptInvite(
-                accessToken = accessToken,
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 inviteId = inviteId
             )
 
@@ -54,6 +56,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+
                 Log.e("InviteRepository", "acceptInvite[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
             }
@@ -72,7 +75,7 @@ class InviteRepositoryImpl @Inject constructor(
     override suspend fun rejectInvite(accessToken: String?, inviteId: UUID): HttpResult<Invite> {
         try {
             val response: Response<Invite> = inviteService.rejectInvite(
-                accessToken = accessToken,
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 inviteId = inviteId
             )
 
@@ -81,6 +84,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+
                 Log.e("InviteRepository", "rejectInvite[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
             }
@@ -99,7 +103,7 @@ class InviteRepositoryImpl @Inject constructor(
     override suspend fun getAllInvites(accessToken: String?): HttpResult<List<Invite>> {
         try {
             val response: Response<List<Invite>> = inviteService.getAllInvites(
-                accessToken = accessToken
+                accessToken = HttpUtils.getBearerToken(accessToken)
             )
 
             Log.d("InviteRepository", "getAllInvites[1]: $response")
@@ -107,6 +111,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+
                 Log.e("InviteRepository", "getAllInvites[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
             }
@@ -122,10 +127,43 @@ class InviteRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllInvitesBySenderId(
+        accessToken: String?,
+        senderId: UUID
+    ): HttpResult<List<Invite>> {
+        try {
+            val response: Response<List<Invite>> = inviteService.getAllInvitesBySenderId(
+                accessToken = HttpUtils.getBearerToken(accessToken),
+                senderId = senderId
+            )
+
+            Log.d("InviteRepository", "getAllInvitesBySenderId[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorResponse: ErrorResponse = Gson()
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
+
+                Log.e("InviteRepository", "getAllInvitesBySenderId[2]: $errorResponse")
+
+                return HttpResult.Error(errorResponse)
+            }
+
+            return HttpResult.Success(response.body())
+        }
+        catch (e: Exception) {
+            Log.e("InviteRepository", "getAllInvitesBySenderId[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                throwable = e,
+                errorBody = ErrorResponse(detail = e.localizedMessage)
+            )
+        }
+    }
+
     override suspend fun deleteInvite(accessToken: String?, inviteId: UUID): HttpResult<Invite> {
         try {
             val response: Response<Invite> = inviteService.deleteInvite(
-                accessToken = accessToken,
+                accessToken = HttpUtils.getBearerToken(accessToken),
                 inviteId = inviteId
             )
 
@@ -134,6 +172,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+
                 Log.e("InviteRepository", "deleteInvite[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
             }

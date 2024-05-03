@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.states.UiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,11 +37,8 @@ fun TransparentSearchTextField(
     onValueChange: (String) -> Unit = {},
     uiStateDispatcher: UiStateDispatcher 
 ) {
-    val isSearchBarActive = uiStateDispatcher
-        .uiState
-        .collectAsState()
-        .value
-        .isSearchBarActive
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val isSearchBarActive = uiState.isSearchBarActive
 
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -87,7 +85,7 @@ fun TransparentSearchTextField(
 
 @Composable
 @Preview(name = "SearchTextField", showBackground = true)
-fun SearchTextFieldPreview() {
+private fun SearchTextFieldPreview() {
     var text by remember { mutableStateOf("") }
 
     TransparentSearchTextField(

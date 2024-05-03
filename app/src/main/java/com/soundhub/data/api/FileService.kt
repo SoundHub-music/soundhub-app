@@ -12,7 +12,8 @@ interface FileService {
     @Streaming
     @GET
     suspend fun getFile(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String,
         @Url fileName: String?,
     ): Response<ResponseBody>
 }

@@ -3,47 +3,39 @@ package com.soundhub.ui.profile.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
-import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureList
-import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonRow
-import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
+import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureSection
+import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonsSection
+import com.soundhub.ui.profile.components.sections.user_main_data.UserMainDataSection
 import com.soundhub.ui.profile.components.sections.wall.UserWall
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun UserProfileContainer(
     user: User?,
-    authViewModel: AuthenticationViewModel,
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher,
+    profileViewModel: ProfileViewModel
 ) {
-    val authorizedUser: UserState by authViewModel
-        .userInstance
+    val authorizedUser: User? by profileViewModel
+        .authorizedUserState
         .collectAsState()
 
-    val isOriginProfile: Boolean = authorizedUser
-        .current?.id == user?.id
-
-    val userLocation: String = getUserLocation(user?.city, user?.country)
+    val isOriginProfile: Boolean = authorizedUser?.id == user?.id
 
     Box(
         modifier = Modifier
@@ -59,27 +51,21 @@ fun UserProfileContainer(
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             item {
-                Column {
-                    UserNameWithDescription(user)
-                    if (userLocation.isNotEmpty())
-                        Text(
-                            text = userLocation,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 14.sp
-                        )
-                }
+                UserMainDataSection(user)
             }
 
             item {
-                ProfileButtonRow(
+                ProfileButtonsSection(
+                    profileViewModel = profileViewModel,
                     isOriginProfile = isOriginProfile,
                     navController = navController,
+                    user = user
                 )
             }
 
             item {
-                FriendMiniatureList(
-                    friendList = authorizedUser.current?.friends ?: emptyList(),
+                FriendMiniatureSection(
+                    friendList = authorizedUser?.friends ?: emptyList(),
                     navController = navController
                 )
             }
@@ -117,11 +103,3 @@ fun UserProfileContainer(
         }
     }
 }
-
-internal fun getUserLocation(city: String?, country: String?): String {
-    return if ((city == null && country == null) || (city!!.isEmpty() && country!!.isEmpty())) ""
-    else if (country!!.isNotEmpty() && city.isEmpty()) country
-    else "$country, $city"
-}
-
-

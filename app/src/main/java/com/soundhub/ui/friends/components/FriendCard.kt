@@ -1,5 +1,6 @@
 package com.soundhub.ui.friends.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,30 +15,35 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
 import com.soundhub.Route
+import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
+import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
-import com.soundhub.ui.profile.components.getUserLocation
+import com.soundhub.ui.profile.components.sections.user_main_data.getUserLocation
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 @Composable
 fun FriendCard(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    friendsViewModel: FriendsViewModel,
+    chosenPage: FriendListPage,
     user: User,
-    chosenPage: FriendListPage
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -47,7 +53,11 @@ fun FriendCard(
             contentColor = MaterialTheme.colorScheme.onBackground,
             disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        ),
+        onClick = { navController
+            .navigate(Route.Profile
+                .getStringRouteWithNavArg(user.id.toString()))
+        }
     ) {
         Row(
             modifier = Modifier
@@ -65,59 +75,72 @@ fun FriendCard(
                     imageUrl = user.avatarUrl,
                     modifier = Modifier.size(64.dp)
                 )
-                Column(modifier = Modifier) {
-                    Text(
-                        text = "${user.firstName} ${user.lastName}".trim(),
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 20.sp,
-                    )
 
-                    Text(
-                        text = when (chosenPage) {
-                            FriendListPage.MAIN ->
-                                getUserLocation(city = user.city, country = user.country)
-                            FriendListPage.RECOMMENDATIONS ->
-                                // TODO: implement the logic of determining user similarity
-                                stringResource(R.string.friends_recommendation_page_card_caption, 98)
-                        },
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraLight,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Left,
-                    )
-                }
+                UserDescriptionColumn(user = user, chosenPage = chosenPage)
+            }
 
-            }
-            FilledTonalIconButton(
-                onClick = {
-                    navController.navigate(Route.Messenger.Chat(user.id.toString()).route)
-                },
-                shape = RoundedCornerShape(5.dp),
-                modifier = Modifier,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
-                    contentDescription = "send message"
-                )
-            }
+            NavigateToChatButton(
+                user = user,
+                navController = navController,
+                friendsViewModel = friendsViewModel
+            )
         }
     }
 }
 
 @Composable
-@Preview
-fun FriendCardPreview() {
-    val navController = rememberNavController()
-    val user = User(
-        firstName = "Alexey",
-        lastName = "Zaycev",
-        avatarUrl = "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671122.jpg",
-        country = "Russia",
-        city = "Novosibirsk"
-    )
-    FriendCard(
-        user = user,
-        navController = navController,
-        chosenPage = FriendListPage.MAIN
-    )
+private fun UserDescriptionColumn(user: User, chosenPage: FriendListPage) {
+    Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+        Text(
+            text = "${user.firstName} ${user.lastName}".trim(),
+            fontWeight = FontWeight.Medium,
+            fontSize = 20.sp,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Text(
+            text = when (chosenPage) {
+                FriendListPage.MAIN ->
+                    getUserLocation(city = user.city, country = user.country)
+                FriendListPage.RECOMMENDATIONS ->
+                    // TODO: implement the logic of determining user similarity
+                    stringResource(R.string.friends_recommendation_page_card_caption, 98)
+            },
+            fontSize = 12.sp,
+            fontWeight = FontWeight.ExtraLight,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Left,
+
+        )
+    }
+}
+
+@Composable
+private fun NavigateToChatButton(
+    user: User,
+    navController: NavHostController,
+    friendsViewModel: FriendsViewModel
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    FilledTonalIconButton(
+        onClick = {
+            coroutineScope.launch {
+                val chat: Chat? = friendsViewModel.getOrCreateChat(user).firstOrNull()
+                Log.d("FriendCard", "chat: $chat")
+                chat?.let {
+                    navController
+                        .navigate(Route.Messenger.Chat
+                            .getStringRouteWithNavArg(it.id.toString()))
+                }
+            }
+        },
+        shape = RoundedCornerShape(5.dp),
+        modifier = Modifier,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
+            contentDescription = "send message"
+        )
+    }
 }

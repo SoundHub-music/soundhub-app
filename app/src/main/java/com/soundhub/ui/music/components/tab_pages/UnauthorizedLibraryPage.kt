@@ -53,6 +53,6 @@ fun UnauthorizedLibraryPage(
 
 @Composable
 @Preview
-fun UnauthorizedLibraryPagePreview() {
+private fun UnauthorizedLibraryPagePreview() {
     UnauthorizedLibraryPage()
 }

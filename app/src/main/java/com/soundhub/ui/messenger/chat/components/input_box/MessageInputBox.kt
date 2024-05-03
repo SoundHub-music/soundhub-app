@@ -15,23 +15,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun MessageInputBox(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     chatViewModel: ChatViewModel,
-    authViewModel: AuthenticationViewModel
+    uiStateDispatcher: UiStateDispatcher
 ) {
     val messageContent = rememberSaveable { mutableStateOf("") }
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val authorizedUserState: UserState by authViewModel
-        .userInstance
-        .collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUserState: User? = uiState.authorizedUser
 
     Row(
         modifier = modifier

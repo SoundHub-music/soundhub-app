@@ -61,7 +61,7 @@ internal fun PostHeader(
                         .size(40.dp)
                         .clickable {
                             navController
-                                .navigate(Route.Profile(postAuthor?.id.toString()).route)
+                                .navigate(Route.Profile.getStringRouteWithNavArg(postAuthor?.id.toString()))
                         }
                 )
 

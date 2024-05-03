@@ -72,10 +72,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providesChatRepository(
-        chatService: ChatService,
-        @ApplicationContext context: Context
+        chatService: ChatService
     ): ChatRepository =
-        ChatRepositoryImpl(chatService, context)
+        ChatRepositoryImpl(chatService)
 
     @Provides
     @Singleton

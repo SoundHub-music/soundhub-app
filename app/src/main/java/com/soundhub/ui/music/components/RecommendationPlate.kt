@@ -54,7 +54,7 @@ internal fun RecommendationPlate(
 
 @Composable
 @Preview
-fun RecommendationPlatePreview() {
+private fun RecommendationPlatePreview() {
     RecommendationPlate(
         gradientColor = Brush.linearGradient(listOf(Color(0xFFd18787), Color(0xFFFF0000))),
         text = "Новинки недели"

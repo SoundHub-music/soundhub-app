@@ -18,25 +18,26 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.post_card.PostCard
-import com.soundhub.ui.viewmodels.PostViewModel
 
 @Composable
 fun PostLineScreen(
     modifier: Modifier = Modifier,
-    postViewModel: PostViewModel = hiltViewModel(),
+    postViewModel: PostlineViewModel = hiltViewModel(),
     uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController,
     currentUser: User?
 ) {
-    val postUiState by postViewModel.postUiState.collectAsState()
+    val postUiState by postViewModel.postsUiState.collectAsState()
+    val isLoading: Boolean = postUiState.status == ApiStatus.LOADING
 
     ContentContainer(contentAlignment = Alignment.Center) {
-        if (postUiState.isLoading) CircleLoader(modifier = Modifier.size(72.dp))
+        if (isLoading) CircleLoader(modifier = Modifier.size(72.dp))
         else if (postUiState.posts.isEmpty())
             Text(
                 text = stringResource(id = R.string.empty_postline_screen),
@@ -54,7 +55,6 @@ fun PostLineScreen(
                         post = post,
                         uiStateDispatcher = uiStateDispatcher,
                         currentUser = currentUser,
-                        postViewModel = postViewModel
                     )
                 }
             }

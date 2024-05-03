@@ -14,9 +14,9 @@ import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.ContentTypes
-import com.soundhub.utils.converters.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,7 +46,7 @@ class AuthRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_authorization_error)
                     )
 
-                Log.d("AuthRepository", "signIn[2]: $errorBody")
+                Log.e("AuthRepository", "signIn[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -79,7 +79,7 @@ class AuthRepositoryImpl @Inject constructor(
                         status = signUpResponse.code()
                     )
 
-                Log.d("AuthRepository", "signUp[2]: $errorBody")
+                Log.e("AuthRepository", "signUp[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -107,7 +107,7 @@ class AuthRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_logout_error)
                     )
 
-                Log.d("AuthRepository", "logout[2]: $errorBody")
+                Log.e("AuthRepository", "logout[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = logoutResponse.body())
@@ -134,7 +134,7 @@ class AuthRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_fetch_user_data_error)
                     )
 
-                Log.d("AuthRepository", "refreshToken[2]: $errorBody")
+                Log.e("AuthRepository", "refreshToken[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 

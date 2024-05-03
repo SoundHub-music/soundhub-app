@@ -15,45 +15,59 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface UserService {
-    @GET(ApiEndpoints.SoundHub.CURRENT_USER)
+    @GET(ApiEndpoints.Users.CURRENT_USER)
     suspend fun getCurrentUser(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?
     ): Response<User?>
 
-    @GET(ApiEndpoints.SoundHub.GET_USER_BY_ID)
+    @GET(ApiEndpoints.Users.GET_USER_BY_ID)
     suspend fun getUserById(
-        @Path(ApiEndpoints.SoundHub.USER_ID_DYNAMIC_PARAM) id: UUID?,
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?
+        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
+        id: UUID?,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?
     ): Response<User?>
 
-    @PUT(ApiEndpoints.SoundHub.UPDATE_USER)
+    @PUT(ApiEndpoints.Users.UPDATE_USER)
     @Multipart
     suspend fun updateUserById(
-        @Path(ApiEndpoints.SoundHub.USER_ID_DYNAMIC_PARAM)
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
         id: UUID?,
         @Part("userDto") user: RequestBody,
-        @Part userAvatar: MultipartBody.Part?,
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?
+        @Part userAvatar: MultipartBody.Part?
     ): Response<User>
 
-    @PUT(ApiEndpoints.SoundHub.ADD_FRIEND)
+    @PUT(ApiEndpoints.Users.ADD_FRIEND)
     suspend fun addFriend(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.SoundHub.FRIEND_ID_DYNAMIC_PARAM)
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM)
         friendId: UUID
     ): Response<User>
 
-    @PUT(ApiEndpoints.SoundHub.DELETE_FRIEND)
+    @PUT(ApiEndpoints.Users.DELETE_FRIEND)
     suspend fun deleteFriend(
         @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.SoundHub.FRIEND_ID_DYNAMIC_PARAM)
+        @Path(ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM)
         friendId: UUID
     ): Response<User>
 
-    @GET(ApiEndpoints.SoundHub.GET_RECOMMENDED_FRIENDS)
+    @GET(ApiEndpoints.Users.GET_RECOMMENDED_FRIENDS)
     suspend fun getRecommendedFriends(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.SoundHub.USER_ID_DYNAMIC_PARAM)
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
         userId: UUID?
+    ): Response<List<User>>
+
+    @GET(ApiEndpoints.Users.GET_FRIENDS)
+    suspend fun getFriendsByUserId(
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
+        userId: UUID
     ): Response<List<User>>
 }

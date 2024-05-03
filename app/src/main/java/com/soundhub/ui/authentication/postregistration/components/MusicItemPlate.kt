@@ -42,10 +42,11 @@ fun MusicItemPlate(
     caption: String,
     thumbnailUrl: String? = null,
     onClick: (Boolean) -> Unit = {},
+    isChosen: Boolean = false,
     width: Dp = 72.dp,
     height: Dp = 72.dp
 ) {
-    var isItemChosen by rememberSaveable { mutableStateOf(false) }
+    var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
     var itemBoxModifier: Modifier = Modifier
         .width(width)
         .height(height)
@@ -100,6 +101,6 @@ fun MusicItemPlate(
 
 @Preview
 @Composable
-fun ItemPlatePreview() {
+private fun ItemPlatePreview() {
     MusicItemPlate(caption = "Rap")
 }

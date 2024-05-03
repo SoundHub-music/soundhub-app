@@ -1,7 +1,6 @@
 package com.soundhub.di
 
 import android.app.Application
-import com.soundhub.data.datastore.UserCredsStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,12 +13,12 @@ import javax.inject.Singleton
     ServiceModule::class,
     RepositoryModule::class,
     DomainModule::class,
-    WebSocketModule::class
+    WebSocketModule::class,
+    DataModule::class
 ])
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @Provides
     @Singleton
-    fun providesUserDataStore(app: Application): UserCredsStore = UserCredsStore(app)
+    fun providesApplication(application: Application): Application = application
 }

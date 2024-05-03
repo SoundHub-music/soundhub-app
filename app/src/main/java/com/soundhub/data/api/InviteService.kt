@@ -17,7 +17,7 @@ interface InviteService {
         @Header(HttpUtils.AUTHORIZATION_HEADER)
         accessToken: String?,
         @Path(ApiEndpoints.Invites.RECIPIENT_ID_DYNAMIC_PARAM)
-        recipientId: UUID
+        recipientId: UUID?
     ): Response<Invite>
 
     @POST(ApiEndpoints.Invites.ACCEPT_INVITE)
@@ -36,10 +36,18 @@ interface InviteService {
         inviteId: UUID
     ): Response<Invite>
 
-    @GET
+    @GET(ApiEndpoints.Invites.INVITES_ENDPOINT)
     suspend fun getAllInvites(
         @Header(HttpUtils.AUTHORIZATION_HEADER)
         accessToken: String?
+    ): Response<List<Invite>>
+
+    @GET(ApiEndpoints.Invites.GET_ALL_INVITES_BY_SENDER_ID)
+    suspend fun getAllInvitesBySenderId(
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Invites.SENDER_ID_DYNAMIC_PARAM)
+        senderId: UUID?
     ): Response<List<Invite>>
 
     @DELETE(ApiEndpoints.Invites.DELETE_INVITE)

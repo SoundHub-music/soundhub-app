@@ -44,7 +44,7 @@ fun BottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun BottomSheetPreview() {
+private fun BottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(
         SheetState(

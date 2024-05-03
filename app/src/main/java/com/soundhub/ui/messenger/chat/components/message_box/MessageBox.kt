@@ -90,7 +90,7 @@ fun MessageBox(
 
 @Composable
 @Preview(showBackground = true)
-fun MessageBoxPreview() {
+private fun MessageBoxPreview() {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {

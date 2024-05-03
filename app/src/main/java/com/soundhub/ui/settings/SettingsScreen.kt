@@ -10,12 +10,19 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.settings.components.SettingsMenu
 import com.soundhub.ui.settings.components.UserCardSettings
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
-fun SettingsScreen(authViewModel: AuthenticationViewModel) {
+fun SettingsScreen(
+    authViewModel: AuthenticationViewModel,
+    uiStateDispatcher: UiStateDispatcher
+) {
     ContentContainer(modifier = Modifier.padding(vertical = 10.dp)) {
         Column {
-            UserCardSettings(authViewModel)
+            UserCardSettings(
+                authViewModel = authViewModel,
+                uiStateDispatcher = uiStateDispatcher
+            )
             HorizontalDivider(thickness = 1.dp)
             SettingsMenu()
         }

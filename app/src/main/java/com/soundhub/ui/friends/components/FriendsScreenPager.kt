@@ -21,8 +21,11 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
+import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.loaders.CircleLoader
+import com.soundhub.ui.friends.EmptyFriendsScreen
 import com.soundhub.ui.friends.FriendsUiState
+import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -32,46 +35,51 @@ internal fun FriendsScreenPager(
     tabs: List<FriendListPage>,
     navController: NavHostController,
     friendsUiState: FriendsUiState,
-    filteredFriendList: List<User>
+    filteredFriendList: List<User>,
+    friendsViewModel: FriendsViewModel
 ) {
-    HorizontalPager(
-        state = selectedTabState,
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
-    ) { page ->
-        when (tabs[page]) {
-            FriendListPage.MAIN -> {
-                if (filteredFriendList.isEmpty()) {
-                    EmptyFriendsListScreenMessage(
-                        selectedTabState = selectedTabState,
-                        tabs = tabs
+    ContentContainer {
+        HorizontalPager(
+            state = selectedTabState,
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) { page ->
+            when (tabs[page]) {
+                FriendListPage.MAIN -> {
+                    if (filteredFriendList.isEmpty()) {
+                        EmptyFriendsScreen(
+                            selectedTabState = selectedTabState,
+                            tabs = tabs
+                        )
+                    } else UserFriendsPage(
+                        friendList = filteredFriendList,
+                        navController = navController,
+                        chosenPage = tabs[page],
+                        friendsViewModel = friendsViewModel
                     )
-                } else UserFriendsPage(
-                    friendList = filteredFriendList,
-                    navController = navController,
-                    chosenPage = tabs[page]
-                )
-            }
-            FriendListPage.RECOMMENDATIONS -> {
-                when (friendsUiState.status) {
-                    ApiStatus.LOADING -> Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) { CircleLoader(modifier = Modifier.size(64.dp)) }
-                    ApiStatus.ERROR -> {
-                        Text(
-                            text = stringResource(id = R.string.friends_recommended_friends_error_message),
-                            textAlign = TextAlign.Center,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    ApiStatus.SUCCESS -> {
-                        UserFriendsPage(
-                            friendList = filteredFriendList,
-                            navController = navController,
-                            chosenPage = tabs[page]
-                        )
+                }
+                FriendListPage.RECOMMENDATIONS -> {
+                    when (friendsUiState.status) {
+                        ApiStatus.LOADING -> Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) { CircleLoader(modifier = Modifier.size(64.dp)) }
+                        ApiStatus.ERROR -> {
+                            Text(
+                                text = stringResource(id = R.string.friends_recommended_friends_error_message),
+                                textAlign = TextAlign.Center,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        ApiStatus.SUCCESS -> {
+                            UserFriendsPage(
+                                friendList = friendsUiState.recommendedFriends,
+                                navController = navController,
+                                chosenPage = tabs[page],
+                                friendsViewModel = friendsViewModel
+                            )
+                        }
                     }
                 }
             }

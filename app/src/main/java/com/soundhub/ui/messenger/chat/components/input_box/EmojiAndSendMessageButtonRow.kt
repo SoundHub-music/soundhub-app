@@ -9,13 +9,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import com.soundhub.R
-import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
 internal fun EmojiAndSendMessageButtonRow(
-    authorizedUserState: UserState,
+    authorizedUserState: User?,
     chatUiState: ChatUiState,
     messageContent: MutableState<String>,
     lazyListState: LazyListState,
@@ -33,7 +33,7 @@ internal fun EmojiAndSendMessageButtonRow(
             messageContent = messageContent,
             messageCount = chatUiState.chat?.messages?.size ?: 0,
             lazyListState = lazyListState,
-            authorizedUser = authorizedUserState.current,
+            authorizedUser = authorizedUserState,
             chatViewModel = chatViewModel
         )
     }

@@ -15,16 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.states.UserState
 import com.soundhub.ui.components.avatar.CircularAvatar
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
+import java.io.File
 
 @Composable
-internal fun UserCardSettings(authViewModel: AuthenticationViewModel) {
-    val authorizedUser: UserState by authViewModel
-        .userInstance
-        .collectAsState(initial = UserState())
-    val userAvatar by authViewModel.currentUserAvatar.collectAsState()
+internal fun UserCardSettings(
+    authViewModel: AuthenticationViewModel,
+    uiStateDispatcher: UiStateDispatcher
+) {
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
+    val userAvatar: File? = authorizedUser?.avatarImageFile
 
     Box(
         modifier = Modifier
@@ -45,7 +50,7 @@ internal fun UserCardSettings(authViewModel: AuthenticationViewModel) {
                    imageUrl = userAvatar?.absolutePath
                )
                Text(
-                   text = "${authorizedUser.current?.firstName} ${authorizedUser.current?.lastName}"
+                   text = "${authorizedUser?.firstName} ${authorizedUser?.lastName}"
                        .trim(),
                    fontWeight = FontWeight.Bold,
                    fontSize = 18.sp,

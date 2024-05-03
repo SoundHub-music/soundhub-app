@@ -25,34 +25,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.avatar.CircularAvatar
-import com.soundhub.ui.messenger.chat.ChatUiState
-import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun ChatCard(
     chat: Chat?,
     navController: NavHostController,
-    authenticationViewModel: AuthenticationViewModel,
-    chatViewModel: ChatViewModel = hiltViewModel()
+    uiStateDispatcher: UiStateDispatcher
 ) {
     var lastMessageModifier: Modifier = Modifier
-    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val unreadMessageCount = chatUiState.unreadMessageCount
+    val unreadMessageCount = chat?.messages?.size ?: 0
     val hasUnreadMessages: Boolean = unreadMessageCount > 0
-    val authorizedUser by authenticationViewModel
-        .userInstance
-        .collectAsState()
+
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
 
     val interlocutor: User? = chat?.participants?.firstOrNull {
-        it.id != authorizedUser.current?.id
+        it.id != authorizedUser?.id
     }
+
     val lastMessage: String = if (chat?.messages?.isNotEmpty() == true)
         chat.messages.last().content.substring(20) + "..."
     else ""
@@ -70,8 +67,9 @@ internal fun ChatCard(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.inverseOnSurface),
         shape = RoundedCornerShape(12.dp),
         onClick = {
-            chatViewModel.setInterlocutor(interlocutor)
-            navController.navigate(Route.Messenger.Chat(chat?.id.toString()).route)
+            navController
+                .navigate(Route.Messenger.Chat
+                    .getStringRouteWithNavArg(chat?.id.toString()))
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -88,9 +86,9 @@ internal fun ChatCard(
             BadgedBox(
                 badge = {
                     if (hasUnreadMessages)
-                        Badge(
-                            modifier = Modifier.offset(x = (-35).dp)
-                        ) { Text(text = unreadMessageCount.toString()) }
+                        Badge(modifier = Modifier.offset(x = (-35).dp)) {
+                            Text(text = unreadMessageCount.toString())
+                        }
                 }
             ) {
                 CircularAvatar(
@@ -105,6 +103,7 @@ internal fun ChatCard(
                     fontSize = 16.sp,
                     lineHeight = 24.sp
                 )
+
                 Text(
                     text = lastMessage,
                     modifier = lastMessageModifier,

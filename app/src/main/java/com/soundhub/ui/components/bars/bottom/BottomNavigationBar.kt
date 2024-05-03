@@ -42,7 +42,7 @@ fun BottomNavigationBar(
     messengerViewModel: MessengerViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
-    val currentRoute by uiStateDispatcher.currentRoute.collectAsState()
+    val uiState by uiStateDispatcher.uiState.collectAsState()
     val unreadMessageCount = messengerViewModel
         .messengerUiState
         .collectAsState()
@@ -50,7 +50,7 @@ fun BottomNavigationBar(
         .unreadMessagesTotal
 
     val selectedItemState: MutableState<String> = remember {
-        mutableStateOf(currentRoute ?: Route.Postline.route)
+        mutableStateOf(uiState.currentRoute ?: Route.Postline.route)
     }
 
     LaunchedEffect(key1 = selectedItemState) {
@@ -88,7 +88,9 @@ private fun onMenuItemClick(
     menuItem: NavBarItem,
     navController: NavController
 ) {
-    selectedItemState.value =  menuItem.route
+    selectedItemState.value = menuItem.route
+    Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
+    Log.d("BottomNavigationBar", "route: ${Route.Profile.route}")
     navController.navigate(menuItem.route) {
         popUpTo(navController.graph.findStartDestination().id) {
             saveState = true
@@ -124,7 +126,7 @@ private fun getNavBarItems(
             },
         ),
         NavBarItem(
-            route = Route.Profile(userId.toString()).route,
+            route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
             icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
         )
     )

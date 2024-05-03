@@ -27,14 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.ui.authentication.states.UserState
+import com.soundhub.data.model.User
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
 fun PostEditorScreen(
     postEditorViewModel: PostEditorViewModel = hiltViewModel(),
-    user: UserState?,
+    user: User?,
     postId: UUID? = null
 ) {
     val postState by postEditorViewModel.postEditorState.collectAsState()
@@ -81,7 +81,7 @@ fun PostEditorScreen(
                 modifier = Modifier.padding(10.dp),
                 onClick = {
                     coroutineScope.launch {
-                        postEditorViewModel.createPost(author = user?.current,)
+                        postEditorViewModel.createPost(author = user,)
                     }
                 }
             ) {

@@ -3,7 +3,7 @@ package com.soundhub.ui.components.bars.top
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 
 @Composable
 internal fun TopAppBarBuilder(

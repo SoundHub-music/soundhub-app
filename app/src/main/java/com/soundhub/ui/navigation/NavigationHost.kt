@@ -1,8 +1,6 @@
 package com.soundhub.ui.navigation
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -15,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
@@ -28,18 +25,19 @@ import androidx.navigation.navArgument
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationScreen
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.states.UserState
-import com.soundhub.ui.authentication.postregistration.ChooseArtistsScreen
-import com.soundhub.ui.authentication.postregistration.ChooseGenresScreen
+import com.soundhub.ui.authentication.postregistration.PostRegisterChooseArtistsScreen
+import com.soundhub.ui.authentication.postregistration.PostRegisterChooseGenresScreen
 import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
 import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.edit_profile.music.EditFavoriteArtistsScreen
+import com.soundhub.ui.edit_profile.music.EditFavoriteGenresScreen
+import com.soundhub.ui.edit_profile.music.EditMusicPreferencesViewModel
 import com.soundhub.ui.post_editor.PostEditorScreen
-import com.soundhub.ui.edit_profile.EditUserProfileScreen
-import com.soundhub.ui.edit_profile.EditUserProfileViewModel
+import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
+import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.friends.FriendsScreen
 import com.soundhub.ui.gallery.GalleryScreen
 import com.soundhub.ui.messenger.MessengerScreen
@@ -48,12 +46,13 @@ import com.soundhub.ui.messenger.chat.ChatScreen
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.notifications.NotificationScreen
+import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.viewmodels.UserViewModel
-import com.soundhub.utils.Constants
+import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID
 
@@ -66,18 +65,20 @@ fun NavigationHost(
     uiStateDispatcher: UiStateDispatcher,
     messengerViewModel: MessengerViewModel,
     editUserProfileViewModel: EditUserProfileViewModel,
+    notificationViewModel: NotificationViewModel,
     topBarTitle: MutableState<String?>,
-    authorizedUser: UserState
+    authorizedUser: User?
 ) {
     var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
-
-    val userCreds: UserPreferences? by authViewModel.userCreds.collectAsState(initial = null)
-    val userViewModel: UserViewModel = hiltViewModel()
+    val userCreds: UserPreferences? by authViewModel
+        .userCreds
+        .collectAsState(initial = null)
 
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
 
-    val context: Context = LocalContext.current
+    val userViewModel: UserViewModel = hiltViewModel()
+    val editMusicPrefViewModel: EditMusicPreferencesViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = currentRoute) {
         Log.d("HomeScreen", "current_route: $currentRoute")
@@ -86,11 +87,7 @@ fun NavigationHost(
     }
 
     LaunchedEffect(key1 = userCreds?.accessToken) {
-        startDestination = defineStartDestination(
-            context = context,
-            authorizedUser = authorizedUser,
-            userCreds = userCreds
-        )
+        startDestination = defineStartDestination(userCreds = userCreds)
     }
 
     NavHost(
@@ -107,19 +104,20 @@ fun NavigationHost(
         }
 
         composable(
-            route = "${Route.Authentication.route}/{${Constants.POST_REGISTER_NAV_ARG}}",
+            route = Route.Authentication.withNavArg,
             arguments = listOf(navArgument(Constants.POST_REGISTER_NAV_ARG) { NavType.StringType })
         ) { entry ->
             val nestedRoute =
                 "${Route.Authentication.route}/${entry.arguments?.getString(Constants.POST_REGISTER_NAV_ARG)}"
 
             when (nestedRoute) {
-                Route.Authentication.ChooseGenres.route -> ChooseGenresScreen(
+                Route.Authentication.ChooseGenres.route -> PostRegisterChooseGenresScreen(
                     registrationViewModel = registrationViewModel
                 )
 
-                Route.Authentication.ChooseArtists.route -> ChooseArtistsScreen(
-                    registrationViewModel = registrationViewModel
+                Route.Authentication.ChooseArtists.route -> PostRegisterChooseArtistsScreen(
+                    registrationViewModel = registrationViewModel,
+                    uiStateDispatcher = uiStateDispatcher
                 )
 
                 Route.Authentication.FillUserData.route -> FillUserDataScreen(
@@ -139,7 +137,7 @@ fun NavigationHost(
                 PostLineScreen(
                     navController = navController,
                     uiStateDispatcher = uiStateDispatcher,
-                    currentUser = authorizedUser.current
+                    currentUser = authorizedUser
                 )
             }
         }
@@ -165,7 +163,6 @@ fun NavigationHost(
                 topBarTitle.value = stringResource(id = R.string.screen_title_messenger)
                 MessengerScreen(
                     navController = navController,
-                    authViewModel = authViewModel,
                     uiStateDispatcher = uiStateDispatcher,
                     messengerViewModel = messengerViewModel,
                 )
@@ -173,7 +170,7 @@ fun NavigationHost(
         }
 
         composable(
-            route = Route.Messenger.Chat().route,
+            route = Route.Messenger.Chat.route,
             arguments = listOf(navArgument(Constants.CHAT_NAV_ARG) { NavType.StringType})
         ) { entry ->
             runCatching {
@@ -186,7 +183,6 @@ fun NavigationHost(
                 ) {
                     ChatScreen(
                         chatId = chatId,
-                        authViewModel = authViewModel,
                         navController = navController,
                         uiStateDispatcher = uiStateDispatcher
                     )
@@ -195,11 +191,11 @@ fun NavigationHost(
         }
 
         composable(
-            route = Route.Profile().route,
+            route = Route.Profile.route,
             arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
         ) { entry ->
             runCatching {
-                authorizedUser.current?.let { currentUser ->
+                authorizedUser?.let { currentUser ->
                     val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
                     val userId: UUID? = argument?.let { UUID.fromString(argument) }
                     var user: User? by remember { mutableStateOf(null) }
@@ -207,7 +203,7 @@ fun NavigationHost(
                     Log.d("NavigationHost", "Profile[userId]: $userId")
 
                     LaunchedEffect(key1 = true) {
-                        user = if (userId == authorizedUser.current.id)
+                        user = if (userId == authorizedUser.id)
                             currentUser
                         else userId?.let { userId ->
                             userViewModel
@@ -222,14 +218,13 @@ fun NavigationHost(
                     ) {
                         ProfileScreen(
                             navController = navController,
-                            authViewModel = authViewModel,
                             uiStateDispatcher = uiStateDispatcher,
                             user = user
                         )
                     }
                 }
             }.onFailure {
-                Log.d("NavigationHost", "Profile: ${it.stackTraceToString()}")
+                Log.e("NavigationHost", "Profile: ${it.stackTraceToString()}")
             }
         }
 
@@ -242,7 +237,7 @@ fun NavigationHost(
                 FriendsScreen(
                     uiStateDispatcher = uiStateDispatcher,
                     navController = navController,
-                    authorizedUser = authorizedUser.current
+                    authorizedUser = authorizedUser
                 )
             }
         }
@@ -253,7 +248,10 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_notifications)
-                NotificationScreen(navController)
+                NotificationScreen(
+                    navController = navController,
+                    notificationViewModel = notificationViewModel
+                )
             }
         }
 
@@ -264,7 +262,7 @@ fun NavigationHost(
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_edit_profile)
                 EditUserProfileScreen(
-                    authorizedUser = authorizedUser.current,
+                    authorizedUser = authorizedUser,
                     editUserProfileViewModel = editUserProfileViewModel,
                     authViewModel = authViewModel
                 )
@@ -277,7 +275,10 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_settings)
-                SettingsScreen(authViewModel = authViewModel)
+                SettingsScreen(
+                    authViewModel = authViewModel,
+                    uiStateDispatcher = uiStateDispatcher
+                )
             }
         }
 
@@ -320,7 +321,7 @@ fun NavigationHost(
 
         // post editing route
         composable(
-            route = Route.PostEditor().route,
+            route = Route.PostEditor.route,
             arguments = listOf(navArgument(Constants.POST_EDITOR_NAV_ARG) {
                 NavType.StringType
             })
@@ -341,24 +342,27 @@ fun NavigationHost(
                 }
             }
         }
+
+        composable(Route.EditFavoriteGenres.route) {
+            ScreenContainer(userCreds = userCreds, navController = navController) {
+                EditFavoriteGenresScreen(editMusicPrefViewModel)
+            }
+        }
+
+        composable(Route.EditFavoriteArtists.route) {
+            ScreenContainer(userCreds = userCreds, navController = navController) {
+                EditFavoriteArtistsScreen(
+                    editMusicPrefViewModel = editMusicPrefViewModel,
+                    uiStateDispatcher = uiStateDispatcher
+                )
+            }
+        }
     }
 }
 
 private fun defineStartDestination(
-    context: Context,
-    authorizedUser: UserState,
     userCreds: UserPreferences?
-): String {
-    val authErrorMessage: String = context.getString(R.string.toast_authorization_error)
-    if (authorizedUser.current == null && authorizedUser.status == ApiStatus.ERROR)
-        Toast.makeText(
-            context,
-            authErrorMessage,
-            Toast.LENGTH_SHORT
-        ).show()
-
-    return if (
-        userCreds?.accessToken.isNullOrEmpty()
-    ) Route.Authentication.route
+): String =
+    if (userCreds?.accessToken.isNullOrEmpty())
+        Route.Authentication.route
     else Route.Postline.route
-}

@@ -8,8 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SplashScreenViewModel: ViewModel() {
-    var isLoading = MutableStateFlow(true)
-        private set
+    val isLoading = MutableStateFlow(true)
 
     init {
         viewModelScope.launch {

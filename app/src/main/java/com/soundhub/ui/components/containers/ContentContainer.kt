@@ -1,6 +1,7 @@
 package com.soundhub.ui.components.containers
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -12,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun ContentContainer(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    content: @Composable () -> Unit = {}
+    content: @Composable() (BoxScope.() -> Unit)
 ) {
     Box(
         contentAlignment = contentAlignment,

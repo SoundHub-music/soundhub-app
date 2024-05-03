@@ -6,65 +6,60 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.soundhub.R
+import com.soundhub.data.model.Invite
 import com.soundhub.ui.components.containers.ContentContainer
-import com.soundhub.ui.notifications.components.Notification
-import com.soundhub.ui.notifications.components.NotificationItem
-import com.soundhub.ui.notifications.components.NotificationType
+import com.soundhub.ui.notifications.components.FriendRequestNotificationItem
 
 @Composable
 fun NotificationScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    notificationViewModel: NotificationViewModel
 ) {
-    val notifications = listOf(
-        Notification(
-            avatarUrl = null,
-            type = NotificationType.FRIEND_REQUEST,
-            objectName = "User"
-        )
-    )
+    val notificationUiState: NotificationUiState by notificationViewModel
+        .notificationUiState
+        .collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        notificationViewModel.loadInvites()
+    }
 
 
     ContentContainer(
         modifier = Modifier.padding(top = 10.dp),
-        contentAlignment = if (notifications.isEmpty()) Alignment.Center
+        contentAlignment = if (notificationUiState.notifications.isEmpty()) Alignment.Center
         else Alignment.TopStart
     ) {
-        if (notifications.isEmpty()) Text(
-            text = "Здесь появятся ваши уведомления",
+        if (notificationUiState.notifications.isEmpty()) Text(
+            text = stringResource(id = R.string.empty_notification_screen),
             textAlign = TextAlign.Center,
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(items = notifications, key = { it.id }) { n ->
-                NotificationItem(
-                    avatarUrl = n.avatarUrl,
-                    type = n.type,
-                    objectName = n.objectName
-                )
+            items(items = notificationUiState.notifications, key = { it.id }) { item ->
+                when (item) {
+                    is Invite ->
+                        FriendRequestNotificationItem(
+                            invite = item,
+                            notificationViewModel = notificationViewModel
+                        )
+                }
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun NotificationScreenPreview() {
-    val navController = rememberNavController()
-    NotificationScreen(navController)
 }
