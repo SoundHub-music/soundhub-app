@@ -10,7 +10,9 @@ sealed class Route(var route: String): Cloneable {
         data object FillUserData: Route(route = Constants.FILL_DATA_REGISTRATION_ROUTE)
     }
 
-    data object Profile: Route(route = Constants.PROFILE_ROUTE)
+    data object Profile: Route(route = Constants.PROFILE_ROUTE) {
+        data object Friends: Route(route = Constants.FRIENDS_ROUTE)
+    }
 
     data object Postline: Route(route = Constants.POSTLINE_ROUTE)
     data object Music: Route(route = Constants.MUSIC_ROUTE) {
@@ -19,7 +21,7 @@ sealed class Route(var route: String): Cloneable {
         data object RecommendMusic: Route(route = Constants.MUSIC_RECOMMENDATIONS)
     }
 
-    data object FriendList: Route(route = Constants.FRIEND_LIST_ROUTE)
+
     data object Gallery: Route(route = Constants.GALLERY_ROUTE)
 
     data object Messenger: Route(route = Constants.MESSENGER_ROUTE) {
@@ -33,14 +35,21 @@ sealed class Route(var route: String): Cloneable {
     data object EditFavoriteGenres: Route(route = Constants.EDIT_FAV_GENRES_ROUTE)
     data object PostEditor: Route(route = Constants.POST_EDITOR_ROUTE) {
         val createPostRoute: String = Constants.POST_EDITOR_ROUTE
-            .replace(Regex("/${Constants.NAV_ARG_REGEX}"),"")
+            .replace(Regex("/${Constants.NAV_ARG_DYNAMIC_PARAM_REGEX}"),"")
     }
 
     companion object {
         fun replaceNavArgTemplate(route: String, navArg: String) = Regex(
-            Constants.NAV_ARG_REGEX
-        ).replace(route, navArg)
+            Constants.NAV_ARG_DYNAMIC_PARAM_REGEX
+        ).replaceFirst(route, navArg)
+
+        fun replaceNavArgsTemplate(route: String, vararg navArgs: String): String {
+            var result: String = route
+            navArgs.forEach { arg -> result = replaceNavArgTemplate(result, arg) }
+            return result
+        }
     }
+
     fun getStringRouteWithNavArg(navArg: String? = null): String = navArg?.let {
         replaceNavArgTemplate(route, navArg)
     } ?: route

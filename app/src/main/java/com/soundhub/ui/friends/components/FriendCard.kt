@@ -1,6 +1,5 @@
 package com.soundhub.ui.friends.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.friends.FriendsViewModel
@@ -100,11 +98,12 @@ private fun UserDescriptionColumn(user: User, chosenPage: FriendListPage) {
 
         Text(
             text = when (chosenPage) {
-                FriendListPage.MAIN ->
+                in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
                     getUserLocation(city = user.city, country = user.country)
                 FriendListPage.RECOMMENDATIONS ->
                     // TODO: implement the logic of determining user similarity
                     stringResource(R.string.friends_recommendation_page_card_caption, 98)
+                else -> ""
             },
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraLight,
@@ -126,12 +125,13 @@ private fun NavigateToChatButton(
     FilledTonalIconButton(
         onClick = {
             coroutineScope.launch {
-                val chat: Chat? = friendsViewModel.getOrCreateChat(user).firstOrNull()
-                Log.d("FriendCard", "chat: $chat")
-                chat?.let {
-                    navController
-                        .navigate(Route.Messenger.Chat
-                            .getStringRouteWithNavArg(it.id.toString()))
+                friendsViewModel.getOrCreateChat(user)
+                    .firstOrNull()
+                    ?.let {
+                        val route: String = Route.Messenger.Chat
+                            .getStringRouteWithNavArg(it.id.toString())
+
+                        navController.navigate(route)
                 }
             }
         },

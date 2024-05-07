@@ -16,8 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -42,6 +40,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -55,15 +54,15 @@ class MainActivity : ComponentActivity() {
     private val notificationViewModel: NotificationViewModel by viewModels()
 
     private lateinit var navController: NavHostController
-    private lateinit var uiEventState: LiveData<UiEvent>
+    private lateinit var uiEventState: Flow<UiEvent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSplashScreen()
-        uiEventState = uiStateDispatcher.uiEvent.asLiveData()
+        uiEventState = uiStateDispatcher.uiEvent.receiveAsFlow()
 
         lifecycleScope.launch {
-            uiEventState.observe(this@MainActivity) { event ->
+            uiEventState.collect { event ->
                 handleUiEvent(event, navController)
             }
         }
@@ -98,6 +97,7 @@ class MainActivity : ComponentActivity() {
         navController = rememberNavController()
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             coroutineScope.launch {
+
                 onNavDestinationChangeListener(
                     controller = controller,
                     destination = destination,
@@ -187,8 +187,6 @@ class MainActivity : ComponentActivity() {
                 .toggleSearchBarActive()
             is UiEvent.UpdateUserAction -> editUserProfileViewModel
                 .updateUser()
-            is UiEvent.UpdateUserInstance -> uiStateDispatcher
-                .setAuthorizedUser(event.user)
         }
     }
 

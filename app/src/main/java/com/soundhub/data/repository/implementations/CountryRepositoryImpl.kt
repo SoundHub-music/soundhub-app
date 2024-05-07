@@ -20,12 +20,12 @@ class CountryRepositoryImpl @Inject constructor(
             Log.d("CountryRepository", "getAllCountryNames[1]: $response")
 
             if (!response.isSuccessful) {
-                val errorBody: ErrorResponse? = Gson()
+                val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
 
                 Log.e("CountryRepository", "getAllCountryNames[2]: ${errorBody.toString()}")
-                return HttpResult.Error(errorBody = errorBody
-                    ?: ErrorResponse(status = response.code()))
+                return HttpResult.Error(errorBody = errorBody)
             }
 
             return HttpResult.Success(body = response.body())

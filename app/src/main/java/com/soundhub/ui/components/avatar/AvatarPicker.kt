@@ -3,7 +3,6 @@ package com.soundhub.ui.components.avatar
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,11 +23,7 @@ fun AvatarPicker(
 ) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            imageUriState.value = it
-        }
-    }
+    ) { uri -> uri?.let { imageUriState.value = it } }
 
     Column(
         modifier = modifier
@@ -37,10 +32,9 @@ fun AvatarPicker(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularAvatar(
-            modifier = Modifier
-                .size(150.dp)
-                .clickable { launcher.launch("image/*") },
-            imageUrl = imageUriState.value?.toString()
+            modifier = Modifier.size(150.dp),
+            imageUrl = imageUriState.value?.toString(),
+            onClick = { launcher.launch("image/*") }
         )
     }
 }

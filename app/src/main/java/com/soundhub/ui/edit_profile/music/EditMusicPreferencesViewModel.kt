@@ -11,6 +11,7 @@ import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
+import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
 import com.soundhub.ui.authentication.postregistration.states.GenreUiState
@@ -19,11 +20,13 @@ import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,22 +37,24 @@ class EditMusicPreferencesViewModel @Inject constructor(
     private val updateUserUseCase: UpdateUserUseCase,
     private val loadGenresUseCase: LoadGenresUseCase,
     private val loadArtistsUseCase: LoadArtistsUseCase,
+    private val searchArtistsUseCase: SearchArtistsUseCase,
     userCredsStore: UserCredsStore
 ): ViewModel() {
     val genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
     val artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
 
     private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState.asStateFlow()
-    private val currentUserState: MutableStateFlow<User?> = MutableStateFlow(null)
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+    private val authorizedUser: Flow<User?> = uiState.map { it.authorizedUser }
 
-    init {
-        viewModelScope.launch {
-            uiState.collect { state ->
-                currentUserState.update { state.authorizedUser }
-                loadGenres()
-            }
-        }
+    private var loadArtistsJob: Job? = null
+    private var searchArtistsJob: Job? = null
+
+    init { loadGenres() }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("EditMusicPreferencesViewModel", "viewmodel was cleared")
     }
 
     fun onNextButtonClick() = viewModelScope.launch {
@@ -61,50 +66,74 @@ class EditMusicPreferencesViewModel @Inject constructor(
         }
     }
 
+    // TODO: fix bug when loadGenres calls outside the edit genres page
     private fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
-        val favoriteGenres: List<Genre> = currentUserState.value
-            ?.favoriteGenres ?: emptyList()
+        authorizedUser.collect { user ->
+            val favoriteGenres: List<Genre> = user
+                ?.favoriteGenres ?: emptyList()
 
-        loadGenresUseCase(genreUiState = genreUiState)
-        genreUiState.update { it.copy(chosenGenres = favoriteGenres) }
-        Log.d("EditMusicPreferencesViewModel", "loadGenre: $genreUiState")
+            if (genreUiState.value.chosenGenres.isEmpty())
+                genreUiState.update { it.copy(chosenGenres = favoriteGenres) }
+            if (genreUiState.value.genres.isEmpty())
+                loadGenresUseCase(genreUiState = genreUiState)
+            Log.d("EditMusicPreferencesViewModel", "loadGenres: ${genreUiState.value}")
+        }
     }
 
-    private fun loadArtist() = viewModelScope.launch(Dispatchers.IO) {
-        val favoriteArtists: List<Artist> = currentUserState.value
-            ?.favoriteArtists ?: emptyList()
+    fun loadArtists(page: Int = 1) {
+        loadArtistsJob = viewModelScope.launch(Dispatchers.IO) {
+            authorizedUser.collect { user ->
+                val favoriteArtists: List<Artist> = user
+                    ?.favoriteArtists ?: emptyList()
 
-        loadArtistsUseCase(
-            artistUiState = artistUiState,
-            genreUiState = genreUiState
-        )
-        artistUiState.update { it.copy(chosenArtists = favoriteArtists) }
+                loadArtistsUseCase(
+                    artistUiState = artistUiState,
+                    genreUiState = genreUiState,
+                    page = page
+                )
+                artistUiState.update { it.copy(chosenArtists = favoriteArtists) }
+            }
+        }
+    }
+
+    fun searchArtists(value: String) {
+        searchArtistsJob?.cancel()
+        searchArtistsJob = viewModelScope.launch(Dispatchers.IO) {
+            searchArtistsUseCase(
+                searchBarValue = value,
+                artistStateFlow = artistUiState
+            )
+        }
     }
 
     private fun handleFavoriteArtists() = viewModelScope.launch(Dispatchers.IO) {
-        currentUserState.update {
-            it?.copy(
-                favoriteArtists = artistUiState.value.chosenArtists,
-                favoriteGenres = genreUiState.value.chosenGenres
-            )
-        }
+        loadArtistsJob?.cancel()
+
+        val user: User? = authorizedUser.firstOrNull()?.copy(
+            favoriteArtists = artistUiState.value.chosenArtists,
+            favoriteGenres = genreUiState.value.chosenGenres
+        )
 
         updateUserUseCase(
-            user = currentUserState.value,
+            user = user,
             accessToken = userCreds.firstOrNull()?.accessToken
         )
 
-        currentUserState.value?.let {
-            uiStateDispatcher.setAuthorizedUser(it)
+        user?.let {
+            uiStateDispatcher.setAuthorizedUser(user)
             uiStateDispatcher.sendUiEvent(
-                UiEvent.Navigate(Route.Profile.getRouteWithNavArg(it.id.toString()))
+                UiEvent.Navigate(Route.Profile.getRouteWithNavArg(user.id.toString()))
             )
         }
     }
 
     private fun handleFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
-        loadArtist()
+        loadArtists()
         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.EditFavoriteArtists))
+    }
+
+    fun setCurrentArtistPage(page: Int) = artistUiState.update {
+        it.copy(currentPage = page)
     }
 
     fun setChosenGenres(genres: List<Genre>) = genreUiState.update {

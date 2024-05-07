@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components.sections.user_actions
+package com.soundhub.ui.profile.components.sections.user_actions.buttons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
@@ -15,7 +15,7 @@ internal fun EditProfileButton(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-    val buttonContent = stringResource(id = R.string.edit_profile_btn_content)
+    val buttonContent = stringResource(id = R.string.profile_screen_edit_profile_btn_content)
     val buttonIcon: ImageVector = Icons.Rounded.Person
 
     ProfileActionLongButton(

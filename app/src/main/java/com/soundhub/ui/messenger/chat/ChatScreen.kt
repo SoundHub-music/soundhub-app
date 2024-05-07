@@ -64,7 +64,8 @@ fun ChatScreen(
         topBar = {
             ChatTopAppBar(
                 navController = navController,
-                chatViewModel = chatViewModel
+                chatViewModel = chatViewModel,
+                uiStateDispatcher = uiStateDispatcher
             )
         }
     ) {

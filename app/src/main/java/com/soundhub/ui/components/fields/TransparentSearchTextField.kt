@@ -40,8 +40,8 @@ fun TransparentSearchTextField(
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
     val isSearchBarActive = uiState.isSearchBarActive
 
-    val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
+
     LaunchedEffect(key1 = isSearchBarActive) {
         if (isSearchBarActive) focusRequester.requestFocus()
     }
@@ -64,13 +64,7 @@ fun TransparentSearchTextField(
             )
         },
         trailingIcon = {
-            IconButton(onClick = {
-                coroutineScope.launch {
-                    uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
-                }
-            }) {
-                Icon(imageVector = Icons.Rounded.Close, contentDescription = "close search bar button")
-            }
+            CloseSearchBarButton(uiStateDispatcher)
        },
         singleLine = true,
         colors = TextFieldDefaults.colors(
@@ -81,6 +75,20 @@ fun TransparentSearchTextField(
             disabledContainerColor = Color.Transparent,
         ),
     )
+}
+
+@Composable
+private fun CloseSearchBarButton(uiStateDispatcher: UiStateDispatcher) {
+    val coroutineScope = rememberCoroutineScope()
+
+    IconButton(onClick = {
+        coroutineScope.launch { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }
+    }) {
+        Icon(
+            imageVector = Icons.Rounded.Close,
+            contentDescription = "close search bar button"
+        )
+    }
 }
 
 @Composable

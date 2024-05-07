@@ -28,7 +28,7 @@ class HttpUtils {
                 "file", imageFile.name, imageFile
                     .asRequestBody(ContentTypes.IMAGE_ALL.type.toMediaTypeOrNull())
             )
-            Log.d("FileRepositoryUtils", "getImageFormData[1]: generated formdata: $formData")
+            Log.d("HttpUtils", "getImageFormData[1]: generated formdata: $formData")
             return formData
         }
 
@@ -54,11 +54,11 @@ class HttpUtils {
                     }
                 }
 
-                Log.d("AuthRepository", "createTempMediaFile[1]: fileExtension = $fileExtension")
+                Log.d("HttpUtils", "createTempMediaFile[1]: fileExtension = $fileExtension")
                 return tempFile
             }
             catch (e: Exception) {
-                Log.e("FileRepository", "createTempMediaFile: ${e.stackTraceToString()}")
+                Log.e("HttpUtils", "createTempMediaFile: ${e.stackTraceToString()}")
                 return null
             }
         }

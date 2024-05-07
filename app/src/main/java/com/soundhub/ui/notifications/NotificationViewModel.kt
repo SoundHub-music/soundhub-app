@@ -6,15 +6,20 @@ import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
+import com.soundhub.data.model.Invite
+import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
 import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -27,14 +32,17 @@ class NotificationViewModel @Inject constructor(
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+    private val uiState: Flow<UiState> = uiStateDispatcher.uiState.asStateFlow()
     val notificationUiState = MutableStateFlow(NotificationUiState())
 
     init { loadInvites() }
 
     fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
         notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
-        userCreds.collect { creds ->
-            inviteRepository.getAllInvites(creds.accessToken)
+        userCreds.firstOrNull()
+            ?.accessToken
+            ?.let { accessToken ->
+            inviteRepository.getAllInvites(accessToken)
                 .onSuccess { response ->
                     val invites = response.body ?: emptyList()
                     notificationUiState.update {
@@ -52,17 +60,25 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
-    fun acceptInvite(inviteId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+    fun acceptInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
         val toastText = UiText.StringResource(R.string.toast_invite_accepted_successfully)
         val uiEvent = UiEvent.ShowToast(toastText)
 
         val creds: UserPreferences? = userCreds.firstOrNull()
         inviteRepository.acceptInvite(
             accessToken = creds?.accessToken,
-            inviteId = inviteId
+            inviteId = invite.id
         )
             .onSuccess {
-                deleteNotificationById(inviteId)
+                deleteNotificationById(invite.id)
+                val authorizedUser: User? = uiState.map { it.authorizedUser }
+                    .firstOrNull()
+                authorizedUser?.let { user ->
+                    with(user) {
+                        this.friends += invite.sender
+                        uiStateDispatcher.setAuthorizedUser(this)
+                    }
+                }
             }
             .onFailure {
                 toastText.srcId = R.string.toast_accept_invite_error

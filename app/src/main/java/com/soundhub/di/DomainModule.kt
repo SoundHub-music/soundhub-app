@@ -1,5 +1,6 @@
 package com.soundhub.di
 
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository
@@ -9,6 +10,8 @@ import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
 import com.soundhub.domain.usecases.file.GetImageUseCase
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
+import com.soundhub.domain.usecases.music.SearchArtistsUseCase
+import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.Module
@@ -23,8 +26,12 @@ object DomainModule {
     @Provides
     @Singleton
     fun providesUpdateUserUseCase(
-        userRepository: UserRepository
-    ): UpdateUserUseCase = UpdateUserUseCase(userRepository)
+        userRepository: UserRepository,
+        uiStateDispatcher: UiStateDispatcher
+    ): UpdateUserUseCase = UpdateUserUseCase(
+        userRepository,
+        uiStateDispatcher
+    )
 
     @Provides
     @Singleton
@@ -58,4 +65,17 @@ object DomainModule {
         chatRepository: ChatRepository
     ): GetOrCreateChatByUserUseCase =
         GetOrCreateChatByUserUseCase(chatRepository)
+
+    @Provides
+    @Singleton
+    fun providesSearchArtistsUseCase(musicRepository: MusicRepository): SearchArtistsUseCase =
+        SearchArtistsUseCase(musicRepository)
+
+    @Provides
+    @Singleton
+    fun providesGetUserByIdUseCase(
+        userRepository: UserRepository,
+        userCredsStore: UserCredsStore
+    ): GetUserByIdUseCase =
+        GetUserByIdUseCase(userRepository, userCredsStore)
 }

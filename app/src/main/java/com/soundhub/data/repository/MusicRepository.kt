@@ -14,15 +14,17 @@ interface MusicRepository {
         genres: List<String>,
         styles: List<String> = emptyList(),
         page: Int = 1,
-        countPerPage: Int = 50,
+        countPerPage: Int = 100,
         artistState: MutableStateFlow<ArtistUiState>
     ): HttpResult<List<Artist>>
     suspend fun getArtistById(artistId: Int): HttpResult<Artist?>
 
-    suspend fun searchArtistByName(artistName: String): HttpResult<Artist?>
+    suspend fun searchArtistInReleaseResponse(artistName: String): HttpResult<Artist?>
     suspend fun getArtistReleases(
         artistId: Int,
         sortType: DiscogsSortType? = null,
         sortOrder: String? = null
     ): HttpResult<List<Track>>
+
+    suspend fun searchArtists(artistName: String): HttpResult<List<Artist>>
 }

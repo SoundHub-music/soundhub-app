@@ -18,5 +18,5 @@ fun SearchButton(uiStateDispatcher: UiStateDispatcher) {
             uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
         }
     }
-    ) { Icon(Icons.Rounded.Search, contentDescription = null) }
+    ) { Icon(Icons.Rounded.Search, contentDescription = "search button") }
 }

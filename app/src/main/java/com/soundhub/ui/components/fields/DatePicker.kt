@@ -39,7 +39,7 @@ fun DatePicker(
 ) {
     var currentDate: String by rememberSaveable { mutableStateOf(value) }
     val context = LocalContext.current
-    val invalidBirthdayMessage: String = stringResource(id = R.string.userform_invalid_birthday_error_message)
+    val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
 
     LaunchedEffect(true) {
         Log.d("DatePicker", "current value: $value")

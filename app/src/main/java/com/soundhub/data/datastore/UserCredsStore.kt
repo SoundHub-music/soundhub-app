@@ -30,8 +30,7 @@ class UserCredsStore(private val context: Context) {
 
     fun getCreds(): Flow<UserPreferences> {
         return context.dataStore.data.map {
-            pref ->
-            UserPreferences(
+            pref -> UserPreferences(
                 accessToken = pref[PreferenceKeys.accessToken],
                 refreshToken = pref[PreferenceKeys.refreshToken]
             )

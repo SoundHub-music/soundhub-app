@@ -34,7 +34,7 @@ internal fun EmptyMessengerScreen(navController: NavHostController) {
         )
 
         OutlinedButton(
-            onClick = { navController.navigate(Route.FriendList.route) },
+            onClick = { navController.navigate(Route.Profile.Friends.route) },
             shape = RoundedCornerShape(10.dp)
         ) {
             Text(

@@ -5,20 +5,19 @@
 Предусмотрена интеграция музыкальных сервисов, таких как *Spotify*, *Яндекс.Музыка*, *Last.FM* для загрузки плейлистов и треков пользователя.
 
 Для успешной сборки проекта необходимо включить некоторые константы в файл `local.properties` в корне проекта, а именно:
-```
+```properties
 DISCOGS_KEY="Discogs key"
 DISCOGS_SECRET="Discogs secret"
 
 LAST_FM_API_KEY="last fm api key"
 LAST_FM_SHARED_SECRET="last fm shared secret"
 ```
-Также в файле `Constants.kt` указать адрес сервера приложения
+Также в файле `src/utils/constants/Constants.kt` указать адрес сервера приложения
 ```kotlin
 object Constants {
     //...
-    const val SOUNDHUB_API = "address-to-backend/api/v1/"
-    // Константа используется в случае использования сервера на локальной машине
-    const val SOUNDHUB_API_ADDRESS = "address-to-backend"
+    const val SOUNDHUB_API_HOSTNAME="real-server-host"
+    const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
 }
 ```
 

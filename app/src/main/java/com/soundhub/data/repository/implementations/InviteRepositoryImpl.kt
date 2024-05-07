@@ -111,6 +111,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
 
                 Log.e("InviteRepository", "getAllInvites[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)
@@ -172,6 +173,7 @@ class InviteRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(status = response.code())
 
                 Log.e("InviteRepository", "deleteInvite[2]: $errorResponse")
                 return HttpResult.Error(errorBody = errorResponse)

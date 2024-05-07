@@ -13,13 +13,14 @@ object Constants {
 
     // regular expressions
     const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
-    const val NAV_ARG_REGEX: String = """\{[^}]*\}"""
+    const val NAV_ARG_DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
 
     // datastore identifiers
     const val DATASTORE_USER_CREDS = "user_creds"
     const val DATASTORE_ACCESS_TOKEN = "user_access_token"
     const val DATASTORE_REFRESH_TOKEN = "user_refresh_token"
 
+    // room db
     const val ROOM_DB_NAME = "soundhub_db"
 
     // route list constants
@@ -48,7 +49,7 @@ object Constants {
     val ROUTES_WITH_SEARCH_BAR: List<String> = listOf(
         Route.Music.route,
         Route.Messenger.route,
-        Route.FriendList.route
+        Route.Profile.Friends.route
     )
 
     // nav arguments
@@ -57,7 +58,8 @@ object Constants {
     const val CHAT_NAV_ARG = "chatId"
     const val GALLERY_INITIAL_PAGE_NAV_ARG = "imageIndex"
     const val POST_EDITOR_NAV_ARG = "postId"
-    val ALL_NAV_ARGS = listOf(
+
+    val ALL_NAV_ARGS: List<String> = listOf(
         POST_REGISTER_NAV_ARG,
         PROFILE_NAV_ARG,
         CHAT_NAV_ARG,
@@ -73,8 +75,8 @@ object Constants {
     const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
 
     const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
+    const val FRIENDS_ROUTE = "${PROFILE_ROUTE}/friends"
     const val POSTLINE_ROUTE = "postline"
-
     const val MUSIC_ROUTE = "music"
 
     // messenger routes
@@ -88,7 +90,6 @@ object Constants {
     const val EDIT_FAV_ARTISTS_ROUTE = "fav-artists-editor"
     const val POST_EDITOR_ROUTE = "post-editor/{$POST_EDITOR_NAV_ARG}"
     const val GALLERY_ROUTE = "gallery"
-    const val FRIEND_LIST_ROUTE = "friends"
 
     // music page
     const val MUSIC_NEW_OF_THE_WEEK = "new-of-the-week"
@@ -98,7 +99,7 @@ object Constants {
     // response error body type
     val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>(){}.type
 
-    // named injections for hilt
+    // named hilt injections
     const val COUNTRIES_API_RETROFIT = "countries_api"
     const val SOUNDHUB_API_RETROFIT = "soundhub_api"
     const val LAST_FM_API_RETROFIT = "lastfm_api"
@@ -106,9 +107,9 @@ object Constants {
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API_HOSTNAME="192.168.0.167"
-    const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME:8080/api/v1/"
-    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/api/v1/"
+    const val SOUNDHUB_API_HOSTNAME="192.168.0.167:8080"
+    const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
+    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/api/v1/messages"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 

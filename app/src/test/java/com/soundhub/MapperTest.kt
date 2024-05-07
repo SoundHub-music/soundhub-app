@@ -11,7 +11,6 @@ import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
 import org.junit.Test
 import org.junit.Assert.*
-import org.mapstruct.factory.Mappers
 import java.time.LocalDate
 
 class UserMapperTest {
@@ -25,12 +24,12 @@ class UserMapperTest {
         birthday = LocalDate.now(),
         description = "description",
         languages = mutableListOf("Russian"),
-        favoriteArtists = mutableListOf(Artist(name = "Rammstein")),
+        favoriteArtists = mutableListOf(Artist(title = "Rammstein")),
         favoriteGenres = mutableListOf(Genre(name = "Industrial metal")),
     )
 
     private val registerState: RegistrationState = RegistrationState(
-        email = user.email!!,
+        email = user.email,
         password = "11111111",
         firstName = user.firstName,
         lastName = user.lastName,
@@ -46,7 +45,7 @@ class UserMapperTest {
     )
 
     private val userFormState: UserFormState = UserFormState(
-        email = user.email!!,
+        email = user.email,
         firstName = user.firstName,
         lastName = user.lastName,
         gender = user.gender,
@@ -59,10 +58,10 @@ class UserMapperTest {
     )
 
     private val registerRequestBody = RegisterRequestBody(
-        email = user.email!!,
+        email = user.email,
         password = "11111111",
-        firstName = user.firstName!!,
-        lastName = user.lastName!!,
+        firstName = user.firstName,
+        lastName = user.lastName,
         gender = user.gender,
         country = user.country,
         city = user.city,
@@ -70,33 +69,32 @@ class UserMapperTest {
         description = user.description,
         languages = user.languages,
         favoriteGenres = user.favoriteGenres,
-        favoriteArtists = user.favoriteArtists,
+        favoriteArtistsIds = user.favoriteArtists.map { it.id },
     )
 
-    private val mapper: UserMapper = Mappers.getMapper(UserMapper::class.java)
 
     @Test
     fun getUserFromRegistrationTest() {
-        val result: User = mapper.fromRegistrationState(registerState)
+        val result: User = UserMapper.impl.fromRegistrationState(registerState)
         assertEquals(user, result)
     }
 
     @Test
     fun getUserFromFormState() {
-        val result: User = mapper.mergeUserWithFormState(userFormState, user)
+        val result: User = UserMapper.impl.mergeUserWithFormState(userFormState, user)
         assertEquals(user, result)
     }
 
     @Test
     fun getFormStateFromUserInstance() {
-        val result: UserFormState = mapper.toFormState(user)
+        val result: UserFormState = UserMapper.impl.toFormState(user)
         assertEquals(userFormState, result)
     }
 
     @Test
     fun getRegisterRequestBody() {
-        val regMapper = Mappers.getMapper(RegisterDataMapper::class.java)
-        val result: RegisterRequestBody = regMapper.registerStateToRegisterRequestBody(registerState)
+        val result: RegisterRequestBody = RegisterDataMapper
+            .impl.registerStateToRegisterRequestBody(registerState)
         assertEquals(registerRequestBody, result)
     }
 }

@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components.sections.user_actions
+package com.soundhub.ui.profile.components.sections.user_actions.buttons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape

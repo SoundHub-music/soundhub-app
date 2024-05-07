@@ -39,6 +39,7 @@ import com.soundhub.ui.post_editor.PostEditorScreen
 import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
 import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.friends.FriendsScreen
+import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.gallery.GalleryScreen
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.messenger.MessengerViewModel
@@ -49,11 +50,11 @@ import com.soundhub.ui.notifications.NotificationScreen
 import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.viewmodels.UserViewModel
 import com.soundhub.utils.constants.Constants
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Composable
@@ -70,24 +71,26 @@ fun NavigationHost(
     authorizedUser: User?
 ) {
     var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
-    val userCreds: UserPreferences? by authViewModel
-        .userCreds
-        .collectAsState(initial = null)
+    val userCredsFlow: Flow<UserPreferences> = authViewModel.userCreds
+    var userCreds: UserPreferences? by remember {
+        mutableStateOf(null)
+    }
 
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
-
-    val userViewModel: UserViewModel = hiltViewModel()
     val editMusicPrefViewModel: EditMusicPreferencesViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = currentRoute) {
-        Log.d("HomeScreen", "current_route: $currentRoute")
-        Log.d("HomeScreen", "authorized_user: $authorizedUser")
-        Log.d("HomeScreen", "user_creds: ${userCreds.toString()}")
+        Log.d("NavigationHost", "current_route: $currentRoute")
+        Log.d("NavigationHost", "authorized_user: $authorizedUser")
+        Log.d("NavigationHost", "user_creds: $userCreds")
     }
 
-    LaunchedEffect(key1 = userCreds?.accessToken) {
-        startDestination = defineStartDestination(userCreds = userCreds)
+    LaunchedEffect(key1 = true) {
+        userCredsFlow.collect { creds ->
+            userCreds = creds
+            startDestination = defineStartDestination(userCreds = creds)
+        }
     }
 
     NavHost(
@@ -195,50 +198,51 @@ fun NavigationHost(
             arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
         ) { entry ->
             runCatching {
-                authorizedUser?.let { currentUser ->
-                    val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
-                    val userId: UUID? = argument?.let { UUID.fromString(argument) }
-                    var user: User? by remember { mutableStateOf(null) }
+                val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
+                val userId: UUID? = argument?.let { UUID.fromString(argument) }
+                val profileViewModel: ProfileViewModel = hiltViewModel()
 
-                    Log.d("NavigationHost", "Profile[userId]: $userId")
-
-                    LaunchedEffect(key1 = true) {
-                        user = if (userId == authorizedUser.id)
-                            currentUser
-                        else userId?.let { userId ->
-                            userViewModel
-                                .getUserById(userId)
-                                .firstOrNull()
-                        }
-                    }
-
-                    ScreenContainer(
-                        userCreds = userCreds,
-                        navController = navController
-                    ) {
-                        ProfileScreen(
-                            navController = navController,
-                            uiStateDispatcher = uiStateDispatcher,
-                            user = user
-                        )
-                    }
+                LaunchedEffect(key1 = true) {
+                    userId?.let { userId -> profileViewModel.loadProfileOwner(userId) }
                 }
-            }.onFailure {
-                Log.e("NavigationHost", "Profile: ${it.stackTraceToString()}")
+
+                ScreenContainer(
+                    userCreds = userCreds,
+                    navController = navController
+                ) {
+                    ProfileScreen(
+                        navController = navController,
+                        uiStateDispatcher = uiStateDispatcher,
+                        profileViewModel = profileViewModel
+                    )
+                }
             }
         }
 
-        composable(Route.FriendList.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_friends)
-                FriendsScreen(
-                    uiStateDispatcher = uiStateDispatcher,
-                    navController = navController,
-                    authorizedUser = authorizedUser
-                )
+        composable(
+            route = Route.Profile.Friends.route,
+            arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
+        ) { entry ->
+            runCatching {
+                val argument: String? = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
+                val userId: UUID? = argument?.let { UUID.fromString(it) }
+                val friendsViewModel: FriendsViewModel = hiltViewModel()
+
+                LaunchedEffect(key1 = true) {
+                    userId?.let { friendsViewModel.loadProfileOwner(it) }
+                }
+
+                ScreenContainer(
+                    userCreds = userCreds,
+                    navController = navController
+                ) {
+                    topBarTitle.value = stringResource(id = R.string.screen_title_friends)
+                    FriendsScreen(
+                        uiStateDispatcher = uiStateDispatcher,
+                        navController = navController,
+                        friendsViewModel = friendsViewModel
+                    )
+                }
             }
         }
 
@@ -263,8 +267,7 @@ fun NavigationHost(
                 topBarTitle.value = stringResource(id = R.string.screen_title_edit_profile)
                 EditUserProfileScreen(
                     authorizedUser = authorizedUser,
-                    editUserProfileViewModel = editUserProfileViewModel,
-                    authViewModel = authViewModel
+                    editUserProfileViewModel = editUserProfileViewModel
                 )
             }
         }
@@ -296,7 +299,7 @@ fun NavigationHost(
                     .value
                     .galleryImageUrls
 
-                val initialPage = entry.arguments
+                val initialPage: Int = entry.arguments
                     ?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
                     ?.toInt() ?: 0
 
@@ -334,7 +337,7 @@ fun NavigationHost(
                     userCreds = userCreds,
                     navController = navController
                 ) {
-                    topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
+                    topBarTitle.value = stringResource(id = R.string.screen_title_update_post)
                     PostEditorScreen(
                         user = authorizedUser,
                         postId = postId
@@ -365,4 +368,5 @@ private fun defineStartDestination(
 ): String =
     if (userCreds?.accessToken.isNullOrEmpty())
         Route.Authentication.route
-    else Route.Postline.route
+    else
+        Route.Postline.route

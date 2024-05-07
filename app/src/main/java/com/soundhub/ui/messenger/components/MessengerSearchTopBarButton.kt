@@ -17,12 +17,8 @@ fun MessengerSearchTopBarButton(
 ) {
     val coroutineScope = rememberCoroutineScope()
     IconButton(onClick = {
-        coroutineScope.launch {
-            uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
-        }
-    }) {
-        Icon(Icons.Rounded.Search, contentDescription = null)
-    }
+        coroutineScope.launch { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }
+    }) { Icon(Icons.Rounded.Search, contentDescription = "search chat button") }
 
 }
 

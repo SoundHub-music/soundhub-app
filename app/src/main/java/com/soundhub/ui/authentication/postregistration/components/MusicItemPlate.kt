@@ -1,14 +1,13 @@
 package com.soundhub.ui.authentication.postregistration.components
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -40,7 +38,7 @@ import com.soundhub.R
 fun MusicItemPlate(
     modifier: Modifier = Modifier,
     caption: String,
-    thumbnailUrl: String? = null,
+    thumbnailUrl: String?,
     onClick: (Boolean) -> Unit = {},
     isChosen: Boolean = false,
     width: Dp = 72.dp,
@@ -50,17 +48,12 @@ fun MusicItemPlate(
     var itemBoxModifier: Modifier = Modifier
         .width(width)
         .height(height)
-        .clip(shape = RoundedCornerShape(16.dp))
-        .clickable {
-            isItemChosen = !isItemChosen
-            onClick(isItemChosen)
-        }
 
     if (isItemChosen)
         itemBoxModifier = itemBoxModifier
             .border(
-                width = 5.dp,
-                color = MaterialTheme.colorScheme.primary,
+                width = 8.dp,
+                color = MaterialTheme.colorScheme.tertiary,
                 shape = RoundedCornerShape(16.dp)
             )
 
@@ -69,7 +62,14 @@ fun MusicItemPlate(
         verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box (modifier = itemBoxModifier) {
+        ElevatedCard (
+            modifier = itemBoxModifier,
+            shape = RoundedCornerShape(16.dp),
+            onClick = {
+                isItemChosen = !isItemChosen
+                onClick(isItemChosen)
+            }
+        ) {
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(thumbnailUrl)
@@ -102,5 +102,5 @@ fun MusicItemPlate(
 @Preview
 @Composable
 private fun ItemPlatePreview() {
-    MusicItemPlate(caption = "Rap")
+    MusicItemPlate(caption = "Rap", thumbnailUrl = "")
 }

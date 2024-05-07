@@ -11,12 +11,15 @@ class LoadArtistsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         genreUiState: MutableStateFlow<GenreUiState>,
-        artistUiState: MutableStateFlow<ArtistUiState>
+        artistUiState: MutableStateFlow<ArtistUiState>,
+        page: Int = 1
     ) {
-        musicRepository.loadArtistByGenresToState(
-            genres = genreUiState.value.chosenGenres.map { it.name ?: "" },
-            styles = genreUiState.value.chosenGenres.map { it.name ?: "" },
-            artistState = artistUiState
-        )
+        if (genreUiState.value.chosenGenres.isNotEmpty())
+            musicRepository.loadArtistByGenresToState(
+                genres = genreUiState.value.chosenGenres.map { it.name ?: "" },
+                styles = genreUiState.value.chosenGenres.map { it.name ?: "" },
+                artistState = artistUiState,
+                page = page
+            )
     }
 }

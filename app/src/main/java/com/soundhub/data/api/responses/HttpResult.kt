@@ -18,6 +18,12 @@ sealed class HttpResult<T>(val status: ApiStatus) {
         return this
     }
 
+    fun onSuccessReturn(): T? {
+        if (this is Success)
+            return this.body
+        return null
+    }
+
     suspend fun onFailure(callback: suspend (Error<T>) -> Unit): HttpResult<T> {
         if (this is Error) callback(this)
         return this

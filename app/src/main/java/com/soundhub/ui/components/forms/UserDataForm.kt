@@ -1,6 +1,7 @@
 package com.soundhub.ui.components.forms
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -23,13 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.avatar.AvatarPicker
 import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.CountryDropdownField
 import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
+import com.soundhub.ui.states.UserFormState
 import com.soundhub.utils.constants.Constants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -46,18 +44,16 @@ fun UserDataForm(
     onCountryChange: (String) -> Unit = {},
     onCityChange: (String) -> Unit = {},
     onLanguagesChange: (List<String>) -> Unit = {},
-    authViewModel: AuthenticationViewModel = hiltViewModel(),
 ) {
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
-    val userCreds: UserPreferences? by authViewModel.userCreds
-        .collectAsState(initial = null)
 
-    LaunchedEffect(true) {
-        avatarUri.value = userDataFormViewModel.getAvatar(
-            accessToken = userCreds?.accessToken,
-            avatarUrl = formState.value.avatarUrl
-        )?.toUri()
+    LaunchedEffect(formState) {
+        Log.d("UserDataForm", formState.value.toString())
+        if (formState.value is UserFormState)
+            avatarUri.value = (formState.value as UserFormState)
+                .avatarImageFile
+                ?.absolutePath?.toUri()
     }
 
     LaunchedEffect(key1 = avatarUri.value) {
@@ -81,7 +77,7 @@ fun UserDataForm(
             isError = !formState.value.isFirstNameValid,
             supportingText = {
                 if (!formState.value.isFirstNameValid)
-                    Text(text = stringResource(id = R.string.userform_firstname_error_message))
+                    Text(text = stringResource(id = R.string.user_form_firstname_error_message))
             }
         )
 
@@ -94,7 +90,7 @@ fun UserDataForm(
             isError = !formState.value.isLastNameValid,
             supportingText = {
                 if (!formState.value.isLastNameValid)
-                    Text(text = stringResource(id = R.string.userform_lastname_error_message))
+                    Text(text = stringResource(id = R.string.user_form_lastname_error_message))
             }
         )
 
@@ -133,7 +129,7 @@ fun UserDataForm(
             isError = !formState.value.isBirthdayValid,
             supportingText = {
                 if (!formState.value.isBirthdayValid)
-                    Text(text = stringResource(id = R.string.userform_birthday_error_message))
+                    Text(text = stringResource(id = R.string.user_form_birthday_error_message))
             }
         )
 

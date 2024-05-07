@@ -37,20 +37,22 @@ fun PostEditorScreen(
     user: User?,
     postId: UUID? = null
 ) {
-    val postState by postEditorViewModel.postEditorState.collectAsState()
+    val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = postId) {
         Log.d("PostEditorScreen", "post id: $postId")
-        postId?.let {  id -> postEditorViewModel.loadPost(id) }
+        postId?.let { id -> postEditorViewModel.loadPost(id) }
     }
 
-    Box(
-        contentAlignment = Alignment.BottomEnd
-    ) {
+    LaunchedEffect(key1 = postEditorState) {
+        Log.d("PostEditorScreen", "post editor state: $postEditorState")
+    }
+
+    Box(contentAlignment = Alignment.BottomEnd) {
         OutlinedTextField(
             modifier = Modifier.fillMaxSize(),
-            value = postState.content,
+            value = postEditorState.content,
             onValueChange = { postEditorViewModel.setContent(it) },
             placeholder = {
                 Text(
@@ -76,12 +78,18 @@ fun PostEditorScreen(
                     contentDescription = "add photo"
                 )
             }
+
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier.padding(10.dp),
                 onClick = {
                     coroutineScope.launch {
-                        postEditorViewModel.createPost(author = user,)
+                        if (postId == null)
+                            onCreatePostButtonClick(
+                                postEditorViewModel = postEditorViewModel,
+                                user = user
+                            )
+                        else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
                     }
                 }
             ) {
@@ -93,3 +101,11 @@ fun PostEditorScreen(
         }
     }
 }
+
+private suspend fun onUpdatePostButtonClick(postEditorViewModel: PostEditorViewModel) =
+    postEditorViewModel.updatePost()
+
+private suspend fun onCreatePostButtonClick(
+    postEditorViewModel: PostEditorViewModel,
+    user: User?
+) = postEditorViewModel.createPost(author = user)

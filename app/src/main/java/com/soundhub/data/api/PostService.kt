@@ -51,11 +51,12 @@ interface PostService {
     ): Response<UUID>
 
     @PUT(ApiEndpoints.Posts.UPDATE)
+    @Multipart
     suspend fun updatePost(
         @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
         @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM) postId: UUID,
-        @Part("postDto") post: RequestBody,
+        @Part(value = "postDto") post: RequestBody,
         @Part images: List<MultipartBody.Part?> = emptyList(),
-        @Part imagesToBeDeleted: List<MultipartBody.Part?> = emptyList()
+        @Part(value = "deleteFiles") imagesToBeDeleted: List<String> = emptyList()
     ): Response<Post>
 }

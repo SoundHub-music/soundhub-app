@@ -1,6 +1,5 @@
 package com.soundhub.ui.friends
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +12,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.data.model.User
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.friends.components.FriendsScreenPager
 import com.soundhub.ui.friends.components.FriendsScreenTabs
 import com.soundhub.ui.friends.enums.FriendListPage
@@ -27,50 +25,50 @@ import com.soundhub.ui.states.UiState
 fun FriendsScreen(
     uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController,
-    authorizedUser: User?,
-    friendsViewModel: FriendsViewModel = hiltViewModel()
+    friendsViewModel: FriendsViewModel
 ) {
     val tabs = friendsViewModel.tabs
-    val selectedTabState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { tabs.size }
-    )
-
-    val friends: List<User> = authorizedUser?.friends ?: emptyList()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
     val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val selectedTabState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+
+    val profileOwner: User? = friendsUiState.profileOwner
+    val authorizedUser: User? = uiState.authorizedUser
+    var isOriginProfile: Boolean by rememberSaveable { mutableStateOf(false) }
+    var tabState: List<FriendListPage> by rememberSaveable {
+        mutableStateOf(friendsViewModel.tabs)
+    }
+
     val searchBarText: String = uiState.searchBarText
-    var filteredFriendList: List<User> by rememberSaveable { mutableStateOf(friends) }
 
     LaunchedEffect(key1 = searchBarText) {
-        filteredFriendList = friendsViewModel
-            .filterFriendsList(searchBarText, friends)
+        if (tabs[selectedTabState.currentPage] == FriendListPage.SEARCH)
+            friendsViewModel.searchUsers(searchBarText)
+    }
+
+    LaunchedEffect(key1 = authorizedUser, key2 = profileOwner) {
+        isOriginProfile = authorizedUser?.id == profileOwner?.id
+        tabState = if (!isOriginProfile)
+            listOf(FriendListPage.MAIN)
+        else friendsViewModel.tabs
     }
 
     LaunchedEffect(key1 = selectedTabState.currentPage) {
-        filteredFriendList = when (tabs[selectedTabState.currentPage]) {
-            FriendListPage.MAIN -> authorizedUser?.friends ?: emptyList()
-            FriendListPage.RECOMMENDATIONS -> friendsUiState.recommendedFriends
-        }
-    }
-
-    LaunchedEffect(key1 = filteredFriendList) {
-        Log.d("FriendsScreen", "users: $friendsUiState")
+        uiStateDispatcher.setSearchBarActive(false)
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-       FriendsScreenTabs(
+       if (isOriginProfile) FriendsScreenTabs(
            selectedTabState = selectedTabState,
-           tabs = tabs
+           tabs = tabState
        )
 
        FriendsScreenPager(
            selectedTabState = selectedTabState,
-           tabs = tabs,
            navController = navController,
-           friendsUiState = friendsUiState,
-           filteredFriendList = filteredFriendList,
-           friendsViewModel = friendsViewModel
+           friendsViewModel = friendsViewModel,
+           uiStateDispatcher = uiStateDispatcher,
+           isOriginProfile = isOriginProfile
        )
     }
 }

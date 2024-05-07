@@ -1,6 +1,7 @@
 package com.soundhub.data.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
@@ -17,9 +18,9 @@ data class User(
     var gender: Gender = Gender.UNKNOWN,
     var avatarUrl: String? = null,
     var avatarImageFile: File? = null,
-    var email: String? = "",
-    var firstName: String? = "",
-    var lastName: String? = "",
+    var email: String = "",
+    var firstName: String = "",
+    var lastName: String = "",
     var country: String? = "",
 
     @SerializedName("birthday")
@@ -35,5 +36,9 @@ data class User(
     var favoriteGenres: List<Genre> = emptyList(),
 
     @SerializedName("favoriteArtists")
-    var favoriteArtists: List<Artist> = emptyList()
+    var favoriteArtists: List<Artist> = emptyList(),
+
+    @Ignore
+    @SerializedName("favoriteArtistsIds")
+    var favoriteArtistsIds: List<Int> = emptyList()
 )

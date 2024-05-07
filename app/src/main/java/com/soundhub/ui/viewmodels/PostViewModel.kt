@@ -37,34 +37,37 @@ class PostViewModel @Inject constructor(
             .any { it.likes.contains(user) && it == post }
     }
 
-    fun getPostsByUser(user: User?) =
-        viewModelScope.launch(Dispatchers.IO) {
-            user?.let { user ->
-                postRepository.getPostsByAuthorId(
-                authorId = user.id,
-                accessToken = userCreds.firstOrNull()?.accessToken
-            )
-            .onSuccess { response ->
-                postUiState.update { it.copy(
-                    posts = response.body?.sortedByDescending { p -> p.publishDate }
-                        ?: emptyList(),
+    fun getPostsByUser(user: User) = viewModelScope.launch(Dispatchers.IO) {
+        postUiState.update { it.copy(status = ApiStatus.LOADING) }
+
+        postRepository.getPostsByAuthorId(
+            authorId = user.id,
+            accessToken = userCreds.firstOrNull()?.accessToken
+        ).onSuccess { response ->
+            val sortedPosts: List<Post> = response.body
+                ?.sortedByDescending { p -> p.publishDate }
+                ?: emptyList()
+
+            postUiState.update {
+                it.copy(
+                    posts = sortedPosts,
                     status = ApiStatus.SUCCESS
-                ) }
+                )
             }
-            .onFailure {
-                postUiState.update {
-                    it.copy(status = ApiStatus.ERROR)
-                }
+        }
+        .onFailure {
+            postUiState.update {
+                it.copy(status = ApiStatus.ERROR)
             }
         }
     }
 
     fun deletePostById(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        userCreds.collect { userCreds ->
-            postRepository.deletePost(
-                accessToken = userCreds.accessToken,
-                postId = id
-            )
+        val creds: UserPreferences? = userCreds.firstOrNull()
+        postRepository.deletePost(
+            accessToken = creds?.accessToken,
+            postId = id
+        )
             .onSuccess {
                 postUiState.update { state ->
                     state.copy(posts = state.posts.filter { post -> post.id != id })
@@ -77,66 +80,41 @@ class PostViewModel @Inject constructor(
             .onFailure {
                 uiStateDispatcher
                     .sendUiEvent(
-                       UiEvent.ShowToast(UiText
-                           .StringResource(R.string.toast_delete_post_error_message))
-                )
+                        UiEvent.ShowToast(UiText
+                            .StringResource(R.string.toast_delete_post_error_message))
+                    )
             }
-        }
-    }
-
-    fun updatePost(post: Post, imagesToBeDeleted: List<String> = emptyList()) =
-        viewModelScope.launch(Dispatchers.IO) {
-        userCreds.collect { creds ->
-            postRepository.updatePost(
-                accessToken = creds.accessToken,
-                postId = post.id,
-                post = post,
-                imagesToBeDeleted = imagesToBeDeleted
-            )
-            .onSuccess {
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(UiText
-                    .StringResource(R.string.toast_post_updated_successfully)))
-            }
-            .onFailure {
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(UiText
-                    .StringResource(R.string.toast_update_post_error)))
-            }
-        }
     }
 
     fun toggleLike(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        userCreds.collect { creds ->
-            postRepository.toggleLike(
-                accessToken = creds.accessToken,
-                postId = postId
-            )
-            .onSuccess { response ->
-                val updatedPost = response.body
-                updatePostInList(updatedPost)
-            }
-            .onFailure { response ->
-                uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(UiText
-                        .DynamicString(response.errorBody.detail ?: ""))
-                )
-            }
+        val creds: UserPreferences? = userCreds.firstOrNull()
+
+        postRepository.toggleLike(
+            accessToken = creds?.accessToken,
+            postId = postId
+        )
+        .onSuccess { response -> updatePostInList(response.body) }
+        .onFailure { error ->
+            val toastText: UiText.DynamicString = UiText.DynamicString(error.errorBody.detail ?: "")
+            uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
         }
     }
 
     private fun updatePostInList(updatedPost: Post?) {
         postUiState.update { state ->
+            val updatedPostList: List<Post> = state.posts.map { post ->
+                updatedPost?.let {
+                    if (post.id == it.id) {
+                        post.likes += updatedPost.likes
+                        post
+                    }
+                    else post
+                }
+                post
+            }
             // updating liked post in posts field
             state.copy(
-                posts = state.posts.map { post ->
-                    updatedPost?.let {
-                        if (post.id == it.id) {
-                            post.likes += updatedPost.likes
-                            post
-                        }
-                        else post
-                    }
-                    post
-                }
+                posts = updatedPostList
             )
         }
     }

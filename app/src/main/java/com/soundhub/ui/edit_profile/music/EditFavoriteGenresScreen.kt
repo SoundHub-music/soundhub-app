@@ -13,7 +13,10 @@ import com.soundhub.ui.music_preferences.ChooseGenresScreen
 fun EditFavoriteGenresScreen(
     editMusicPrefViewModel: EditMusicPreferencesViewModel
 ) {
-    val genreUiState: GenreUiState by editMusicPrefViewModel.genreUiState.collectAsState()
+    val genreUiState: GenreUiState by editMusicPrefViewModel
+        .genreUiState
+        .collectAsState()
+
     val chosenGenres: List<Genre> = genreUiState.chosenGenres
 
     LaunchedEffect(key1 = chosenGenres) {

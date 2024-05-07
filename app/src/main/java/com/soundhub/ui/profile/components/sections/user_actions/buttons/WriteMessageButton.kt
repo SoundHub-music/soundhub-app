@@ -1,4 +1,4 @@
-package com.soundhub.ui.profile.components.sections.user_actions
+package com.soundhub.ui.profile.components.sections.user_actions.buttons
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MailOutline
@@ -23,7 +23,7 @@ internal fun WriteMessageButton(
     user: User?
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val buttonContent = stringResource(id = R.string.write_message_btn_content)
+    val buttonContent = stringResource(id = R.string.profile_screen_write_message_btn_content)
     val buttonIcon: ImageVector = Icons.Rounded.MailOutline
 
     ProfileActionLongButton(

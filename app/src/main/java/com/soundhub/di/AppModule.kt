@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Module(includes = [
     UiModule::class,
     NetworkModule::class,
-    ServiceModule::class,
+    HttpServiceModule::class,
     RepositoryModule::class,
     DomainModule::class,
     WebSocketModule::class,
@@ -20,5 +20,5 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesApplication(application: Application): Application = application
+    fun providesApplication(app: Application): Application = app
 }

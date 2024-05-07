@@ -103,9 +103,9 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun addPost(post: Post, accessToken: String?): HttpResult<Post> {
         try {
-            val imagesFormDataList: List<MultipartBody.Part?> = post.images?.map {
+            val imagesFormDataList: List<MultipartBody.Part?> = post.images.map {
                 HttpUtils.prepareMediaFormData(it, context)
-            } ?: emptyList()
+            }
 
             val postRequestBody: RequestBody = gson.toJson(post)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
@@ -200,11 +200,7 @@ class PostRepositoryImpl @Inject constructor(
         imagesToBeDeleted: List<String>
     ): HttpResult<Post> {
         try {
-            val imageFormData: List<MultipartBody.Part?> = post.images?.map {
-                HttpUtils.prepareMediaFormData(it, context)
-            } ?: emptyList()
-
-            val imageToDeleteFormData = imagesToBeDeleted.map {
+            val imageFormData: List<MultipartBody.Part?> = post.images.map {
                 HttpUtils.prepareMediaFormData(it, context)
             }
 
@@ -216,14 +212,17 @@ class PostRepositoryImpl @Inject constructor(
                 postId = postId,
                 post = postRequestBody,
                 images = imageFormData,
-                imagesToBeDeleted = imageToDeleteFormData
+                imagesToBeDeleted = imagesToBeDeleted
             )
+
+            Log.d("PostRepository", "updatePost[1]: $response")
 
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = gson.fromJson(
                     response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE
-                )
+                ) ?: ErrorResponse(status = response.code())
 
+                Log.e("PostRepository", "updatePost[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 

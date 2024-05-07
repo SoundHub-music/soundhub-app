@@ -3,6 +3,7 @@ package com.soundhub.ui.profile.components.sections.wall
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -57,7 +58,10 @@ internal fun UserWall(
         )
 
         if (isLoading)
-            CircleLoader(modifier = Modifier.padding(top = 10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) { CircleLoader(modifier = Modifier.padding(top = 10.dp)) }
         else if (postUiState.posts.isEmpty())
             Text(
                 text = stringResource(id = R.string.empty_postline_screen),
@@ -65,8 +69,7 @@ internal fun UserWall(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-        else postUiState
-            .posts.forEach { post ->
+        else postUiState.posts.forEach { post ->
             PostCard(
                 post = post,
                 navController = navController,

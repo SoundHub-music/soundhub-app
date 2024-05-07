@@ -108,8 +108,7 @@ class ChatRepositoryImpl @Inject constructor(
         body: CreateChatRequestBody
     ): HttpResult<Chat> {
         try {
-            val response: Response<Chat> = chatService
-                .createChat(
+            val response: Response<Chat> = chatService.createChat(
                     accessToken = HttpUtils.getBearerToken(accessToken),
                     body = body
             )
@@ -133,5 +132,4 @@ class ChatRepositoryImpl @Inject constructor(
             )
         }
     }
-
 }

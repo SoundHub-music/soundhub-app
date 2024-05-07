@@ -15,12 +15,12 @@ import com.soundhub.utils.converters.room.StringListRoomConverter
 data class Artist(
     @PrimaryKey
     var id: Int = 0,
-    var name: String? = null,
+    var title: String? = null,
     var description: String = "",
-    var genres: List<String> = emptyList(),
-    var styles: List<String> = emptyList(),
+    var genre: List<String> = emptyList(),
+    var style: List<String> = emptyList(),
 
     @SerializedName("albums")
     var albums: List<Album> = emptyList(),
-    var thumbnailUrl: String? = null
+    var thumb: String? = null
 )

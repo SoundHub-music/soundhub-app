@@ -14,9 +14,11 @@ interface LastFmService {
         @Query("num_res") countPerPage: Int = 10
     ): Response<LastFmGenreResponse>
 
-    @GET("2.0/?method=tag.gettopartists&format=json")
+    @GET("2.0/")
     suspend fun getArtistsByTag(
         @Query("api_key") apiKey: String = BuildConfig.LAST_FM_API_KEY,
+        @Query("method") method: String = "tag.gettopartists",
+        @Query("format") format: String = "json",
         @Query("tag") tag: String,
     ): Response<ArtistsByTagResponse>
 }

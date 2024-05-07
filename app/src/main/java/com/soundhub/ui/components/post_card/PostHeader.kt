@@ -1,19 +1,18 @@
 package com.soundhub.ui.components.post_card
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -29,22 +28,18 @@ import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.components.menu.PostDropdownMenu
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.utils.DateFormatter
-import java.time.LocalDateTime
 
 @Composable
 internal fun PostHeader(
     modifier: Modifier = Modifier,
-    avatarUrl: String?,
-    postAuthor: User?,
     currentUser: User?,
-    publishDate: LocalDateTime,
     navController: NavHostController,
     postViewModel: PostViewModel,
     post: Post
 ) {
-    val isPostMenuExpandedState = rememberSaveable {
-        mutableStateOf(false)
-    }
+    val isPostMenuExpandedState: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+    val userFullName: String = "${post.author?.firstName} ${post.author?.lastName}".trim()
+    val isCurrentUserAuthor: Boolean = currentUser?.id == post.author?.id
 
     Box(contentAlignment = Alignment.TopEnd) {
         Row(
@@ -55,19 +50,21 @@ internal fun PostHeader(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 CircularAvatar(
-                    imageUrl = avatarUrl,
-                    contentDescription = "${postAuthor?.firstName} ${postAuthor?.lastName}".trim(),
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clickable {
-                            navController
-                                .navigate(Route.Profile.getStringRouteWithNavArg(postAuthor?.id.toString()))
+                    imageUrl = post.author?.avatarUrl,
+                    contentDescription = userFullName,
+                    modifier = Modifier,
+                    onClick = {
+                        if (isCurrentUserAuthor) {
+                            val stringAuthorId = post.author?.id.toString()
+                            val route: String = Route.Profile.getStringRouteWithNavArg(stringAuthorId)
+                            navController.navigate(route)
                         }
+                    }
                 )
 
                 Column {
                     Text(
-                        text = "${postAuthor?.firstName} ${postAuthor?.lastName}".trim(),
+                        text = userFullName,
                         fontSize = 16.sp,
                         lineHeight = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -75,7 +72,7 @@ internal fun PostHeader(
                     )
 
                     Text(
-                        text = DateFormatter.getRelativeDate(publishDate),
+                        text = DateFormatter.getRelativeDate(post.publishDate),
                         fontSize = 16.sp,
                         lineHeight = 20.sp,
                         fontWeight = FontWeight.Medium,
@@ -83,11 +80,14 @@ internal fun PostHeader(
                     )
                 }
             }
-
-            IconButton(onClick = { isPostMenuExpandedState.value = !isPostMenuExpandedState.value }) {
-                Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "post parameters")
-
-                if (postAuthor?.id == currentUser?.id) {
+            if (isCurrentUserAuthor) {
+                IconButton(
+                    onClick = { isPostMenuExpandedState.value = !isPostMenuExpandedState.value }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.MoreVert,
+                        contentDescription = "post parameters"
+                    )
                     PostDropdownMenu(
                         isMenuExpandedState = isPostMenuExpandedState,
                         postViewModel = postViewModel,

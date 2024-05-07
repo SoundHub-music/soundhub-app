@@ -54,8 +54,15 @@ object RepositoryModule {
     @Singleton
     fun providesUserRepository(
         userService: UserService,
+        musicRepository: MusicRepository,
+        fileRepository: FileRepository,
         @ApplicationContext context: Context
-    ): UserRepository = UserRepositoryImpl(userService, context)
+    ): UserRepository = UserRepositoryImpl(
+        userService = userService,
+        musicRepository = musicRepository,
+        fileRepository = fileRepository,
+        context = context
+    )
 
     @Provides
     @Singleton

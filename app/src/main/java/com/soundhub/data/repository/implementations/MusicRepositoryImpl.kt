@@ -11,6 +11,7 @@ import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
 import com.soundhub.data.model.Artist
@@ -19,6 +20,7 @@ import com.soundhub.data.model.Track
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
 import com.soundhub.utils.constants.Constants
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Response
@@ -35,12 +37,9 @@ class MusicRepositoryImpl @Inject constructor(
             Log.d("MusicRepository", "getAllGenres[1]: $response")
 
             if (!response.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?:
-                    ErrorResponse(
+                val errorBody = ErrorResponse(
                         status = response.code(),
-                        detail = context.getString(R.string.toast_common_error)
+                        detail = response.message()
                     )
 
                 Log.e("MusicRepository", "getAllGenres[2]: $errorBody")
@@ -70,21 +69,21 @@ class MusicRepositoryImpl @Inject constructor(
                 type = DiscogsSearchType.Release.type,
                 genre = genres.joinToString("|") { it.lowercase() },
                 style = styles.joinToString("|") { it.lowercase() },
-                countPerPage = countPerPage
+                countPerPage = countPerPage,
+                page = page
             )
-            Log.d("MusicRepository", "getArtistsByGenres[1]: $response")
+            artistState.update { it.copy(status = ApiStatus.LOADING) }
+            Log.d("MusicRepository", "loadArtistByGenresToState[1]: $response")
 
             if (!response.isSuccessful) {
-                val errorBody: ErrorResponse? = Gson()
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-
-                Log.e("MusicRepository", "getArtistsByGenres[2]: $errorBody")
-                return HttpResult.Error(
-                    errorBody = errorBody ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_common_error)
-                    )
+                val errorBody = ErrorResponse(
+                    status = response.code(),
+                    detail = response.message()
                 )
+
+                Log.e("MusicRepository", "loadArtistByGenresToState[2]: $errorBody")
+                artistState.update { it.copy(status = ApiStatus.ERROR) }
+                return HttpResult.Error(errorBody = errorBody)
             }
 
             loadDataToArtistState(
@@ -92,6 +91,7 @@ class MusicRepositoryImpl @Inject constructor(
                 state = artistState
             )
 
+            artistState.update { it.copy(status = ApiStatus.SUCCESS) }
             return HttpResult.Success(body = null)
         }
         catch (e: Exception) {
@@ -103,7 +103,35 @@ class MusicRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchArtistByName(artistName: String): HttpResult<Artist?> {
+    private suspend fun loadDataToArtistState(
+        data: List<DiscogsEntityResponse>,
+        state: MutableStateFlow<ArtistUiState>
+    ) {
+        val duplicateEntityRegex = Regex("\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)")
+
+        data.forEach { entity ->
+            val artistName: String = entity.title.split("-")[0].trim()
+
+            searchArtistInReleaseResponse(artistName)
+                .onSuccess { artist ->
+                    artist.body?.let { artistBody ->
+                        artistBody.genre = entity.genre ?: emptyList()
+                        artistBody.style = entity.style ?: emptyList()
+
+                        val artistNotInState: Boolean = artistBody.title !in state.value.artists.map { it.title }
+                        val isNotDuplicate: Boolean = artistBody.title?.matches(duplicateEntityRegex) == false
+
+                        if (artistNotInState && isNotDuplicate)
+                            state.update {
+                                it.copy(artists = (it.artists + artistBody)
+                                    .sortedBy { a -> a.title })
+                            }
+                    }
+                }
+        }
+    }
+
+    override suspend fun searchArtistInReleaseResponse(artistName: String): HttpResult<Artist?> {
         try {
             val response: Response<DiscogsResponse> = musicService.searchData(
                 query = artistName,
@@ -113,11 +141,13 @@ class MusicRepositoryImpl @Inject constructor(
             Log.d("MusicRepository", "searchArtistByName[1]: $response")
 
             if (!response.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE) ?:
-                ErrorResponse(status = response.code(), detail = context.getString(R.string.toast_common_error))
+                val errorBody = ErrorResponse(status = response.code(), detail = response.message())
 
                 Log.e("MusicRepository", "searchArtistByName[2]: $errorBody")
+
+                if (response.code() == 429)
+                    delay(5000)
+
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -145,44 +175,27 @@ class MusicRepositoryImpl @Inject constructor(
     ): Artist? {
         var desiredArtist: Artist? = null
         discogsResponseList.forEach { artist ->
-            if (artist.title.lowercase() == artistName.lowercase())
+            if (artist.title.lowercase() == artistName.lowercase()) {
                 desiredArtist = Artist(
                     id = artist.id,
-                    name = artist.title,
-                    thumbnailUrl = artist.coverImage
+                    title = artist.title,
+                    thumb = artist.coverImage
                 )
+
+                return@forEach
+            }
         }
 
         if (desiredArtist == null && discogsResponseList.isNotEmpty()) {
             val firstArtist: DiscogsEntityResponse = discogsResponseList[0]
             desiredArtist = Artist(
                 id = firstArtist.id,
-                name = firstArtist.title,
-                thumbnailUrl = firstArtist.thumb
+                title = firstArtist.title,
+                thumb = firstArtist.thumb
             )
         }
 
         return desiredArtist
-    }
-
-    private suspend fun loadDataToArtistState(
-        data: List<DiscogsEntityResponse>,
-        state: MutableStateFlow<ArtistUiState>
-    ) {
-        data.forEach { entity ->
-            val artistName: String = entity.title
-                .split("-")[0].trim()
-
-            searchArtistByName(artistName)
-                .onSuccess { artist ->
-                    artist.body?.let { artistBody ->
-                        artistBody.genres = entity.genre ?: emptyList()
-                        artistBody.styles = entity.style ?: emptyList()
-                        if (artistBody.name !in state.value.artists.map { it.name })
-                            state.update { it.copy(artists = it.artists + artistBody) }
-                    }
-                }
-        }
     }
 
     override suspend fun getArtistById(artistId: Int): HttpResult<Artist?> {
@@ -194,12 +207,9 @@ class MusicRepositoryImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_logout_error)
-                    )
+                    ?: ErrorResponse(status = response.code())
 
-                Log.e("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
+                Log.e("MusicRepository", "getArtistById[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -208,15 +218,15 @@ class MusicRepositoryImpl @Inject constructor(
             body?.let {
                 result = Artist(
                     id = it.id,
-                    name = it.name,
-                    thumbnailUrl = it.images[0].uri
+                    title = it.name,
+                    thumb = it.images[0].uri
                 )
             }
 
             return HttpResult.Success(body = result)
         }
         catch (e: Exception) {
-            Log.e("ChatRepository", "getAllChatsByCurrentUser[3]: ${e.stackTraceToString()}")
+            Log.e("MusicRepository", "getArtistById[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e
@@ -224,13 +234,14 @@ class MusicRepositoryImpl @Inject constructor(
         }
     }
 
-    // TODO: find out where to apply it
-    private suspend fun searchSeveralArtistsByNames(artists: List<String>): HttpResult<List<Artist>> {
+    override suspend fun searchArtists(artistName: String): HttpResult<List<Artist>> {
         try {
             val response = musicService.searchData(
-                query = artists.joinToString("|"),
+                query = artistName,
                 type = DiscogsSearchType.Artist.type
             )
+
+            Log.d("MusicRepository", "searchArtists[1]: $response")
 
             if (!response.isSuccessful) {
                 val errorBody = Gson()
@@ -240,25 +251,27 @@ class MusicRepositoryImpl @Inject constructor(
                         detail = context.getString(R.string.toast_common_error)
                     )
 
-                return HttpResult.Error(
-                    errorBody = errorBody
-                )
+                Log.e("MusicRepository", "searchArtists[2]: $errorBody")
+
+                return HttpResult.Error(errorBody = errorBody)
             }
+
             val desiredArtists: List<Artist> = response.body()
                 ?.results
                 ?.map {
                 Artist(
                     id = it.id,
-                    name = it.title,
-                    genres = it.genre ?: emptyList(),
-                    styles = it.style ?: emptyList(),
-                    thumbnailUrl = it.thumb
+                    title = it.title,
+                    genre = it.genre ?: emptyList(),
+                    style = it.style ?: emptyList(),
+                    thumb = it.thumb
                 )
             } ?: emptyList()
 
             return HttpResult.Success(body = desiredArtists)
         }
         catch (e: Exception) {
+            Log.e("MusicRepository", "searchArtists[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

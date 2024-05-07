@@ -20,7 +20,6 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import java.io.File
 
 @Composable
 internal fun UserCardSettings(
@@ -29,7 +28,7 @@ internal fun UserCardSettings(
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
     val authorizedUser: User? = uiState.authorizedUser
-    val userAvatar: File? = authorizedUser?.avatarImageFile
+    val userFullName: String = "${authorizedUser?.firstName} ${authorizedUser?.lastName}".trim()
 
     Box(
         modifier = Modifier
@@ -47,11 +46,10 @@ internal fun UserCardSettings(
            ) {
                CircularAvatar(
                    modifier = Modifier.size(64.dp),
-                   imageUrl = userAvatar?.absolutePath
+                   imageUrl = authorizedUser?.avatarUrl
                )
                Text(
-                   text = "${authorizedUser?.firstName} ${authorizedUser?.lastName}"
-                       .trim(),
+                   text = userFullName,
                    fontWeight = FontWeight.Bold,
                    fontSize = 18.sp,
                    lineHeight = 32.sp

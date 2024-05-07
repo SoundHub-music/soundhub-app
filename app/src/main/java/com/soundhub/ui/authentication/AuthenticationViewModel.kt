@@ -16,19 +16,16 @@ import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.domain.usecases.file.GetImageUseCase
 import com.soundhub.ui.authentication.states.AuthFormState
-import com.soundhub.ui.states.UiState
-import com.soundhub.utils.MediaFolder
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,16 +36,14 @@ class AuthenticationViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val userRepository: UserRepository,
     private val userCredsStore: UserCredsStore,
-    private val getImageUseCase: GetImageUseCase,
     appDb: AppDatabase
 ) : ViewModel() {
-    private val uiState: Flow<UiState> = uiStateDispatcher.uiState.asStateFlow()
-    private val userDao: UserDao = appDb.userDao()
     private val authAttemptCount: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val userDao: UserDao = appDb.userDao()
     private val maxRefreshTokenAttemptCount: Int = 2
 
-    val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     val authFormState = MutableStateFlow(AuthFormState())
+    val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
     init {
         viewModelScope.launch {
@@ -64,37 +59,101 @@ class AuthenticationViewModel @Inject constructor(
 
     private suspend fun initializeUser(creds: UserPreferences?) {
         if (!creds?.accessToken.isNullOrEmpty()) {
-            getCurrentUser().collect { currentUser ->
-                currentUser?.let { userDao.saveUser(currentUser) }
-                uiStateDispatcher.setAuthorizedUser(currentUser)
-                loadAuthenticatedUserAvatar()
+            val authorizedUser = getCurrentUser()
+            authorizedUser.collect { currentUser ->
+                currentUser?.let {
+                    userDao.saveUser(currentUser)
+                    uiStateDispatcher.setAuthorizedUser(currentUser)
+                }
             }
         }
     }
 
+    fun logout() = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("AuthenticationViewModel", "logout: $userCreds")
+        authRepository
+            .logout(userCreds.firstOrNull()?.accessToken)
+            .onFailure {
+                val toastText: UiText.DynamicString = UiText.DynamicString(it.errorBody.detail ?: "")
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            }
+            .finally { deleteUserData() }
+    }
 
-    private suspend fun loadAuthenticatedUserAvatar() {
-        val authorizedUser: User? = uiState
+    private suspend fun deleteUserData() {
+        val currentUser: User? = uiStateDispatcher.uiState
+            .map { it.authorizedUser }
             .firstOrNull()
-            ?.authorizedUser
 
-        val avatar = getImageUseCase(
-            accessToken = userCreds.firstOrNull()?.accessToken,
-            fileName = authorizedUser?.avatarUrl,
-            folderName = MediaFolder.Avatar.NAME
-        )
-        Log.d("AuthenticationViewModel", "user avatar: ${avatar?.name.toString()}")
+        currentUser?.let { user ->
+            user.avatarImageFile?.delete()
+            userDao.deleteUser(user)
+            uiStateDispatcher.setAuthorizedUser(null)
+        }
+        userCredsStore.clear()
+    }
 
-        val currentUser = authorizedUser?.copy()
-        currentUser?.avatarImageFile = avatar
+    private suspend fun getCurrentUser(): Flow<User?> = flow {
+        val creds: UserPreferences? = userCreds.firstOrNull()
+        userRepository.getCurrentUser(creds?.accessToken)
+            .onSuccess { emit(it.body) }
+            .onFailure { error ->
+                tryRefreshToken(
+                    error = error,
+                    userCreds = creds
+                )
+            }
+    }
 
-        uiStateDispatcher.setAuthorizedUser(currentUser)
+    private suspend fun tryRefreshToken(
+        error: HttpResult.Error<User?>,
+        userCreds: UserPreferences?
+    ) {
+        val requestBody = RefreshTokenRequestBody(userCreds?.refreshToken)
+        authRepository.refreshToken(requestBody)
+            .onSuccess { response ->
+                userCredsStore.updateCreds(response.body)
+                initializeUser(userCreds)
+                authAttemptCount.update { 0 }
+        }.onFailure {
+            authAttemptCount.update { it + 1 }
+            if (authAttemptCount.value <= maxRefreshTokenAttemptCount)
+                tryRefreshToken(error, userCreds)
+            else {
+                val toastText: UiText.DynamicString =  UiText.DynamicString(error.errorBody.detail ?: "")
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+            }
+        }
+    }
+
+    fun signIn() = viewModelScope.launch(Dispatchers.IO) {
+        authFormState.update { it.copy(isLoading = true) }
+        authRepository.signIn(
+            SignInRequestBody(
+                email = authFormState.value.email,
+                password = authFormState.value.password
+            ))
+            .onSuccess { response ->
+                userCredsStore.updateCreds(response.body)
+                val currentUser: User? = getCurrentUser().firstOrNull()
+
+                uiStateDispatcher.setAuthorizedUser(currentUser)
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+            }
+            .onFailure {
+                val toastText = UiText.DynamicString(it.errorBody.detail ?: "")
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            }
+            .finally {
+                authFormState.update { it.copy(isLoading = false) }
+            }
     }
 
     fun resetAuthFormState() = authFormState.update { AuthFormState() }
 
     fun resetRepeatedPassword() = authFormState.update {
-        authFormState.value.copy(repeatedPassword = null)
+        it.copy(repeatedPassword = null)
     }
 
     fun setEmail(value: String) = authFormState.update {
@@ -115,101 +174,5 @@ class AuthenticationViewModel @Inject constructor(
 
     fun setAuthFormType(value: Boolean) = authFormState.update {
         it.copy(isRegisterForm = value)
-    }
-
-    fun logout() = viewModelScope.launch {
-        Log.d("AuthenticationViewModel", "logout: $userCreds")
-        userCreds.collect { creds ->
-            authRepository
-                .logout(creds.accessToken)
-                .onFailure {
-                    uiStateDispatcher.sendUiEvent(
-                        UiEvent.ShowToast(
-                        UiText.DynamicString(it.errorBody.detail ?: "")
-                    ))
-                }
-                .finally {
-                    val currentUser: User? = uiState
-                        .firstOrNull()
-                        ?.authorizedUser
-                        ?.copy()
-
-                    currentUser?.let {
-                        userDao.deleteUser(it)
-                        it.avatarImageFile?.delete()
-                        uiStateDispatcher.setAuthorizedUser(null)
-                    }
-                    userCredsStore.clear()
-                }
-        }
-    }
-
-    private suspend fun getCurrentUser(): Flow<User?> = flow {
-        val creds = userCreds.firstOrNull()
-        creds?.accessToken?.let {
-            userRepository.getCurrentUser(creds.accessToken)
-            .onSuccess { emit(it.body) }
-            .onFailure { currentUserError ->
-                tryRefreshToken(
-                    error = currentUserError,
-                    userCreds = creds
-                )
-            }
-        }
-    }
-
-    private suspend fun tryRefreshToken(
-        error: HttpResult.Error<User?>,
-        userCreds: UserPreferences?
-    ) {
-        authRepository.refreshToken(
-            RefreshTokenRequestBody(userCreds?.refreshToken)
-        ).onSuccess { newCredsResponse ->
-            userCredsStore.updateCreds(newCredsResponse.body)
-            initializeUser(userCreds)
-            authAttemptCount.update { 0 }
-
-        }.onFailure {
-            authAttemptCount.update { it + 1 }
-            if (authAttemptCount.value <= maxRefreshTokenAttemptCount)
-                tryRefreshToken(error, userCreds)
-            else {
-                uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(
-                        UiText.DynamicString(error.errorBody.detail ?: "")
-                    )
-                )
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
-            }
-        }
-    }
-
-    fun signIn() = viewModelScope.launch(Dispatchers.IO) {
-        authFormState.update { it.copy(isLoading = true) }
-        authRepository.signIn(
-            SignInRequestBody(
-                email = authFormState.value.email,
-                password = authFormState.value.password
-            ))
-
-            .onSuccess { response ->
-                userCredsStore.updateCreds(response.body)
-                val currentUser: User? = getCurrentUser()
-                    .firstOrNull()
-
-                uiStateDispatcher.setAuthorizedUser(currentUser)
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
-            }
-            .onFailure {
-                uiStateDispatcher.sendUiEvent(
-                    UiEvent.ShowToast(
-                        UiText.DynamicString(
-                            it.errorBody.detail ?: ""
-                        )
-                    )
-                )
-            }
-
-        authFormState.update { it.copy(isLoading = false) }
     }
 }

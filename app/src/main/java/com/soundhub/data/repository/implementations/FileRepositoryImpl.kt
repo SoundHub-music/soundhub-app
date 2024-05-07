@@ -29,15 +29,11 @@ class FileRepositoryImpl @Inject constructor(
         accessToken: String?
     ): HttpResult<File> {
         try {
-            // TODO: remove this shit after deploying backend on server
-            val fileNameWithServerIp = fileNameUrl
-                ?.replace("localhost", Constants.SOUNDHUB_API_HOSTNAME)
-
             val response: Response<ResponseBody> = fileService.getFile(
                 accessToken = HttpUtils.getBearerToken(accessToken),
-                fileName = "$fileNameWithServerIp?folderName=$folderName"
+                fileName = fileNameUrl,
+                folderName = folderName
             )
-
             Log.d("FileRepository", "getFile[1]: response is $response")
 
             if (!response.isSuccessful) {

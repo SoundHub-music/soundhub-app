@@ -64,7 +64,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?> {
         try {
-            val avatarFormData: MultipartBody.Part? = HttpUtils.prepareMediaFormData(body.avatarUrl, context)
+            val avatarFormData: MultipartBody.Part? = HttpUtils
+                .prepareMediaFormData(body.avatarUrl, context)
+
             val requestBody: RequestBody = gson.toJson(body)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
@@ -123,14 +125,14 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun refreshToken(body: RefreshTokenRequestBody): HttpResult<UserPreferences?> {
         try {
-            val refreshTokenResponse: Response<UserPreferences> = authService.refreshToken(body)
-            Log.d("AuthRepository", "refreshToken[1]: ${refreshTokenResponse.raw()}")
+            val response: Response<UserPreferences> = authService.refreshToken(body)
+            Log.d("AuthRepository", "refreshToken[1]: $response")
 
-            if (!refreshTokenResponse.isSuccessful) {
+            if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = gson
-                    .fromJson(refreshTokenResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
-                        status = refreshTokenResponse.code(),
+                        status = response.code(),
                         detail = context.getString(R.string.toast_fetch_user_data_error)
                     )
 
@@ -138,7 +140,7 @@ class AuthRepositoryImpl @Inject constructor(
                 return HttpResult.Error(errorBody = errorBody)
             }
 
-            return HttpResult.Success(body = refreshTokenResponse.body())
+            return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
             Log.e("AuthRepository", "refreshToken[3]: ${e.stackTraceToString()}")

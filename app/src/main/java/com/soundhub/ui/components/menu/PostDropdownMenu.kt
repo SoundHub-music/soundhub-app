@@ -32,25 +32,49 @@ fun PostDropdownMenu(
         expanded = isMenuExpandedState.value,
         onDismissRequest = onDismissRequest
     ) {
-        DropdownMenuItem(
-            text = { Text(text = stringResource(id = R.string.delete_post_dropdown_menu)) },
-            leadingIcon = { Icon(
-                imageVector = Icons.Rounded.Delete, contentDescription = "delete post"
-            ) },
-            onClick = {
-                onDeletePostMenuClick(postViewModel, post)
-                isMenuExpandedState.value = false
-            }
+        DeletePostMenuItem(
+            isMenuExpandedState = isMenuExpandedState,
+            postViewModel = postViewModel,
+            post = post
         )
-        DropdownMenuItem(
-            text = { Text(text = stringResource(id = R.string.edit_post_dropdown_menu)) },
-            leadingIcon = { Icon(
-                imageVector = Icons.Rounded.Edit,
-                contentDescription = "edit post"
-            )},
-            onClick = { onEditPostMenuClick(navController = navController, postId = post.id) }
+        EditPostMenuItem(
+            navController = navController,
+            post = post
         )
     }
+}
+
+@Composable
+private fun DeletePostMenuItem(
+    isMenuExpandedState: MutableState<Boolean>,
+    postViewModel: PostViewModel,
+    post: Post
+) {
+    DropdownMenuItem(
+        text = { Text(text = stringResource(id = R.string.delete_post_dropdown_menu)) },
+        leadingIcon = { Icon(
+            imageVector = Icons.Rounded.Delete, contentDescription = "delete post"
+        ) },
+        onClick = {
+            onDeletePostMenuClick(postViewModel, post)
+            isMenuExpandedState.value = false
+        }
+    )
+}
+
+@Composable
+private fun EditPostMenuItem(
+    navController: NavHostController,
+    post: Post
+) {
+    DropdownMenuItem(
+        text = { Text(text = stringResource(id = R.string.edit_post_dropdown_menu)) },
+        leadingIcon = { Icon(
+            imageVector = Icons.Rounded.Edit,
+            contentDescription = "edit post"
+        )},
+        onClick = { onEditPostMenuClick(navController = navController, postId = post.id) }
+    )
 }
 
 private fun onDeletePostMenuClick(

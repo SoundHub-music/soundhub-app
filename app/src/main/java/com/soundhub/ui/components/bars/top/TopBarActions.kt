@@ -1,7 +1,6 @@
 package com.soundhub.ui.components.bars.top
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -10,23 +9,20 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.utils.constants.Constants
 import com.soundhub.Route
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.components.menu.ChatTopBarDropdownMenu
+import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
 import com.soundhub.ui.states.UiState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun TopBarActions(
@@ -39,17 +35,13 @@ fun TopBarActions(
 
     val isSearchBarActive: Boolean = uiState.isSearchBarActive
     val searchBarText: String = uiState.searchBarText
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     when (currentRoute) {
-        Route.EditUserData.route -> {
-            IconButton(onClick = {
-                coroutineScope.launch {
-                    uiStateDispatcher.sendUiEvent(UiEvent.UpdateUserAction)
-                    navController.popBackStack()
-                }
-            }) { Icon(imageVector = Icons.Rounded.Check, contentDescription = "save_data" ) }
-        }
+        Route.EditUserData.route ->
+            EditProfileTopBarButton(
+                uiStateDispatcher = uiStateDispatcher,
+                navController = navController
+            )
 
         Route.Postline.route -> PostlineNotificationTopBarButton(navController)
         in Constants.ROUTES_WITH_SEARCH_BAR -> {
@@ -69,7 +61,8 @@ fun TopBarActions(
 internal fun ChatTopBarActions(
     navController: NavHostController,
     chatState: ChatUiState,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
+    uiStateDispatcher: UiStateDispatcher
 ) {
     val isMenuExpanded: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 
@@ -81,6 +74,7 @@ internal fun ChatTopBarActions(
         menuState = isMenuExpanded,
         navController = navController,
         chatState = chatState,
-        chatViewModel = chatViewModel
+        chatViewModel = chatViewModel,
+        uiStateDispatcher = uiStateDispatcher
     )
 }

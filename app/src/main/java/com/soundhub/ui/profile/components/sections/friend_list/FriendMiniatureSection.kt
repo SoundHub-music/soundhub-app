@@ -14,8 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,11 +24,15 @@ import com.soundhub.Route
 import com.soundhub.data.model.User
 
 @Composable
-fun FriendMiniatureSection(friendList: List<User>, navController: NavHostController) {
+fun FriendMiniatureSection(
+    profileOwner: User?,
+    navController: NavHostController
+) {
+    val friendList: List<User> = profileOwner?.friends ?: emptyList()
+
     ElevatedCard(
-        onClick = { navController.navigate(Route.FriendList.route) },
-        modifier = Modifier
-            .fillMaxWidth(),
+        onClick = { onSectionClick(profileOwner, navController) },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
     ) {
         Column(
@@ -49,7 +51,6 @@ fun FriendMiniatureSection(friendList: List<User>, navController: NavHostControl
                 Text(
                     text = "${friendList.size}",
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily(Font(R.font.nunito_bold)),
                     fontSize = 14.sp,
                 )
             }
@@ -57,4 +58,10 @@ fun FriendMiniatureSection(friendList: List<User>, navController: NavHostControl
         }
     }
 
+}
+
+private fun onSectionClick(profileOwner: User?, navController: NavHostController) {
+    val userId: String = profileOwner?.id.toString()
+    val friendPage: Route = Route.Profile.Friends.getRouteWithNavArg(userId)
+    navController.navigate(friendPage.route)
 }

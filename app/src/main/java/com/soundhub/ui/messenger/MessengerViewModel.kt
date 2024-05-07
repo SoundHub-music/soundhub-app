@@ -12,9 +12,9 @@ import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.utils.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,15 +31,15 @@ class MessengerViewModel @Inject constructor(
     val messengerUiState = MutableStateFlow(MessengerUiState())
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            initAuthorizedUser()
+        viewModelScope.launch {
+            updateUserData()
             loadChats()
         }
     }
 
-    private suspend fun initAuthorizedUser() =
-        messengerUiState
-            .update { it.copy(authorizedUser = userDao.getCurrentUser()) }
+    private suspend fun updateUserData() {
+        messengerUiState.update { it.copy(authorizedUser = userDao.getCurrentUser()) }
+    }
 
     fun filterChats(
         chats: List<Chat>,
@@ -55,8 +55,10 @@ class MessengerViewModel @Inject constructor(
         else chats
 
     fun loadChats() = viewModelScope.launch {
-        userCreds.collect { creds ->
-            chatRepository.getAllChatsByCurrentUser(creds.accessToken)
+        userCreds.firstOrNull()
+            ?.accessToken
+            ?.let { accessToken ->
+            chatRepository.getAllChatsByCurrentUser(accessToken)
             .onSuccess { response ->
                 val chats: List<Chat>? = response.body
                 val unreadMessagesCountTotal: Int = chats

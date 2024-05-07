@@ -23,7 +23,7 @@ import com.soundhub.ui.authentication.postregistration.states.RegistrationState
 @Composable
 fun FillUserDataScreen(
     modifier: Modifier = Modifier,
-    registrationViewModel: RegistrationViewModel 
+    registrationViewModel: RegistrationViewModel
 ) {
     val registerState: State<RegistrationState> = registrationViewModel
         .registerState.collectAsState()
@@ -53,7 +53,7 @@ fun FillUserDataScreen(
                 onCountryChange = registrationViewModel::setCountry,
                 onCityChange = registrationViewModel::setCity,
                 onLanguagesChange = registrationViewModel::setLanguages,
-                onAvatarChange = registrationViewModel::setAvatar,
+                onAvatarChange = registrationViewModel::setAvatar
             )
         }
 

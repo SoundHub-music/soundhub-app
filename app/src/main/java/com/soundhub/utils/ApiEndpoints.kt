@@ -14,6 +14,18 @@ sealed class ApiEndpoints {
         const val DELETE_FRIEND: String = "$USERS_ENDPOINT/deleteFriend/{$FRIEND_ID_DYNAMIC_PARAM}"
         const val GET_RECOMMENDED_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/recommendedFriends"
         const val GET_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/friends"
+        const val SEARCH_USER = "$USERS_ENDPOINT/search"
+
+        const val SEARCH_PARAM_NAME = "name"
+    }
+
+    data object Message {
+        const val MESSAGES_ENDPOINT = "messages"
+        const val CHAT_ID_DYNAMIC_PARAM = "chatId"
+        const val MESSAGE_ID_DYNAMIC_PARAM = "messageId"
+
+        const val GET_CHAT_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_ID_DYNAMIC_PARAM}"
+        const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/$MESSAGE_ID_DYNAMIC_PARAM"
     }
 
     data object Authentication {

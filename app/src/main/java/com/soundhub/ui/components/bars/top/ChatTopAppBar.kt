@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.bars.top
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +18,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,18 +41,23 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.utils.DateFormatter
+import java.time.LocalDateTime
+import java.time.Month
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopAppBar(
     navController: NavHostController,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
+    uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
 
     TopAppBar(
         title = { InterlocutorDetails(
-            chatUiState = chatUiState,
+            chatViewModel = chatViewModel,
             navController = navController
         ) },
         navigationIcon = {
@@ -60,25 +72,41 @@ fun ChatTopAppBar(
         actions = { ChatTopBarActions(
             navController = navController,
             chatState = chatUiState,
-            chatViewModel = chatViewModel
+            chatViewModel = chatViewModel,
+            uiStateDispatcher = uiStateDispatcher
         ) }
     )
 }
 
 @Composable
 private fun InterlocutorDetails(
-    chatUiState: ChatUiState,
+    chatViewModel: ChatViewModel,
     navController: NavHostController
 ) {
-    val friendName = "${chatUiState.interlocutor?.firstName} ${chatUiState.interlocutor?.lastName}"
-        .trim()
-
+    val context: Context = LocalContext.current
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor
-    val isOnline = false
-    val indicator = painterResource(
-        id = if (isOnline) R.drawable.online_indicator
-        else R.drawable.offline_indicator
-    )
+    val friendName = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
+
+    var isOnline: Boolean by rememberSaveable { mutableStateOf(false) }
+    var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
+    var onlineIndicatorText: String by rememberSaveable {
+        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
+    }
+
+    val lastOnline: LocalDateTime = LocalDateTime.of(2024, Month.MAY, 7, 15, 0)
+    val lastOnlineString = DateFormatter.getRelativeDate(lastOnline)
+
+    LaunchedEffect(key1 = isOnline) {
+        if (isOnline) {
+            onlineIndicator = R.drawable.online_indicator
+            onlineIndicatorText = context.getString(R.string.online_indicator_user_online)
+        }
+        else {
+            onlineIndicator = R.drawable.offline_indicator
+            onlineIndicatorText = context.getString(R.string.online_indicator_user_offline, lastOnlineString)
+        }
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -88,7 +116,10 @@ private fun InterlocutorDetails(
             .clickable { onInterlocutorDetailsClick(interlocutor, navController) }
             .padding(horizontal = 10.dp)
     ) {
-        CircularAvatar(modifier = Modifier.size(40.dp))
+        CircularAvatar(
+            modifier = Modifier.size(40.dp),
+            imageUrl = interlocutor?.avatarUrl
+        )
 
         // user name and online status
         Column {
@@ -104,12 +135,12 @@ private fun InterlocutorDetails(
                 modifier = Modifier
             ) {
                 Image(
-                    painter = indicator,
+                    painter = painterResource(id = onlineIndicator),
                     contentDescription = "online indicator",
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
-                    text = "Был в сети",
+                    text = onlineIndicatorText,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     fontSize = 12.sp
                 )

@@ -3,8 +3,14 @@ package com.soundhub.ui.profile.components.sections.friend_list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.soundhub.data.model.User
@@ -13,16 +19,22 @@ import com.soundhub.ui.components.avatar.CircularAvatar
 @Composable
 internal fun FriendsMiniaturesRow(friendList: List<User>) {
     val maxFriendsMiniatureCount = 10
+    var friendCount: Int by rememberSaveable {
+        mutableIntStateOf(friendList.size)
+    }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy((-15).dp)
-    ) {
-        val friendsMiniatureCount = if (friendList.size > maxFriendsMiniatureCount)
+    LaunchedEffect(key1 = friendList) {
+        friendCount = if (friendList.size > maxFriendsMiniatureCount)
             (maxFriendsMiniatureCount - 1)
         else friendList.size
+    }
 
-        friendList.subList(0, friendsMiniatureCount)
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(start = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy((-15).dp)
+    ) {
+        friendList.subList(0, friendCount)
             .forEach { friend ->
                 CircularAvatar(
                     imageUrl = friend.avatarUrl,

@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Artist
 import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
 import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
@@ -42,7 +45,9 @@ fun ChooseArtistsScreen(
     artistState: ArtistUiState,
     onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
     uiStateDispatcher: UiStateDispatcher,
-    onNextButtonClick: () -> Unit
+    onNextButtonClick: () -> Unit,
+    onSearchFieldChange: (value: String) -> Unit,
+    lazyGridState: LazyGridState
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState()
 
@@ -68,7 +73,7 @@ fun ChooseArtistsScreen(
 
             OutlinedTextField(
                 value = uiState.searchBarText,
-                onValueChange = uiStateDispatcher::updateSearchBarText,
+                onValueChange = onSearchFieldChange,
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
@@ -81,22 +86,16 @@ fun ChooseArtistsScreen(
                     .padding(bottom = 5.dp),
             )
 
-            if (artistState.artists.isEmpty())
-                CircleLoader(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .padding(top = 20.dp),
-                    strokeWidth = 7.dp
-                )
-            else LazyVerticalGrid(
+            LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 100.dp),
-                contentPadding = PaddingValues(all = 10.dp)
+                contentPadding = PaddingValues(all = 10.dp),
+                state = lazyGridState
             ) {
                 items(items = artistState.artists, key = { it.id }) { artist ->
                     MusicItemPlate(
                         modifier = Modifier.padding(bottom = 20.dp),
-                        caption = artist.name ?: "",
-                        thumbnailUrl = artist.thumbnailUrl,
+                        caption = artist.title ?: "",
+                        thumbnailUrl = artist.thumb,
                         onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
                         isChosen = artist in artistState.chosenArtists,
                         width = 90.dp,
@@ -104,6 +103,14 @@ fun ChooseArtistsScreen(
                     )
                 }
             }
+
+            if (artistState.artists.isEmpty() || artistState.status == ApiStatus.LOADING)
+                CircleLoader(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(vertical = 20.dp),
+                    strokeWidth = 7.dp
+                )
         }
 
         FloatingNextButton(
@@ -124,8 +131,9 @@ private fun ChooseArtistsPreview() {
     ChooseArtistsScreen(
         artistState = ArtistUiState(),
         onItemPlateClick = {_, _ ->  },
-        uiStateDispatcher = UiStateDispatcher()
-    ) {
-
-    }
+        uiStateDispatcher = UiStateDispatcher(),
+        onNextButtonClick = {},
+        onSearchFieldChange = {},
+        lazyGridState = rememberLazyGridState()
+    )
 }

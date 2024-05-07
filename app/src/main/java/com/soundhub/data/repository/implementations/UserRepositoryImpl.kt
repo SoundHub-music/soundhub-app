@@ -8,10 +8,13 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.User
 import com.soundhub.data.api.UserService
 import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.repository.FileRepository
+import com.soundhub.data.repository.MusicRepository
 import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.MediaFolder
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -24,6 +27,8 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userService: UserService,
+    private val musicRepository: MusicRepository,
+    private val fileRepository: FileRepository,
     private val context: Context
 ): UserRepository {
     private val gson = GsonBuilder()
@@ -33,8 +38,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getUserById(accessToken: String?, id: UUID?): HttpResult<User?> {
         try {
             val response: Response<User?> = userService.getUserById(
-                id = id,
-                accessToken = HttpUtils.getBearerToken(accessToken)
+                accessToken = HttpUtils.getBearerToken(accessToken),
+                id = id
             )
             Log.d("UserRepository", "getUserById[1]: $response")
 
@@ -50,6 +55,9 @@ class UserRepositoryImpl @Inject constructor(
                 return HttpResult.Error(errorBody = errorBody)
             }
 
+            val user: User? = response.body()
+            user?.let { loadAllUserData(user, accessToken) }
+
             return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
@@ -61,7 +69,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUser(accessToken: String): HttpResult<User?> {
+    override suspend fun getCurrentUser(accessToken: String?): HttpResult<User?> {
         try {
             val currentUserResponse: Response<User?> = userService.getCurrentUser(
                 accessToken = HttpUtils.getBearerToken(accessToken)
@@ -82,15 +90,7 @@ class UserRepositoryImpl @Inject constructor(
             }
 
             val user: User? = currentUserResponse.body()
-            user?.let {
-                getFriendsByUserId(
-                    accessToken = accessToken,
-                    userId = it.id
-                )
-                .onSuccess { response ->
-                    user.friends = response.body ?: emptyList()
-                }
-            }
+            user?.let { loadAllUserData(user, accessToken) }
 
             return HttpResult.Success(body = user)
         }
@@ -103,10 +103,40 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun loadAllUserData(user: User, accessToken: String?) {
+        loadUserFriends(user, accessToken)
+        user.friends.forEach { f -> loadUserFriends(f, accessToken) }
+        loadUserFavoriteArtists(user)
+        loadUserAvatar(user, accessToken)
+    }
+
+    private suspend fun loadUserFriends(user: User, accessToken: String?) {
+        getFriendsByUserId(
+            accessToken = accessToken,
+            userId = user.id
+        )
+            .onSuccess { response -> user.friends = response.body ?: emptyList() }
+    }
+
+    private suspend fun loadUserFavoriteArtists(user: User) {
+        user.favoriteArtists = user.favoriteArtistsIds
+            .mapNotNull { artistId -> musicRepository.getArtistById(artistId).getOrNull() }
+    }
+
+    private suspend fun loadUserAvatar(user: User, accessToken: String?) {
+        fileRepository.getFile(
+            accessToken = accessToken,
+            fileNameUrl = user.avatarUrl,
+            folderName = MediaFolder.Avatar.NAME
+        )
+            .onSuccess { user.avatarImageFile = it.body }
+    }
+
     override suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User> {
         try {
             val avatarFormData: MultipartBody.Part? = HttpUtils
                 .prepareMediaFormData(user?.avatarUrl, context)
+
             val userRequestBody: RequestBody = gson.toJson(user)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
@@ -159,7 +189,6 @@ class UserRepositoryImpl @Inject constructor(
                     )
 
                 Log.e("UserRepository", "addFriend[2]: $errorBody")
-                response.headers()
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -225,7 +254,6 @@ class UserRepositoryImpl @Inject constructor(
                     )
 
                 Log.e("UserRepository", "getRecommendedFriends[2]: $errorBody")
-                response.headers()
                 return HttpResult.Error(errorBody = errorBody)
             }
 
@@ -249,7 +277,7 @@ class UserRepositoryImpl @Inject constructor(
                 accessToken = HttpUtils.getBearerToken(accessToken),
                 userId = userId
             )
-            Log.e("UserRepository", "getFriendsByUserId[1]: $response")
+            Log.d("UserRepository", "getFriendsByUserId[1]: $response")
 
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = gson
@@ -264,6 +292,38 @@ class UserRepositoryImpl @Inject constructor(
         }
         catch (e: Exception) {
             Log.e("UserRepository", "getFriendsByUserId[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
+    }
+
+    override suspend fun searchUserByFullName(accessToken: String?, name: String): HttpResult<List<User>> {
+        try {
+            val response: Response<List<User>> = userService.searchUserByFullName(
+                accessToken = HttpUtils.getBearerToken(accessToken),
+                name = name
+            )
+
+            Log.d("UserRepository", "searchUserByFullName[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorResponse: ErrorResponse = gson
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(
+                        status = response.code(),
+                        detail = response.message()
+                    )
+
+                Log.e("UserRepository", "searchUserByFullName[2]: $errorResponse")
+                return HttpResult.Error(errorResponse)
+            }
+
+            return HttpResult.Success(response.body())
+        }
+        catch (e: Exception) {
+            Log.e("UserRepository", "searchUserByFullName[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

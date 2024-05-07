@@ -1,6 +1,7 @@
 package com.soundhub.ui.edit_profile.music
 
 import android.util.Log
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,16 +16,24 @@ fun EditFavoriteArtistsScreen(
     editMusicPrefViewModel: EditMusicPreferencesViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
-    val artistsUiState: ArtistUiState by editMusicPrefViewModel
+    val artistUiState: ArtistUiState by editMusicPrefViewModel
         .artistUiState.collectAsState()
-    val chosenArtists: List<Artist> = artistsUiState.chosenArtists
+    val lazyGridState = rememberLazyGridState()
+    val chosenArtists: List<Artist> = artistUiState.chosenArtists
 
-    LaunchedEffect(key1 = artistsUiState) {
-        Log.d("EditFavoriteArtistsScreen", "artist state: $artistsUiState")
+    LaunchedEffect(key1 = artistUiState) {
+        Log.d("EditFavoriteArtistsScreen", "artist state: $artistUiState")
+    }
+
+    LaunchedEffect(key1 = lazyGridState.canScrollForward) {
+        if (!lazyGridState.canScrollForward) {
+            editMusicPrefViewModel.setCurrentArtistPage(artistUiState.currentPage + 1)
+            editMusicPrefViewModel.loadArtists(artistUiState.currentPage)
+        }
     }
 
     ChooseArtistsScreen(
-        artistState = artistsUiState,
+        artistState = artistUiState,
         onItemPlateClick = { isChosen, artist ->
             if (isChosen)
                 editMusicPrefViewModel.addChosenArtist(artist)
@@ -33,6 +42,11 @@ fun EditFavoriteArtistsScreen(
             )
         },
         onNextButtonClick = editMusicPrefViewModel::onNextButtonClick,
-        uiStateDispatcher = uiStateDispatcher
+        onSearchFieldChange = { value ->
+            uiStateDispatcher.updateSearchBarText(value)
+            editMusicPrefViewModel.searchArtists(value)
+        },
+        uiStateDispatcher = uiStateDispatcher,
+        lazyGridState = lazyGridState
     )
 }

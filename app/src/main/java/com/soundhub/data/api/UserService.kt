@@ -12,6 +12,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.util.UUID
 
 interface UserService {
@@ -69,5 +70,13 @@ interface UserService {
         accessToken: String?,
         @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
         userId: UUID
+    ): Response<List<User>>
+
+    @GET(ApiEndpoints.Users.SEARCH_USER)
+    suspend fun searchUserByFullName(
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Query(ApiEndpoints.Users.SEARCH_PARAM_NAME)
+        name: String
     ): Response<List<User>>
 }

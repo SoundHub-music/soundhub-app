@@ -21,11 +21,11 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 @Composable
 fun PostCard(
     modifier: Modifier = Modifier,
-    post: Post,
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher,
+    postViewModel: PostViewModel = hiltViewModel(),
+    post: Post,
     currentUser: User?,
-    postViewModel: PostViewModel = hiltViewModel()
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -42,9 +42,6 @@ fun PostCard(
         border = BorderStroke(1.dp, borderColor)
     ) {
         PostHeader(
-            postAuthor = post.author,
-            publishDate = post.publishDate,
-            avatarUrl = post.author?.avatarUrl,
             navController = navController,
             currentUser = currentUser,
             postViewModel = postViewModel,
@@ -52,7 +49,7 @@ fun PostCard(
         )
         PostContent(textContent = post.content)
         PostImages(
-            images = post.images ?: emptyList(),
+            images = post.images,
             navController = navController,
             uiStateDispatcher = uiStateDispatcher
         )

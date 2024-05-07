@@ -2,6 +2,7 @@ package com.soundhub.ui.states
 
 import com.soundhub.data.model.Gender
 import com.soundhub.ui.components.forms.IUserDataFormState
+import java.io.File
 import java.time.LocalDate
 import java.util.UUID
 
@@ -17,6 +18,7 @@ data class UserFormState(
     override var avatarUrl: String? = null,
     override var languages: List<String> = emptyList(),
     var email: String? = "",
+    var avatarImageFile: File? = null,
 
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,

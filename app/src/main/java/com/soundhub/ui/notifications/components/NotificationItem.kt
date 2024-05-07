@@ -106,7 +106,7 @@ internal fun FriendRequestNotificationItem(
 
                 Row {
                     OutlinedIconButton(
-                        onClick = { notificationViewModel.acceptInvite(invite.id) },
+                        onClick = { notificationViewModel.acceptInvite(invite) },
                         shape = RoundedCornerShape(10.dp)
                     ) {
                         Icon(
