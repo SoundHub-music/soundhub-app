@@ -72,9 +72,7 @@ fun NavigationHost(
 ) {
     var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
     val userCredsFlow: Flow<UserPreferences> = authViewModel.userCreds
-    var userCreds: UserPreferences? by remember {
-        mutableStateOf(null)
-    }
+    var userCreds: UserPreferences? by remember { mutableStateOf(null) }
 
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route

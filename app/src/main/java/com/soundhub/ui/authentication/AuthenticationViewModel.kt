@@ -47,8 +47,7 @@ class AuthenticationViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val creds = userCreds.firstOrNull()
-            initializeUser(creds)
+            initializeUser()
         }
     }
 
@@ -57,14 +56,12 @@ class AuthenticationViewModel @Inject constructor(
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
-    private suspend fun initializeUser(creds: UserPreferences?) {
-        if (!creds?.accessToken.isNullOrEmpty()) {
-            val authorizedUser = getCurrentUser()
-            authorizedUser.collect { currentUser ->
-                currentUser?.let {
-                    userDao.saveUser(currentUser)
-                    uiStateDispatcher.setAuthorizedUser(currentUser)
-                }
+    private suspend fun initializeUser() {
+        val authorizedUser = getCurrentUser()
+        authorizedUser.collect { currentUser ->
+            currentUser?.let {
+                userDao.saveUser(currentUser)
+                uiStateDispatcher.setAuthorizedUser(currentUser)
             }
         }
     }
@@ -86,7 +83,6 @@ class AuthenticationViewModel @Inject constructor(
             .firstOrNull()
 
         currentUser?.let { user ->
-            user.avatarImageFile?.delete()
             userDao.deleteUser(user)
             uiStateDispatcher.setAuthorizedUser(null)
         }
@@ -113,7 +109,7 @@ class AuthenticationViewModel @Inject constructor(
         authRepository.refreshToken(requestBody)
             .onSuccess { response ->
                 userCredsStore.updateCreds(response.body)
-                initializeUser(userCreds)
+                initializeUser()
                 authAttemptCount.update { 0 }
         }.onFailure {
             authAttemptCount.update { it + 1 }
@@ -121,8 +117,12 @@ class AuthenticationViewModel @Inject constructor(
                 tryRefreshToken(error, userCreds)
             else {
                 val toastText: UiText.DynamicString =  UiText.DynamicString(error.errorBody.detail ?: "")
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
+                deleteUserData()
+
+                with(uiStateDispatcher) {
+                    sendUiEvent(UiEvent.ShowToast(toastText))
+                    sendUiEvent(UiEvent.Navigate(Route.Authentication))
+                }
             }
         }
     }
@@ -138,8 +138,10 @@ class AuthenticationViewModel @Inject constructor(
                 userCredsStore.updateCreds(response.body)
                 val currentUser: User? = getCurrentUser().firstOrNull()
 
-                uiStateDispatcher.setAuthorizedUser(currentUser)
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
+                with(uiStateDispatcher) {
+                    setAuthorizedUser(currentUser)
+                    sendUiEvent(UiEvent.Navigate(Route.Postline))
+                }
             }
             .onFailure {
                 val toastText = UiText.DynamicString(it.errorBody.detail ?: "")

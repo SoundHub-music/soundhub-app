@@ -62,9 +62,7 @@ class MainActivity : ComponentActivity() {
         uiEventState = uiStateDispatcher.uiEvent.receiveAsFlow()
 
         lifecycleScope.launch {
-            uiEventState.collect { event ->
-                handleUiEvent(event, navController)
-            }
+            uiEventState.collect { event -> handleUiEvent(event, navController) }
         }
 
         setContent {
@@ -97,7 +95,6 @@ class MainActivity : ComponentActivity() {
         navController = rememberNavController()
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             coroutineScope.launch {
-
                 onNavDestinationChangeListener(
                     controller = controller,
                     destination = destination,

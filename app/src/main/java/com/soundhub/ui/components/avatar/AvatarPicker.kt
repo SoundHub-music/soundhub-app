@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.soundhub.utils.ContentTypes
 
 @Composable
 fun AvatarPicker(
@@ -34,7 +35,7 @@ fun AvatarPicker(
         CircularAvatar(
             modifier = Modifier.size(150.dp),
             imageUrl = imageUriState.value?.toString(),
-            onClick = { launcher.launch("image/*") }
+            onClick = { launcher.launch(ContentTypes.IMAGE_ALL.type) }
         )
     }
 }

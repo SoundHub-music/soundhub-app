@@ -26,10 +26,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.Route
+import com.soundhub.utils.ContentTypes
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -52,8 +54,7 @@ fun UserPhotoCarousel(
         ) {
             SectionLabel(text = stringResource(id = R.string.profile_screen_photo_section_caption))
             FilledTonalIconButton(onClick = {
-                /* TODO: implement loading new images */
-                launcher.launch("image/*")
+                launcher.launch(ContentTypes.IMAGE_ALL.type)
             }) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
@@ -71,6 +72,7 @@ fun UserPhotoCarousel(
                             navController.navigate("${Route.Gallery.route}/$index")
                         },
                     model = images[index],
+                    failure = placeholder(R.drawable.circular_user),
                     contentDescription = null
                 )
             }

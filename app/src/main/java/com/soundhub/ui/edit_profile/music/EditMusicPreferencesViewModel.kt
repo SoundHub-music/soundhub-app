@@ -120,10 +120,13 @@ class EditMusicPreferencesViewModel @Inject constructor(
         )
 
         user?.let {
-            uiStateDispatcher.setAuthorizedUser(user)
-            uiStateDispatcher.sendUiEvent(
-                UiEvent.Navigate(Route.Profile.getRouteWithNavArg(user.id.toString()))
-            )
+            val route: Route = Route.Profile.getRouteWithNavArg(user.id.toString())
+            with(uiStateDispatcher) {
+                setAuthorizedUser(user)
+                sendUiEvent(
+                    UiEvent.Navigate(route)
+                )
+            }
         }
     }
 

@@ -51,7 +51,8 @@ interface UserService {
 
     @PUT(ApiEndpoints.Users.DELETE_FRIEND)
     suspend fun deleteFriend(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
         @Path(ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM)
         friendId: UUID
     ): Response<User>

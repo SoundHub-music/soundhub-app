@@ -19,44 +19,54 @@ import java.util.UUID
 interface PostService {
     @GET(ApiEndpoints.Posts.GET_POST_BY_ID)
     suspend fun getPostById(
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM) id: UUID,
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?
+        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        id: UUID,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?
     ): Response<Post?>
 
     @GET(ApiEndpoints.Posts.GET_POSTS_BY_AUTHOR_ID)
     suspend fun getPostsByAuthorId(
         @Path(ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM)
         authorId: UUID,
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?
     ): Response<List<Post>>
 
     @POST(ApiEndpoints.Posts.ADD_POST)
     @Multipart
     suspend fun addPost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
         @Part("postDto") post: RequestBody,
-        @Part images: List<MultipartBody.Part?> = emptyList()
+        @Part files: List<MultipartBody.Part>
     ): Response<Post>
 
     @PUT(ApiEndpoints.Posts.TOGGLE_LIKE)
     suspend fun toggleLike(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM) postId: UUID
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        postId: UUID
     ): Response<Post>
 
     @DELETE(ApiEndpoints.Posts.DELETE)
     suspend fun deletePost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM) postId: UUID
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        postId: UUID
     ): Response<UUID>
 
     @PUT(ApiEndpoints.Posts.UPDATE)
     @Multipart
     suspend fun updatePost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER) accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM) postId: UUID,
+        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        postId: UUID,
         @Part(value = "postDto") post: RequestBody,
         @Part images: List<MultipartBody.Part?> = emptyList(),
-        @Part(value = "deleteFiles") imagesToBeDeleted: List<String> = emptyList()
+        @Part(value = "deleteFiles") deleteFiles: RequestBody? = null
     ): Response<Post>
 }

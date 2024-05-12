@@ -17,6 +17,6 @@ interface FileService {
         accessToken: String,
         @Url fileName: String?,
         @Query("folderName")
-        folderName: String
+        folderName: String? = null
     ): Response<ResponseBody>
 }

@@ -1,6 +1,7 @@
 package com.soundhub.ui.post_editor
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.datastore.UserCredsStore
@@ -15,6 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -26,6 +29,14 @@ class PostEditorViewModel @Inject constructor(
 ): ViewModel() {
     private val userCreds = userCredsStore.getCreds()
     val postEditorState: MutableStateFlow<PostEditorState> = MutableStateFlow(PostEditorState())
+
+    init {
+        viewModelScope.launch {
+            postEditorState.update {
+                it.copy(userCreds = userCreds.firstOrNull())
+            }
+        }
+    }
 
     fun setContent(value: String) = postEditorState.update {
         it.copy(content = value)
@@ -42,26 +53,68 @@ class PostEditorViewModel @Inject constructor(
             post?.let {
                 val newState: PostEditorState = PostMapper.impl
                     .fromPostToPostEditorState(post)
+                    .apply {
+                        this.doesPostExist = true
+                        this.oldPostState = post
+                    }
 
                 postEditorState.update { newState }
             }
         }
     }
 
+    fun setImages(list: List<String>) {
+        val doesPostExist: Boolean = postEditorState.value.doesPostExist
+
+        if (doesPostExist) {
+            postEditorState.update {
+                it.copy(newImages = list)
+            }
+        }
+        else {
+            var images: MutableList<String> = postEditorState.value.images.toMutableList()
+            if (images.isNotEmpty())
+                images += list
+            else images = list.toMutableList()
+
+            postEditorState.update {
+                it.copy(images = images)
+            }
+        }
+    }
+
+    fun deleteImage(uri: String) = postEditorState.update {
+        val doesPostExist: Boolean = postEditorState.value.doesPostExist
+        val originalImages: List<String> = postEditorState.value.oldPostState?.images ?: emptyList()
+        val imagesToBeDeleted: MutableList<String> = it.imagesToBeDeleted.toMutableList()
+
+        if (doesPostExist && uri in originalImages) {
+            imagesToBeDeleted += uri
+        }
+
+        it.copy(
+            images = it.images.filter { u -> u != uri },
+            imagesToBeDeleted = it.imagesToBeDeleted + imagesToBeDeleted
+        )
+    }
+
     suspend fun createPost(author: User?) {
         val creds: UserPreferences? = userCreds.firstOrNull()
         var toastText: UiText = UiText.StringResource(R.string.toast_post_created_successfully)
-        val post = Post(
-            author = author,
-            content = postEditorState.value.content
-        )
+        val post: Post = PostMapper.impl.fromPostEditorStateToPost(postEditorState.value)
+            .apply {
+                this.author = author
+                this.publishDate = LocalDateTime.now()
+            }
 
         postRepository.addPost(
             post = post,
             accessToken = creds?.accessToken
         ).onSuccess {
-            uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
-            uiStateDispatcher.sendUiEvent(UiEvent.PopBackStack)
+            with(uiStateDispatcher) {
+                sendUiEvent(UiEvent.ShowToast(toastText))
+                sendUiEvent(UiEvent.PopBackStack)
+            }
         }
         .onFailure { response ->
             response.errorBody.detail?.let { message ->
@@ -71,7 +124,7 @@ class PostEditorViewModel @Inject constructor(
         }
     }
 
-    suspend fun updatePost(imagesToBeDeleted: List<String> = emptyList()) {
+    suspend fun updatePost() {
         val creds: UserPreferences? = userCreds.firstOrNull()
         val post: Post = PostMapper.impl.fromPostEditorStateToPost(postEditorState.value)
         var toastText: UiText
@@ -80,11 +133,15 @@ class PostEditorViewModel @Inject constructor(
             accessToken = creds?.accessToken,
             postId = post.id,
             post = post,
-            imagesToBeDeleted = imagesToBeDeleted
+            newImages = postEditorState.value.newImages,
+            imagesToBeDeleted = postEditorState.value.imagesToBeDeleted
         )
             .onSuccess {
                 toastText = UiText.StringResource(R.string.toast_post_updated_successfully)
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                with(uiStateDispatcher) {
+                    sendUiEvent(UiEvent.ShowToast(toastText))
+                    sendUiEvent(UiEvent.PopBackStack)
+                }
             }
             .onFailure {
                 toastText = UiText.StringResource(R.string.toast_update_post_error)

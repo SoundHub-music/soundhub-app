@@ -5,7 +5,7 @@ import java.io.File
 
 interface FileRepository {
     suspend fun getFile(
-        folderName: String,
+        folderName: String? = null,
         fileNameUrl: String?,
         accessToken: String?
     ): HttpResult<File>

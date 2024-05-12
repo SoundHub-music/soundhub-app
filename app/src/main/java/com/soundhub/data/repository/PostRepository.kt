@@ -33,6 +33,7 @@ interface PostRepository {
         accessToken: String?,
         postId: UUID,
         post: Post,
+        newImages: List<String> = emptyList(),
         imagesToBeDeleted: List<String> = emptyList()
     ): HttpResult<Post>
 }

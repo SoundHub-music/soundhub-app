@@ -52,8 +52,7 @@ fun UserDataForm(
         Log.d("UserDataForm", formState.value.toString())
         if (formState.value is UserFormState)
             avatarUri.value = (formState.value as UserFormState)
-                .avatarImageFile
-                ?.absolutePath?.toUri()
+                .avatarUrl?.toUri()
     }
 
     LaunchedEffect(key1 = avatarUri.value) {

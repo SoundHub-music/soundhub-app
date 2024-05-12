@@ -29,8 +29,8 @@ class PostViewModel @Inject constructor(
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
-        private set
+    val postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState())
+
 
     fun isPostLiked(user: User, post: Post): Boolean {
         return postUiState.value.posts
@@ -113,9 +113,7 @@ class PostViewModel @Inject constructor(
                 post
             }
             // updating liked post in posts field
-            state.copy(
-                posts = updatedPostList
-            )
+            state.copy(posts = updatedPostList)
         }
     }
 }

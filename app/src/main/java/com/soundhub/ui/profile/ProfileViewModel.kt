@@ -52,7 +52,10 @@ class ProfileViewModel @Inject constructor(
     private suspend fun initializeProfileState() {
         uiState.map { it.authorizedUser }
             .collect { user ->
-                profileUiState.update { it.copy(authorizedUser = user) }
+                profileUiState.update { it.copy(
+                    authorizedUser = user,
+                    userCreds = userCreds.firstOrNull()
+                ) }
                 loadAllInvitesByAuthorizedUser()
         }
     }

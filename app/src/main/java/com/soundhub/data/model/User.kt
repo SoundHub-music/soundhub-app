@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import com.soundhub.utils.converters.room.UserRoomConverter
-import java.io.File
 import java.time.LocalDate
 import java.util.UUID
 
@@ -17,7 +16,6 @@ data class User(
     var id: UUID = UUID.randomUUID(),
     var gender: Gender = Gender.UNKNOWN,
     var avatarUrl: String? = null,
-    var avatarImageFile: File? = null,
     var email: String = "",
     var firstName: String = "",
     var lastName: String = "",

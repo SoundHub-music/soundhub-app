@@ -1,12 +1,10 @@
 package com.soundhub.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +26,6 @@ import com.soundhub.ui.navigation.NavigationHost
 import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.utils.constants.Constants
-import java.io.File
 
 @Composable
 fun HomeScreen(
@@ -47,11 +44,7 @@ fun HomeScreen(
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
 
     val authorizedUser: User? = uiState.authorizedUser
-    val userAvatar: File? = authorizedUser?.avatarImageFile
 
-    LaunchedEffect(key1 = userAvatar) {
-        Log.d("HomeScreen", "user_avatar: $userAvatar")
-    }
 
     Scaffold(
         modifier = modifier

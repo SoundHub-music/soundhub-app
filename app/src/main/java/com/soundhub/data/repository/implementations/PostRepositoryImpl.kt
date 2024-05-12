@@ -103,7 +103,7 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun addPost(post: Post, accessToken: String?): HttpResult<Post> {
         try {
-            val imagesFormDataList: List<MultipartBody.Part?> = post.images.map {
+            val imagesFormDataList: List<MultipartBody.Part> = post.images.mapNotNull {
                 HttpUtils.prepareMediaFormData(it, context)
             }
 
@@ -113,7 +113,7 @@ class PostRepositoryImpl @Inject constructor(
             val response: Response<Post> = postService.addPost(
                 accessToken = HttpUtils.getBearerToken(accessToken),
                 post = postRequestBody,
-                images = imagesFormDataList
+                files = imagesFormDataList
             )
 
             Log.d("PostRepository", "response: $response")
@@ -197,22 +197,31 @@ class PostRepositoryImpl @Inject constructor(
         accessToken: String?,
         postId: UUID,
         post: Post,
+        newImages: List<String>,
         imagesToBeDeleted: List<String>
     ): HttpResult<Post> {
         try {
-            val imageFormData: List<MultipartBody.Part?> = post.images.map {
+            val imageFormData: List<MultipartBody.Part?> = newImages.map {
                 HttpUtils.prepareMediaFormData(it, context)
             }
 
+            Log.d("PostRepository", "json: ${gson.toJson(post)}")
             val postRequestBody: RequestBody = gson.toJson(post)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
+
+            Log.d("PostRepository", "json images to delete: ${gson.toJson(imagesToBeDeleted)}")
+
+            val imagesToBeDeletedRequestBody: RequestBody = gson.toJson(imagesToBeDeleted)
+                .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
+
+            Log.d("PostRepository", "request body: $imagesToBeDeletedRequestBody")
 
             val response: Response<Post> = postService.updatePost(
                 accessToken = HttpUtils.getBearerToken(accessToken),
                 postId = postId,
                 post = postRequestBody,
                 images = imageFormData,
-                imagesToBeDeleted = imagesToBeDeleted
+                deleteFiles = imagesToBeDeletedRequestBody
             )
 
             Log.d("PostRepository", "updatePost[1]: $response")

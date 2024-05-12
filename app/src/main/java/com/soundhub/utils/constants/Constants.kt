@@ -107,9 +107,9 @@ object Constants {
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API_HOSTNAME="192.168.0.167:8080"
+    const val SOUNDHUB_API_HOSTNAME="192.168.1.41:8080"
     const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
-    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/api/v1/messages"
+    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/ws"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 

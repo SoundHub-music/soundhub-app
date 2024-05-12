@@ -14,7 +14,6 @@ import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.ContentTypes
-import com.soundhub.utils.MediaFolder
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -126,10 +125,8 @@ class UserRepositoryImpl @Inject constructor(
     private suspend fun loadUserAvatar(user: User, accessToken: String?) {
         fileRepository.getFile(
             accessToken = accessToken,
-            fileNameUrl = user.avatarUrl,
-            folderName = MediaFolder.Avatar.NAME
+            fileNameUrl = user.avatarUrl
         )
-            .onSuccess { user.avatarImageFile = it.body }
     }
 
     override suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User> {

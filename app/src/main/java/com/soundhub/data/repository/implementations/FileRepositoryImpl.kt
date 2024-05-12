@@ -24,7 +24,7 @@ class FileRepositoryImpl @Inject constructor(
     private val context: Context
 ): FileRepository {
     override suspend fun getFile(
-        folderName: String,
+        folderName: String?,
         fileNameUrl: String?,
         accessToken: String?
     ): HttpResult<File> {

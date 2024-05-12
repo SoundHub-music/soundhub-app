@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 class SplashScreenViewModel: ViewModel() {
     val isLoading = MutableStateFlow(true)
 
+    fun setLoading() = isLoading.update { true }
+
     init {
         viewModelScope.launch {
             delay(2000)

@@ -6,19 +6,15 @@ import com.soundhub.data.dao.CountryDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.model.Country
 import com.soundhub.data.repository.CountryRepository
-import com.soundhub.domain.usecases.file.GetImageUseCase
-import com.soundhub.utils.MediaFolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class UserDataFormViewModel @Inject constructor(
     private val countryRepository: CountryRepository,
-    private val getImageUseCase: GetImageUseCase,
     appDb: AppDatabase
 ): ViewModel() {
     val countryList = MutableStateFlow<List<Country>>(emptyList())
@@ -46,13 +42,5 @@ class UserDataFormViewModel @Inject constructor(
             countries.sortedBy { it.translations.rus.common }
         }
         isLoading.value = false
-    }
-
-    suspend fun getAvatar(avatarUrl: String?, accessToken: String?): File? {
-        return getImageUseCase(
-            fileName = avatarUrl,
-            accessToken = accessToken,
-            folderName = MediaFolder.Avatar.NAME
-        )
     }
 }

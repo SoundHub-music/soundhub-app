@@ -90,9 +90,7 @@ private fun InterlocutorDetails(
 
     var isOnline: Boolean by rememberSaveable { mutableStateOf(false) }
     var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
-    var onlineIndicatorText: String by rememberSaveable {
-        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
-    }
+    var onlineIndicatorText: String by rememberSaveable { mutableStateOf(context.getString(R.string.online_indicator_user_offline)) }
 
     val lastOnline: LocalDateTime = LocalDateTime.of(2024, Month.MAY, 7, 15, 0)
     val lastOnlineString = DateFormatter.getRelativeDate(lastOnline)
@@ -153,6 +151,5 @@ private fun onInterlocutorDetailsClick(
     interlocutor: User?,
     navController: NavHostController
 ) = interlocutor?.let {
-        navController.navigate(Route.Profile
-                .getStringRouteWithNavArg(it.id.toString()))
+    navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString()))
 }

@@ -1,8 +1,11 @@
 package com.soundhub.ui.post_editor
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.post_editor.components.ImagePreviewRow
+import com.soundhub.utils.ContentTypes
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -39,6 +44,12 @@ fun PostEditorScreen(
 ) {
     val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    val activityResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) {
+        postEditorViewModel.setImages(it.map { uri -> uri.toString() })
+    }
 
     LaunchedEffect(key1 = postId) {
         Log.d("PostEditorScreen", "post id: $postId")
@@ -62,41 +73,44 @@ fun PostEditorScreen(
             }
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            FloatingActionButton(
-                onClick = { /*TODO: implement uploading images*/ },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
+        Column {
+            ImagePreviewRow(postEditorViewModel = postEditorViewModel)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_photo_camera_24),
-                    contentDescription = "add photo"
-                )
-            }
-
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.padding(10.dp),
-                onClick = {
-                    coroutineScope.launch {
-                        if (postId == null)
-                            onCreatePostButtonClick(
-                                postEditorViewModel = postEditorViewModel,
-                                user = user
-                            )
-                        else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
-                    }
+                FloatingActionButton(
+                    onClick = { activityResultLauncher.launch(ContentTypes.IMAGE_ALL.type) },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_photo_camera_24),
+                        contentDescription = "add photo"
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.Send,
-                    contentDescription = "send post"
-                )
+
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.padding(10.dp),
+                    onClick = {
+                        coroutineScope.launch {
+                            if (postId == null)
+                                onCreatePostButtonClick(
+                                    postEditorViewModel = postEditorViewModel,
+                                    user = user
+                                )
+                            else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.Send,
+                        contentDescription = "send post"
+                    )
+                }
             }
         }
     }

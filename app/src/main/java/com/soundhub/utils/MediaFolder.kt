@@ -1,7 +1,6 @@
 package com.soundhub.utils
 
-sealed class MediaFolder {
-    object Avatar {
-        const val NAME: String = "avatars"
-    }
+enum class MedialFolder(val folderName: String) {
+    AVATAR("avatars"),
+    POST_PICTURE("postPictures")
 }
