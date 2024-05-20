@@ -63,9 +63,9 @@ fun CircularAvatar(
             contentScale = ContentScale.Crop,
             failure = placeholder(R.drawable.circular_user),
             transition = CrossFade
-        ) {
+        ) /*{
             it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, imageUrl))
-        }
+        }*/
     }
 }
 

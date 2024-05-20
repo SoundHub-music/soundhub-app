@@ -11,9 +11,13 @@ object Constants {
     const val DATE_FORMAT = "yyyy-MM-dd"
     const val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
 
+    // online status
+    const val SET_OFFLINE_DELAY_ON_DESTROY: Long = 60 * 1000
+    const val SET_OFFLINE_DELAY_ON_STOP: Long = 5 * 60 * 1000
+
     // regular expressions
     const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
-    const val NAV_ARG_DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
+    const val DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
 
     // datastore identifiers
     const val DATASTORE_USER_CREDS = "user_creds"

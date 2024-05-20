@@ -1,5 +1,6 @@
 package com.soundhub.di
 
+import android.content.Context
 import com.google.gson.GsonBuilder
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.converters.json.LocalDateAdapter
@@ -7,11 +8,14 @@ import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Named
@@ -22,12 +26,17 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun providesOkHttpClient(): OkHttpClient {
+    fun providesOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
+        val cacheSize: Long = 10 * 1024 * 1024 // 10 MB
+        val cacheDirectory = File(context.cacheDir, "http-cache")
+        val cache = Cache(cacheDirectory, cacheSize)
+
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .cache(cache)
             .build()
     }
 

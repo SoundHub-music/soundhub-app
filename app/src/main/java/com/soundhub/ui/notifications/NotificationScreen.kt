@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.Invite
 import com.soundhub.ui.components.containers.ContentContainer
-import com.soundhub.ui.notifications.components.FriendRequestNotificationItem
+import com.soundhub.ui.notifications.components.FriendRequestNotification
 
 @Composable
 fun NotificationScreen(
@@ -54,9 +54,10 @@ fun NotificationScreen(
             items(items = notificationUiState.notifications, key = { it.id }) { item ->
                 when (item) {
                     is Invite ->
-                        FriendRequestNotificationItem(
+                        FriendRequestNotification(
                             invite = item,
-                            notificationViewModel = notificationViewModel
+                            notificationViewModel = notificationViewModel,
+                            navController = navController
                         )
                 }
             }

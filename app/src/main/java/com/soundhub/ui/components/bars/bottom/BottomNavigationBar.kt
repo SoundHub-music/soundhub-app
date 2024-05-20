@@ -31,6 +31,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.model.User
+import com.soundhub.ui.messenger.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
@@ -43,12 +44,6 @@ fun BottomNavigationBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState()
-    val unreadMessageCount = messengerViewModel
-        .messengerUiState
-        .collectAsState()
-        .value
-        .unreadMessagesTotal
-
     val selectedItemState: MutableState<String> = remember {
         mutableStateOf(uiState.currentRoute ?: Route.Postline.route)
     }
@@ -70,8 +65,8 @@ fun BottomNavigationBar(
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
         getNavBarItems(
-            unreadMessageCount = unreadMessageCount,
-            userId = user.id
+            userId = user.id,
+            messengerViewModel = messengerViewModel
         ).forEach { menuItem ->
             Log.d("BottomNavigationBar", "menuItem: $menuItem")
             NavigationBarItem(
@@ -102,10 +97,15 @@ private fun onMenuItemClick(
     }
 }
 
+@Composable
 private fun getNavBarItems(
-    unreadMessageCount: Int = 0,
+    messengerViewModel: MessengerViewModel,
     userId: UUID
 ): List<NavBarItem> {
+    val messengerUiState: MessengerUiState by
+        messengerViewModel.messengerUiState.collectAsState()
+    val unreadMessageCount: Int = messengerUiState.unreadMessagesCount
+
     return listOf(
         NavBarItem(
             route = Route.Postline.route,

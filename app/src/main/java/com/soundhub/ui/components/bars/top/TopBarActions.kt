@@ -1,19 +1,26 @@
 package com.soundhub.ui.components.bars.top
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.utils.constants.Constants
 import com.soundhub.Route
+import com.soundhub.data.model.Message
+import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
@@ -77,4 +84,27 @@ internal fun ChatTopBarActions(
         chatViewModel = chatViewModel,
         uiStateDispatcher = uiStateDispatcher
     )
+}
+
+
+@Composable
+internal fun ChatTopBarCheckMessagesActions(chatViewModel: ChatViewModel, uiStateDispatcher: UiStateDispatcher) {
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val checkedMessages: List<Message> = uiState.checkedMessages
+    val authorizedUser: User? = uiState.authorizedUser
+
+    var hasOnlyOwnMessages by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = checkedMessages, key2 = authorizedUser) {
+        hasOnlyOwnMessages = checkedMessages.all { it.sender?.id == authorizedUser?.id }
+    }
+
+    Row {
+        // TODO: add new message options
+        if (hasOnlyOwnMessages) IconButton(
+            onClick = { checkedMessages.forEach { message -> chatViewModel.deleteMessage(message) } }
+        ) {
+            Icon(imageVector = Icons.Rounded.Delete, contentDescription = "Delete message option")
+        }
+    }
 }

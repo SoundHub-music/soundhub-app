@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration.states
+package com.soundhub.ui.authentication.registration.states
 
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Gender

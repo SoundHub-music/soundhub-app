@@ -32,20 +32,22 @@ class NotificationViewModel @Inject constructor(
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    private val uiState: Flow<UiState> = uiStateDispatcher.uiState.asStateFlow()
-    val notificationUiState = MutableStateFlow(NotificationUiState())
+    private val uiState: Flow<UiState> = uiStateDispatcher.uiState
+
+    private val _notificationUiState = MutableStateFlow(NotificationUiState())
+    val notificationUiState = _notificationUiState.asStateFlow()
 
     init { loadInvites() }
 
     fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
-        notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
+        _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
         userCreds.firstOrNull()
             ?.accessToken
             ?.let { accessToken ->
             inviteRepository.getAllInvites(accessToken)
                 .onSuccess { response ->
-                    val invites = response.body ?: emptyList()
-                    notificationUiState.update {
+                    val invites = response.body.orEmpty()
+                    _notificationUiState.update {
                         it.copy(
                             notifications = invites,
                             status = ApiStatus.SUCCESS
@@ -53,7 +55,7 @@ class NotificationViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    notificationUiState.update {
+                    _notificationUiState.update {
                      it.copy(status = ApiStatus.ERROR)
                     }
                 }
@@ -88,17 +90,17 @@ class NotificationViewModel @Inject constructor(
             }
     }
 
-    fun rejectInvite(inviteId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+    fun rejectInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
         val toastText = UiText.StringResource(R.string.toast_invite_rejected_successfully)
         val uiEvent = UiEvent.ShowToast(toastText)
 
         val creds: UserPreferences? = userCreds.firstOrNull()
         inviteRepository.rejectInvite(
             accessToken = creds?.accessToken,
-            inviteId = inviteId
+            inviteId = invite.id
         )
             .onSuccess {
-                deleteNotificationById(inviteId)
+                deleteNotificationById(invite.id)
             }
             .onFailure {
                 toastText.srcId = R.string.toast_reject_invite_error
@@ -108,7 +110,7 @@ class NotificationViewModel @Inject constructor(
             }
     }
 
-    private fun deleteNotificationById(notificationId: UUID) = notificationUiState.update {
+    private fun deleteNotificationById(notificationId: UUID) = _notificationUiState.update {
         val notifications = it.notifications.filter { n -> n.id != notificationId }
         it.copy(notifications = notifications)
     }

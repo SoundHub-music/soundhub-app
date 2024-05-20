@@ -1,8 +1,19 @@
 package com.soundhub.data.api
 
 import com.soundhub.data.model.User
-import com.soundhub.utils.ApiEndpoints
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.ApiEndpoints.Users.ADD_FRIEND
+import com.soundhub.utils.ApiEndpoints.Users.CURRENT_USER
+import com.soundhub.utils.ApiEndpoints.Users.DELETE_FRIEND
+import com.soundhub.utils.ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Users.GET_FRIENDS
+import com.soundhub.utils.ApiEndpoints.Users.GET_RECOMMENDED_FRIENDS
+import com.soundhub.utils.ApiEndpoints.Users.GET_USER_BY_ID
+import com.soundhub.utils.ApiEndpoints.Users.SEARCH_PARAM_NAME
+import com.soundhub.utils.ApiEndpoints.Users.SEARCH_USER
+import com.soundhub.utils.ApiEndpoints.Users.TOGGLE_ONLINE
+import com.soundhub.utils.ApiEndpoints.Users.UPDATE_USER
+import com.soundhub.utils.ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM
+import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -16,68 +27,72 @@ import retrofit2.http.Query
 import java.util.UUID
 
 interface UserService {
-    @GET(ApiEndpoints.Users.CURRENT_USER)
+    @GET(CURRENT_USER)
     suspend fun getCurrentUser(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?
     ): Response<User?>
 
-    @GET(ApiEndpoints.Users.GET_USER_BY_ID)
+    @GET(GET_USER_BY_ID)
     suspend fun getUserById(
-        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
+        @Path(USER_ID_DYNAMIC_PARAM)
         id: UUID?,
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?
     ): Response<User?>
 
-    @PUT(ApiEndpoints.Users.UPDATE_USER)
+    @PUT(UPDATE_USER)
     @Multipart
     suspend fun updateUserById(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
+        @Path(USER_ID_DYNAMIC_PARAM)
         id: UUID?,
         @Part("userDto") user: RequestBody,
         @Part userAvatar: MultipartBody.Part?
     ): Response<User>
 
-    @PUT(ApiEndpoints.Users.ADD_FRIEND)
+    @PUT(ADD_FRIEND)
     suspend fun addFriend(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM)
+        @Path(FRIEND_ID_DYNAMIC_PARAM)
         friendId: UUID
     ): Response<User>
 
-    @PUT(ApiEndpoints.Users.DELETE_FRIEND)
+    @PUT(DELETE_FRIEND)
     suspend fun deleteFriend(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM)
+        @Path(FRIEND_ID_DYNAMIC_PARAM)
         friendId: UUID
     ): Response<User>
 
-    @GET(ApiEndpoints.Users.GET_RECOMMENDED_FRIENDS)
+    @GET(GET_RECOMMENDED_FRIENDS)
     suspend fun getRecommendedFriends(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
-        accessToken: String?,
-        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
-        userId: UUID?
+        @Header(AUTHORIZATION_HEADER)
+        accessToken: String?
     ): Response<List<User>>
 
-    @GET(ApiEndpoints.Users.GET_FRIENDS)
+    @GET(GET_FRIENDS)
     suspend fun getFriendsByUserId(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM)
+        @Path(USER_ID_DYNAMIC_PARAM)
         userId: UUID
     ): Response<List<User>>
 
-    @GET(ApiEndpoints.Users.SEARCH_USER)
+    @GET(SEARCH_USER)
     suspend fun searchUserByFullName(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Query(ApiEndpoints.Users.SEARCH_PARAM_NAME)
+        @Query(SEARCH_PARAM_NAME)
         name: String
     ): Response<List<User>>
+
+    @PUT(TOGGLE_ONLINE)
+    suspend fun toggleUserOnline(
+        @Header(AUTHORIZATION_HEADER)
+        accessToken: String?
+    ): Response<User?>
 }

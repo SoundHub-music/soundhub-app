@@ -10,25 +10,31 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
+import com.soundhub.ui.messenger.chat.ChatUiState
+import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
 fun MessageTextField(
     modifier: Modifier = Modifier,
-    messageContent: MutableState<String>
+    chatViewModel: ChatViewModel
 ) {
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val messageContent: String = chatUiState.messageContent
+
     OutlinedTextField(
         modifier = modifier
             .height(72.dp)
             .fillMaxWidth(),
         singleLine = true,
-        value = messageContent.value,
-        onValueChange = { messageContent.value = it },
+        value = messageContent,
+        onValueChange = { chatViewModel.setMessageContent(it) },
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

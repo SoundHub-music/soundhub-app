@@ -7,8 +7,9 @@ import com.soundhub.data.model.Chat
 import java.util.UUID
 
 interface ChatRepository {
-    suspend fun getAllChatsByCurrentUser(
-        accessToken: String?
+    suspend fun getAllChatsByUserId(
+        accessToken: String?,
+        userId: UUID
     ): HttpResult<List<Chat>>
 
     suspend fun getChatById(

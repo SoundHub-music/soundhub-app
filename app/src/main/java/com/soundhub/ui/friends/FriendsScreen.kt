@@ -35,11 +35,13 @@ fun FriendsScreen(
     val profileOwner: User? = friendsUiState.profileOwner
     val authorizedUser: User? = uiState.authorizedUser
     var isOriginProfile: Boolean by rememberSaveable { mutableStateOf(false) }
-    var tabState: List<FriendListPage> by rememberSaveable {
-        mutableStateOf(friendsViewModel.tabs)
-    }
+    var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(friendsViewModel.tabs) }
 
     val searchBarText: String = uiState.searchBarText
+
+    LaunchedEffect(key1 = authorizedUser) {
+        friendsViewModel.loadRecommendedFriends()
+    }
 
     LaunchedEffect(key1 = searchBarText) {
         if (tabs[selectedTabState.currentPage] == FriendListPage.SEARCH)

@@ -14,6 +14,7 @@ import com.soundhub.utils.UiText
 import com.soundhub.utils.mappers.PostMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,17 +29,19 @@ class PostEditorViewModel @Inject constructor(
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds = userCredsStore.getCreds()
-    val postEditorState: MutableStateFlow<PostEditorState> = MutableStateFlow(PostEditorState())
+
+    private val _postEditorState: MutableStateFlow<PostEditorState> = MutableStateFlow(PostEditorState())
+    val postEditorState = _postEditorState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            postEditorState.update {
+            _postEditorState.update {
                 it.copy(userCreds = userCreds.firstOrNull())
             }
         }
     }
 
-    fun setContent(value: String) = postEditorState.update {
+    fun setContent(value: String) = _postEditorState.update {
         it.copy(content = value)
     }
 
@@ -58,34 +61,34 @@ class PostEditorViewModel @Inject constructor(
                         this.oldPostState = post
                     }
 
-                postEditorState.update { newState }
+                _postEditorState.update { newState }
             }
         }
     }
 
     fun setImages(list: List<String>) {
-        val doesPostExist: Boolean = postEditorState.value.doesPostExist
+        val doesPostExist: Boolean = _postEditorState.value.doesPostExist
 
         if (doesPostExist) {
-            postEditorState.update {
+            _postEditorState.update {
                 it.copy(newImages = list)
             }
         }
         else {
-            var images: MutableList<String> = postEditorState.value.images.toMutableList()
+            var images: MutableList<String> = _postEditorState.value.images.toMutableList()
             if (images.isNotEmpty())
                 images += list
             else images = list.toMutableList()
 
-            postEditorState.update {
+            _postEditorState.update {
                 it.copy(images = images)
             }
         }
     }
 
-    fun deleteImage(uri: String) = postEditorState.update {
-        val doesPostExist: Boolean = postEditorState.value.doesPostExist
-        val originalImages: List<String> = postEditorState.value.oldPostState?.images ?: emptyList()
+    fun deleteImage(uri: String) = _postEditorState.update {
+        val doesPostExist: Boolean = _postEditorState.value.doesPostExist
+        val originalImages: List<String> = _postEditorState.value.oldPostState?.images.orEmpty()
         val imagesToBeDeleted: MutableList<String> = it.imagesToBeDeleted.toMutableList()
 
         if (doesPostExist && uri in originalImages) {
@@ -101,7 +104,7 @@ class PostEditorViewModel @Inject constructor(
     suspend fun createPost(author: User?) {
         val creds: UserPreferences? = userCreds.firstOrNull()
         var toastText: UiText = UiText.StringResource(R.string.toast_post_created_successfully)
-        val post: Post = PostMapper.impl.fromPostEditorStateToPost(postEditorState.value)
+        val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
             .apply {
                 this.author = author
                 this.publishDate = LocalDateTime.now()
@@ -126,15 +129,15 @@ class PostEditorViewModel @Inject constructor(
 
     suspend fun updatePost() {
         val creds: UserPreferences? = userCreds.firstOrNull()
-        val post: Post = PostMapper.impl.fromPostEditorStateToPost(postEditorState.value)
+        val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
         var toastText: UiText
 
         postRepository.updatePost(
             accessToken = creds?.accessToken,
             postId = post.id,
             post = post,
-            newImages = postEditorState.value.newImages,
-            imagesToBeDeleted = postEditorState.value.imagesToBeDeleted
+            newImages = _postEditorState.value.newImages,
+            imagesToBeDeleted = _postEditorState.value.imagesToBeDeleted
         )
             .onSuccess {
                 toastText = UiText.StringResource(R.string.toast_post_updated_successfully)

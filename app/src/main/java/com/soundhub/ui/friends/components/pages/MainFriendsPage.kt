@@ -35,7 +35,7 @@ internal fun MainFriendsPage(
 
     val profileOwner: User? = friendsUiState.profileOwner
     val searchBarText: String = uiState.searchBarText
-    val friends: List<User> = profileOwner?.friends ?: emptyList()
+    val friends: List<User> = profileOwner?.friends.orEmpty()
     var filteredFriendList: List<User> by rememberSaveable { mutableStateOf(friends) }
 
     LaunchedEffect(key1 = searchBarText) {

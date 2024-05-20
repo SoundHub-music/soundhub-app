@@ -7,6 +7,7 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Invite
 import com.soundhub.data.repository.InviteRepository
+import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.constants.Constants
 import retrofit2.Response
@@ -14,7 +15,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 class InviteRepositoryImpl @Inject constructor(
-    private val inviteService: InviteService
+    private val inviteService: InviteService,
+    private val loadAllUserDataUseCase: LoadAllUserDataUseCase
 ): InviteRepository {
     override suspend fun createInvite(accessToken: String?, recipientId: UUID): HttpResult<Invite> {
         try {
@@ -128,32 +130,41 @@ class InviteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllInvitesBySenderId(
+    override suspend fun getInviteBySenderAndRecipientId(
         accessToken: String?,
-        senderId: UUID
-    ): HttpResult<List<Invite>> {
+        senderId: UUID?,
+        recipientId: UUID?
+    ): HttpResult<Invite?> {
         try {
-            val response: Response<List<Invite>> = inviteService.getAllInvitesBySenderId(
+            val response: Response<Invite?> = inviteService.getInviteBySenderAndRecipientId(
                 accessToken = HttpUtils.getBearerToken(accessToken),
-                senderId = senderId
+                senderId = senderId,
+                recipientId = recipientId
             )
 
-            Log.d("InviteRepository", "getAllInvitesBySenderId[1]: $response")
+            Log.d("InviteRepository", "getInviteBySenderAndRecipientId[1]: $response")
 
             if (!response.isSuccessful) {
                 val errorResponse: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(status = response.code())
 
-                Log.e("InviteRepository", "getAllInvitesBySenderId[2]: $errorResponse")
+                Log.e("InviteRepository", "getInviteBySenderAndRecipientId[2]: $errorResponse")
 
                 return HttpResult.Error(errorResponse)
+            }
+
+            with(response.body()) {
+                this?.let {
+                    loadAllUserDataUseCase(it.recipient)
+                    loadAllUserDataUseCase(it.sender)
+                }
             }
 
             return HttpResult.Success(response.body())
         }
         catch (e: Exception) {
-            Log.e("InviteRepository", "getAllInvitesBySenderId[3]: ${e.stackTraceToString()}")
+            Log.e("InviteRepository", "getInviteBySenderAndRecipientId[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 throwable = e,
                 errorBody = ErrorResponse(detail = e.localizedMessage)

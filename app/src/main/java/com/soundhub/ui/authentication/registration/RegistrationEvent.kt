@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration
+package com.soundhub.ui.authentication.registration
 
 import com.soundhub.data.model.User
 

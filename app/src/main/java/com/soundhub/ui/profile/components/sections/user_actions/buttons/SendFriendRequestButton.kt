@@ -34,10 +34,14 @@ internal fun SendFriendRequestButton(
     val coroutineScope = rememberCoroutineScope()
     var buttonIconRes by rememberSaveable { mutableIntStateOf(R.drawable.baseline_person_add) }
 
+    LaunchedEffect(key1 = profileUiState) {
+        profileViewModel.checkInvite()
+    }
+
     LaunchedEffect(key1 = isRequestSent) {
         Log.d("SendFriendRequestButton", "was request sent: $isRequestSent")
         buttonIconRes = getSendRequestBtnIconRes(isRequestSent)
-        profileViewModel.loadAllInvitesByAuthorizedUser()
+//        profileViewModel.loadAllInvitesByAuthorizedUser()
     }
 
     FilledTonalIconToggleButton(

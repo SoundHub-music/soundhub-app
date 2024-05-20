@@ -1,7 +1,7 @@
 package com.soundhub.utils.mappers
 
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.postregistration.states.RegistrationState
+import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.states.UserFormState
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping

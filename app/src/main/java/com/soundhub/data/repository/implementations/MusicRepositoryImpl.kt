@@ -18,7 +18,7 @@ import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Track
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +87,7 @@ class MusicRepositoryImpl @Inject constructor(
             }
 
             loadDataToArtistState(
-                data = response.body()?.results ?: emptyList(),
+                data = response.body()?.results.orEmpty(),
                 state = artistState
             )
 
@@ -115,8 +115,8 @@ class MusicRepositoryImpl @Inject constructor(
             searchArtistInReleaseResponse(artistName)
                 .onSuccess { artist ->
                     artist.body?.let { artistBody ->
-                        artistBody.genre = entity.genre ?: emptyList()
-                        artistBody.style = entity.style ?: emptyList()
+                        artistBody.genre = entity.genre.orEmpty()
+                        artistBody.style = entity.style.orEmpty()
 
                         val artistNotInState: Boolean = artistBody.title !in state.value.artists.map { it.title }
                         val isNotDuplicate: Boolean = artistBody.title?.matches(duplicateEntityRegex) == false
@@ -152,7 +152,7 @@ class MusicRepositoryImpl @Inject constructor(
             }
 
             val desiredArtist: Artist? = findArtistOrGetFirst(
-                discogsResponseList = response.body()?.results ?: emptyList(),
+                discogsResponseList = response.body()?.results.orEmpty(),
                 artistName = artistName
             )
 
@@ -262,11 +262,11 @@ class MusicRepositoryImpl @Inject constructor(
                 Artist(
                     id = it.id,
                     title = it.title,
-                    genre = it.genre ?: emptyList(),
-                    style = it.style ?: emptyList(),
+                    genre = it.genre.orEmpty(),
+                    style = it.style.orEmpty(),
                     thumb = it.thumb
                 )
-            } ?: emptyList()
+            }.orEmpty()
 
             return HttpResult.Success(body = desiredArtists)
         }

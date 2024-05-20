@@ -18,10 +18,10 @@ import javax.inject.Inject
 class ChatRepositoryImpl @Inject constructor(
     private val chatService: ChatService
 ): ChatRepository {
-    override suspend fun getAllChatsByCurrentUser(accessToken: String?): HttpResult<List<Chat>> {
+    override suspend fun getAllChatsByUserId(accessToken: String?, userId: UUID): HttpResult<List<Chat>> {
         try {
             val response: Response<List<Chat>> = chatService
-                .getAllChatsByCurrentUser(HttpUtils.getBearerToken(accessToken))
+                .getAllChatsByUserId(HttpUtils.getBearerToken(accessToken), userId)
             Log.d("ChatRepository", "getAllChatsByCurrentUser[1]: $response")
 
             if (!response.isSuccessful) {

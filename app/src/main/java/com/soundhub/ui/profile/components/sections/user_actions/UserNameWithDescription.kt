@@ -17,6 +17,7 @@ import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,9 +37,14 @@ import com.soundhub.utils.DateFormatter
 import java.time.LocalDate
 
 @Composable
-internal fun UserNameWithDescription(user: User?) {
+internal fun UserNameWithDescription(profileOwner: User?) {
+    var userFullName by rememberSaveable { mutableStateOf("") }
     var isDescriptionButtonChecked: Boolean by rememberSaveable {
         mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = profileOwner) {
+        userFullName = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
     }
 
     Row(
@@ -47,7 +53,7 @@ internal fun UserNameWithDescription(user: User?) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "${user?.firstName} ${user?.lastName}".trim(),
+            text = userFullName,
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             fontSize = 28.sp,
@@ -69,7 +75,7 @@ internal fun UserNameWithDescription(user: User?) {
         }
     }
     if (isDescriptionButtonChecked)
-        UserDetailsSection(user = user)
+        UserDetailsSection(user = profileOwner)
 }
 
 

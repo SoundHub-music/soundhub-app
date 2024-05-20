@@ -32,17 +32,17 @@ internal fun SearchUserPage(
     val foundUsers: List<User> = friendsUiState.foundUsers
     val searchStatus: ApiStatus = friendsUiState.status
 
-    if (searchStatus == ApiStatus.ERROR) {
+    if (foundUsers.isEmpty()) {
         Text(
-            text = stringResource(id = R.string.friends_search_users_not_found),
+            text = stringResource(id = R.string.friends_search_users_empty_screen),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
     }
-    else if (foundUsers.isEmpty()) {
+    else if (searchStatus == ApiStatus.ERROR) {
         Text(
-            text = stringResource(id = R.string.friends_search_users_empty_screen),
+            text = stringResource(id = R.string.friends_search_users_not_found),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold

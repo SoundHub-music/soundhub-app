@@ -36,7 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.soundhub.ui.authentication.components.AuthForm
 import com.soundhub.ui.authentication.components.LoginScreenLogo
-import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.components.sheets.BottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +54,7 @@ fun AuthenticationScreen(
     )
 
     LaunchedEffect(key1 = scaffoldState.bottomSheetState.currentValue) {
-        Log.d(
-            "AuthenticationScreen",
-            "scaffold_state: ${scaffoldState.bottomSheetState.currentValue}"
-        )
+        Log.d("AuthenticationScreen", "scaffold_state: ${scaffoldState.bottomSheetState.currentValue}")
     }
 
     Box(
@@ -100,7 +97,7 @@ private fun StartButton(scaffoldState: BottomSheetScaffoldState) {
         modifier = Modifier
             .padding(bottom = 20.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } }
     ) {
         Text(

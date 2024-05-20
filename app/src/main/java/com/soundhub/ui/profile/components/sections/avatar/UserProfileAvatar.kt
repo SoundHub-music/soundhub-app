@@ -1,6 +1,5 @@
 package com.soundhub.ui.profile.components.sections.avatar
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -38,8 +36,9 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.menu.AvatarDropdownMenu
-import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.MedialFolder
 
@@ -47,11 +46,12 @@ import com.soundhub.utils.MedialFolder
 internal fun UserProfileAvatar(
     navController: NavHostController,
     profileViewModel: ProfileViewModel,
+    uiStateDispatcher: UiStateDispatcher,
     profileOwner: User?
 ) {
     var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val authorizedUser: User? = profileUiState.authorizedUser
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
 
     val isAuthorizedUser: Boolean = authorizedUser?.id == profileOwner?.id
     val isAvatarMenuExpandedState: MutableState<Boolean> = rememberSaveable {
@@ -106,7 +106,6 @@ private fun Avatar(
     val creds = state.userCreds
     val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
     val userFullName: String = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
-    val context: Context = LocalContext.current
 
     GlideImage(
         model = HttpUtils.prepareGlideUrl(creds, profileOwner?.avatarUrl, MedialFolder.AVATAR),
@@ -116,7 +115,7 @@ private fun Avatar(
         modifier = Modifier
             .fillMaxSize()
             .clickable { isAvatarMenuExpandedState.value = true },
-    ) {
+    ) /*{
         it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, profileOwner?.avatarUrl))
-    }
+    }*/
 }

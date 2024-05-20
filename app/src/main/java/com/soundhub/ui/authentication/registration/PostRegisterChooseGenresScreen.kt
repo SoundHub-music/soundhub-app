@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration
+package com.soundhub.ui.authentication.registration
 
 import android.util.Log
 import android.widget.Toast
@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.music_preferences.ChooseGenresScreen
 
 @Composable

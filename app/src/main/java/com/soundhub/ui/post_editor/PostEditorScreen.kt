@@ -47,9 +47,7 @@ fun PostEditorScreen(
 
     val activityResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
-    ) {
-        postEditorViewModel.setImages(it.map { uri -> uri.toString() })
-    }
+    ) { postEditorViewModel.setImages(it.map { uri -> uri.toString() }) }
 
     LaunchedEffect(key1 = postId) {
         Log.d("PostEditorScreen", "post id: $postId")

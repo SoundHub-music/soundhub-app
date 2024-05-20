@@ -2,7 +2,7 @@ package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.model.Artist
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,7 +16,7 @@ class SearchArtistsUseCase @Inject constructor(
         if (searchBarValue.isNotEmpty()) {
             musicRepository.searchArtists(searchBarValue)
                 .onSuccess { response ->
-                    val artists: List<Artist> = response.body ?: emptyList()
+                    val artists: List<Artist> = response.body.orEmpty()
                     artistStateFlow.update { it.copy(artists = artists) }
                 }
         }

@@ -14,8 +14,5 @@ data class Message(
     @SerializedName("timestamp")
     val timestamp: LocalDateTime = LocalDateTime.now(),
     val content: String = "",
-    val isRead: Boolean = false,
-
-    @SerializedName("chat")
-    val chat: Chat?
+    var isRead: Boolean = false,
 ): Serializable

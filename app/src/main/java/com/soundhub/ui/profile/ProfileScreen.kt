@@ -28,9 +28,7 @@ fun ProfileScreen(
 ) {
     val profileUiState by profileViewModel.profileUiState.collectAsState()
     val profileOwner: User? = profileUiState.profileOwner
-    var isLoading: Boolean by rememberSaveable {
-        mutableStateOf(true)
-    }
+    var isLoading: Boolean by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(key1 = profileOwner) {
         profileOwner?.let { isLoading = false }
@@ -46,6 +44,7 @@ fun ProfileScreen(
         UserProfileAvatar(
             navController = navController,
             profileViewModel = profileViewModel,
+            uiStateDispatcher = uiStateDispatcher,
             profileOwner = profileOwner
         )
 

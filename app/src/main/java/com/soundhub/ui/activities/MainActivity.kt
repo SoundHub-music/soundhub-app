@@ -27,7 +27,7 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.home.HomeScreen
@@ -38,8 +38,10 @@ import com.soundhub.utils.constants.Constants
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -55,11 +57,13 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private lateinit var uiEventState: Flow<UiEvent>
+    private lateinit var uiState: Flow<UiState>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSplashScreen()
         uiEventState = uiStateDispatcher.uiEvent.receiveAsFlow()
+        uiState = uiStateDispatcher.uiState
 
         lifecycleScope.launch {
             uiEventState.collect { event -> handleUiEvent(event, navController) }
@@ -107,7 +111,7 @@ class MainActivity : ComponentActivity() {
 
     private fun initSplashScreen() {
         val splashScreen: SplashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition{ splashScreenViewModel.isLoading.value }
+        splashScreen.setKeepOnScreenCondition { splashScreenViewModel.isLoading.value }
     }
 
     private fun onNavDestinationChangeListener(
@@ -190,12 +194,51 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy: user has closed the app")
-        // TODO: implement setting offline user status
+
+        updateUserOnlineStatusDelayed(
+            isOnline = false,
+            delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY
+        )
+        disconnectWebSocket()
+        uiStateDispatcher.clearState()
     }
 
     override fun onStop() {
         super.onStop()
         Log.d("MainActivity", "onStop: user has minimized the app")
-        // TODO: implement setting offline user status after a certain time
+        updateUserOnlineStatusDelayed(
+            isOnline = false,
+            delayTime = Constants.SET_OFFLINE_DELAY_ON_STOP
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("MainActivity", "onResume: user has opened the app")
+        lifecycleScope.launch {
+            updateUserOnlineStatusDelayed(isOnline = true)
+        }
+
+    }
+
+    private fun updateUserOnlineStatusDelayed(isOnline: Boolean, delayTime: Long = 0) {
+        Log.i(
+            "MainActivity",
+            "updateUserOnlineStatusDelayed: " +
+            "user will be ${if (isOnline) "offline" else "online"} in ${delayTime / 1000} seconds"
+        )
+        lifecycleScope.launch {
+            delay(delayTime)
+            uiState.map { it.authorizedUser }.firstOrNull()
+                ?.let { user ->
+                    if (isOnline != user.isOnline) {
+                        authViewModel.toggleUserOnline()
+                    }
+                }
+        }
+    }
+
+    private fun disconnectWebSocket() = lifecycleScope.launch {
+        uiState.collect { it.webSocketClient?.disconnect() }
     }
 }

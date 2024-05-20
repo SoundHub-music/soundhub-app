@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration
+package com.soundhub.ui.authentication.registration
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
-import com.soundhub.ui.authentication.postregistration.states.RegistrationState
+import com.soundhub.ui.authentication.registration.states.RegistrationState
 
 @Composable
 fun FillUserDataScreen(

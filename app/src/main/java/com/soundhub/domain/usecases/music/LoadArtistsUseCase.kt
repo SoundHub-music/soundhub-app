@@ -1,8 +1,8 @@
 package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 

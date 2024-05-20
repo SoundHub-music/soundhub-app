@@ -7,6 +7,7 @@ import com.soundhub.data.api.FileService
 import com.soundhub.data.api.GenreService
 import com.soundhub.data.api.InviteService
 import com.soundhub.data.api.LastFmService
+import com.soundhub.data.api.MessageService
 import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.PostService
 import com.soundhub.data.api.UserService
@@ -81,4 +82,10 @@ object HttpServiceModule {
     fun providesInviteService(
         @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
     ): InviteService = retrofit.create(InviteService::class.java)
+
+    @Provides
+    @Singleton
+    fun providesMessageService(
+        @Named(Constants.SOUNDHUB_WEBSOCKET) retrofit: Retrofit
+    ): MessageService = retrofit.create(MessageService::class.java)
 }

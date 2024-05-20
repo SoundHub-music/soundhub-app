@@ -17,7 +17,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
 import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel

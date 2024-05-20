@@ -5,10 +5,9 @@ import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
 
 data class ProfileUiState(
-    val authorizedUser: User? = null,
     val profileOwner: User? = null,
     val isRequestSent: Boolean = false,
     val isUserAFriendToAuthorizedUser: Boolean = false,
-    val invitesSentByCurrentUser: List<Invite> = emptyList(),
+    val inviteSentByCurrentUser: Invite? = null,
     val userCreds: UserPreferences? = null
 )

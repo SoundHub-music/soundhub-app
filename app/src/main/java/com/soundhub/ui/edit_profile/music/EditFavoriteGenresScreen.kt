@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.soundhub.data.model.Genre
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.music_preferences.ChooseGenresScreen
 
 @Composable

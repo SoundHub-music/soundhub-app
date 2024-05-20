@@ -1,5 +1,6 @@
 package com.soundhub.di
 
+import com.soundhub.data.api.UserService
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.FileRepository
@@ -12,6 +13,7 @@ import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
+import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import dagger.Module
@@ -28,16 +30,12 @@ object DomainModule {
     fun providesUpdateUserUseCase(
         userRepository: UserRepository,
         uiStateDispatcher: UiStateDispatcher
-    ): UpdateUserUseCase = UpdateUserUseCase(
-        userRepository,
-        uiStateDispatcher
-    )
+    ): UpdateUserUseCase = UpdateUserUseCase(userRepository, uiStateDispatcher)
 
     @Provides
     @Singleton
-    fun providesGetImageUseCase(
-        fileRepository: FileRepository
-    ): GetImageUseCase = GetImageUseCase(fileRepository)
+    fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase =
+        GetImageUseCase(fileRepository)
 
     @Provides
     @Singleton
@@ -48,22 +46,17 @@ object DomainModule {
 
     @Provides
     @Singleton
-    fun providesLoadArtistsUseCase(
-        musicRepository: MusicRepository
-    ): LoadArtistsUseCase = LoadArtistsUseCase(musicRepository)
+    fun providesLoadArtistsUseCase(musicRepository: MusicRepository): LoadArtistsUseCase =
+        LoadArtistsUseCase(musicRepository)
 
     @Provides
     @Singleton
-    fun providesGetAllChatsByUserUseCase(
-        chatRepository: ChatRepository
-    ): GetAllChatsByUserUseCase =
+    fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase =
         GetAllChatsByUserUseCase(chatRepository)
 
     @Provides
     @Singleton
-    fun providesGetOrCreateChatUseCase(
-        chatRepository: ChatRepository
-    ): GetOrCreateChatByUserUseCase =
+    fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase =
         GetOrCreateChatByUserUseCase(chatRepository)
 
     @Provides
@@ -76,6 +69,19 @@ object DomainModule {
     fun providesGetUserByIdUseCase(
         userRepository: UserRepository,
         userCredsStore: UserCredsStore
-    ): GetUserByIdUseCase =
-        GetUserByIdUseCase(userRepository, userCredsStore)
+    ): GetUserByIdUseCase = GetUserByIdUseCase(userRepository, userCredsStore)
+
+    @Provides
+    @Singleton
+    fun providesLoadAllUserDataUseCase(
+        fileRepository: FileRepository,
+        musicRepository: MusicRepository,
+        userService: UserService,
+        userCredsStore: UserCredsStore
+    ): LoadAllUserDataUseCase = LoadAllUserDataUseCase(
+        fileRepository = fileRepository,
+        musicRepository = musicRepository,
+        userService = userService,
+        userCredsStore = userCredsStore
+    )
 }

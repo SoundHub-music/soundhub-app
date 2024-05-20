@@ -5,7 +5,7 @@ import com.soundhub.data.enums.DiscogsSortType
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Track
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface MusicRepository {

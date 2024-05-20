@@ -16,16 +16,21 @@ import com.soundhub.ui.profile.components.sections.user_actions.buttons.EditProf
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.SendFriendRequestButton
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.WriteMessageButton
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.WritePostButton
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun ProfileButtonsSection(
     navController: NavHostController,
     profileViewModel: ProfileViewModel,
+    uiStateDispatcher: UiStateDispatcher,
     isOriginProfile: Boolean,
     profileOwner: User?,
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val authorizedUser: User? = profileUiState.authorizedUser
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
+
     val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
 
     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {

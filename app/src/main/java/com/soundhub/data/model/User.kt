@@ -21,6 +21,9 @@ data class User(
     var lastName: String = "",
     var country: String? = "",
 
+    @SerializedName("online")
+    var isOnline: Boolean = false,
+
     @SerializedName("birthday")
     var birthday: LocalDate? = null,
     var city: String? = "",

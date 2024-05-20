@@ -10,7 +10,8 @@ interface UserRepository {
     suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User>
     suspend fun addFriend(accessToken: String?, friendId: UUID): HttpResult<User>
     suspend fun deleteFriend(accessToken: String?, friendId: UUID): HttpResult<User>
-    suspend fun getRecommendedFriends(accessToken: String?, userId: UUID?): HttpResult<List<User>>
+    suspend fun getRecommendedFriends(accessToken: String?): HttpResult<List<User>>
     suspend fun getFriendsByUserId(accessToken: String?, userId: UUID): HttpResult<List<User>>
     suspend fun searchUserByFullName(accessToken: String?, name: String): HttpResult<List<User>>
+    suspend fun toggleUserOnline(accessToken: String?): HttpResult<User?>
 }

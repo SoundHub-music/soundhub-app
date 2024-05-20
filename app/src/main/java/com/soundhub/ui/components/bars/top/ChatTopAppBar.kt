@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +42,7 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
@@ -54,14 +56,22 @@ fun ChatTopAppBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val isCheckMessageMode: Boolean = uiState.isCheckMessagesMode
 
     TopAppBar(
-        title = { InterlocutorDetails(
-            chatViewModel = chatViewModel,
-            navController = navController
-        ) },
+        title = {
+            if (!isCheckMessageMode) InterlocutorDetails(
+                chatViewModel = chatViewModel,
+                navController = navController
+            )
+        },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            if (isCheckMessageMode)
+                IconButton(onClick = { uiStateDispatcher.unsetCheckMessagesMode() }) {
+                    Icon(imageVector = Icons.Rounded.Close, contentDescription = "off check messages btn")
+                }
+            else IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.btn_description_back),
@@ -69,12 +79,19 @@ fun ChatTopAppBar(
                 )
             }
         },
-        actions = { ChatTopBarActions(
-            navController = navController,
-            chatState = chatUiState,
-            chatViewModel = chatViewModel,
-            uiStateDispatcher = uiStateDispatcher
-        ) }
+        actions = {
+            if (isCheckMessageMode)
+                ChatTopBarCheckMessagesActions(
+                    chatViewModel = chatViewModel,
+                    uiStateDispatcher = uiStateDispatcher
+                )
+            else ChatTopBarActions(
+                navController = navController,
+                chatState = chatUiState,
+                chatViewModel = chatViewModel,
+                uiStateDispatcher = uiStateDispatcher
+            )
+        }
     )
 }
 
@@ -88,9 +105,12 @@ private fun InterlocutorDetails(
     val interlocutor: User? = chatUiState.interlocutor
     val friendName = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
 
+    // TODO: implement user online logic
     var isOnline: Boolean by rememberSaveable { mutableStateOf(false) }
     var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
-    var onlineIndicatorText: String by rememberSaveable { mutableStateOf(context.getString(R.string.online_indicator_user_offline)) }
+    var onlineIndicatorText: String by rememberSaveable {
+        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
+    }
 
     val lastOnline: LocalDateTime = LocalDateTime.of(2024, Month.MAY, 7, 15, 0)
     val lastOnlineString = DateFormatter.getRelativeDate(lastOnline)
@@ -150,6 +170,4 @@ private fun InterlocutorDetails(
 private fun onInterlocutorDetailsClick(
     interlocutor: User?,
     navController: NavHostController
-) = interlocutor?.let {
-    navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString()))
-}
+) = interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) }

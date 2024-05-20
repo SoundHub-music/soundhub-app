@@ -10,6 +10,9 @@
     <string name="password_label">Пароль</string>
     <string name="email_label">Email</string>
 
+    <!-- messenger page-->
+    <string name="messenger_screen_last_message_prefix">Вы: </string>
+
     <!-- authentication button names-->
     <string name="auth_button_login_name">Войти</string>
     <string name="auth_button_register_name">Зарегистрироваться</string>
@@ -113,7 +116,7 @@
 
     <string name="message_input_placeholder">Ваше сообщение</string>
 
-    <!--    settings menu items-->
+    <!-- settings menu items-->
     <string name="dark_theme_settings">Темная тема</string>
     <string name="account_settings">Аккаунт</string>
     <string name="appearance_settings">Внешний вид</string>
@@ -169,4 +172,9 @@
     <!-- online indicator -->
     <string name="online_indicator_user_online">Онлайн</string>
     <string name="online_indicator_user_offline">Был в сети %s</string>
+
+    <!-- notifications -->
+    <string name="notification_screen_friend_request_content">отправил вам заявку в друзья</string>
+    <string name="notification_screen_accept_invite_text">Принять</string>
+    <string name="notification_screen_reject_invite_text">Отклонить</string>
 </resources>

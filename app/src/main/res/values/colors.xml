@@ -10,4 +10,6 @@
 
     <color name="emoji_btn_dark">#FFD07965</color>
     <color name="emoji_btn_light">#FFFF7E62</color>
+    <color name="online_status">#6dfb95</color>
+    <color name="offline_status">#f46b58</color>
 </resources>

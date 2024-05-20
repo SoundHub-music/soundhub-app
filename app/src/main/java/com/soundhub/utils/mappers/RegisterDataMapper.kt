@@ -2,7 +2,7 @@ package com.soundhub.utils.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.model.Artist
-import com.soundhub.ui.authentication.postregistration.states.RegistrationState
+import com.soundhub.ui.authentication.registration.states.RegistrationState
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named

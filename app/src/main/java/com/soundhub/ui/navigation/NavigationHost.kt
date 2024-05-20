@@ -28,10 +28,10 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationScreen
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.postregistration.PostRegisterChooseArtistsScreen
-import com.soundhub.ui.authentication.postregistration.PostRegisterChooseGenresScreen
-import com.soundhub.ui.authentication.postregistration.FillUserDataScreen
-import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
+import com.soundhub.ui.authentication.registration.PostRegisterChooseArtistsScreen
+import com.soundhub.ui.authentication.registration.PostRegisterChooseGenresScreen
+import com.soundhub.ui.authentication.registration.FillUserDataScreen
+import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.edit_profile.music.EditFavoriteArtistsScreen
 import com.soundhub.ui.edit_profile.music.EditFavoriteGenresScreen
 import com.soundhub.ui.edit_profile.music.EditMusicPreferencesViewModel
@@ -200,7 +200,7 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(argument) }
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
-                LaunchedEffect(key1 = true) {
+                LaunchedEffect(key1 = userId) {
                     userId?.let { userId -> profileViewModel.loadProfileOwner(userId) }
                 }
 
@@ -226,7 +226,7 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(it) }
                 val friendsViewModel: FriendsViewModel = hiltViewModel()
 
-                LaunchedEffect(key1 = true) {
+                LaunchedEffect(key1 = userId) {
                     userId?.let { friendsViewModel.loadProfileOwner(it) }
                 }
 

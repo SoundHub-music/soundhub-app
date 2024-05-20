@@ -1,9 +1,17 @@
 package com.soundhub.data.api
 
 import com.soundhub.data.model.Post
-import com.soundhub.utils.ApiEndpoints
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.ApiEndpoints.Posts.ADD_POST
+import com.soundhub.utils.ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Posts.GET_POSTS_BY_AUTHOR_ID
+import com.soundhub.utils.ApiEndpoints.Posts.GET_POST_BY_ID
+import com.soundhub.utils.ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Posts.TOGGLE_LIKE
+import com.soundhub.utils.ApiEndpoints.Posts.UPDATE_POST
+import com.soundhub.utils.ApiEndpoints.Posts.DELETE_POST
+import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
+
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.DELETE
@@ -17,53 +25,53 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface PostService {
-    @GET(ApiEndpoints.Posts.GET_POST_BY_ID)
+    @GET(GET_POST_BY_ID)
     suspend fun getPostById(
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        @Path(POST_ID_DYNAMIC_PARAM)
         id: UUID,
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?
     ): Response<Post?>
 
-    @GET(ApiEndpoints.Posts.GET_POSTS_BY_AUTHOR_ID)
+    @GET(GET_POSTS_BY_AUTHOR_ID)
     suspend fun getPostsByAuthorId(
-        @Path(ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM)
+        @Path(AUTHOR_ID_DYNAMIC_PARAM)
         authorId: UUID,
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?
     ): Response<List<Post>>
 
-    @POST(ApiEndpoints.Posts.ADD_POST)
+    @POST(ADD_POST)
     @Multipart
     suspend fun addPost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
         @Part("postDto") post: RequestBody,
         @Part files: List<MultipartBody.Part>
     ): Response<Post>
 
-    @PUT(ApiEndpoints.Posts.TOGGLE_LIKE)
+    @PUT(TOGGLE_LIKE)
     suspend fun toggleLike(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        @Path(POST_ID_DYNAMIC_PARAM)
         postId: UUID
     ): Response<Post>
 
-    @DELETE(ApiEndpoints.Posts.DELETE)
+    @DELETE(DELETE_POST)
     suspend fun deletePost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        @Path(POST_ID_DYNAMIC_PARAM)
         postId: UUID
     ): Response<UUID>
 
-    @PUT(ApiEndpoints.Posts.UPDATE)
+    @PUT(UPDATE_POST)
     @Multipart
     suspend fun updatePost(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM)
+        @Path(POST_ID_DYNAMIC_PARAM)
         postId: UUID,
         @Part(value = "postDto") post: RequestBody,
         @Part images: List<MultipartBody.Part?> = emptyList(),

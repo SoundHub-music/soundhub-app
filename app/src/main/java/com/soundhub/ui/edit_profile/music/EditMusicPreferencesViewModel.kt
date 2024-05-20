@@ -13,8 +13,8 @@ import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -40,10 +40,13 @@ class EditMusicPreferencesViewModel @Inject constructor(
     private val searchArtistsUseCase: SearchArtistsUseCase,
     userCredsStore: UserCredsStore
 ): ViewModel() {
-    val genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
-    val artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
+    private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
+    val genreUiState = _genreUiState.asStateFlow()
 
-    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState.asStateFlow()
+    private val _artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
+    val artistUiState = _artistUiState.asStateFlow()
+
+    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     private val authorizedUser: Flow<User?> = uiState.map { it.authorizedUser }
 
@@ -69,13 +72,15 @@ class EditMusicPreferencesViewModel @Inject constructor(
     // TODO: fix bug when loadGenres calls outside the edit genres page
     private fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
         authorizedUser.collect { user ->
+            val ( _, genres: List<Genre>, chosenGenres: List<Genre> ) = _genreUiState.value
             val favoriteGenres: List<Genre> = user
-                ?.favoriteGenres ?: emptyList()
+                ?.favoriteGenres.orEmpty()
 
-            if (genreUiState.value.chosenGenres.isEmpty())
-                genreUiState.update { it.copy(chosenGenres = favoriteGenres) }
-            if (genreUiState.value.genres.isEmpty())
-                loadGenresUseCase(genreUiState = genreUiState)
+            if (chosenGenres.isEmpty())
+                _genreUiState.update { it.copy(chosenGenres = favoriteGenres) }
+
+            if (genres.isEmpty())
+                loadGenresUseCase(genreUiState = _genreUiState)
             Log.d("EditMusicPreferencesViewModel", "loadGenres: ${genreUiState.value}")
         }
     }
@@ -84,14 +89,14 @@ class EditMusicPreferencesViewModel @Inject constructor(
         loadArtistsJob = viewModelScope.launch(Dispatchers.IO) {
             authorizedUser.collect { user ->
                 val favoriteArtists: List<Artist> = user
-                    ?.favoriteArtists ?: emptyList()
+                    ?.favoriteArtists.orEmpty()
 
                 loadArtistsUseCase(
-                    artistUiState = artistUiState,
-                    genreUiState = genreUiState,
+                    artistUiState = _artistUiState,
+                    genreUiState = _genreUiState,
                     page = page
                 )
-                artistUiState.update { it.copy(chosenArtists = favoriteArtists) }
+                _artistUiState.update { it.copy(chosenArtists = favoriteArtists) }
             }
         }
     }
@@ -101,7 +106,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
         searchArtistsJob = viewModelScope.launch(Dispatchers.IO) {
             searchArtistsUseCase(
                 searchBarValue = value,
-                artistStateFlow = artistUiState
+                artistStateFlow = _artistUiState
             )
         }
     }
@@ -135,23 +140,23 @@ class EditMusicPreferencesViewModel @Inject constructor(
         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.EditFavoriteArtists))
     }
 
-    fun setCurrentArtistPage(page: Int) = artistUiState.update {
+    fun setCurrentArtistPage(page: Int) = _artistUiState.update {
         it.copy(currentPage = page)
     }
 
-    fun setChosenGenres(genres: List<Genre>) = genreUiState.update {
+    fun setChosenGenres(genres: List<Genre>) = _genreUiState.update {
         it.copy(chosenGenres = genres)
     }
 
-    fun addChosenGenre(genre: Genre) = genreUiState.update {
+    fun addChosenGenre(genre: Genre) = _genreUiState.update {
         it.copy(chosenGenres = it.chosenGenres + genre)
     }
 
-    fun setChosenArtists(artists: List<Artist>) = artistUiState.update {
+    fun setChosenArtists(artists: List<Artist>) = _artistUiState.update {
         it.copy(chosenArtists = artists)
     }
 
-    fun addChosenArtist(artist: Artist) = artistUiState.update {
+    fun addChosenArtist(artist: Artist) = _artistUiState.update {
         it.copy(chosenArtists = it.chosenArtists + artist)
     }
 }

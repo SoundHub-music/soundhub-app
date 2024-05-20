@@ -18,4 +18,7 @@ interface UserDao {
 
     @Delete
     suspend fun deleteUser(user: User)
+
+    @Query(Queries.TRUNCATE_USER)
+    suspend fun truncateUser()
 }

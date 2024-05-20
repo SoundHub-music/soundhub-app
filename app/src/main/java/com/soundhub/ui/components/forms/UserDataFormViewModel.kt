@@ -33,14 +33,9 @@ class UserDataFormViewModel @Inject constructor(
 
         if (countries.isEmpty()) {
             countryRepository.getAllCountryNames()
-                .onSuccess {
-                    response -> countries = response.body
-                    ?: emptyList()
-                }
+                .onSuccess { response -> countries = response.body.orEmpty() }
         }
-        countryList.update {
-            countries.sortedBy { it.translations.rus.common }
-        }
+        countryList.update { countries.sortedBy { it.translations.rus.common } }
         isLoading.value = false
     }
 }

@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration.components
+package com.soundhub.ui.authentication.registration.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

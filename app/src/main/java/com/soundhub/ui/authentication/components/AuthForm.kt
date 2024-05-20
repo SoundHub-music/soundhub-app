@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.postregistration.RegistrationViewModel
-import com.soundhub.ui.authentication.states.AuthFormState
+import com.soundhub.ui.authentication.registration.RegistrationViewModel
+import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.utils.Validator
 
@@ -58,11 +58,9 @@ fun AuthForm(
     val authFormState by authViewModel.authFormState.collectAsState()
     var buttonFormText: String = getButtonFormText(authFormState.isRegisterForm, context)
 
-    // if bottom sheet is hidden typed data are deleted
     if (isBottomSheetHidden) authViewModel.resetAuthFormState()
     if (!authFormState.isRegisterForm) authViewModel.resetRepeatedPassword()
 
-    // it works every time when isRegisterForm variable is changed
     LaunchedEffect(key1 = authFormState.isRegisterForm) {
         buttonFormText = getButtonFormText(authFormState.isRegisterForm, context)
     }
@@ -145,9 +143,11 @@ fun AuthForm(
             shape = RoundedCornerShape(5.dp),
             colors = ButtonDefaults.buttonColors(),
             onClick = {
-                if (authFormState.isRegisterForm)
-                    registrationViewModel.onSignUpButtonClick(authFormState)
-                else authViewModel.signIn()
+                onSubmitButtonClick(
+                    authFormState = authFormState,
+                    registrationViewModel = registrationViewModel,
+                    authViewModel = authViewModel
+                )
             },
             enabled = Validator.validateAuthForm(authFormState)
         ) {
@@ -161,6 +161,16 @@ fun AuthForm(
             )
         }
     }
+}
+
+private fun onSubmitButtonClick(
+    authFormState: AuthFormState,
+    registrationViewModel: RegistrationViewModel,
+    authViewModel: AuthenticationViewModel
+) {
+    if (authFormState.isRegisterForm)
+        registrationViewModel.onSignUpButtonClick(authFormState)
+    else authViewModel.signIn()
 }
 
 @Composable

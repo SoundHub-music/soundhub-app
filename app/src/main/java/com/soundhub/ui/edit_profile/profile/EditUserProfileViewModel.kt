@@ -92,6 +92,7 @@ class EditUserProfileViewModel @Inject constructor(
             it.copy(gender = Gender.valueOf(value))
         }
         catch (e: IllegalArgumentException) {
+            Log.e("EditUserProfileViewModel", "error: ${e.stackTraceToString()}")
             it.copy(gender = Gender.UNKNOWN)
         }
     }

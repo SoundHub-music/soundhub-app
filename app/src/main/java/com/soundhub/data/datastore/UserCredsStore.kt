@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -36,6 +38,8 @@ class UserCredsStore(private val context: Context) {
             )
         }
     }
+
+    fun getCredsAsLiveData(): LiveData<UserPreferences> = getCreds().asLiveData()
 
     suspend fun clear() = context.dataStore.edit { it.clear() }
 }

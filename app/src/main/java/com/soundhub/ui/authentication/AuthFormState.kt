@@ -1,10 +1,10 @@
-package com.soundhub.ui.authentication.states
+package com.soundhub.ui.authentication
 
 data class AuthFormState(
-    val isRegisterForm: Boolean = false,
     val email: String = "",
     val password: String = "",
     val repeatedPassword: String? = null,
+    val isRegisterForm: Boolean = false,
 
     val isLoading: Boolean = false,
 

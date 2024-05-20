@@ -46,7 +46,7 @@ class PostViewModel @Inject constructor(
         ).onSuccess { response ->
             val sortedPosts: List<Post> = response.body
                 ?.sortedByDescending { p -> p.publishDate }
-                ?: emptyList()
+                .orEmpty()
 
             postUiState.update {
                 it.copy(

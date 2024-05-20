@@ -1,13 +1,11 @@
 package com.soundhub.ui.components.post_card
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,10 +33,6 @@ internal fun PostBottomPanel(
     val coroutineScope = rememberCoroutineScope()
     var isFavorite: Boolean by rememberSaveable {
         mutableStateOf(postViewModel.isPostLiked(user, post))
-    }
-
-    LaunchedEffect(key1 = true) {
-        Log.d("PostViewModel", post.likes.toString())
     }
 
     Row(

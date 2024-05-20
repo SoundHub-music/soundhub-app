@@ -3,6 +3,7 @@ package com.soundhub.ui.authentication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.R
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.User
@@ -16,16 +17,15 @@ import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.ui.authentication.states.AuthFormState
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,14 +42,11 @@ class AuthenticationViewModel @Inject constructor(
     private val userDao: UserDao = appDb.userDao()
     private val maxRefreshTokenAttemptCount: Int = 2
 
-    val authFormState = MutableStateFlow(AuthFormState())
+    private val _authFormState = MutableStateFlow(AuthFormState())
+    val authFormState = _authFormState.asStateFlow()
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    init {
-        viewModelScope.launch {
-            initializeUser()
-        }
-    }
+    init { viewModelScope.launch { initializeUser() } }
 
     override fun onCleared() {
         super.onCleared()
@@ -57,11 +54,17 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     private suspend fun initializeUser() {
-        val authorizedUser = getCurrentUser()
-        authorizedUser.collect { currentUser ->
+        getCurrentUser().collect { currentUser ->
             currentUser?.let {
-                userDao.saveUser(currentUser)
-                uiStateDispatcher.setAuthorizedUser(currentUser)
+                val creds: UserPreferences? = userCreds.firstOrNull()
+                var user = it
+                if (!user.isOnline)
+                    user = userRepository.toggleUserOnline(creds?.accessToken)
+                        .onFailure { error -> Log.e("AuthenticationViewModel", "initializeUser[online status]: $error") }
+                        .getOrNull() ?: it
+
+                userDao.saveUser(user)
+                uiStateDispatcher.setAuthorizedUser(user)
             }
         }
     }
@@ -78,15 +81,18 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     private suspend fun deleteUserData() {
-        val currentUser: User? = uiStateDispatcher.uiState
-            .map { it.authorizedUser }
-            .firstOrNull()
+        try {
+            val currentUser: User? = userDao.getCurrentUser()
 
-        currentUser?.let { user ->
-            userDao.deleteUser(user)
-            uiStateDispatcher.setAuthorizedUser(null)
+            currentUser?.let { user ->
+                userDao.deleteUser(user)
+                uiStateDispatcher.setAuthorizedUser(null)
+                userCredsStore.clear()
+            }
         }
-        userCredsStore.clear()
+        catch (e: Exception) {
+            userDao.truncateUser()
+        }
     }
 
     private suspend fun getCurrentUser(): Flow<User?> = flow {
@@ -128,53 +134,63 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     fun signIn() = viewModelScope.launch(Dispatchers.IO) {
-        authFormState.update { it.copy(isLoading = true) }
-        authRepository.signIn(
-            SignInRequestBody(
-                email = authFormState.value.email,
-                password = authFormState.value.password
-            ))
+        val toastErrorMessage: UiText.StringResource = UiText.StringResource(R.string.toast_authorization_error)
+        _authFormState.update { it.copy(isLoading = true) }
+
+        val ( email: String, password: String ) = authFormState.value
+        val signInRequestBody = SignInRequestBody(email, password)
+
+        authRepository.signIn(signInRequestBody)
             .onSuccess { response ->
                 userCredsStore.updateCreds(response.body)
                 val currentUser: User? = getCurrentUser().firstOrNull()
 
-                with(uiStateDispatcher) {
-                    setAuthorizedUser(currentUser)
-                    sendUiEvent(UiEvent.Navigate(Route.Postline))
-                }
+                currentUser?.let { user ->
+                    userDao.saveUser(user)
+                    with(uiStateDispatcher) {
+                        setAuthorizedUser(currentUser)
+                        sendUiEvent(UiEvent.Navigate(Route.Postline))
+                    }
+                } ?: uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastErrorMessage))
             }
             .onFailure {
                 val toastText = UiText.DynamicString(it.errorBody.detail ?: "")
                 uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
             }
             .finally {
-                authFormState.update { it.copy(isLoading = false) }
+                _authFormState.update { it.copy(isLoading = false) }
             }
     }
 
-    fun resetAuthFormState() = authFormState.update { AuthFormState() }
+    fun toggleUserOnline() = viewModelScope.launch {
+        val creds: UserPreferences? = userCreds.firstOrNull()
+        userRepository.toggleUserOnline(creds?.accessToken)
+            .onSuccess { uiStateDispatcher.setAuthorizedUser(it.body) }
+    }
 
-    fun resetRepeatedPassword() = authFormState.update {
+    fun resetAuthFormState() = _authFormState.update { AuthFormState() }
+
+    fun resetRepeatedPassword() = _authFormState.update {
         it.copy(repeatedPassword = null)
     }
 
-    fun setEmail(value: String) = authFormState.update {
+    fun setEmail(value: String) = _authFormState.update {
         val isEmailValid = Validator.validateEmail(value)
         it.copy(email = value, isEmailValid = isEmailValid)
     }
 
-    fun setPassword(value: String) = authFormState.update {
+    fun setPassword(value: String) = _authFormState.update {
         val isPasswordValid: Boolean = Validator.validatePassword(value)
         it.copy(password = value, isPasswordValid = isPasswordValid)
     }
 
-    fun setRepeatedPassword(value: String) = authFormState.update {
+    fun setRepeatedPassword(value: String) = _authFormState.update {
         val arePasswordsEqual: Boolean = Validator
             .arePasswordsEqual(authFormState.value.password, value)
         it.copy(repeatedPassword = value, arePasswordsEqual = arePasswordsEqual)
     }
 
-    fun setAuthFormType(value: Boolean) = authFormState.update {
+    fun setAuthFormType(value: Boolean) = _authFormState.update {
         it.copy(isRegisterForm = value)
     }
 }

@@ -35,12 +35,12 @@ sealed class Route(var route: String): Cloneable {
     data object EditFavoriteGenres: Route(route = Constants.EDIT_FAV_GENRES_ROUTE)
     data object PostEditor: Route(route = Constants.POST_EDITOR_ROUTE) {
         val createPostRoute: String = Constants.POST_EDITOR_ROUTE
-            .replace(Regex("/${Constants.NAV_ARG_DYNAMIC_PARAM_REGEX}"),"")
+            .replace(Regex("/${Constants.DYNAMIC_PARAM_REGEX}"),"")
     }
 
     companion object {
         fun replaceNavArgTemplate(route: String, navArg: String) = Regex(
-            Constants.NAV_ARG_DYNAMIC_PARAM_REGEX
+            Constants.DYNAMIC_PARAM_REGEX
         ).replaceFirst(route, navArg)
 
         fun replaceNavArgsTemplate(route: String, vararg navArgs: String): String {

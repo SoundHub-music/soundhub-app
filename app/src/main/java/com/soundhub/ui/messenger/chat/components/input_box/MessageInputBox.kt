@@ -10,28 +10,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.states.UiState
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun MessageInputBox(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     chatViewModel: ChatViewModel,
-    uiStateDispatcher: UiStateDispatcher
 ) {
-    val messageContent = rememberSaveable { mutableStateOf("") }
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
-    val authorizedUserState: User? = uiState.authorizedUser
+    val messageCount: Int = chatUiState.chat?.messages?.size ?: 0
 
     Row(
         modifier = modifier
@@ -45,15 +37,17 @@ fun MessageInputBox(
     ) {
         AttachFileButton()
         MessageTextField(
-            messageContent = messageContent,
+            chatViewModel = chatViewModel,
             modifier = Modifier.weight(1f)
         )
-       EmojiAndSendMessageButtonRow(
-           authorizedUserState = authorizedUserState,
-           chatUiState = chatUiState,
-           messageContent = messageContent,
-           lazyListState = lazyListState,
-           chatViewModel = chatViewModel
-       )
+
+        Row {
+            EmojiButton()
+            SendMessageButton(
+                messageCount = messageCount,
+                lazyListState = lazyListState,
+                chatViewModel = chatViewModel
+            )
+        }
     }
 }

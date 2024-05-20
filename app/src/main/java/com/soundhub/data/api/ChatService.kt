@@ -4,8 +4,18 @@ import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.requests.CreateGroupChatRequestBody
 import com.soundhub.data.api.responses.ApiStateResponse
 import com.soundhub.data.model.Chat
-import com.soundhub.utils.ApiEndpoints
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.ApiEndpoints.Chats.ADD_USER_TO_GROUP
+import com.soundhub.utils.ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Chats.CHAT_NAME_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Chats.CREATE_CHAT
+import com.soundhub.utils.ApiEndpoints.Chats.CREATE_GROUP_CHAT
+import com.soundhub.utils.ApiEndpoints.Chats.DELETE_CHAT
+import com.soundhub.utils.ApiEndpoints.Chats.DELETE_USER_FROM_GROUP
+import com.soundhub.utils.ApiEndpoints.Chats.GET_CHATS_BY_CURRENT_USER
+import com.soundhub.utils.ApiEndpoints.Chats.GET_CHAT_BY_ID
+import com.soundhub.utils.ApiEndpoints.Chats.RENAME_GROUP_CHAT
+import com.soundhub.utils.ApiEndpoints.Chats.USER_ID_DYNAMIC_PARAM
+import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -17,71 +27,73 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface ChatService {
-    @GET(ApiEndpoints.Chats.GET_CHATS_BY_CURRENT_USER)
-    suspend fun getAllChatsByCurrentUser(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
-        accessToken: String?
+    @GET(GET_CHATS_BY_CURRENT_USER)
+    suspend fun getAllChatsByUserId(
+        @Header(AUTHORIZATION_HEADER)
+        accessToken: String?,
+        @Path(USER_ID_DYNAMIC_PARAM)
+        userId: UUID
     ): Response<List<Chat>>
 
-    @GET(ApiEndpoints.Chats.GET_CHAT_BY_ID)
+    @GET(GET_CHAT_BY_ID)
     suspend fun getChatById(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM)
+        @Path(CHAT_ID_DYNAMIC_PARAM)
         chatId: UUID
     ): Response<Chat?>
 
-    @DELETE(ApiEndpoints.Chats.DELETE_CHAT)
+    @DELETE(DELETE_CHAT)
     suspend fun deleteChatById(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM)
+        @Path(CHAT_ID_DYNAMIC_PARAM)
         chatId: UUID
     ): Response<ApiStateResponse>
 
-    @POST(ApiEndpoints.Chats.CREATE_CHAT)
+    @POST(CREATE_CHAT)
     suspend fun createChat(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
         @Body
         body: CreateChatRequestBody
     ): Response<Chat>
 
-    @POST(ApiEndpoints.Chats.CREATE_GROUP_CHAT)
+    @POST(CREATE_GROUP_CHAT)
     suspend fun createGroupChat(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
         @Body
         body: CreateGroupChatRequestBody
     ): Response<Chat>
 
-    @PUT(ApiEndpoints.Chats.ADD_USER_TO_GROUP)
+    @PUT(ADD_USER_TO_GROUP)
     suspend fun addUserToGroup(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM)
+        @Path(CHAT_ID_DYNAMIC_PARAM)
         chatId: UUID,
-        @Path(ApiEndpoints.Chats.USER_ID_DYNAMIC_PARAM)
+        @Path(USER_ID_DYNAMIC_PARAM)
         userId: UUID
     ): Response<Chat>
 
-    @PUT(ApiEndpoints.Chats.DELETE_USER_FROM_GROUP)
+    @PUT(DELETE_USER_FROM_GROUP)
     suspend fun deleteUserFromGroupChat(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM)
+        @Path(CHAT_ID_DYNAMIC_PARAM)
         chatId: UUID,
-        @Path(ApiEndpoints.Chats.USER_ID_DYNAMIC_PARAM)
+        @Path(USER_ID_DYNAMIC_PARAM)
         userId: UUID
     ): Response<Chat>
 
-    @PUT(ApiEndpoints.Chats.RENAME_GROUP_CHAT)
+    @PUT(RENAME_GROUP_CHAT)
     suspend fun renameGroupChat(
-        @Header(HttpUtils.AUTHORIZATION_HEADER)
+        @Header(AUTHORIZATION_HEADER)
         accessToken: String?,
-        @Path(ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM)
+        @Path(CHAT_ID_DYNAMIC_PARAM)
         chatId: UUID,
-        @Path(ApiEndpoints.Chats.CHAT_NAME_DYNAMIC_PARAM)
+        @Path(CHAT_NAME_DYNAMIC_PARAM)
         newChatName: String
     ): Response<Chat>
 }

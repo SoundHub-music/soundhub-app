@@ -28,7 +28,7 @@ fun FriendMiniatureSection(
     profileOwner: User?,
     navController: NavHostController
 ) {
-    val friendList: List<User> = profileOwner?.friends ?: emptyList()
+    val friendList: List<User> = profileOwner?.friends.orEmpty()
 
     ElevatedCard(
         onClick = { onSectionClick(profileOwner, navController) },

@@ -7,6 +7,7 @@ import com.soundhub.data.api.CountryService
 import com.soundhub.data.api.FileService
 import com.soundhub.data.api.GenreService
 import com.soundhub.data.api.InviteService
+import com.soundhub.data.api.MessageService
 import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.PostService
 import com.soundhub.data.api.UserService
@@ -15,6 +16,7 @@ import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.CountryRepository
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.InviteRepository
+import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.data.repository.UserRepository
@@ -23,9 +25,11 @@ import com.soundhub.data.repository.implementations.ChatRepositoryImpl
 import com.soundhub.data.repository.implementations.CountryRepositoryImpl
 import com.soundhub.data.repository.implementations.FileRepositoryImpl
 import com.soundhub.data.repository.implementations.InviteRepositoryImpl
+import com.soundhub.data.repository.implementations.MessageRepositoryImpl
 import com.soundhub.data.repository.implementations.MusicRepositoryImpl
 import com.soundhub.data.repository.implementations.PostRepositoryImpl
 import com.soundhub.data.repository.implementations.UserRepositoryImpl
+import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,8 +43,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providesInviteRepository(
-        inviteService: InviteService
-    ): InviteRepository = InviteRepositoryImpl(inviteService)
+        inviteService: InviteService,
+        loadAllUserDataUseCase: LoadAllUserDataUseCase
+    ): InviteRepository = InviteRepositoryImpl(inviteService, loadAllUserDataUseCase)
 
     @Provides
     @Singleton
@@ -54,13 +59,11 @@ object RepositoryModule {
     @Singleton
     fun providesUserRepository(
         userService: UserService,
-        musicRepository: MusicRepository,
-        fileRepository: FileRepository,
+        loadAllUserDataUseCase: LoadAllUserDataUseCase,
         @ApplicationContext context: Context
     ): UserRepository = UserRepositoryImpl(
         userService = userService,
-        musicRepository = musicRepository,
-        fileRepository = fileRepository,
+        loadAllUserDataUseCase = loadAllUserDataUseCase,
         context = context
     )
 
@@ -97,4 +100,11 @@ object RepositoryModule {
         genreService: GenreService,
         @ApplicationContext context: Context
     ): MusicRepository = MusicRepositoryImpl(musicService, genreService, context)
+
+    @Provides
+    @Singleton
+    fun providesMessageRepository(
+        messageService: MessageService,
+        loadAllUserDataUseCase: LoadAllUserDataUseCase
+    ): MessageRepository = MessageRepositoryImpl(messageService, loadAllUserDataUseCase)
 }

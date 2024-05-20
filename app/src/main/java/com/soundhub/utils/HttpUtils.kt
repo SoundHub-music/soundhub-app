@@ -109,7 +109,7 @@ class HttpUtils {
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken(token))
                         .build()
                     GlideUrl(urlWithParam , headers)
-                } ?: GlideUrl(urlWithParam)
+                }
             }
         }
 

@@ -12,15 +12,16 @@ sealed class ApiEndpoints {
         const val UPDATE_USER: String = "$USERS_ENDPOINT/update/{$USER_ID_DYNAMIC_PARAM}"
         const val ADD_FRIEND: String = "$USERS_ENDPOINT/addFriend/{$FRIEND_ID_DYNAMIC_PARAM}"
         const val DELETE_FRIEND: String = "$USERS_ENDPOINT/deleteFriend/{$FRIEND_ID_DYNAMIC_PARAM}"
-        const val GET_RECOMMENDED_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/recommendedFriends"
+        const val GET_RECOMMENDED_FRIENDS = "$USERS_ENDPOINT/recommendedFriends"
         const val GET_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/friends"
         const val SEARCH_USER = "$USERS_ENDPOINT/search"
+        const val TOGGLE_ONLINE = "$USERS_ENDPOINT/toggleOnline"
 
         const val SEARCH_PARAM_NAME = "name"
     }
 
     data object Message {
-        const val MESSAGES_ENDPOINT = "messages"
+        private const val MESSAGES_ENDPOINT = "messages"
         const val CHAT_ID_DYNAMIC_PARAM = "chatId"
         const val MESSAGE_ID_DYNAMIC_PARAM = "messageId"
 
@@ -43,19 +44,15 @@ sealed class ApiEndpoints {
     data object Music {
         const val RELEASE_ID_DYNAMIC_PARAM = "releaseId"
         const val ARTIST_ID_DYNAMIC_PARAM = "artistId"
-        private const val ARTIST_ENDPOINT: String = "artists"
-        private const val RELEASE_ENDPOINT: String = "releases"
+        private const val ARTIST_ENDPOINT = "artists"
+        private const val RELEASE_ENDPOINT = "releases"
 
-        const val DATABASE_SEARCH: String = "database/search"
+        const val DATABASE_SEARCH = "database/search"
 
-        const val ARTISTS: String = "$ARTIST_ENDPOINT/{$ARTIST_ID_DYNAMIC_PARAM}"
-        const val RELEASES: String = "$RELEASE_ENDPOINT/{$RELEASE_ID_DYNAMIC_PARAM}"
-        const val ARTIST_RELEASES = "$ARTISTS/releases"
-    }
-
-   data object Files {
-        private const val FILES_ENDPOINT: String = "files"
-        const val GET_FILE: String = "$FILES_ENDPOINT/{filename}"
+        const val GET_GENRES = "genres"
+        const val GET_ARTISTS = "$ARTIST_ENDPOINT/{$ARTIST_ID_DYNAMIC_PARAM}"
+        const val GET_RELEASE_BY_ID = "$RELEASE_ENDPOINT/{$RELEASE_ID_DYNAMIC_PARAM}"
+        const val GET_ARTIST_RELEASES = "$GET_ARTISTS/releases"
     }
 
     data object Posts {
@@ -67,8 +64,8 @@ sealed class ApiEndpoints {
         const val GET_POSTS_BY_AUTHOR_ID = "$POSTS_ENDPOINT/post/{$AUTHOR_ID_DYNAMIC_PARAM}"
         const val ADD_POST = "$POSTS_ENDPOINT/add"
         const val TOGGLE_LIKE = "$POSTS_ENDPOINT/like/{$POST_ID_DYNAMIC_PARAM}"
-        const val DELETE = "$POSTS_ENDPOINT/delete/{$POST_ID_DYNAMIC_PARAM}"
-        const val UPDATE = "$POSTS_ENDPOINT/update/{$POST_ID_DYNAMIC_PARAM}"
+        const val DELETE_POST = "$POSTS_ENDPOINT/delete/{$POST_ID_DYNAMIC_PARAM}"
+        const val UPDATE_POST = "$POSTS_ENDPOINT/update/{$POST_ID_DYNAMIC_PARAM}"
     }
 
     data object Chats {
@@ -77,7 +74,7 @@ sealed class ApiEndpoints {
         const val USER_ID_DYNAMIC_PARAM = "user_id"
         const val CHAT_NAME_DYNAMIC_PARAM = "newName"
 
-        const val GET_CHATS_BY_CURRENT_USER = "$CHATS_ENDPOINT/user"
+        const val GET_CHATS_BY_CURRENT_USER = "$CHATS_ENDPOINT/user/{$USER_ID_DYNAMIC_PARAM}"
         const val GET_CHAT_BY_ID = "$CHATS_ENDPOINT/{$CHAT_ID_DYNAMIC_PARAM}"
         const val DELETE_CHAT = "$CHATS_ENDPOINT/delete/{$CHATS_ENDPOINT}"
 
@@ -100,19 +97,21 @@ sealed class ApiEndpoints {
         const val ACCEPT_INVITE = "$INVITES_ENDPOINT/accept/{$INVITE_ID_DYNAMIC_PARAM}"
         const val REJECT_INVITE = "$INVITES_ENDPOINT/reject/{$INVITE_ID_DYNAMIC_PARAM}"
         const val DELETE_INVITE = "$INVITES_ENDPOINT/{$INVITE_ID_DYNAMIC_PARAM}"
-        const val GET_ALL_INVITES_BY_SENDER_ID = "$INVITES_ENDPOINT/{$SENDER_ID_DYNAMIC_PARAM}"
+        const val GET_INVITE_BY_SENDER_AND_RECIPIENT = "$INVITES_ENDPOINT/{$SENDER_ID_DYNAMIC_PARAM}/{$RECIPIENT_ID_DYNAMIC_PARAM}"
     }
 
     data object ChatWebSocket {
-        private const val MESSAGES_ENDPOINT = "messages"
-        const val MESSAGE_DYNAMIC_ID = "messageId"
-        const val CHAT_DYNAMIC_ID = "chatId"
+        private const val MESSAGE_DYNAMIC_ID = "messageId"
 
-        const val SEND_MESSAGE = "$MESSAGES_ENDPOINT/chat"
-        const val GET_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_DYNAMIC_ID}"
-        const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/{$MESSAGE_DYNAMIC_ID}"
-        const val DELETE_MESSAGE = "$MESSAGES_ENDPOINT/message/delete/{$MESSAGE_DYNAMIC_ID}"
+        // topics
+        private const val ROOT_MESSAGE_TOPIC = "/queue/messages"
+        const val WS_GET_MESSAGES_TOPIC = ROOT_MESSAGE_TOPIC
+        const val WS_READ_MESSAGE_TOPIC = "$ROOT_MESSAGE_TOPIC/read"
+        const val WS_DELETE_MESSAGE_TOPIC = "$ROOT_MESSAGE_TOPIC/delete"
 
-        const val MARK_MESSAGE_AS_READ = "$MESSAGES_ENDPOINT/message/read/{$MESSAGE_DYNAMIC_ID}"
+        // endpoints
+        const val WS_SEND_MESSAGE_ENDPOINT = "/app/chat"
+        const val WS_READ_MESSAGE_ENDPOINT = "/app/message/read/{$MESSAGE_DYNAMIC_ID}"
+        const val WS_DELETE_MESSAGE_ENDPOINT = "/app/message/delete/{$MESSAGE_DYNAMIC_ID}"
     }
 }

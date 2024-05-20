@@ -1,7 +1,7 @@
 package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
@@ -22,7 +22,7 @@ class LoadGenresUseCase @Inject constructor(
                 genreUiState.update {
                     it.copy(
                         status = successResponse.status,
-                        genres = successResponse.body ?: emptyList()
+                        genres = successResponse.body.orEmpty()
                     )
                 }
             }

@@ -3,6 +3,8 @@ package com.soundhub.ui.friends
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.data.dao.UserDao
+import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
@@ -13,7 +15,6 @@ import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.friends.enums.FriendListPage
-import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.SearchUtils
 import com.soundhub.utils.UiText
@@ -22,10 +23,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -37,13 +36,13 @@ class FriendsViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
+    appDb: AppDatabase,
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    private val uiState: Flow<UiState> = uiStateDispatcher.uiState.asStateFlow()
-    private val authorizedUser: Flow<User?> = uiState.map { it.authorizedUser }
-
     private var searchUsersJob: Job? = null
+    private val userDao: UserDao = appDb.userDao()
+    private val authorizedUser: MutableStateFlow<User?> = MutableStateFlow(null)
 
     val friendsUiState: MutableStateFlow<FriendsUiState> = MutableStateFlow(FriendsUiState())
     val tabs: List<FriendListPage> = listOf(
@@ -52,16 +51,20 @@ class FriendsViewModel @Inject constructor(
         FriendListPage.SEARCH
     )
 
-    private fun loadRecommendedFriends(userId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+    init { viewModelScope.launch { initializeFriendsUiState() } }
+
+    private suspend fun initializeFriendsUiState() = authorizedUser.update {
+        userDao.getCurrentUser()
+    }
+
+    fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
         friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
         userCreds.collect { creds ->
-            userRepository.getRecommendedFriends(
-                accessToken = creds.accessToken,
-                userId = userId
-            ).onSuccess { response ->
+            userRepository.getRecommendedFriends(creds.accessToken)
+                .onSuccess { response ->
                 friendsUiState.update {
                     it.copy(
-                        recommendedFriends = response.body ?: emptyList(),
+                        recommendedFriends = response.body.orEmpty(),
                         status = ApiStatus.SUCCESS
                     )
                 }
@@ -76,11 +79,15 @@ class FriendsViewModel @Inject constructor(
 
     fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
         userCreds.collect { creds ->
-            val chat: Chat? = getOrCreateChatByUserUseCase(
-                interlocutor = interlocutor,
-                accessToken = creds.accessToken
-            )
-            emit(chat)
+            authorizedUser.value?.let {  user ->
+                val chat: Chat? = getOrCreateChatByUserUseCase(
+                    interlocutor = interlocutor,
+                    accessToken = creds.accessToken,
+                    userId = user.id
+                )
+                emit(chat)
+
+            } ?: emit(null)
         }
     }
 
@@ -105,7 +112,7 @@ class FriendsViewModel @Inject constructor(
              ).onSuccess { response ->
                  val otherUsers: List<User> = response.body
                      ?.filter { user -> user.id != authorizedUser.firstOrNull()?.id }
-                     ?: emptyList()
+                     .orEmpty()
 
                  friendsUiState.update {
                      it.copy(
@@ -134,10 +141,6 @@ class FriendsViewModel @Inject constructor(
         val profileOwner: User? = if (authorizedUser?.id == id)
             authorizedUser
         else getUserByIdUseCase(id)
-
-        profileOwner?.let {
-            loadRecommendedFriends(it.id)
-        }
 
         setProfileOwner(profileOwner)
     }

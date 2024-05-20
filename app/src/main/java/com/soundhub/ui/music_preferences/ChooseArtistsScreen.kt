@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Artist
-import com.soundhub.ui.authentication.postregistration.components.MusicItemPlate
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.components.MusicItemPlate
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.loaders.CircleLoader

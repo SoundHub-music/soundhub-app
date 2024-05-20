@@ -16,7 +16,7 @@ import com.soundhub.data.model.User
     Artist::class,
     Album::class,
     Country::class
-], version = 6)
+], version = 7, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun countryDao(): CountryDao

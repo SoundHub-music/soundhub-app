@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration
+package com.soundhub.ui.authentication.registration
 
 import android.net.Uri
 import android.util.Log
@@ -19,10 +19,10 @@ import com.soundhub.data.repository.AuthRepository
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
-import com.soundhub.ui.authentication.postregistration.states.GenreUiState
-import com.soundhub.ui.authentication.states.AuthFormState
-import com.soundhub.ui.authentication.postregistration.states.RegistrationState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.GenreUiState
+import com.soundhub.ui.authentication.AuthFormState
+import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.states.UiState
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
@@ -50,12 +50,17 @@ class RegistrationViewModel @Inject constructor(
     private val searchArtistsUseCase: SearchArtistsUseCase,
     appDb: AppDatabase
 ): ViewModel() {
-    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState.asStateFlow()
+    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
     private val userDao: UserDao = appDb.userDao()
 
-    val genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
-    val artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
-    val registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
+    private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
+    val genreUiState = _genreUiState.asStateFlow()
+
+    private val _artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
+    val artistUiState = _artistUiState.asStateFlow()
+
+    private val _registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
+    val registerState = _registerState.asStateFlow()
 
     private var searchJob: Job? = null
     private var loadArtistsJob: Job? = null
@@ -70,15 +75,15 @@ class RegistrationViewModel @Inject constructor(
     private suspend fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
         loadGenresUseCase(
             countPerPage = 50,
-            genreUiState = genreUiState
+            genreUiState = _genreUiState
         )
     }
 
     suspend fun loadArtists(page: Int = 1) {
         loadArtistsJob = viewModelScope.launch(Dispatchers.IO) {
             loadArtistsUseCase(
-                genreUiState = genreUiState,
-                artistUiState = artistUiState,
+                genreUiState = _genreUiState,
+                artistUiState = _artistUiState,
                 page = page
             )
         }
@@ -89,7 +94,7 @@ class RegistrationViewModel @Inject constructor(
         searchJob = viewModelScope.launch(Dispatchers.IO) {
             searchArtistsUseCase(
                 searchBarValue = value,
-                artistStateFlow = artistUiState
+                artistStateFlow = _artistUiState
             )
         }
     }
@@ -106,23 +111,23 @@ class RegistrationViewModel @Inject constructor(
     }
 
     private fun handleChooseGenres() = viewModelScope.launch(Dispatchers.IO) {
-        registerState.update {
-            it.copy(favoriteGenres = genreUiState.value.chosenGenres)
+        _registerState.update {
+            it.copy(favoriteGenres = _genreUiState.value.chosenGenres)
         }
         loadArtists()
         onEvent(RegistrationEvent.OnChooseArtists)
     }
 
     private fun handleChooseArtists() {
-        registerState.update {
-            it.copy(favoriteArtists = artistUiState.value.chosenArtists)
+        _registerState.update {
+            it.copy(favoriteArtists = _artistUiState.value.chosenArtists)
         }
         onEvent(RegistrationEvent.OnFillUserData)
     }
 
     private fun handleFillUserData() {
         loadArtistsJob?.cancel()
-        registerState.update {
+        _registerState.update {
             it.copy(
                 isFirstNameValid = it.firstName?.isNotEmpty() ?: false,
                 isLastNameValid = it.lastName?.isNotEmpty() ?: false,
@@ -130,8 +135,8 @@ class RegistrationViewModel @Inject constructor(
             )
         }
 
-        if (Validator.validateRegistrationState(registerState.value)) {
-            val user: User = UserMapper.impl.fromRegistrationState(registerState.value)
+        if (Validator.validateRegistrationState(_registerState.value)) {
+            val user: User = UserMapper.impl.fromRegistrationState(_registerState.value)
             user.favoriteArtistsIds = user.favoriteArtists.map { it.id }
 
             onEvent(RegistrationEvent.OnRegister(user))
@@ -141,7 +146,7 @@ class RegistrationViewModel @Inject constructor(
 
     fun onSignUpButtonClick(authForm: AuthFormState) {
         Log.d("PostRegistrationViewModel", "authForm: $authForm")
-        registerState.update {
+        _registerState.update {
             it.copy(
                 email = authForm.email,
                 password = authForm.password
@@ -173,16 +178,18 @@ class RegistrationViewModel @Inject constructor(
 
     private fun handleRegister(event: RegistrationEvent.OnRegister) = viewModelScope.launch(Dispatchers.IO) {
         val registerRequestBody: RegisterRequestBody = RegisterDataMapper.impl
-            .registerStateToRegisterRequestBody(registerState.value)
+            .registerStateToRegisterRequestBody(_registerState.value)
 
         authRepository
             .signUp(registerRequestBody)
             .onSuccess { response ->
                 userCredsStore.updateCreds(response.body)
                 userDao.saveUser(event.user)
-                uiStateDispatcher.setAuthorizedUser(event.user)
+                with(uiStateDispatcher) {
+                    setAuthorizedUser(event.user)
+                    sendUiEvent(UiEvent.Navigate(Route.Postline))
+                }
 
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Postline))
             }
             .onFailure {
                 it.errorBody.detail?.let { error ->
@@ -192,60 +199,60 @@ class RegistrationViewModel @Inject constructor(
             }
     }
 
-    fun addChosenGenre(list: List<Genre>) = genreUiState.update { it.copy(chosenGenres = list) }
+    fun addChosenGenre(list: List<Genre>) = _genreUiState.update { it.copy(chosenGenres = list) }
 
-    fun addChosenGenre(genre: Genre) = genreUiState.update {
+    fun addChosenGenre(genre: Genre) = _genreUiState.update {
         it.copy(chosenGenres =  it.chosenGenres + genre)
     }
 
-    fun addChosenArtist(list: List<Artist>) = artistUiState.update { it.copy(chosenArtists = list) }
+    fun addChosenArtist(list: List<Artist>) = _artistUiState.update { it.copy(chosenArtists = list) }
 
-    fun addChosenArtist(artist: Artist) = artistUiState.update {
+    fun addChosenArtist(artist: Artist) = _artistUiState.update {
         it.copy(chosenArtists = it.chosenArtists + artist)
     }
 
-    fun setFirstName(value: String) = registerState.update {
+    fun setFirstName(value: String) = _registerState.update {
         it.copy(firstName = value, isFirstNameValid = value.isNotEmpty())
     }
 
 
-    fun setLastName(value: String) = registerState.update {
+    fun setLastName(value: String) = _registerState.update {
         it.copy(lastName = value, isLastNameValid = value.isNotEmpty())
     }
 
 
-    fun setBirthday(value: LocalDate?) = registerState.update {
+    fun setBirthday(value: LocalDate?) = _registerState.update {
         it.copy(birthday = value, isBirthdayValid = value != null)
     }
 
 
     fun setGender(value: String) {
         try {
-            registerState.update {
+            _registerState.update {
                 it.copy(gender = Gender.valueOf(value))
             }
         }
         catch (e: IllegalArgumentException) {
             Log.e("RegistrationViewModel", "setGender: ${e.message}")
-            registerState.update {
+            _registerState.update {
                 it.copy(gender = Gender.UNKNOWN)
             }
         }
     }
 
-    fun setCountry(value: String) = registerState.update { it.copy(country = value) }
-    fun setCity(value: String) = registerState.update { it.copy(city = value) }
-    fun setDescription(value: String) = registerState.update { it.copy(description = value) }
+    fun setCountry(value: String) = _registerState.update { it.copy(country = value) }
+    fun setCity(value: String) = _registerState.update { it.copy(city = value) }
+    fun setDescription(value: String) = _registerState.update { it.copy(description = value) }
 
-    fun setLanguages(languages: List<String>) = registerState.update {
+    fun setLanguages(languages: List<String>) = _registerState.update {
         it.copy(languages = languages.toMutableList())
     }
 
-    fun setAvatar(avatarUrl: Uri?) = registerState.update {
+    fun setAvatar(avatarUrl: Uri?) = _registerState.update {
         it.copy(avatarUrl = avatarUrl?.toString())
     }
 
-    fun setCurrentArtistPage(page: Int) = artistUiState.update {
+    fun setCurrentArtistPage(page: Int) = _artistUiState.update {
         it.copy(currentPage = page)
     }
 }

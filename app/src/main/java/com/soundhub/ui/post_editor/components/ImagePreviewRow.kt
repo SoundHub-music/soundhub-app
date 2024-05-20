@@ -65,7 +65,6 @@ private fun ImageItem(
 ) {
     val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
     val userCreds: UserPreferences? = postEditorState.userCreds
-    val context: Context = LocalContext.current
 
     Box(
         modifier = modifier,
@@ -91,8 +90,8 @@ private fun ImageItem(
                 .clip(RoundedCornerShape(12.dp))
                 .width(100.dp)
                 .height(100.dp)
-        ) {
+        ) /*{
             it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, imageUri))
-        }
+        }*/
     }
 }

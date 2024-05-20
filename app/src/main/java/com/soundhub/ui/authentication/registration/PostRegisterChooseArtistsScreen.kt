@@ -1,4 +1,4 @@
-package com.soundhub.ui.authentication.postregistration
+package com.soundhub.ui.authentication.registration
 
 import android.widget.Toast
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
-import com.soundhub.ui.authentication.postregistration.states.ArtistUiState
+import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.music_preferences.ChooseArtistsScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 

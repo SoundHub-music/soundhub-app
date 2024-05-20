@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +26,9 @@ internal fun ProfileActionLongButton(
     onClick: () -> Unit
 ) {
     Button(
-        colors = ButtonDefaults.buttonColors(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         onClick = onClick
@@ -43,6 +46,7 @@ internal fun ProfileActionLongButton(
                 text = content,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

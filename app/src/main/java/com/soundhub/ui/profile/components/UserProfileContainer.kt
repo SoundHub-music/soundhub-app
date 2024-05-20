@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
-import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureSection
 import com.soundhub.ui.profile.components.sections.user_actions.ProfileButtonsSection
 import com.soundhub.ui.profile.components.sections.user_main_data.UserMainDataSection
 import com.soundhub.ui.profile.components.sections.wall.UserWall
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -37,8 +37,8 @@ fun UserProfileContainer(
     uiStateDispatcher: UiStateDispatcher,
     profileViewModel: ProfileViewModel
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val authorizedUser: User? = profileUiState.authorizedUser
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
     var isOriginProfile: Boolean by rememberSaveable {
         mutableStateOf(authorizedUser?.id == profileOwner?.id)
     }
@@ -65,6 +65,7 @@ fun UserProfileContainer(
             item {
                 ProfileButtonsSection(
                     profileViewModel = profileViewModel,
+                    uiStateDispatcher = uiStateDispatcher,
                     isOriginProfile = isOriginProfile,
                     navController = navController,
                     profileOwner = profileOwner
@@ -78,7 +79,7 @@ fun UserProfileContainer(
             }
             item {
                 FavoriteGenresSection(
-                    genreList = profileOwner?.favoriteGenres ?: emptyList(),
+                    genreList = profileOwner?.favoriteGenres.orEmpty(),
                     isOriginProfile = isOriginProfile,
                     navController = navController
                 )

@@ -90,9 +90,9 @@ fun ImageHorizontalPager(
                         )
                     }
                     .alpha(getImageOpacity(pagerState, page)),
-            ) {
+            ) /*{
                 it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, images[page]))
-            }
+            }*/
         }
     }
 }
