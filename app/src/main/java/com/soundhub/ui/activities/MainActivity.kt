@@ -195,10 +195,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy: user has closed the app")
 
-        updateUserOnlineStatusDelayed(
-            isOnline = false,
-            delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY
-        )
+        updateUserOnlineStatusDelayed(isOnline = false, delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY)
         disconnectWebSocket()
         uiStateDispatcher.clearState()
     }

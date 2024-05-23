@@ -6,16 +6,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.messenger.chat.components.MessageDateChip
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import java.time.LocalDate
 
 @Composable
 fun MessageBoxContainer(
@@ -25,24 +32,50 @@ fun MessageBoxContainer(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val messages: List<Message> = chatUiState.chat?.messages ?: emptyList()
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
 
     val user: User? = uiState.authorizedUser
-    val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
+    var messagesGroupedByDate: Map<LocalDate, List<Message>> by rememberSaveable {
+        mutableStateOf(emptyMap())
+    }
+
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(key1 = messages) {
+        if (messages.isNotEmpty()) {
+            val lastMessageIndex = messages.lastIndex
+            lazyListState.scrollToItem(lastMessageIndex)
+        }
+
+        messagesGroupedByDate = messages
+            .groupBy { it.timestamp.toLocalDate() }
+            .toSortedMap()
+    }
 
     LazyColumn(
         state = lazyListState,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(items = messages) { message ->
-            MessageBox(
-                modifier = Modifier,
-                message = message,
-                isOwnMessage = message.sender?.id == user?.id,
-                uiStateDispatcher = uiStateDispatcher
-            )
+        var lastDate: LocalDate? = null
+
+        messagesGroupedByDate.forEach { (date, messages) ->
+            if (lastDate != date) {
+                lastDate = date
+                lastDate?.let {
+                    item { MessageDateChip(date = date) }
+                }
+            }
+
+            items(messages.sortedBy { it.timestamp }, key = { it.id }) { message ->
+                MessageBox(
+                    modifier = Modifier,
+                    message = message,
+                    isOwnMessage = message.sender?.id == user?.id,
+                    uiStateDispatcher = uiStateDispatcher
+                )
+            }
         }
     }
 }

@@ -45,7 +45,6 @@ fun HomeScreen(
 
     val authorizedUser: User? = uiState.authorizedUser
 
-
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -59,15 +58,12 @@ fun HomeScreen(
             )
         },
         bottomBar = {
-            authorizedUser?.let { user ->
             if (currentRoute in Constants.ROUTES_WITH_BOTTOM_BAR)
                 BottomNavigationBar(
                     navController = navController,
                     messengerViewModel = messengerViewModel,
-                    user = user,
                     uiStateDispatcher = uiStateDispatcher
                 )
-            }
         }
     ) {
         NavigationHost(

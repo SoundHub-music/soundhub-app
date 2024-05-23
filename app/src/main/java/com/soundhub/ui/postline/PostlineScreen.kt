@@ -24,6 +24,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.post_card.PostCard
+import com.soundhub.ui.states.PostlineUiState
 
 @Composable
 fun PostLineScreen(
@@ -33,7 +34,7 @@ fun PostLineScreen(
     navController: NavHostController,
     currentUser: User?
 ) {
-    val postUiState by postViewModel.postsUiState.collectAsState()
+    val postUiState by postViewModel.postLineUiState.collectAsState(initial = PostlineUiState())
     val isLoading: Boolean = postUiState.status == ApiStatus.LOADING
 
     ContentContainer(contentAlignment = Alignment.Center) {

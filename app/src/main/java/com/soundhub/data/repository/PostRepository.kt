@@ -10,8 +10,8 @@ interface PostRepository {
         postId: UUID
     ): HttpResult<Post?>
     suspend fun getPostsByAuthorId(
-        authorId: UUID,
-        accessToken: String?
+        accessToken: String?,
+        authorId: UUID
     ): HttpResult<List<Post>>
 
     suspend fun addPost(

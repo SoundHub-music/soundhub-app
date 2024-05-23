@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import com.soundhub.utils.converters.room.UserRoomConverter
+import java.io.Serializable
 import java.time.LocalDate
 import java.util.UUID
 
@@ -42,4 +43,4 @@ data class User(
     @Ignore
     @SerializedName("favoriteArtistsIds")
     var favoriteArtistsIds: List<Int> = emptyList()
-)
+): Serializable

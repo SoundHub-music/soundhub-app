@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
@@ -93,7 +94,7 @@ private fun ChatDetails(
     }
 
     val messengerUiState: MessengerUiState by messengerViewModel.messengerUiState.collectAsState()
-    val messages: List<Message> = chat?.messages.orEmpty()
+    val messages: List<Message> = chat?.messages.orEmpty().sortedBy { it.timestamp }
 
     val unreadMessageCount: Int = messengerUiState.unreadMessagesCount
     var lastMessageState by rememberSaveable { mutableStateOf("") }
@@ -113,7 +114,8 @@ private fun ChatDetails(
 
     LaunchedEffect(messages) {
         lastMessageState = if (messages.isNotEmpty()) {
-            messengerViewModel.prepareMessagePreview(context, messages.last())
+            val prefix = context.getString(R.string.messenger_screen_last_message_prefix)
+            messengerViewModel.prepareMessagePreview(prefix, messages.last())
         } else ""
     }
 

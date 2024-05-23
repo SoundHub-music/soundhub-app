@@ -28,7 +28,9 @@
         <service
             android:name=".services.MessengerAndroidService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+        />
 
         <activity
             android:name=".ui.activities.MainActivity"

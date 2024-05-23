@@ -1,10 +1,8 @@
 package com.soundhub.ui.messenger
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
@@ -67,7 +65,7 @@ class MessengerViewModel @Inject constructor(
         }
     }
 
-    suspend fun prepareMessagePreview(context: Context, lastMessage: Message): String {
+    suspend fun prepareMessagePreview(prefix: String, lastMessage: Message): String {
         val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
         var lastMessageContent = lastMessage.content
 
@@ -75,7 +73,6 @@ class MessengerViewModel @Inject constructor(
             lastMessageContent = "${lastMessageContent.substring(0, 20)}..."
         }
 
-        val prefix = context.getString(R.string.messenger_screen_last_message_prefix)
         lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {
             prefix + lastMessageContent
         } else "${lastMessage.sender?.firstName}: $lastMessageContent".trim()

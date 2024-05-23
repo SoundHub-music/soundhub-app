@@ -2,73 +2,53 @@ package com.soundhub.ui.postline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.data.dao.UserDao
+import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
+import com.soundhub.data.repository.PostRepository
 import com.soundhub.ui.states.PostlineUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.Month
 import javax.inject.Inject
 
 @HiltViewModel
-class PostlineViewModel @Inject constructor() : ViewModel() {
-    val postsUiState: MutableStateFlow<PostlineUiState> =
+class PostlineViewModel @Inject constructor(
+    private val userDao: UserDao,
+    private val postRepository: PostRepository,
+    userCredsStore: UserCredsStore
+) : ViewModel() {
+    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+    private val _postLineUiState: MutableStateFlow<PostlineUiState> =
         MutableStateFlow(PostlineUiState())
 
-    init {
-        // TODO: implement post fetching
-        viewModelScope.launch {
-            val posts = listOf(
-                Post(
-                    author = User(firstName = "Billie", lastName = "Elish"),
-                    publishDate = LocalDateTime.now(),
-                    content = "reprimique aliquet sodales enim luctus",
-                    images = listOf(
-                        "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8fDA%3D",
-                        "https://media.istockphoto.com/id/1322277517/photo/wild-grass-in-the-mountains-at-sunset.jpg?s=612x612&w=0&k=20&c=6mItwwFFGqKNKEAzv0mv6TaxhLN3zSE43bWmFN--J5w="
-                    )
-                ),
-                Post(
-                    author = User(firstName = "Billy", lastName = "Elish"),
-                    publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "litora ultrices petentium ancillae feugait eruditi justo viverra in quis",
-                    images = listOf("https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg")
-                ),
-                Post(
-                    author = User(firstName = "Billy", lastName = "Elish"),
-                    publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 26, 12, 11),
-                    content = "commune pri ubique iudicabit turpis eleifend accumsan adipisci partiendo urbanitas viris vehicula putent ei quas sed at consetetur offendit suscipiantur esse luctus feugait ullamcorper est",
-                    images = emptyList()
-                ),
-                Post(
-                    author = User(firstName = "Billy", lastName = "Elish"),
-                    publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
-                    images = emptyList()
-                ),
-                Post(
-                    author = User(firstName = "Billy", lastName = "Elish"),
-                    publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "aenean ornatus adversarium doming sumo natoque ultricies reformidans contentiones recteque omnesque postulant omittantur homero decore rutrum egestas vis signiferumque quaeque partiendo eget elementum consectetur invidunt melius sapientem tation fabellas equidem errem idque efficitur his euismod utroque augue his necessitatibus aliquam vestibulum purus tincidunt in iriure mei duo vulputate dicat tamquam",
-                    images = emptyList()
-                ),
-                Post(
-                    author = User(firstName = "Billy", lastName = "Elish"),
-                    publishDate = LocalDateTime.of(2024, Month.FEBRUARY, 24, 12, 11),
-                    content = "honcus maiorum molestie antiopam postulant salutatus",
-                    images = emptyList()
-                )
+    val postLineUiState: Flow<PostlineUiState> = _postLineUiState.asStateFlow()
 
+    init { loadPosts() }
+
+    private fun loadPosts() = viewModelScope.launch(Dispatchers.IO) {
+        val authorizedUser: User? = userDao.getCurrentUser()
+        val friends: List<User> = authorizedUser?.friends.orEmpty()
+
+        friends.forEach { user ->
+            postRepository.getPostsByAuthorId(
+                accessToken = userCreds.firstOrNull()?.accessToken,
+                authorId = user.id
             )
-            // fetching posts imitation
-            delay(2000)
-            postsUiState.update { it.copy(status = ApiStatus.SUCCESS, posts = posts) }
+            .onSuccess { response ->
+                _postLineUiState.update { state ->
+                    state.copy(posts = (state.posts + response.body.orEmpty()).sortedBy { it.publishDate })
+                }
+            }
         }
 
+        _postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,9 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
@@ -29,7 +28,6 @@ import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.bars.top.ChatTopAppBar
 import com.soundhub.ui.components.containers.ContentContainer
-import com.soundhub.ui.messenger.chat.components.MessageDateChip
 import com.soundhub.ui.messenger.chat.components.message_box.MessageBoxContainer
 import com.soundhub.ui.messenger.chat.components.input_box.MessageInputBox
 import com.soundhub.ui.states.UiState
@@ -50,22 +48,16 @@ fun ChatScreen(
     val authorizedUser: User? = uiState.authorizedUser
     val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
 
-    val lazyListState = rememberLazyListState()
-    val firstVisibleMessageIndex by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
-    var firstVisibleMessage: Message? by remember { mutableStateOf(null) }
+    val lazyListState: LazyListState = rememberLazyListState()
+    val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
 
-    LaunchedEffect(key1 = messages) {
-        if (messages.isNotEmpty()) {
-            val lastMessageIndex = messages.lastIndex
-            lazyListState.scrollToItem(lastMessageIndex)
-        }
-    }
 
     LaunchedEffect(key1 = firstVisibleMessageIndex, key2 = messages, key3 = authorizedUser) {
-        chatViewModel.readVisibleMessages(firstVisibleMessageIndex)
+        var index = firstVisibleMessageIndex
+        if (firstVisibleMessageIndex > 0)
+            index -= 1
 
-        if (messages.isNotEmpty())
-            firstVisibleMessage = messages[firstVisibleMessageIndex]
+        chatViewModel.readVisibleMessages(index)
     }
 
     LaunchedEffect(key1 = chatUiState) {
@@ -92,15 +84,10 @@ fun ChatScreen(
                 .padding(it)
                 .padding(top = 10.dp),
         ) {
-
-            firstVisibleMessage?.let { message ->
-                MessageDateChip(date = message.timestamp.toLocalDate())
-            }
-
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.padding(bottom = 10.dp)
-                ) {
+            ) {
                 MessageBoxContainer(
                     lazyListState = lazyListState,
                     chatViewModel = chatViewModel,

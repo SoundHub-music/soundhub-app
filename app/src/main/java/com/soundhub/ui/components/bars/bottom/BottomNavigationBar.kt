@@ -39,11 +39,11 @@ import java.util.UUID
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
-    user: User,
     messengerViewModel: MessengerViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
     val selectedItemState: MutableState<String> = remember {
         mutableStateOf(uiState.currentRoute ?: Route.Postline.route)
     }
@@ -65,7 +65,7 @@ fun BottomNavigationBar(
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
         getNavBarItems(
-            userId = user.id,
+            userId = authorizedUser?.id,
             messengerViewModel = messengerViewModel
         ).forEach { menuItem ->
             Log.d("BottomNavigationBar", "menuItem: $menuItem")
@@ -100,13 +100,13 @@ private fun onMenuItemClick(
 @Composable
 private fun getNavBarItems(
     messengerViewModel: MessengerViewModel,
-    userId: UUID
+    userId: UUID?
 ): List<NavBarItem> {
     val messengerUiState: MessengerUiState by
         messengerViewModel.messengerUiState.collectAsState()
     val unreadMessageCount: Int = messengerUiState.unreadMessagesCount
 
-    return listOf(
+    val navBarButtons = mutableListOf(
         NavBarItem(
             route = Route.Postline.route,
             icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
@@ -124,10 +124,17 @@ private fun getNavBarItems(
                     }
                 else Icon(Icons.Rounded.Email, contentDescription = "Messenger")
             },
-        ),
-        NavBarItem(
-            route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
-            icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
         )
     )
+
+    userId?.let {
+        navBarButtons.add(
+            NavBarItem(
+                route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
+                icon = { Icon(Icons.Rounded.AccountCircle, contentDescription = "Profile") }
+            )
+        )
+    }
+
+    return navBarButtons
 }

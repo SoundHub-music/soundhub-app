@@ -2,6 +2,7 @@ package com.soundhub.di
 
 import android.content.Context
 import androidx.room.Room
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.utils.constants.Constants
@@ -30,4 +31,8 @@ object DataModule {
         )
             .fallbackToDestructiveMigration()
             .build()
+
+    @Provides
+    @Singleton
+    fun providesUserDao(database: AppDatabase): UserDao = database.userDao()
 }

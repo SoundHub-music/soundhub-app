@@ -26,7 +26,7 @@ sealed class ApiEndpoints {
         const val MESSAGE_ID_DYNAMIC_PARAM = "messageId"
 
         const val GET_CHAT_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_ID_DYNAMIC_PARAM}"
-        const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/$MESSAGE_ID_DYNAMIC_PARAM"
+        const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/{$MESSAGE_ID_DYNAMIC_PARAM}"
     }
 
     data object Authentication {
@@ -102,6 +102,7 @@ sealed class ApiEndpoints {
 
     data object ChatWebSocket {
         private const val MESSAGE_DYNAMIC_ID = "messageId"
+        const val CHAT_DYNAMIC_ID = "chatId"
 
         // topics
         private const val ROOT_MESSAGE_TOPIC = "/queue/messages"

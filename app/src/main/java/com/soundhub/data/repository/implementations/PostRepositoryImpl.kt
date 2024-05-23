@@ -69,8 +69,8 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPostsByAuthorId(
-        authorId: UUID,
-        accessToken: String?
+        accessToken: String?,
+        authorId: UUID
     ): HttpResult<List<Post>> {
         try {
             val response: Response<List<Post>> = postService.getPostsByAuthorId(

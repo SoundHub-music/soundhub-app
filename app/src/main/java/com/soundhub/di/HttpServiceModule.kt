@@ -86,6 +86,6 @@ object HttpServiceModule {
     @Provides
     @Singleton
     fun providesMessageService(
-        @Named(Constants.SOUNDHUB_WEBSOCKET) retrofit: Retrofit
+        @Named(Constants.SOUNDHUB_API_RETROFIT) retrofit: Retrofit
     ): MessageService = retrofit.create(MessageService::class.java)
 }

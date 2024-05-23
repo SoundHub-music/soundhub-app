@@ -54,7 +54,10 @@ class WebSocketClient(private val accessToken: String?) {
         val endpoint: String = replaceParam(messageId, WS_DELETE_MESSAGE_ENDPOINT)
         return stompClient
             ?.send(endpoint, null)
-            ?.subscribe()
+            ?.subscribe(
+                { Log.d("WebSocketClient", "deleteMessage[1]: message with id $messageId deleted successfully") },
+                { Log.e("WebSocketClient", "deleteMessage[2]: ${it.stackTraceToString()}") }
+            )
     }
 
     fun subscribe(

@@ -14,7 +14,6 @@ import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.UiText
@@ -36,10 +35,9 @@ class AuthenticationViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val userRepository: UserRepository,
     private val userCredsStore: UserCredsStore,
-    appDb: AppDatabase
+    private val userDao: UserDao
 ) : ViewModel() {
     private val authAttemptCount: MutableStateFlow<Int> = MutableStateFlow(0)
-    private val userDao: UserDao = appDb.userDao()
     private val maxRefreshTokenAttemptCount: Int = 2
 
     private val _authFormState = MutableStateFlow(AuthFormState())
@@ -96,15 +94,21 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     private suspend fun getCurrentUser(): Flow<User?> = flow {
-        val creds: UserPreferences? = userCreds.firstOrNull()
-        userRepository.getCurrentUser(creds?.accessToken)
-            .onSuccess { emit(it.body) }
-            .onFailure { error ->
-                tryRefreshToken(
-                    error = error,
-                    userCreds = creds
-                )
-            }
+        var authorizedUser: User? = userDao.getCurrentUser()
+
+        if (authorizedUser == null) {
+            val creds: UserPreferences? = userCreds.firstOrNull()
+            userRepository.getCurrentUser(creds?.accessToken)
+                .onSuccess { authorizedUser = it.body }
+                .onFailure { error ->
+                    tryRefreshToken(
+                        error = error,
+                        userCreds = creds
+                    )
+                }
+        }
+
+        emit(authorizedUser)
     }
 
     private suspend fun tryRefreshToken(
