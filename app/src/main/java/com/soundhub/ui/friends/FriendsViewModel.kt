@@ -1,6 +1,5 @@
 package com.soundhub.ui.friends
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.dao.UserDao
@@ -17,7 +16,6 @@ import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.SearchUtils
-import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -69,9 +67,8 @@ class FriendsViewModel @Inject constructor(
                     )
                 }
             }.onFailure { error ->
-                Log.d("FriendsViewModel", "error: $error")
-                val toastText: UiText.DynamicString =  UiText.DynamicString(error.errorBody.detail ?: "")
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
                 friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
             }
         }
@@ -121,7 +118,9 @@ class FriendsViewModel @Inject constructor(
                      )
                  }
              }
-             .onFailure {
+             .onFailure { error ->
+                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                 uiStateDispatcher.sendUiEvent(errorEvent)
                  friendsUiState.update { it.copy(
                      status = ApiStatus.ERROR,
                      foundUsers = emptyList()

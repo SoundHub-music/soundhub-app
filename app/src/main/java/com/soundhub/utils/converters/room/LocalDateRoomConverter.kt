@@ -5,7 +5,7 @@ import com.soundhub.utils.constants.Constants
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-interface LocalDateRoomConverter {
+class LocalDateRoomConverter {
     private val formatter: DateTimeFormatter
         get() = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT)
 

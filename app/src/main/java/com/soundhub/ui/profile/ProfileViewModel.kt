@@ -6,12 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Invite
+import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
 import com.soundhub.data.repository.UserRepository
+import com.soundhub.domain.usecases.UseCaseResult
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
+import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
+import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
+import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.states.UiState
@@ -32,11 +38,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
-    private val inviteRepository: InviteRepository,
     private val userRepository: UserRepository,
     private val uiStateDispatcher: UiStateDispatcher,
+    private val inviteRepository: InviteRepository,
+
+    private val togglePostLikeAndUpdateListUseCase: TogglePostLikeAndUpdateListUseCase,
+    private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
+    private val getPostsByUserUseCase: GetPostsByUserUseCase,
+    private val deletePostByIdUseCase: DeletePostByIdUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
+
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
@@ -85,8 +96,13 @@ class ProfileViewModel @Inject constructor(
             .onSuccess {
                 _profileUiState.update { it.copy(isRequestSent = false) }
             }
-            .onFailure {
-                text.srcId = R.string.toast_delete_invite_error
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(
+                    error.errorBody,
+                    error.throwable,
+                    R.string.toast_delete_invite_error
+                )
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
             .finally {
                 uiStateDispatcher.sendUiEvent(showToastEvent)
@@ -113,8 +129,12 @@ class ProfileViewModel @Inject constructor(
             recipientId = recipientId
         ).onSuccess {
             _profileUiState.update { it.copy(isRequestSent = true) }
-        }.onFailure {
-            text.srcId = R.string.toast_common_error
+        }.onFailure { error ->
+            val errorEvent: UiEvent = UiEvent.Error(
+                error.errorBody,
+                error.throwable
+            )
+            uiStateDispatcher.sendUiEvent(errorEvent)
         }
         .finally {
             uiStateDispatcher.sendUiEvent(showToastEvent)
@@ -165,5 +185,49 @@ class ProfileViewModel @Inject constructor(
         else getUserByIdUseCase(id)
 
         setProfileOwner(profileOwner)
+    }
+
+    fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
+        val ( profileOwner: User? ) = _profileUiState.value
+        _profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+
+        profileOwner?.let {
+            when (val result = getPostsByUserUseCase(profileOwner)) {
+                is UseCaseResult.Success -> _profileUiState.update {
+                    it.copy(
+                        userPosts = result.data.orEmpty(),
+                        postStatus = ApiStatus.SUCCESS
+                    )
+                }
+                else -> { _profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) } }
+            }
+        }
+    }
+
+    fun deletePostById(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+        when (val result = deletePostByIdUseCase(postId)) {
+            is UseCaseResult.Success -> _profileUiState.update { state ->
+                val deletedPostId: UUID? = result.data
+                state.copy(
+                    userPosts = state.userPosts.filter { deletedPostId != it.id },
+                )
+            }
+            else -> {}
+        }
+    }
+
+    fun togglePostLikeAndUpdatePostList(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+        val posts: List<Post> = _profileUiState.value.userPosts
+
+        when (val result = togglePostLikeAndUpdateListUseCase(postId, posts)) {
+            is UseCaseResult.Success -> _profileUiState.update {
+                val updatedPostList: List<Post> = result.data.orEmpty()
+                it.copy(userPosts = updatedPostList)
+            }
+            is UseCaseResult.Failure -> {
+                val toastText: UiText = UiText.DynamicString(result.error?.detail ?: "")
+                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            }
+        }
     }
 }

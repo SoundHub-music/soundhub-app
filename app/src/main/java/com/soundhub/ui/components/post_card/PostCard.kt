@@ -6,6 +6,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -14,9 +16,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.theme.borderColor
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import java.util.UUID
 
 @Composable
 fun PostCard(
@@ -25,8 +29,12 @@ fun PostCard(
     uiStateDispatcher: UiStateDispatcher,
     postViewModel: PostViewModel = hiltViewModel(),
     post: Post,
-    currentUser: User?,
+    onLikePost: (UUID) -> Unit = {},
+    onDeletePost: (UUID) -> Unit = {}
 ) {
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -43,8 +51,8 @@ fun PostCard(
     ) {
         PostHeader(
             navController = navController,
-            currentUser = currentUser,
-            postViewModel = postViewModel,
+            currentUser = authorizedUser,
+            onDeletePost = onDeletePost,
             post = post
         )
         PostContent(textContent = post.content)
@@ -53,11 +61,12 @@ fun PostCard(
             navController = navController,
             uiStateDispatcher = uiStateDispatcher
         )
-        currentUser?.let {
+        authorizedUser?.let {
             PostBottomPanel(
                 post = post,
-                user = it,
-                postViewModel = postViewModel
+                postViewModel = postViewModel,
+                uiStateDispatcher = uiStateDispatcher,
+                onLikePost = onLikePost
             )
         }
     }

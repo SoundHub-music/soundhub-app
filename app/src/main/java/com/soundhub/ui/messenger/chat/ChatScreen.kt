@@ -51,13 +51,12 @@ fun ChatScreen(
     val lazyListState: LazyListState = rememberLazyListState()
     val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
 
-
     LaunchedEffect(key1 = firstVisibleMessageIndex, key2 = messages, key3 = authorizedUser) {
         var index = firstVisibleMessageIndex
         if (firstVisibleMessageIndex > 0)
             index -= 1
 
-        chatViewModel.readVisibleMessages(index)
+        chatViewModel.readVisibleMessagesFromIndex(index)
     }
 
     LaunchedEffect(key1 = chatUiState) {

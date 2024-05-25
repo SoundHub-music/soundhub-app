@@ -1,9 +1,9 @@
-package com.soundhub.ui.states
+package com.soundhub.ui.postline
 
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
 
-data class PostlineUiState(
+data class PostLineUiState(
     val posts: List<Post> = emptyList(),
     val status: ApiStatus = ApiStatus.LOADING
 )

@@ -15,17 +15,16 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.Post
-import com.soundhub.ui.viewmodels.PostViewModel
 import java.util.UUID
 
 @Composable
 fun PostDropdownMenu(
     modifier: Modifier = Modifier,
     isMenuExpandedState: MutableState<Boolean>,
-    postViewModel: PostViewModel,
     post: Post,
     navController: NavHostController,
-    onDismissRequest: () -> Unit = {},
+    onDeletePost: (UUID) -> Unit,
+    onDismissRequest: () -> Unit = {}
 ) {
     DropdownMenu(
         modifier = modifier,
@@ -34,7 +33,7 @@ fun PostDropdownMenu(
     ) {
         DeletePostMenuItem(
             isMenuExpandedState = isMenuExpandedState,
-            postViewModel = postViewModel,
+            onDeletePost = onDeletePost,
             post = post
         )
         EditPostMenuItem(
@@ -47,7 +46,7 @@ fun PostDropdownMenu(
 @Composable
 private fun DeletePostMenuItem(
     isMenuExpandedState: MutableState<Boolean>,
-    postViewModel: PostViewModel,
+    onDeletePost: (UUID) -> Unit = {},
     post: Post
 ) {
     DropdownMenuItem(
@@ -56,7 +55,7 @@ private fun DeletePostMenuItem(
             imageVector = Icons.Rounded.Delete, contentDescription = "delete post"
         ) },
         onClick = {
-            onDeletePostMenuClick(postViewModel, post)
+            onDeletePost(post.id)
             isMenuExpandedState.value = false
         }
     )
@@ -77,10 +76,10 @@ private fun EditPostMenuItem(
     )
 }
 
-private fun onDeletePostMenuClick(
-    postViewModel: PostViewModel,
-    post: Post
-) = postViewModel.deletePostById(post.id)
+//private fun onDeletePostMenuClick(
+//    postViewModel: PostViewModel,
+//    post: Post
+//) = postViewModel.deletePostById(post.id)
 
 private fun onEditPostMenuClick(
     postId: UUID,

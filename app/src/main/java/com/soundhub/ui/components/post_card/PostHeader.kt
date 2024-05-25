@@ -26,20 +26,20 @@ import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.components.menu.PostDropdownMenu
-import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.utils.DateFormatter
+import java.util.UUID
 
 @Composable
 internal fun PostHeader(
     modifier: Modifier = Modifier,
     currentUser: User?,
     navController: NavHostController,
-    postViewModel: PostViewModel,
-    post: Post
+    post: Post,
+    onDeletePost: (UUID) -> Unit
 ) {
     val isPostMenuExpandedState: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
     val userFullName: String = "${post.author?.firstName} ${post.author?.lastName}".trim()
-    val isCurrentUserAuthor: Boolean = currentUser?.id == post.author?.id
+    val isAuthorizedUserAuthor: Boolean = currentUser?.id == post.author?.id
 
     Box(contentAlignment = Alignment.TopEnd) {
         Row(
@@ -54,11 +54,9 @@ internal fun PostHeader(
                     contentDescription = userFullName,
                     modifier = Modifier,
                     onClick = {
-                        if (isCurrentUserAuthor) {
-                            val stringAuthorId = post.author?.id.toString()
-                            val route: String = Route.Profile.getStringRouteWithNavArg(stringAuthorId)
-                            navController.navigate(route)
-                        }
+                        val stringAuthorId = post.author?.id.toString()
+                        val route: String = Route.Profile.getStringRouteWithNavArg(stringAuthorId)
+                        navController.navigate(route)
                     }
                 )
 
@@ -80,7 +78,7 @@ internal fun PostHeader(
                     )
                 }
             }
-            if (isCurrentUserAuthor) {
+            if (isAuthorizedUserAuthor) {
                 IconButton(
                     onClick = { isPostMenuExpandedState.value = !isPostMenuExpandedState.value }
                 ) {
@@ -90,8 +88,8 @@ internal fun PostHeader(
                     )
                     PostDropdownMenu(
                         isMenuExpandedState = isPostMenuExpandedState,
-                        postViewModel = postViewModel,
                         post = post,
+                        onDeletePost = onDeletePost,
                         navController = navController
                     ) { isPostMenuExpandedState.value = false }
                 }

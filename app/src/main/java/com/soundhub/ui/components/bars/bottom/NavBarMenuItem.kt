@@ -4,6 +4,6 @@ import androidx.compose.runtime.Composable
 import com.soundhub.Route
 
 data class NavBarItem(
-    val route: String = Route.Postline.route,
+    val route: String = Route.PostLine.route,
     val icon: @Composable () -> Unit,
 )

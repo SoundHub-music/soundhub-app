@@ -9,7 +9,7 @@ import com.soundhub.utils.converters.json.LocalDateAdapter
 import java.lang.reflect.Type
 import java.time.LocalDate
 
-interface UserListRoomConverter {
+class UserListRoomConverter {
     private val gson: Gson
         get() = GsonBuilder()
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())

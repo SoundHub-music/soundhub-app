@@ -3,29 +3,14 @@ package com.soundhub.ui.components.bars.top
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,11 +27,9 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
-import java.time.Month
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,41 +39,34 @@ fun ChatTopAppBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
-    val isCheckMessageMode: Boolean = uiState.isCheckMessagesMode
+    val uiState by uiStateDispatcher.uiState.collectAsState()
+    val isCheckMessageMode = uiState.isCheckMessagesMode
 
     TopAppBar(
         title = {
-            if (!isCheckMessageMode) InterlocutorDetails(
-                chatViewModel = chatViewModel,
-                navController = navController
-            )
+            if (!isCheckMessageMode) InterlocutorDetails(chatViewModel, navController)
         },
         navigationIcon = {
-            if (isCheckMessageMode)
-                IconButton(onClick = { uiStateDispatcher.unsetCheckMessagesMode() }) {
-                    Icon(imageVector = Icons.Rounded.Close, contentDescription = "off check messages btn")
+            IconButton(onClick = {
+                if (isCheckMessageMode) {
+                    uiStateDispatcher.unsetCheckMessagesMode()
+                } else {
+                    navController.popBackStack()
                 }
-            else IconButton(onClick = { navController.popBackStack() }) {
+            }) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+                    imageVector = if (isCheckMessageMode) Icons.Rounded.Close else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.btn_description_back),
                     modifier = Modifier.size(32.dp)
                 )
             }
         },
         actions = {
-            if (isCheckMessageMode)
-                ChatTopBarCheckMessagesActions(
-                    chatViewModel = chatViewModel,
-                    uiStateDispatcher = uiStateDispatcher
-                )
-            else ChatTopBarActions(
-                navController = navController,
-                chatState = chatUiState,
-                chatViewModel = chatViewModel,
-                uiStateDispatcher = uiStateDispatcher
-            )
+            if (isCheckMessageMode) {
+                ChatTopBarCheckMessagesActions(chatViewModel, uiStateDispatcher)
+            } else {
+                ChatTopBarActions(navController, chatUiState, chatViewModel, uiStateDispatcher)
+            }
         }
     )
 }
@@ -103,26 +79,18 @@ private fun InterlocutorDetails(
     val context: Context = LocalContext.current
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor
-    val friendName = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
+    val friendName: String = "${interlocutor?.firstName.orEmpty()} ${interlocutor?.lastName.orEmpty()}".trim()
 
-    // TODO: implement user online logic
-    var isOnline: Boolean by rememberSaveable { mutableStateOf(false) }
+    var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.isOnline ?: false) }
     var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
-    var onlineIndicatorText: String by rememberSaveable {
-        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
-    }
+    var onlineIndicatorText: String by rememberSaveable { mutableStateOf("") }
+    val lastOnline: LocalDateTime? = interlocutor?.lastOnline
 
-    val lastOnline: LocalDateTime = LocalDateTime.of(2024, Month.MAY, 7, 15, 0)
-    val lastOnlineString = DateFormatter.getRelativeDate(lastOnline)
-
-    LaunchedEffect(key1 = isOnline) {
-        if (isOnline) {
-            onlineIndicator = R.drawable.online_indicator
-            onlineIndicatorText = context.getString(R.string.online_indicator_user_online)
-        }
-        else {
-            onlineIndicator = R.drawable.offline_indicator
-            onlineIndicatorText = context.getString(R.string.online_indicator_user_offline, lastOnlineString)
+    LaunchedEffect(interlocutor) {
+        isOnline = interlocutor?.isOnline ?: false
+        updateOnlineStatus(isOnline, lastOnline, context) { indicator, text ->
+            onlineIndicator = indicator
+            onlineIndicatorText = text
         }
     }
 
@@ -131,15 +99,10 @@ private fun InterlocutorDetails(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(5.dp))
-            .clickable { onInterlocutorDetailsClick(interlocutor, navController) }
+            .clickable { interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) } }
             .padding(horizontal = 10.dp)
     ) {
-        CircularAvatar(
-            modifier = Modifier.size(40.dp),
-            imageUrl = interlocutor?.avatarUrl
-        )
-
-        // user name and online status
+        CircularAvatar(modifier = Modifier.size(40.dp), imageUrl = interlocutor?.avatarUrl)
         Column {
             Text(
                 text = friendName,
@@ -149,8 +112,7 @@ private fun InterlocutorDetails(
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Image(
                     painter = painterResource(id = onlineIndicator),
@@ -167,7 +129,22 @@ private fun InterlocutorDetails(
     }
 }
 
-private fun onInterlocutorDetailsClick(
-    interlocutor: User?,
-    navController: NavHostController
-) = interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) }
+private fun updateOnlineStatus(
+    isOnline: Boolean,
+    lastOnline: LocalDateTime?,
+    context: Context,
+    update: (Int, String) -> Unit
+) {
+    val (indicator, text) = if (isOnline) {
+        R.drawable.online_indicator to context.getString(R.string.online_indicator_user_online)
+    } else {
+        val lastOnlineString = lastOnline?.let { DateFormatter.getRelativeDate(it) } ?: ""
+        val statusText = if (lastOnline == null) {
+            context.getString(R.string.online_indicator_user_offline)
+        } else {
+            context.getString(R.string.online_indicator_user_offline_with_time, lastOnlineString)
+        }
+        R.drawable.offline_indicator to statusText
+    }
+    update(indicator, text)
+}

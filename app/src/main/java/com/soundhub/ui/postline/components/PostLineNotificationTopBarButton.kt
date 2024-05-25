@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.Route
 
 @Composable
-fun PostlineNotificationTopBarButton(navController: NavHostController) {
+fun PostLineNotificationTopBarButton(navController: NavHostController) {
     IconButton(onClick = { navController.navigate(Route.Notifications.route) }) {
         Icon(Icons.Rounded.Notifications, contentDescription = "notification_button")
     }

@@ -17,6 +17,8 @@ interface UserMapper {
     @Mapping(target = "firstNameValid", ignore = true)
     @Mapping(target = "lastNameValid", ignore = true)
     @Mapping(target = "birthdayValid", ignore = true)
+    @Mapping(target = "user.isOnline", ignore = true)
+    @Mapping(target = "user.lastOnline", ignore = true)
     fun toFormState(user: User): UserFormState
 
     @Mapping(target = "friends", ignore = true)

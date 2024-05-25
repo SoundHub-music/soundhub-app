@@ -129,7 +129,7 @@ fun NavigationHost(
             }
         }
 
-        composable(Route.Postline.route) {
+        composable(Route.PostLine.route) {
             ScreenContainer(
                 userCreds = userCreds,
                 navController = navController
@@ -138,7 +138,6 @@ fun NavigationHost(
                 PostLineScreen(
                     navController = navController,
                     uiStateDispatcher = uiStateDispatcher,
-                    currentUser = authorizedUser
                 )
             }
         }
@@ -323,9 +322,7 @@ fun NavigationHost(
         // post editing route
         composable(
             route = Route.PostEditor.route,
-            arguments = listOf(navArgument(Constants.POST_EDITOR_NAV_ARG) {
-                NavType.StringType
-            })
+            arguments = listOf(navArgument(Constants.POST_EDITOR_NAV_ARG) { NavType.StringType })
         ) { entry ->
             runCatching {
                 val postArgument = entry.arguments?.getString(Constants.POST_EDITOR_NAV_ARG)
@@ -367,4 +364,4 @@ private fun defineStartDestination(
     if (userCreds?.accessToken.isNullOrEmpty())
         Route.Authentication.route
     else
-        Route.Postline.route
+        Route.PostLine.route

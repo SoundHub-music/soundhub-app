@@ -8,12 +8,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
@@ -40,17 +41,19 @@ fun MessageBoxContainer(
         mutableStateOf(emptyMap())
     }
 
-    val keyboard = LocalSoftwareKeyboardController.current
+    val totalMessageCount by remember {
+        derivedStateOf { lazyListState.layoutInfo.totalItemsCount }
+    }
 
     LaunchedEffect(key1 = messages) {
-        if (messages.isNotEmpty()) {
-            val lastMessageIndex = messages.lastIndex
-            lazyListState.scrollToItem(lastMessageIndex)
-        }
-
         messagesGroupedByDate = messages
             .groupBy { it.timestamp.toLocalDate() }
             .toSortedMap()
+    }
+
+    LaunchedEffect(key1 = totalMessageCount) {
+        if (totalMessageCount > 0 && messages.last().isRead)
+            lazyListState.scrollToItem(totalMessageCount - 1)
     }
 
     LazyColumn(

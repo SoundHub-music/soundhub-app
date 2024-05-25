@@ -44,11 +44,21 @@ fun BottomNavigationBar(
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState()
     val authorizedUser: User? = uiState.authorizedUser
+
+    val defaultSelectedItem = uiState.currentRoute ?: Route.PostLine.route
     val selectedItemState: MutableState<String> = remember {
-        mutableStateOf(uiState.currentRoute ?: Route.Postline.route)
+        mutableStateOf(defaultSelectedItem)
     }
 
-    LaunchedEffect(key1 = selectedItemState) {
+    val navBarItems: List<NavBarItem> = getNavBarItems(
+        messengerViewModel = messengerViewModel,
+        userId = authorizedUser?.id
+    )
+
+    LaunchedEffect(key1 = selectedItemState.value) {
+        val stringNavBarItems: List<String> = navBarItems.map { it.route }
+        if (selectedItemState.value !in stringNavBarItems)
+            selectedItemState.value = Route.PostLine.route
         Log.d("BottomNavigationBar", selectedItemState.value)
     }
 
@@ -64,10 +74,7 @@ fun BottomNavigationBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary,
     ) {
-        getNavBarItems(
-            userId = authorizedUser?.id,
-            messengerViewModel = messengerViewModel
-        ).forEach { menuItem ->
+        navBarItems.forEach { menuItem ->
             Log.d("BottomNavigationBar", "menuItem: $menuItem")
             NavigationBarItem(
                 icon = menuItem.icon,
@@ -85,7 +92,7 @@ private fun onMenuItemClick(
 ) {
     selectedItemState.value = menuItem.route
     Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
-    Log.d("BottomNavigationBar", "route: ${Route.Profile.route}")
+
     navController.navigate(menuItem.route) {
         popUpTo(navController.graph.findStartDestination().id) {
             saveState = true
@@ -108,7 +115,7 @@ private fun getNavBarItems(
 
     val navBarButtons = mutableListOf(
         NavBarItem(
-            route = Route.Postline.route,
+            route = Route.PostLine.route,
             icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") },
         ),
         NavBarItem(

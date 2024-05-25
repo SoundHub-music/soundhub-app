@@ -26,6 +26,10 @@ class HttpUtils {
         private const val FOLDER_NAME_PARAM: String = "?folderName="
         private const val FILE_REQUEST_NAME = "files"
 
+        /**
+         * transforms an access token to bearer token
+         * @param token access token
+         */
         fun getBearerToken(token: String?) = "Bearer $token"
 
         /**
@@ -101,6 +105,12 @@ class HttpUtils {
             return MimeTypeMap.getSingleton().getExtensionFromMimeType(fileType)
         }
 
+        /**
+         * prepares image url for glide by adding access token and media folder name
+         * @param userCreds creds datastore container
+         * @param imageUrl image url (get file endpoint)
+         * @param folder enum type with certain folder
+         */
         fun prepareGlideUrl(userCreds: UserPreferences?, imageUrl: String?, folder: MedialFolder): GlideUrl? {
             return imageUrl?.let { url ->
                 val urlWithParam: String = url + FOLDER_NAME_PARAM + folder.folderName
@@ -108,11 +118,16 @@ class HttpUtils {
                     val headers = LazyHeaders.Builder()
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken(token))
                         .build()
-                    GlideUrl(urlWithParam , headers)
+                    GlideUrl(urlWithParam, headers)
                 }
             }
         }
 
+        /**
+         * prepares request builder for glide by adding cache parameters
+         * @param context android app context
+         * @param imageUrl image url (get file endpoint)
+         */
         fun prepareGlideRequestBuilder(context: Context, imageUrl: String?): RequestBuilder<Drawable> {
             return Glide.with(context)
                 .asDrawable()

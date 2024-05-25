@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.soundhub.data.model.CountryTranslationBody
 import java.lang.reflect.Type
 
-interface CountryTranslationBodyRoomConverter {
+class CountryTranslationBodyRoomConverter {
     private val ctbJsonType: Type
         get() = object : TypeToken<CountryTranslationBody>(){}.type
 

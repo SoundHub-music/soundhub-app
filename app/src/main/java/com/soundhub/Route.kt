@@ -14,7 +14,7 @@ sealed class Route(var route: String): Cloneable {
         data object Friends: Route(route = Constants.FRIENDS_ROUTE)
     }
 
-    data object Postline: Route(route = Constants.POSTLINE_ROUTE)
+    data object PostLine: Route(route = Constants.POSTLINE_ROUTE)
     data object Music: Route(route = Constants.MUSIC_ROUTE) {
         data object NewOfTheWeek: Route(route = Constants.MUSIC_NEW_OF_THE_WEEK)
         data object NewOfTheMonth: Route(route = Constants.MUSIC_NEW_OF_THE_MONTH)

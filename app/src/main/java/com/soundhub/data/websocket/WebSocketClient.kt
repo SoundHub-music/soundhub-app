@@ -12,6 +12,8 @@ import com.soundhub.utils.constants.Constants.DYNAMIC_PARAM_REGEX
 import io.reactivex.disposables.Disposable
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
+import ua.naiksoftware.stomp.dto.StompCommand
+import ua.naiksoftware.stomp.dto.StompHeader
 import ua.naiksoftware.stomp.dto.StompMessage
 import java.util.UUID
 
@@ -22,9 +24,10 @@ class WebSocketClient(private val accessToken: String?) {
     fun connect(url: String) {
         val bearerToken: String = getBearerToken(accessToken)
         val header: Map<String, String> = mapOf(AUTHORIZATION_HEADER to bearerToken)
+        val stompHeader = StompHeader(AUTHORIZATION_HEADER, bearerToken)
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url, header)
-        stompClient?.connect()
+        stompClient?.connect(listOf(stompHeader))
         Log.i("WebSocketClient", "Connected successfully")
     }
 
@@ -52,8 +55,17 @@ class WebSocketClient(private val accessToken: String?) {
         messageId: UUID,
     ): Disposable? {
         val endpoint: String = replaceParam(messageId, WS_DELETE_MESSAGE_ENDPOINT)
+        val bearerToken: String = getBearerToken(accessToken)
+
+        val stompMessage = StompMessage(
+            StompCommand.SEND,
+            listOf(
+                StompHeader(AUTHORIZATION_HEADER, bearerToken),
+                StompHeader("destination", endpoint)),
+            null
+        )
         return stompClient
-            ?.send(endpoint, null)
+            ?.send(stompMessage)
             ?.subscribe(
                 { Log.d("WebSocketClient", "deleteMessage[1]: message with id $messageId deleted successfully") },
                 { Log.e("WebSocketClient", "deleteMessage[2]: ${it.stackTraceToString()}") }

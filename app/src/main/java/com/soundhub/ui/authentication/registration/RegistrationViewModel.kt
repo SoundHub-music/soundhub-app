@@ -24,7 +24,6 @@ import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.states.UiState
-import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
@@ -187,15 +186,13 @@ class RegistrationViewModel @Inject constructor(
                 userDao.saveUser(event.user)
                 with(uiStateDispatcher) {
                     setAuthorizedUser(event.user)
-                    sendUiEvent(UiEvent.Navigate(Route.Postline))
+                    sendUiEvent(UiEvent.Navigate(Route.PostLine))
                 }
 
             }
-            .onFailure {
-                it.errorBody.detail?.let { error ->
-                    val toastText: UiText.DynamicString = UiText.DynamicString(error)
-                    uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
-                }
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
     }
 

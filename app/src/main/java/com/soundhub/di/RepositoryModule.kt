@@ -71,8 +71,13 @@ object RepositoryModule {
     @Singleton
     fun providesPostRepository(
         postService: PostService,
-        @ApplicationContext context: Context
-    ): PostRepository = PostRepositoryImpl(postService, context)
+        @ApplicationContext context: Context,
+        loadAllUserDataUseCase: LoadAllUserDataUseCase
+    ): PostRepository = PostRepositoryImpl(
+        postService = postService,
+        loadAllUserDataUseCase = loadAllUserDataUseCase,
+        context = context
+    )
 
     @Provides
     @Singleton

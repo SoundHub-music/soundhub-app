@@ -54,7 +54,9 @@ class NotificationViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure {
+                .onFailure { error ->
+                    val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                    uiStateDispatcher.sendUiEvent(errorEvent)
                     _notificationUiState.update {
                      it.copy(status = ApiStatus.ERROR)
                     }
@@ -82,8 +84,14 @@ class NotificationViewModel @Inject constructor(
                     }
                 }
             }
-            .onFailure {
-                toastText.srcId = R.string.toast_accept_invite_error
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(
+                    error.errorBody,
+                    error.throwable,
+                    R.string.toast_accept_invite_error
+                )
+                uiStateDispatcher.sendUiEvent(errorEvent)
+//                toastText.srcId = R.string.toast_accept_invite_error
             }
             .finally {
                 uiStateDispatcher.sendUiEvent(uiEvent)
@@ -102,8 +110,13 @@ class NotificationViewModel @Inject constructor(
             .onSuccess {
                 deleteNotificationById(invite.id)
             }
-            .onFailure {
-                toastText.srcId = R.string.toast_reject_invite_error
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(
+                    error.errorBody,
+                    error.throwable,
+                    R.string.toast_reject_invite_error
+                )
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
             .finally {
                 uiStateDispatcher.sendUiEvent(uiEvent)

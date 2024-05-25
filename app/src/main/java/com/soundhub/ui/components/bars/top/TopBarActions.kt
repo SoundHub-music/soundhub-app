@@ -28,7 +28,7 @@ import com.soundhub.ui.components.menu.ChatTopBarDropdownMenu
 import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.postline.components.PostlineNotificationTopBarButton
+import com.soundhub.ui.postline.components.PostLineNotificationTopBarButton
 import com.soundhub.ui.states.UiState
 
 @Composable
@@ -50,7 +50,7 @@ fun TopBarActions(
                 navController = navController
             )
 
-        Route.Postline.route -> PostlineNotificationTopBarButton(navController)
+        Route.PostLine.route -> PostLineNotificationTopBarButton(navController)
         in Constants.ROUTES_WITH_SEARCH_BAR -> {
             if (isSearchBarActive)
                 TransparentSearchTextField(

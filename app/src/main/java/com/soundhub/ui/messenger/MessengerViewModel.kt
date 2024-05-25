@@ -10,6 +10,7 @@ import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MessengerViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    uiStateDispatcher: UiStateDispatcher,
+    private val uiStateDispatcher: UiStateDispatcher,
     userCredsStore: UserCredsStore,
 ): ViewModel() {
 
@@ -98,7 +99,9 @@ class MessengerViewModel @Inject constructor(
                             )
                         }
                     }
-                    .onFailure {
+                    .onFailure { error ->
+                        val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                        uiStateDispatcher.sendUiEvent(errorEvent)
                         _messengerUiState.update {
                             it.copy(status = ApiStatus.ERROR)
                         }

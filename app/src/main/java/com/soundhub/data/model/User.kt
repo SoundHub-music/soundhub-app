@@ -5,13 +5,30 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
-import com.soundhub.utils.converters.room.UserRoomConverter
+import com.soundhub.utils.converters.room.ArtistRoomConverter
+import com.soundhub.utils.converters.room.FileRoomConverter
+import com.soundhub.utils.converters.room.GenreRoomConverter
+import com.soundhub.utils.converters.room.IntListRoomConverter
+import com.soundhub.utils.converters.room.LocalDateRoomConverter
+import com.soundhub.utils.converters.room.LocalDateTimeRoomConverter
+import com.soundhub.utils.converters.room.StringListRoomConverter
+import com.soundhub.utils.converters.room.UserListRoomConverter
 import java.io.Serializable
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
-@TypeConverters(UserRoomConverter::class)
+@TypeConverters(
+    StringListRoomConverter::class,
+    IntListRoomConverter::class,
+    LocalDateRoomConverter::class,
+    LocalDateTimeRoomConverter::class,
+    UserListRoomConverter::class,
+    ArtistRoomConverter::class,
+    GenreRoomConverter::class,
+    FileRoomConverter::class
+)
 data class User(
     @PrimaryKey
     var id: UUID = UUID.randomUUID(),
@@ -24,6 +41,7 @@ data class User(
 
     @SerializedName("online")
     var isOnline: Boolean = false,
+    var lastOnline: LocalDateTime? = null,
 
     @SerializedName("birthday")
     var birthday: LocalDate? = null,

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
-import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.ReceivedMessageResponse
@@ -23,7 +22,6 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
-import com.soundhub.utils.UiText
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
@@ -73,7 +71,7 @@ class ChatViewModel @Inject constructor(
         webSocketClient = WebSocketClient(accessToken)
         uiStateDispatcher.setWebSocketClient(webSocketClient)
 
-        val chatIdFlow: Flow<UUID?> = _chatUiState.asStateFlow().map { it.chat?.id }
+        val chatIdFlow: Flow<UUID?> = chatUiState.map { it.chat?.id }
 
         webSocketClient.apply {
             connect(SOUNDHUB_WEBSOCKET)
@@ -81,7 +79,7 @@ class ChatViewModel @Inject constructor(
             chatIdFlow.collect { id ->
                 id?.let {
                     subscribe(
-                        topic = "$WS_GET_MESSAGES_TOPIC/${id}",
+                        topic = "$WS_GET_MESSAGES_TOPIC/$id",
                         messageListener = ::onReceiveMessageListener,
                         errorListener = ::onSubscribeErrorListener
                     )
@@ -171,7 +169,9 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
-            ?.onFailure {
+            ?.onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
                 _chatUiState.update { it.copy(status = ApiStatus.ERROR) }
             }
     }
@@ -188,9 +188,9 @@ class ChatViewModel @Inject constructor(
             .onSuccess  {
                 uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Messenger))
             }
-            .onFailure {
-                val toastMessage = UiText.StringResource(R.string.toast_common_error)
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastMessage))
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
     }
 
@@ -199,7 +199,8 @@ class ChatViewModel @Inject constructor(
     fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         val (chat, messageContent) = _chatUiState.value
-        if (messageContent.isBlank()) return@launch
+        if (messageContent.isEmpty() || messageContent.isBlank())
+            return@launch
 
         val sendMessageRequest = MessageMapper.impl.toSendMessageRequest(
             chat = chat,
@@ -207,10 +208,7 @@ class ChatViewModel @Inject constructor(
             content = messageContent
         )
 
-        _chatUiState.update {
-            it.copy(messageContent = "",)
-        }
-
+        _chatUiState.update { it.copy(messageContent = "") }
         webSocketClient.sendMessage(
             messageRequest = sendMessageRequest,
             onComplete = {
@@ -218,31 +216,26 @@ class ChatViewModel @Inject constructor(
             },
             onError = { error ->
                 Log.e("ChatViewModel", "sendMessage[error]: ${error.stackTraceToString()}")
-//                // Rollback UI state if sending fails
-//                _chatUiState.update { state ->
-//                    val updatedMessages = state.chat?.messages.orEmpty().filter { it.id != message.id }
-//                    state.copy(chat = state.chat?.copy(messages = updatedMessages))
-//                }
             }
         )
     }
 
 
-    fun readVisibleMessages(messageIndex: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun readVisibleMessagesFromIndex(startIndex: Int) = viewModelScope.launch(Dispatchers.IO) {
         val messages: List<Message> = chatUiState.map { it.chat?.messages }
             .firstOrNull()
             .orEmpty()
 
-        if (messageIndex >= messages.size)
+        if (startIndex >= messages.size)
             return@launch
 
         val authorizedUser: User? = userDao.getCurrentUser()
         authorizedUser?.let {  user ->
-            val visibleInterlocutorMessages: List<Message> = messages.subList(messageIndex, messages.size)
+            val visibleInterlocutorMessages: List<Message> = messages.subList(startIndex, messages.size)
                 .filter { it.sender?.id != user.id && !it.isRead }
 
             visibleInterlocutorMessages.forEach { msg -> readMessage(msg)}
-            Log.d("ChatScreen", "visible message: ${visibleInterlocutorMessages.size}")
+            Log.d("ChatScreen", "visible message: $visibleInterlocutorMessages")
         }
     }
 

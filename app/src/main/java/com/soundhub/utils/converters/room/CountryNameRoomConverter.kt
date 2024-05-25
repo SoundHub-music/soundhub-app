@@ -3,7 +3,7 @@ package com.soundhub.utils.converters.room
 import androidx.room.TypeConverter
 import com.soundhub.data.model.CountryName
 
-interface CountryNameRoomConverter {
+class CountryNameRoomConverter {
     @TypeConverter
     fun toStringName(countryName: CountryName): String = countryName.common
 

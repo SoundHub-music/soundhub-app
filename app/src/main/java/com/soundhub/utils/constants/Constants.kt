@@ -29,7 +29,7 @@ object Constants {
 
     // route list constants
     val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
-        Route.Postline.route,
+        Route.PostLine.route,
         Route.Music.route,
         Route.Messenger.route
     )
@@ -45,7 +45,7 @@ object Constants {
 
     val ROUTES_WITH_BOTTOM_BAR: List<String> = listOf(
         Route.Profile.route,
-        Route.Postline.route,
+        Route.PostLine.route,
         Route.Music.route,
         Route.Messenger.route
     )
@@ -111,12 +111,13 @@ object Constants {
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API_HOSTNAME="192.168.1.41:8080"
+    const val SOUNDHUB_API_HOSTNAME = "192.168.1.41:8080"
     const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
     const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/ws"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 
+    const val UNAUTHORIZED_USER_ERROR_CODE = 401
     // Discogs API authorization header
     const val DISCOGS_AUTHORIZATION = "Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 }

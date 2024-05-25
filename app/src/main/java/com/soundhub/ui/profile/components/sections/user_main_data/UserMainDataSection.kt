@@ -44,7 +44,7 @@ private fun OnlineStatusBlock(profileOwner: User?) {
 
     var indicatorColor: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
     var onlineIndicatorText: String by rememberSaveable {
-        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
+        mutableStateOf(context.getString(R.string.online_indicator_user_offline_with_time))
     }
 
     LaunchedEffect(key1 = profileOwner?.isOnline) {
@@ -54,7 +54,7 @@ private fun OnlineStatusBlock(profileOwner: User?) {
         }
         else {
             indicatorColor = R.color.offline_status
-            onlineIndicatorText = context.getString(R.string.online_indicator_user_offline)
+            onlineIndicatorText = context.getString(R.string.online_indicator_user_offline_with_time)
         }
     }
 

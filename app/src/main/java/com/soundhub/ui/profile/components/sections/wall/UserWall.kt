@@ -22,11 +22,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
+import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.post_card.PostCard
+import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.SectionLabel
-import com.soundhub.ui.states.PostUiState
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -34,15 +36,16 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 internal fun UserWall(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher,
+    profileViewModel: ProfileViewModel,
     postViewModel: PostViewModel = hiltViewModel(),
-    user: User,
 ) {
-    val postUiState: PostUiState by postViewModel.postUiState.collectAsState()
-    val isLoading = postUiState.status == ApiStatus.LOADING
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val posts: List<Post> = profileUiState.userPosts
+    val isLoading = profileUiState.postStatus == ApiStatus.LOADING
 
     LaunchedEffect(true) {
-        postViewModel.getPostsByUser(user)
-        Log.d("UserWall", postUiState.toString())
+        profileViewModel.loadPostsByUser()
+        Log.d("UserWall", posts.toString())
     }
 
     Column(
@@ -62,20 +65,21 @@ internal fun UserWall(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) { CircleLoader(modifier = Modifier.padding(top = 10.dp)) }
-        else if (postUiState.posts.isEmpty())
+        else if (posts.isEmpty())
             Text(
                 text = stringResource(id = R.string.empty_postline_screen),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-        else postUiState.posts.forEach { post ->
+        else posts.forEach { post ->
             PostCard(
                 post = post,
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
-                currentUser = user,
-                postViewModel = postViewModel
+                postViewModel = postViewModel,
+                onDeletePost = { id -> profileViewModel.deletePostById(id) },
+                onLikePost = { id -> profileViewModel.togglePostLikeAndUpdatePostList(id) }
             )
         }
     }

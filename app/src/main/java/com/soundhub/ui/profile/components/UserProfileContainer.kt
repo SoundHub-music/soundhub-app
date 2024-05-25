@@ -103,7 +103,7 @@ fun UserProfileContainer(
                     UserWall(
                         navController = navController,
                         uiStateDispatcher = uiStateDispatcher,
-                        user = it
+                        profileViewModel = profileViewModel
                     )
                 }
             }

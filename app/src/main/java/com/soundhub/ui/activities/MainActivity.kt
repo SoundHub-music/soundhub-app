@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
@@ -144,12 +145,12 @@ class MainActivity : ComponentActivity() {
         userInstance: User?,
         controller: NavController
     ) {
-        // it doesn't allow to navigate to auth screen if there is access token or user instance
+        // it doesn't allow to navigate to the auth screen if there are access token and user instance
         if (route?.contains(Route.Authentication.route) == true
             && !userCreds?.accessToken.isNullOrEmpty()
             && userInstance != null
         )
-            controller.navigate(Route.Postline.route)
+            controller.navigate(Route.PostLine.route)
     }
 
     private fun setCurrentRouteState(appBundleState: Bundle?, route: String?) {
@@ -168,26 +169,36 @@ class MainActivity : ComponentActivity() {
         uiStateDispatcher.setCurrentRoute(currentRoute)
     }
 
-    private fun handleUiEvent(event: UiEvent, navController: NavHostController) {
+    private fun handleUiEvent(event: UiEvent, navController: NavHostController) = lifecycleScope.launch {
         Log.d("MainActivity", "handleUiEvent: $event")
         when (event) {
             is UiEvent.ShowToast -> {
-                if (event.uiText.getString(this).isNotEmpty())
+                val uiText: String = event.uiText.getString(this@MainActivity)
+                if (uiText.isNotEmpty())
                     Toast.makeText(
-                        this,
-                        event.uiText.getString(this),
+                        this@MainActivity,
+                        uiText,
                         Toast.LENGTH_SHORT
                     ).show()
             }
 
-            is UiEvent.Navigate -> navController
-                .navigate(event.route.route)
-            is UiEvent.PopBackStack -> navController
-                .popBackStack()
-            is UiEvent.SearchButtonClick -> uiStateDispatcher
-                .toggleSearchBarActive()
-            is UiEvent.UpdateUserAction -> editUserProfileViewModel
-                .updateUser()
+            is UiEvent.Navigate -> navController.navigate(event.route.route)
+            is UiEvent.PopBackStack -> navController.popBackStack()
+            is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
+            is UiEvent.UpdateUserAction -> editUserProfileViewModel.updateUser()
+            is UiEvent.Error -> {
+                if (event.response.status == Constants.UNAUTHORIZED_USER_ERROR_CODE)
+                    authViewModel.tryRefreshToken()
+                else {
+                    val message: String = event.response.detail
+                        ?: event.throwable?.localizedMessage
+                        ?: event.customMessageStringRes?.let { getString(it) }
+                        ?: getString(R.string.toast_common_error)
+
+                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+                }
+
+            }
         }
     }
 
@@ -195,7 +206,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy: user has closed the app")
 
-        updateUserOnlineStatusDelayed(isOnline = false, delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY)
+        updateUserOnlineStatusDelayed(setOnline = false, delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY)
         disconnectWebSocket()
         uiStateDispatcher.clearState()
     }
@@ -204,7 +215,7 @@ class MainActivity : ComponentActivity() {
         super.onStop()
         Log.d("MainActivity", "onStop: user has minimized the app")
         updateUserOnlineStatusDelayed(
-            isOnline = false,
+            setOnline = false,
             delayTime = Constants.SET_OFFLINE_DELAY_ON_STOP
         )
     }
@@ -213,22 +224,21 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         Log.d("MainActivity", "onResume: user has opened the app")
         lifecycleScope.launch {
-            updateUserOnlineStatusDelayed(isOnline = true)
+            updateUserOnlineStatusDelayed(setOnline = true)
         }
-
     }
 
-    private fun updateUserOnlineStatusDelayed(isOnline: Boolean, delayTime: Long = 0) {
+    private fun updateUserOnlineStatusDelayed(setOnline: Boolean, delayTime: Long = 0) {
         Log.i(
             "MainActivity",
             "updateUserOnlineStatusDelayed: " +
-            "user will be ${if (isOnline) "offline" else "online"} in ${delayTime / 1000} seconds"
+            "user will be ${if (setOnline) "online" else "offline"} in ${delayTime / 1000} seconds"
         )
         lifecycleScope.launch {
             delay(delayTime)
             uiState.map { it.authorizedUser }.firstOrNull()
                 ?.let { user ->
-                    if (isOnline != user.isOnline) {
+                    if (setOnline != user.isOnline) {
                         authViewModel.toggleUserOnline()
                     }
                 }

@@ -2,7 +2,7 @@ package com.soundhub.utils.converters.room
 
 import androidx.room.TypeConverter
 
-interface IntListRoomConverter {
+class IntListRoomConverter {
     @TypeConverter
     fun toStringIntList(list: List<Int>): String =
         list.joinToString { "," }

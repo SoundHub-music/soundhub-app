@@ -4,11 +4,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
-import com.soundhub.utils.converters.room.CountryRoomConverter
+import com.soundhub.utils.converters.room.CountryNameRoomConverter
+import com.soundhub.utils.converters.room.CountryTranslationBodyRoomConverter
+import com.soundhub.utils.converters.room.CountryTranslationRoomConverter
 import java.io.Serializable
 
 @Entity
-@TypeConverters(CountryRoomConverter::class)
+@TypeConverters(
+    CountryNameRoomConverter::class,
+    CountryTranslationBodyRoomConverter::class,
+    CountryTranslationRoomConverter::class
+)
 data class Country(
     @PrimaryKey
     @SerializedName("name")

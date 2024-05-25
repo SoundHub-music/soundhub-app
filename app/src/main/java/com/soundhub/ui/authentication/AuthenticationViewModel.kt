@@ -12,7 +12,6 @@ import com.soundhub.Route
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
-import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
@@ -71,9 +70,13 @@ class AuthenticationViewModel @Inject constructor(
         Log.d("AuthenticationViewModel", "logout: $userCreds")
         authRepository
             .logout(userCreds.firstOrNull()?.accessToken)
-            .onFailure {
-                val toastText: UiText.DynamicString = UiText.DynamicString(it.errorBody.detail ?: "")
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(
+                    response = error.errorBody,
+                    throwable = error.throwable
+                )
+
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
             .finally { deleteUserData() }
     }
@@ -100,37 +103,31 @@ class AuthenticationViewModel @Inject constructor(
             val creds: UserPreferences? = userCreds.firstOrNull()
             userRepository.getCurrentUser(creds?.accessToken)
                 .onSuccess { authorizedUser = it.body }
-                .onFailure { error ->
-                    tryRefreshToken(
-                        error = error,
-                        userCreds = creds
-                    )
-                }
+                .onFailure { tryRefreshToken() }
         }
 
         emit(authorizedUser)
     }
 
-    private suspend fun tryRefreshToken(
-        error: HttpResult.Error<User?>,
-        userCreds: UserPreferences?
-    ) {
-        val requestBody = RefreshTokenRequestBody(userCreds?.refreshToken)
+    suspend fun tryRefreshToken() {
+        val creds: UserPreferences? = userCreds.firstOrNull()
+        val requestBody = RefreshTokenRequestBody(creds?.refreshToken)
+
         authRepository.refreshToken(requestBody)
-            .onSuccess { response ->
+        .onSuccess { response ->
                 userCredsStore.updateCreds(response.body)
                 initializeUser()
                 authAttemptCount.update { 0 }
-        }.onFailure {
+        }.onFailure { error ->
             authAttemptCount.update { it + 1 }
             if (authAttemptCount.value <= maxRefreshTokenAttemptCount)
-                tryRefreshToken(error, userCreds)
+                tryRefreshToken()
             else {
-                val toastText: UiText.DynamicString =  UiText.DynamicString(error.errorBody.detail ?: "")
                 deleteUserData()
 
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 with(uiStateDispatcher) {
-                    sendUiEvent(UiEvent.ShowToast(toastText))
+                    sendUiEvent(errorEvent)
                     sendUiEvent(UiEvent.Navigate(Route.Authentication))
                 }
             }
@@ -147,19 +144,18 @@ class AuthenticationViewModel @Inject constructor(
         authRepository.signIn(signInRequestBody)
             .onSuccess { response ->
                 userCredsStore.updateCreds(response.body)
-                val currentUser: User? = getCurrentUser().firstOrNull()
 
-                currentUser?.let { user ->
+                getCurrentUser().firstOrNull()?.let { user ->
                     userDao.saveUser(user)
                     with(uiStateDispatcher) {
-                        setAuthorizedUser(currentUser)
-                        sendUiEvent(UiEvent.Navigate(Route.Postline))
+                        setAuthorizedUser(user)
+                        sendUiEvent(UiEvent.Navigate(Route.PostLine))
                     }
                 } ?: uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastErrorMessage))
             }
-            .onFailure {
-                val toastText = UiText.DynamicString(it.errorBody.detail ?: "")
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
             }
             .finally {
                 _authFormState.update { it.copy(isLoading = false) }
@@ -170,6 +166,10 @@ class AuthenticationViewModel @Inject constructor(
         val creds: UserPreferences? = userCreds.firstOrNull()
         userRepository.toggleUserOnline(creds?.accessToken)
             .onSuccess { uiStateDispatcher.setAuthorizedUser(it.body) }
+            .onFailure { error ->
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                uiStateDispatcher.sendUiEvent(errorEvent)
+            }
     }
 
     fun resetAuthFormState() = _authFormState.update { AuthFormState() }
