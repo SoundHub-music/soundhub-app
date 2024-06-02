@@ -30,7 +30,7 @@ internal fun MainFriendsPage(
     selectedTabState: PagerState,
     page: Int
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
 
     val profileOwner: User? = friendsUiState.profileOwner

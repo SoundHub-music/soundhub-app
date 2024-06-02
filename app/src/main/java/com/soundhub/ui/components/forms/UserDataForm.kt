@@ -23,8 +23,8 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.ui.components.avatar.AvatarPicker
-import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.CountryDropdownField
+import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
 import com.soundhub.ui.states.UserFormState
@@ -34,33 +34,33 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun UserDataForm(
+    modifier: Modifier = Modifier,
     formState: State<IUserDataFormState>,
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onBirthdayChange: (LocalDate?) -> Unit = {},
-    onAvatarChange: (Uri?) -> Unit = {},
+    onAvatarChange: (Uri) -> Unit = {},
     onDescriptionChange: (String) -> Unit = {},
     onGenderChange: (String) -> Unit = {},
     onCountryChange: (String) -> Unit = {},
     onCityChange: (String) -> Unit = {},
-    onLanguagesChange: (List<String>) -> Unit = {},
+    onLanguagesChange: (List<String>) -> Unit = {}
 ) {
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(formState) {
+    LaunchedEffect(formState.value) {
         Log.d("UserDataForm", formState.value.toString())
         if (formState.value is UserFormState)
-            avatarUri.value = (formState.value as UserFormState)
-                .avatarUrl?.toUri()
+            avatarUri.value = (formState.value as UserFormState).avatarUrl?.toUri()
     }
 
     LaunchedEffect(key1 = avatarUri.value) {
-        onAvatarChange(avatarUri.value)
+        avatarUri.value?.let { onAvatarChange(it) }
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 20.dp, vertical = 20.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)

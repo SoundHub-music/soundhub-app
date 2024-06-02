@@ -9,7 +9,6 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.HttpUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -26,11 +25,9 @@ class FileRepositoryImpl @Inject constructor(
     override suspend fun getFile(
         folderName: String?,
         fileNameUrl: String?,
-        accessToken: String?
     ): HttpResult<File> {
         try {
             val response: Response<ResponseBody> = fileService.getFile(
-                accessToken = HttpUtils.getBearerToken(accessToken),
                 fileName = fileNameUrl,
                 folderName = folderName
             )

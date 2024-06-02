@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
 import com.soundhub.utils.converters.room.GenreRoomConverter
 import com.soundhub.utils.converters.room.LocalDateRoomConverter
+import java.io.Serializable
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,4 +25,4 @@ data class Album(
 
     @SerializedName("genre")
     var genre: Genre? = null
-)
+): Serializable

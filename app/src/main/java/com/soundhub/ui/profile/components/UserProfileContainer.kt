@@ -37,7 +37,7 @@ fun UserProfileContainer(
     uiStateDispatcher: UiStateDispatcher,
     profileViewModel: ProfileViewModel
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
     var isOriginProfile: Boolean by rememberSaveable {
         mutableStateOf(authorizedUser?.id == profileOwner?.id)

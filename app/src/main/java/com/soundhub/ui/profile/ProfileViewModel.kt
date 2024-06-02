@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
@@ -27,7 +28,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -47,10 +47,11 @@ class ProfileViewModel @Inject constructor(
     private val getPostsByUserUseCase: GetPostsByUserUseCase,
     private val deletePostByIdUseCase: DeletePostByIdUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val userDao: UserDao,
 
     userCredsStore: UserCredsStore
 ): ViewModel() {
-    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
+    private val uiState: Flow<UiState> = uiStateDispatcher.uiState
     private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
@@ -66,11 +67,8 @@ class ProfileViewModel @Inject constructor(
 
     suspend fun getOrCreateChatByUser(user: User?): Chat? {
         val ( authorizedUser: User? ) = _profileUiState.value
-        val creds: UserPreferences? = userCreds.firstOrNull()
-
         return authorizedUser?.let {
             getOrCreateChatByUserUseCase(
-                accessToken = creds?.accessToken,
                 interlocutor = user,
                 userId = authorizedUser.id
             )
@@ -89,10 +87,7 @@ class ProfileViewModel @Inject constructor(
             ?.takeIf { it.recipient.id == profileOwner?.id }
             ?: return@launch
 
-        inviteRepository.deleteInvite(
-            accessToken = userCreds.firstOrNull()?.accessToken,
-            inviteId = invite.id
-        )
+        inviteRepository.deleteInvite(invite.id)
             .onSuccess {
                 _profileUiState.update { it.copy(isRequestSent = false) }
             }
@@ -110,10 +105,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun deleteFriend(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        userRepository.deleteFriend(
-            accessToken = userCreds.firstOrNull()?.accessToken,
-            friendId = user.id
-        )
+        userRepository.deleteFriend(user.id)
             .onSuccess { response ->
                 Log.d("ProfileViewModel", "deleted friend ${response.body}")
                 _profileUiState.update { it.copy(isRequestSent = false) }
@@ -124,10 +116,8 @@ class ProfileViewModel @Inject constructor(
         val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
         val showToastEvent: UiEvent = UiEvent.ShowToast(text)
 
-        inviteRepository.createInvite(
-            accessToken = userCreds.firstOrNull()?.accessToken,
-            recipientId = recipientId
-        ).onSuccess {
+        inviteRepository.createInvite(recipientId)
+            .onSuccess {
             _profileUiState.update { it.copy(isRequestSent = true) }
         }.onFailure { error ->
             val errorEvent: UiEvent = UiEvent.Error(
@@ -147,7 +137,6 @@ class ProfileViewModel @Inject constructor(
 
         authorizedUser.collect { user ->
             val invite: Invite? = inviteRepository.getInviteBySenderAndRecipientId(
-                accessToken = userCreds.firstOrNull()?.accessToken,
                 senderId = user?.id,
                 recipientId = profileOwner?.id
             ).getOrNull()
@@ -162,29 +151,28 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun setProfileOwner(user: User?) = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = uiState
-            .map { it.authorizedUser }
-            .firstOrNull()
-
-        val isFriend: Boolean = authorizedUser?.friends?.map { it.id }
-            ?.contains(user?.id) == true
-
-        _profileUiState.update {
-            it.copy(
-                isUserAFriendToAuthorizedUser = isFriend,
-                profileOwner = user
-            )
-        }
-    }
-
     fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
+        val authorizedUser: User? = userDao.getCurrentUser()
         val profileOwner: User? = if (authorizedUser?.id == id)
             authorizedUser
         else getUserByIdUseCase(id)
 
-        setProfileOwner(profileOwner)
+        setProfileOwner(profileOwner, authorizedUser)
+    }
+
+    private fun setProfileOwner(
+        profileOwner: User?,
+        authorizedUser: User?
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val isFriend: Boolean = authorizedUser
+            ?.friends?.any { it.id == profileOwner?.id } == true
+
+        _profileUiState.update {
+            it.copy(
+                isUserAFriendToAuthorizedUser = isFriend,
+                profileOwner = profileOwner
+            )
+        }
     }
 
     fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {

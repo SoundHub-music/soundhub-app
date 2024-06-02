@@ -23,7 +23,6 @@ import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.authentication.registration.states.RegistrationState
-import com.soundhub.ui.states.UiState
 import com.soundhub.utils.Validator
 import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
@@ -31,8 +30,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
@@ -49,7 +48,7 @@ class RegistrationViewModel @Inject constructor(
     private val searchArtistsUseCase: SearchArtistsUseCase,
     appDb: AppDatabase
 ): ViewModel() {
-    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
+    private val uiState = uiStateDispatcher.uiState
     private val userDao: UserDao = appDb.userDao()
 
     private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
@@ -98,10 +97,10 @@ class RegistrationViewModel @Inject constructor(
         }
     }
 
-    fun onPostRegisterNextBtnClick() {
+    fun onPostRegisterNextBtnClick() = viewModelScope.launch {
         Log.d("RegistrationViewModel", "onPostRegisterNextButtonClick: ${registerState.value}")
-        val uiState = uiState.value
-        when (uiState.currentRoute) {
+        val uiState = uiState.firstOrNull()
+        when (uiState?.currentRoute) {
             Route.Authentication.ChooseGenres.route -> handleChooseGenres()
             Route.Authentication.ChooseArtists.route -> handleChooseArtists()
             Route.Authentication.FillUserData.route -> handleFillUserData()

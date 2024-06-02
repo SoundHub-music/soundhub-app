@@ -51,8 +51,13 @@ object RepositoryModule {
     @Singleton
     fun providesAuthRepository(
         authService: AuthService,
+        userRepository: UserRepository,
         @ApplicationContext context: Context
-    ): AuthRepository = AuthRepositoryImpl(authService, context)
+    ): AuthRepository = AuthRepositoryImpl(
+        authService = authService,
+        userRepository = userRepository,
+        context = context
+    )
 
 
     @Provides

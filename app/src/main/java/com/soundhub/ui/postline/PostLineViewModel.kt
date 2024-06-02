@@ -3,8 +3,6 @@ package com.soundhub.ui.postline
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
@@ -15,13 +13,11 @@ import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
-import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -34,43 +30,30 @@ class PostLineViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val deletePostByIdUseCase: DeletePostByIdUseCase,
     private val togglePostLikeAndUpdateListUseCase: TogglePostLikeAndUpdateListUseCase,
-    userCredsStore: UserCredsStore
 ) : ViewModel() {
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    private val loadPostsAttemptCount: MutableStateFlow<Int> = MutableStateFlow(0)
-
     private val _postLineUiState: MutableStateFlow<PostLineUiState> = MutableStateFlow(PostLineUiState())
     val postLineUiState: Flow<PostLineUiState> = _postLineUiState.asStateFlow()
 
-    init { loadPosts() }
-
-    private fun loadPosts() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadPosts() = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         val friends: List<User> = authorizedUser?.friends.orEmpty()
 
+        if (friends.isEmpty())
+            _postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
         friends.forEach { user -> fetchAndProcessPosts(user) }
     }
 
     private suspend fun fetchAndProcessPosts(user: User) {
-        val creds: UserPreferences? = userCreds.firstOrNull()
+        _postLineUiState.update { it.copy(status = ApiStatus.LOADING) }
 
-        postRepository.getPostsByAuthorId(
-            accessToken = creds?.accessToken,
-            authorId = user.id
-        ).onSuccess { response ->
+        postRepository.getPostsByAuthorId(user.id).onSuccess { response ->
             _postLineUiState.update { state ->
                 state.copy(
-                    posts = (state.posts + response.body.orEmpty()).sortedBy { it.publishDate },
+                    posts = response.body.orEmpty().sortedBy { it.publishDate },
                     status = ApiStatus.SUCCESS
                 )
             }
         }.onFailure { error ->
-            loadPostsAttemptCount.update { loadPostsAttemptCount.value++ }
-            if (error.errorBody.status == UNAUTHORIZED_USER_ERROR_CODE && loadPostsAttemptCount.value > 2) {
-                loadPosts()
-            }
-            loadPostsAttemptCount.update { 0 }
-
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
             uiStateDispatcher.sendUiEvent(errorEvent)
             _postLineUiState.update { it.copy(status = ApiStatus.ERROR) }

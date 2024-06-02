@@ -18,6 +18,7 @@ object Constants {
     // regular expressions
     const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
     const val DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
+    const val URL_WITH_PARAMS_REGEX: String = "/\\S+\\?\\w+=\\w+"
 
     // datastore identifiers
     const val DATASTORE_USER_CREDS = "user_creds"
@@ -38,9 +39,13 @@ object Constants {
         Route.Authentication.withNavArg,
         Route.Authentication.route,
         Route.Profile.route,
-        Route.Messenger.Chat.route,
         Route.EditFavoriteArtists.route,
         Route.EditFavoriteGenres.route
+    )
+
+    val ROUTES_WITH_INNER_TOP_APP_BAR: List<String> = listOf(
+        Route.EditUserData.route,
+        Route.Messenger.Chat.route
     )
 
     val ROUTES_WITH_BOTTOM_BAR: List<String> = listOf(
@@ -111,13 +116,18 @@ object Constants {
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API_HOSTNAME = "192.168.1.41:8080"
+    private const val SOUNDHUB_API_HOSTNAME = "192.168.1.41:8080"
     const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
-    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/ws"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 
+    // websocket constants
+    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/ws"
+    const val DELETER_ID_HEADER = "DeleterId"
+    const val DESTINATION_HEADER = "destination"
+
     const val UNAUTHORIZED_USER_ERROR_CODE = 401
+
     // Discogs API authorization header
     const val DISCOGS_AUTHORIZATION = "Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 }

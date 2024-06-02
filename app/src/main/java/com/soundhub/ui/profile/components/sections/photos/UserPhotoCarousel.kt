@@ -31,7 +31,7 @@ import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.Route
-import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.enums.ContentTypes
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

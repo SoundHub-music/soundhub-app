@@ -25,6 +25,17 @@ interface UserMapper {
     @Mapping(target = "favoriteGenres", ignore = true)
     @Mapping(target = "favoriteArtists", ignore = true)
     @Mapping(target = "favoriteArtistsIds", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "gender", source = "state.gender")
+    @Mapping(target = "avatarUrl", source = "state.avatarUrl")
+    @Mapping(target = "email", source = "state.email")
+    @Mapping(target = "firstName", source = "state.firstName")
+    @Mapping(target = "lastName", source = "state.lastName")
+    @Mapping(target = "country", source = "state.country")
+    @Mapping(target = "birthday", source = "state.birthday")
+    @Mapping(target = "city", source = "state.city")
+    @Mapping(target = "description", source = "state.description")
+    @Mapping(target = "languages", source = "state.languages")
     fun mergeUserWithFormState(state: UserFormState, @MappingTarget user: User): User
 
     companion object {

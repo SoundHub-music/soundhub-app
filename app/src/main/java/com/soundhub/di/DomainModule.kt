@@ -1,14 +1,13 @@
 package com.soundhub.di
 
 import com.soundhub.data.api.UserService
-import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
+import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.file.GetImageUseCase
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
@@ -72,8 +71,7 @@ object DomainModule {
     @Singleton
     fun providesGetUserByIdUseCase(
         userRepository: UserRepository,
-        userCredsStore: UserCredsStore
-    ): GetUserByIdUseCase = GetUserByIdUseCase(userRepository, userCredsStore)
+    ): GetUserByIdUseCase = GetUserByIdUseCase(userRepository)
 
     @Provides
     @Singleton
@@ -81,42 +79,28 @@ object DomainModule {
         fileRepository: FileRepository,
         musicRepository: MusicRepository,
         userService: UserService,
-        userCredsStore: UserCredsStore
     ): LoadAllUserDataUseCase = LoadAllUserDataUseCase(
         fileRepository = fileRepository,
         musicRepository = musicRepository,
-        userService = userService,
-        userCredsStore = userCredsStore
+        userService = userService
     )
 
     @Provides
     @Singleton
     fun providesGetPostsByUserUseCase(
         postRepository: PostRepository,
-        userCredsStore: UserCredsStore
-    ): GetPostsByUserUseCase = GetPostsByUserUseCase(
-        postRepository = postRepository,
-        userCredsStore = userCredsStore
-    )
+    ): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository)
 
     @Provides
     @Singleton
     fun providesDeletePostByIdUseCase(
         postRepository: PostRepository,
-        userCredsStore: UserCredsStore
-    ): DeletePostByIdUseCase = DeletePostByIdUseCase(
-        postRepository = postRepository,
-        userCredsStore = userCredsStore
-    )
+    ): DeletePostByIdUseCase = DeletePostByIdUseCase(postRepository)
 
     @Provides
     @Singleton
     fun providesTogglePostLikeAndUpdateListUseCase(
-        postRepository: PostRepository,
-        userCredsStore: UserCredsStore
+        postRepository: PostRepository
     ): TogglePostLikeAndUpdateListUseCase =
-        TogglePostLikeAndUpdateListUseCase(
-            postRepository = postRepository,
-            userCredsStore = userCredsStore
-        )
+        TogglePostLikeAndUpdateListUseCase(postRepository)
 }

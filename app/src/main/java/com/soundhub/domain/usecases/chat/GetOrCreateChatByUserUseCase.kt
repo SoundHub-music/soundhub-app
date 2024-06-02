@@ -13,14 +13,13 @@ class GetOrCreateChatByUserUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         interlocutor: User?,
-        accessToken: String?,
         userId: UUID
     ): Chat? {
         if (interlocutor == null)
             return null
 
         val allChats: List<Chat> = chatRepository
-            .getAllChatsByUserId(accessToken, userId)
+            .getAllChatsByUserId(userId)
             .onFailure { Log.e("GetOrCreateChatUseCase", "get all chats error: $it") }
             .getOrNull()
             .orEmpty()
@@ -29,7 +28,6 @@ class GetOrCreateChatByUserUseCase @Inject constructor(
 
         return if (!isChatExists)
             chatRepository.createChat(
-                accessToken = accessToken,
                 body = CreateChatRequestBody(interlocutor.id)
             ).onFailure { Log.e("GetOrCreateChatUseCase", "create chat error: $it") }
             .getOrNull()

@@ -26,13 +26,15 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.fields.TransparentSearchTextField
+import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.states.UiState
 
 @Composable
 fun CustomTopAppBar(
     topBarTitle: String?,
     uiStateDispatcher: UiStateDispatcher,
-    navController: NavHostController
+    navController: NavHostController,
+    notificationViewModel: NotificationViewModel
 ) {
     topBarTitle?.let {
         AppHeader(
@@ -42,7 +44,8 @@ fun CustomTopAppBar(
             actionButton = {
                 TopBarActions(
                     navController = navController,
-                    uiStateDispatcher = uiStateDispatcher
+                    uiStateDispatcher = uiStateDispatcher,
+                    notificationViewModel = notificationViewModel
                 )
             }
         )
@@ -56,7 +59,7 @@ private fun AppHeader(
     actionButton: @Composable () -> Unit,
     uiStateDispatcher: UiStateDispatcher 
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val isSearchBarActive: Boolean = uiState.isSearchBarActive
     val inputValue: String = uiState.searchBarText
 

@@ -34,7 +34,7 @@ internal fun PostBottomPanel(
     uiStateDispatcher: UiStateDispatcher,
     onLikePost: (UUID) -> Unit
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
     var isFavorite: Boolean by rememberSaveable {
         mutableStateOf(false)

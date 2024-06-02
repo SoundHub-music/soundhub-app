@@ -38,6 +38,7 @@ import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.loaders.CircleLoader
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -49,7 +50,7 @@ fun ChooseArtistsScreen(
     onSearchFieldChange: (value: String) -> Unit,
     lazyGridState: LazyGridState
 ) {
-    val uiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
     ContentContainer(
         modifier = Modifier

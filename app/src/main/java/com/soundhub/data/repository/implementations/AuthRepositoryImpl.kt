@@ -12,10 +12,12 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
+import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -27,6 +29,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
+    private val userRepository: UserRepository,
     private val context: Context
 ): AuthRepository {
     private val gson = GsonBuilder()
@@ -96,9 +99,9 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(accessToken: String?): HttpResult<LogoutResponse> {
+    override suspend fun logout(authorizedUser: User?): HttpResult<LogoutResponse> {
         try {
-            val logoutResponse: Response<LogoutResponse> = authService.logout(HttpUtils.getBearerToken(accessToken))
+            val logoutResponse: Response<LogoutResponse> = authService.logout()
             Log.d("AuthRepository", "logout[1]: $logoutResponse")
 
             if (!logoutResponse.isSuccessful) {
@@ -112,6 +115,10 @@ class AuthRepositoryImpl @Inject constructor(
                 Log.e("AuthRepository", "logout[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
+
+            if (authorizedUser?.isOnline == true)
+                userRepository.toggleUserOnline()
+
             return HttpResult.Success(body = logoutResponse.body())
         }
         catch (e: Exception) {

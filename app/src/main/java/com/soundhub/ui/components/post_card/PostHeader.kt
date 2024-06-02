@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.Post
@@ -50,7 +51,7 @@ internal fun PostHeader(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 CircularAvatar(
-                    imageUrl = post.author?.avatarUrl,
+                    imageUrl = post.author?.avatarUrl?.toUri(),
                     contentDescription = userFullName,
                     modifier = Modifier,
                     onClick = {

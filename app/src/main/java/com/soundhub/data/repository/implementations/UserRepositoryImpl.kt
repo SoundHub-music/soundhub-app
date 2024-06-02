@@ -12,14 +12,16 @@ import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.converters.json.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -30,14 +32,12 @@ class UserRepositoryImpl @Inject constructor(
 ): UserRepository {
     private val gson = GsonBuilder()
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
         .create()
 
-    override suspend fun getUserById(accessToken: String?, id: UUID?): HttpResult<User?> {
+    override suspend fun getUserById(id: UUID?): HttpResult<User?> {
         try {
-            val response: Response<User?> = userService.getUserById(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                id = id
-            )
+            val response: Response<User?> = userService.getUserById(id)
             Log.d("UserRepository", "getUserById[1]: $response")
 
             if (!response.isSuccessful) {
@@ -54,11 +54,12 @@ class UserRepositoryImpl @Inject constructor(
 
             val user: User? = response.body()
             user?.let { loadAllUserDataUseCase(user) }
+            Log.d("UserRepository", "getUserById[3]: user = $user")
 
             return HttpResult.Success(body = user)
         }
         catch (e: Exception) {
-            Log.e("UserRepository", "getUserById[3]: ${e.stackTraceToString()}")
+            Log.e("UserRepository", "getUserById[4]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e
@@ -66,11 +67,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentUser(accessToken: String?): HttpResult<User?> {
+    override suspend fun getCurrentUser(): HttpResult<User?> {
         try {
-            val currentUserResponse: Response<User?> = userService.getCurrentUser(
-                accessToken = HttpUtils.getBearerToken(accessToken)
-            )
+            val currentUserResponse: Response<User?> = userService.getCurrentUser()
 
             Log.d("UserRepository", "getCurrentUser[1]: $currentUserResponse")
 
@@ -100,7 +99,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserById(accessToken: String?, user: User?): HttpResult<User> {
+    override suspend fun updateUserById(user: User?): HttpResult<User> {
         try {
             val avatarFormData: MultipartBody.Part? = HttpUtils
                 .prepareMediaFormData(user?.avatarUrl, context)
@@ -112,7 +111,6 @@ class UserRepositoryImpl @Inject constructor(
                 id = user?.id,
                 user = userRequestBody,
                 userAvatar = avatarFormData,
-                accessToken = HttpUtils.getBearerToken(accessToken)
             )
             Log.d("UserRepository", "updateUserById[1]: $response")
 
@@ -140,12 +138,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addFriend(accessToken: String?, friendId: UUID): HttpResult<User> {
+    override suspend fun addFriend(friendId: UUID): HttpResult<User> {
         try {
-            val response: Response<User> = userService.addFriend(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                friendId = friendId
-            )
+            val response: Response<User> = userService.addFriend(friendId)
             Log.d("UserRepository", "addFriend[1]: $response")
 
             if (!response.isSuccessful) {
@@ -171,12 +166,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteFriend(accessToken: String?, friendId: UUID): HttpResult<User> {
+    override suspend fun deleteFriend(friendId: UUID): HttpResult<User> {
         try {
-            val response: Response<User> = userService.deleteFriend(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                friendId = friendId
-            )
+            val response: Response<User> = userService.deleteFriend(friendId)
             Log.d("UserRepository", "addFriend[1]: $response")
 
             if (!response.isSuccessful) {
@@ -202,11 +194,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecommendedFriends(accessToken: String?): HttpResult<List<User>> {
+    override suspend fun getRecommendedFriends(): HttpResult<List<User>> {
         try {
-            val response: Response<List<User>> = userService.getRecommendedFriends(
-                accessToken = HttpUtils.getBearerToken(accessToken)
-            )
+            val response: Response<List<User>> = userService.getRecommendedFriends()
             Log.d("UserRepository", "getRecommendedFriends[1]: $response")
 
             if (!response.isSuccessful) {
@@ -232,15 +222,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFriendsByUserId(
-        accessToken: String?,
-        userId: UUID
-    ): HttpResult<List<User>> {
+    override suspend fun getFriendsByUserId(userId: UUID): HttpResult<List<User>> {
         try {
-            val response: Response<List<User>> = userService.getFriendsByUserId(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                userId = userId
-            )
+            val response: Response<List<User>> = userService.getFriendsByUserId(userId)
             Log.d("UserRepository", "getFriendsByUserId[1]: $response")
 
             if (!response.isSuccessful) {
@@ -263,12 +247,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchUserByFullName(accessToken: String?, name: String): HttpResult<List<User>> {
+    override suspend fun searchUserByFullName(name: String): HttpResult<List<User>> {
         try {
-            val response: Response<List<User>> = userService.searchUserByFullName(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                name = name
-            )
+            val response: Response<List<User>> = userService.searchUserByFullName(name)
 
             Log.d("UserRepository", "searchUserByFullName[1]: $response")
 
@@ -295,11 +276,9 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun toggleUserOnline(accessToken: String?): HttpResult<User?> {
+    override suspend fun toggleUserOnline(): HttpResult<User?> {
         try {
-            val response: Response<User?> = userService.toggleUserOnline(
-                accessToken = HttpUtils.getBearerToken(accessToken)
-            )
+            val response: Response<User?> = userService.toggleUserOnline()
 
             Log.d("UserRepository", "toggleUserOnline[1]: $response")
 
@@ -315,7 +294,10 @@ class UserRepositoryImpl @Inject constructor(
                 return HttpResult.Error(errorResponse)
             }
 
-            return HttpResult.Success(response.body())
+            val user = response.body()
+            user?.let { loadAllUserDataUseCase(user) }
+
+            return HttpResult.Success(user)
         }
         catch (e: Exception) {
             Log.e("UserRepository", "toggleUserOnline[3]: ${e.stackTraceToString()}")

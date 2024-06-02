@@ -8,7 +8,6 @@ import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Message
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
-import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.constants.Constants
 import retrofit2.Response
 import java.util.UUID
@@ -19,14 +18,10 @@ class MessageRepositoryImpl @Inject constructor(
     private val loadAllUserDataUseCase: LoadAllUserDataUseCase
 ): MessageRepository {
     override suspend fun getAllMessagesByChatId(
-        accessToken: String?,
         chatId: UUID
     ): HttpResult<List<Message>> {
         try {
-            val response: Response<List<Message>> = messageService.getAllMessagesByChatId(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                chatId = chatId
-            )
+            val response: Response<List<Message>> = messageService.getAllMessagesByChatId(chatId)
 
             Log.d("MessageRepository", "getAllMessagesByChatId[1]: $response")
 
@@ -53,14 +48,10 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMessageById(
-        accessToken: String?,
         messageId: UUID
     ): HttpResult<Message?> {
         try {
-            val response: Response<Message?> = messageService.getMessageById(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                messageId = messageId
-            )
+            val response: Response<Message?> = messageService.getMessageById(messageId)
 
             Log.d("MessageRepository", "getMessageById[1]: $response")
 

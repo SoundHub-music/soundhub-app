@@ -23,7 +23,6 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
-import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.post_card.PostCard
 import com.soundhub.ui.profile.ProfileUiState

@@ -4,71 +4,59 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.states.UserFormState
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.mappers.UserMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class EditUserProfileViewModel @Inject constructor(
-    private val uiStateDispatcher: UiStateDispatcher,
     private val updateUserUseCase: UpdateUserUseCase,
-    userCredsStore: UserCredsStore
+    private val userDao: UserDao,
 ): ViewModel() {
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-    private val currentUser: MutableStateFlow<User?> = MutableStateFlow(null)
+    private val authorizedUser: MutableStateFlow<User?> = MutableStateFlow(null)
     val formState: MutableStateFlow<UserFormState> = MutableStateFlow(UserFormState())
+
     var isLoading = MutableStateFlow(false)
         private set
 
     init {
         viewModelScope.launch {
-            val userFromState: Flow<User?> = uiStateDispatcher.uiState.map { it.authorizedUser }
-            userFromState.collect { authorizedUser ->
-                authorizedUser?.let { user ->
-                    currentUser.update { user }
-                    updateFormStateFromUser(user)
-                }
+            userDao.getCurrentUser()?.let { user ->
+                authorizedUser.update { user }
+                updateFormStateFromUser(user)
             }
         }
     }
 
+    fun hasStateChanges(): Boolean = authorizedUser.value?.let { user ->
+        val mappedUser = UserMapper.impl.mergeUserWithFormState(formState.value, user.copy())
+        mappedUser != authorizedUser.value
+    } ?: false
+
     private fun updateFormStateFromUser(user: User) = formState.update {
-        UserMapper.impl.toFormState(user)
+        UserMapper.impl.toFormState(user.copy())
     }
 
     fun updateUser() = viewModelScope.launch(Dispatchers.IO) {
         isLoading.update { true }
-        updateLocalUserStateFromFormState()
-        updateUserUseCase(
-            accessToken = userCreds.firstOrNull()?.accessToken,
-            user = currentUser.value
-        )
-
-        Log.d("EditUserProfileViewModel", "current user after update: ${currentUser.value}")
-        isLoading.update { false }
-    }
-
-    private fun updateLocalUserStateFromFormState() = currentUser.value?.let { user ->
-        currentUser.update {
-            UserMapper.impl
-                .mergeUserWithFormState(formState.value, user)
+        val updatedUser: User? = userDao.getCurrentUser()?.let { user ->
+            UserMapper.impl.mergeUserWithFormState(formState.value, user)
         }
+
+        updateUserUseCase(updatedUser)
+
+        Log.d("EditUserProfileViewModel", "current user after update: $updatedUser")
+        isLoading.update { false }
     }
 
     fun setFirstName(value: String) = formState.update {
@@ -105,8 +93,9 @@ class EditUserProfileViewModel @Inject constructor(
         it.copy(city = value)
     }
 
-    fun setAvatar(avatarUri: Uri?) = formState.update {
-        it.copy(avatarUrl = avatarUri?.toString())
+    fun setAvatar(avatarUri: Uri) = formState.update {
+        Log.d("EditUserProfileViewModel", "setAvatar[uri]: ${avatarUri.toString()}")
+        it.copy(avatarUrl = avatarUri.toString())
     }
 
     fun setLanguages(languages: List<String>) = formState.update {

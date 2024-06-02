@@ -32,7 +32,7 @@ fun PostCard(
     onLikePost: (UUID) -> Unit = {},
     onDeletePost: (UUID) -> Unit = {}
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
     Card(

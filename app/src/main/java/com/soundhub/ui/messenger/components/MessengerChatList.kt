@@ -35,7 +35,7 @@ internal fun MessengerChatList(
         .messengerUiState
         .collectAsState()
 
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
     val chats: List<Chat> = messengerUiState.chats

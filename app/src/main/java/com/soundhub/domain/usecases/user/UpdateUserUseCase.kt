@@ -12,9 +12,9 @@ class UpdateUserUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val uiStateDispatcher: UiStateDispatcher
 ) {
-    suspend operator fun invoke(user: User?, accessToken: String?) {
+    suspend operator fun invoke(user: User?) {
         userRepository
-            .updateUserById(accessToken, user)
+            .updateUserById(user)
             .onFailure {
                 val toastText = UiText.StringResource(R.string.toast_update_error)
                 uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))

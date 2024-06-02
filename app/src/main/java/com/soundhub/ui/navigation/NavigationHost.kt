@@ -37,7 +37,6 @@ import com.soundhub.ui.edit_profile.music.EditFavoriteGenresScreen
 import com.soundhub.ui.edit_profile.music.EditMusicPreferencesViewModel
 import com.soundhub.ui.post_editor.PostEditorScreen
 import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
-import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.friends.FriendsScreen
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.gallery.GalleryScreen
@@ -52,6 +51,7 @@ import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.settings.SettingsScreen
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.Flow
@@ -65,7 +65,6 @@ fun NavigationHost(
     registrationViewModel: RegistrationViewModel,
     uiStateDispatcher: UiStateDispatcher,
     messengerViewModel: MessengerViewModel,
-    editUserProfileViewModel: EditUserProfileViewModel,
     notificationViewModel: NotificationViewModel,
     topBarTitle: MutableState<String?>,
     authorizedUser: User?
@@ -261,10 +260,9 @@ fun NavigationHost(
                 userCreds = userCreds,
                 navController = navController
             ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_edit_profile)
                 EditUserProfileScreen(
                     authorizedUser = authorizedUser,
-                    editUserProfileViewModel = editUserProfileViewModel
+                    navController = navController
                 )
             }
         }
@@ -292,7 +290,7 @@ fun NavigationHost(
             ) {
                 topBarTitle.value = null
                 val images = uiStateDispatcher.uiState
-                    .collectAsState()
+                    .collectAsState(initial = UiState())
                     .value
                     .galleryImageUrls
 

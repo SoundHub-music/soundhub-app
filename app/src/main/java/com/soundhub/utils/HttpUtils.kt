@@ -11,6 +11,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.enums.ContentTypes
+import com.soundhub.utils.enums.MediaFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -30,7 +33,10 @@ class HttpUtils {
          * transforms an access token to bearer token
          * @param token access token
          */
-        fun getBearerToken(token: String?) = "Bearer $token"
+        fun getBearerToken(token: String?): String =
+            if (token?.matches(Regex("Bearer\\s\\S+")) == true)
+                token
+            else "Bearer ${token?.trim()}"
 
         /**
          * creates temporary file and multipart form data
@@ -111,9 +117,14 @@ class HttpUtils {
          * @param imageUrl image url (get file endpoint)
          * @param folder enum type with certain folder
          */
-        fun prepareGlideUrl(userCreds: UserPreferences?, imageUrl: String?, folder: MedialFolder): GlideUrl? {
+        fun prepareGlideUrl(userCreds: UserPreferences?, imageUrl: String?, folder: MediaFolder): GlideUrl? {
             return imageUrl?.let { url ->
-                val urlWithParam: String = url + FOLDER_NAME_PARAM + folder.folderName
+                var urlWithParam: String = url
+
+                if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(url)) {
+                    urlWithParam += FOLDER_NAME_PARAM + folder.folderName
+                }
+
                 userCreds?.accessToken?.let { token ->
                     val headers = LazyHeaders.Builder()
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken(token))

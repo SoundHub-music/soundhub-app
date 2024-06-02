@@ -25,32 +25,30 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.components.menu.ChatTopBarDropdownMenu
-import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.postline.components.PostLineNotificationTopBarButton
 import com.soundhub.ui.states.UiState
 
 @Composable
 fun TopBarActions(
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher
+    uiStateDispatcher: UiStateDispatcher,
+    notificationViewModel: NotificationViewModel
 ) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute: String? = currentBackStackEntry?.destination?.route
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
     val isSearchBarActive: Boolean = uiState.isSearchBarActive
     val searchBarText: String = uiState.searchBarText
 
     when (currentRoute) {
-        Route.EditUserData.route ->
-            EditProfileTopBarButton(
-                uiStateDispatcher = uiStateDispatcher,
-                navController = navController
-            )
-
-        Route.PostLine.route -> PostLineNotificationTopBarButton(navController)
+        Route.PostLine.route -> PostLineNotificationTopBarButton(
+            navController = navController,
+            notificationViewModel = notificationViewModel
+        )
         in Constants.ROUTES_WITH_SEARCH_BAR -> {
             if (isSearchBarActive)
                 TransparentSearchTextField(
@@ -88,8 +86,11 @@ internal fun ChatTopBarActions(
 
 
 @Composable
-internal fun ChatTopBarCheckMessagesActions(chatViewModel: ChatViewModel, uiStateDispatcher: UiStateDispatcher) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+internal fun ChatTopBarCheckMessagesActions(
+    chatViewModel: ChatViewModel,
+    uiStateDispatcher: UiStateDispatcher
+) {
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val checkedMessages: List<Message> = uiState.checkedMessages
     val authorizedUser: User? = uiState.authorizedUser
 
@@ -102,9 +103,19 @@ internal fun ChatTopBarCheckMessagesActions(chatViewModel: ChatViewModel, uiStat
     Row {
         // TODO: add new message options
         if (hasOnlyOwnMessages) IconButton(
-            onClick = { checkedMessages.forEach { message -> chatViewModel.deleteMessage(message) } }
+            onClick = {
+                authorizedUser?.let { user ->
+                    checkedMessages.forEach {
+                        message -> chatViewModel.deleteMessage(message, user.id)
+                    }
+                }
+                uiStateDispatcher.setCheckMessagesMode(false)
+            }
         ) {
-            Icon(imageVector = Icons.Rounded.Delete, contentDescription = "Delete message option")
+            Icon(
+                imageVector = Icons.Rounded.Delete,
+                contentDescription = "Delete message option"
+            )
         }
     }
 }

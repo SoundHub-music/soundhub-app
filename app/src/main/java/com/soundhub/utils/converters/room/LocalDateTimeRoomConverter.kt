@@ -1,13 +1,11 @@
 package com.soundhub.utils.converters.room
 
 import androidx.room.TypeConverter
-import com.soundhub.utils.constants.Constants
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class LocalDateTimeRoomConverter {
-    private val formatter: DateTimeFormatter
-        get() = DateTimeFormatter.ofPattern(Constants.DATETIME_FORMAT)
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
     @TypeConverter
     fun fromLocalDateTime(date: LocalDateTime?): String {

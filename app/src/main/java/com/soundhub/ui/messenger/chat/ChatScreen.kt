@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -43,7 +44,7 @@ fun ChatScreen(
 ) {
     val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
     val authorizedUser: User? = uiState.authorizedUser
     val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
@@ -67,14 +68,10 @@ fun ChatScreen(
         chatViewModel.loadChatById(chatId)
     }
 
-    Scaffold(
-        topBar = {
-            ChatTopAppBar(
-                navController = navController,
-                chatViewModel = chatViewModel,
-                uiStateDispatcher = uiStateDispatcher
-            )
-        }
+    ChatScreenScaffold(
+        chatViewModel = chatViewModel,
+        navController = navController,
+        uiStateDispatcher = uiStateDispatcher
     ) {
         ContentContainer(
             modifier = Modifier
@@ -101,4 +98,22 @@ fun ChatScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ChatScreenScaffold(
+    chatViewModel: ChatViewModel,
+    navController: NavHostController,
+    uiStateDispatcher: UiStateDispatcher,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            ChatTopAppBar(
+                navController = navController,
+                chatViewModel = chatViewModel,
+                uiStateDispatcher = uiStateDispatcher
+            )
+        }
+    ) { content(it) }
 }

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun ContentContainer(
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    content: @Composable() (BoxScope.() -> Unit)
+    content: @Composable (BoxScope.() -> Unit)
 ) {
     Box(
         contentAlignment = contentAlignment,

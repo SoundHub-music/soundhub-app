@@ -40,7 +40,7 @@ import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.MedialFolder
+import com.soundhub.utils.enums.MediaFolder
 
 @Composable
 internal fun UserProfileAvatar(
@@ -50,13 +50,11 @@ internal fun UserProfileAvatar(
     profileOwner: User?
 ) {
     var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
     val isAuthorizedUser: Boolean = authorizedUser?.id == profileOwner?.id
-    val isAvatarMenuExpandedState: MutableState<Boolean> = rememberSaveable {
-        mutableStateOf(false)
-    }
+    val isAvatarMenuExpandedState = rememberSaveable { mutableStateOf(false) }
 
     val changeAvatarLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -108,7 +106,7 @@ private fun Avatar(
     val userFullName: String = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
 
     GlideImage(
-        model = HttpUtils.prepareGlideUrl(creds, profileOwner?.avatarUrl, MedialFolder.AVATAR),
+        model = HttpUtils.prepareGlideUrl(creds, profileOwner?.avatarUrl, MediaFolder.AVATAR),
         contentScale = ContentScale.Crop,
         failure = placeholder(defaultAvatar),
         contentDescription = userFullName,

@@ -1,4 +1,4 @@
-package com.soundhub.utils
+package com.soundhub.utils.enums
 
 enum class ContentTypes(val type: String) {
     IMAGE_ALL("image/*"),

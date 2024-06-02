@@ -1,5 +1,6 @@
 package com.soundhub.data.model
 
+import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -10,4 +11,4 @@ data class Post(
     val content: String = "",
     var images: List<String> = emptyList(),
     var likes: Set<User> = emptySet()
-)
+): Serializable

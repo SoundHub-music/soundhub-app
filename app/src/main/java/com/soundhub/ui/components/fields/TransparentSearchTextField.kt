@@ -37,7 +37,7 @@ fun TransparentSearchTextField(
     onValueChange: (String) -> Unit = {},
     uiStateDispatcher: UiStateDispatcher 
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val isSearchBarActive = uiState.isSearchBarActive
 
     val focusRequester = remember { FocusRequester() }

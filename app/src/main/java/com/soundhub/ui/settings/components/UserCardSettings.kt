@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.components.avatar.CircularAvatar
@@ -26,7 +27,7 @@ internal fun UserCardSettings(
     authViewModel: AuthenticationViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
     val userFullName: String = "${authorizedUser?.firstName} ${authorizedUser?.lastName}".trim()
 
@@ -46,7 +47,7 @@ internal fun UserCardSettings(
            ) {
                CircularAvatar(
                    modifier = Modifier.size(64.dp),
-                   imageUrl = authorizedUser?.avatarUrl
+                   imageUrl = authorizedUser?.avatarUrl?.toUri()
                )
                Text(
                    text = userFullName,

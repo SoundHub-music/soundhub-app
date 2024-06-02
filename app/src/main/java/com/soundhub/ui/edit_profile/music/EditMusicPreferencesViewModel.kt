@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
@@ -23,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -38,7 +35,6 @@ class EditMusicPreferencesViewModel @Inject constructor(
     private val loadGenresUseCase: LoadGenresUseCase,
     private val loadArtistsUseCase: LoadArtistsUseCase,
     private val searchArtistsUseCase: SearchArtistsUseCase,
-    userCredsStore: UserCredsStore
 ): ViewModel() {
     private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
     val genreUiState = _genreUiState.asStateFlow()
@@ -46,8 +42,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
     private val _artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
     val artistUiState = _artistUiState.asStateFlow()
 
-    private val uiState: StateFlow<UiState> = uiStateDispatcher.uiState
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+    private val uiState: Flow<UiState> = uiStateDispatcher.uiState
     private val authorizedUser: Flow<User?> = uiState.map { it.authorizedUser }
 
     private var loadArtistsJob: Job? = null
@@ -119,10 +114,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
             favoriteGenres = genreUiState.value.chosenGenres
         )
 
-        updateUserUseCase(
-            user = user,
-            accessToken = userCreds.firstOrNull()?.accessToken
-        )
+        updateUserUseCase(user)
 
         user?.let {
             val route: Route = Route.Profile.getRouteWithNavArg(user.id.toString())

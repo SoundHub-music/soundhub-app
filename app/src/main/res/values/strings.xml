@@ -179,4 +179,10 @@
     <string name="notification_screen_friend_request_content">отправил вам заявку в друзья</string>
     <string name="notification_screen_accept_invite_text">Принять</string>
     <string name="notification_screen_reject_invite_text">Отклонить</string>
+
+    <!-- edit user profile -->
+    <string name="edit_profile_alert_dialog_title">Отменить изменения?</string>
+    <string name="edit_profile_alert_dialog_content">Есть несохраненные изменения вашего профиля. Вы действительно хотите отменить их?</string>
+    <string name="edit_profile_alert_dialog_dismiss_btn">Продолжить редактирование</string>
+    <string name="edit_profile_alert_dialog_confirm_btn">Отмена</string>
 </resources>

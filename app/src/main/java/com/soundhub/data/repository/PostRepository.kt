@@ -5,32 +5,16 @@ import com.soundhub.data.model.Post
 import java.util.UUID
 
 interface PostRepository {
-    suspend fun getPostById(
-        accessToken: String?,
-        postId: UUID
-    ): HttpResult<Post?>
-    suspend fun getPostsByAuthorId(
-        accessToken: String?,
-        authorId: UUID
-    ): HttpResult<List<Post>>
+    suspend fun getPostById(postId: UUID): HttpResult<Post?>
+    suspend fun getPostsByAuthorId(authorId: UUID): HttpResult<List<Post>>
 
-    suspend fun addPost(
-        post: Post,
-        accessToken: String?
-    ): HttpResult<Post>
+    suspend fun addPost(post: Post, ): HttpResult<Post>
 
-    suspend fun toggleLike(
-        accessToken: String?,
-        postId: UUID
-    ): HttpResult<Post>
+    suspend fun toggleLike(postId: UUID): HttpResult<Post>
 
-    suspend fun deletePost(
-        accessToken: String?,
-        postId: UUID
-    ): HttpResult<UUID>
+    suspend fun deletePost(postId: UUID): HttpResult<UUID>
 
     suspend fun updatePost(
-        accessToken: String?,
         postId: UUID,
         post: Post,
         newImages: List<String> = emptyList(),

@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
@@ -27,6 +28,7 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
@@ -39,7 +41,7 @@ fun ChatTopAppBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val isCheckMessageMode = uiState.isCheckMessagesMode
 
     TopAppBar(
@@ -57,7 +59,7 @@ fun ChatTopAppBar(
                 Icon(
                     imageVector = if (isCheckMessageMode) Icons.Rounded.Close else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.btn_description_back),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
         },
@@ -102,7 +104,7 @@ private fun InterlocutorDetails(
             .clickable { interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) } }
             .padding(horizontal = 10.dp)
     ) {
-        CircularAvatar(modifier = Modifier.size(40.dp), imageUrl = interlocutor?.avatarUrl)
+        CircularAvatar(modifier = Modifier.size(40.dp), imageUrl = interlocutor?.avatarUrl?.toUri())
         Column {
             Text(
                 text = friendName,

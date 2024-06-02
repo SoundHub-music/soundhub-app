@@ -1,6 +1,7 @@
 package com.soundhub.ui.components.avatar
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,8 +27,9 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.utils.enums.UriScheme
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.MedialFolder
+import com.soundhub.utils.enums.MediaFolder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -35,7 +37,7 @@ import kotlinx.coroutines.flow.firstOrNull
 @Composable
 fun CircularAvatar(
     modifier: Modifier = Modifier,
-    imageUrl: String? = null,
+    imageUrl: Uri? = null,
     contentDescription: String? = null,
     onClick: () -> Unit = {}
 ) {
@@ -54,7 +56,9 @@ fun CircularAvatar(
         contentAlignment = Alignment.Center
     ) {
         GlideImage(
-            model = HttpUtils.prepareGlideUrl(userCreds, imageUrl, MedialFolder.AVATAR),
+            model = if (imageUrl?.scheme == UriScheme.HTTP.scheme)
+                HttpUtils.prepareGlideUrl(userCreds, imageUrl.toString(), MediaFolder.AVATAR)
+            else imageUrl.toString(),
             contentDescription = contentDescription,
             modifier = Modifier
                 .clip(CircleShape)

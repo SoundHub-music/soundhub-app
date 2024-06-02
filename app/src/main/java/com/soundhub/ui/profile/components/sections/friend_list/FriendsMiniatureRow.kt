@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 
@@ -37,7 +38,7 @@ internal fun FriendsMiniaturesRow(friendList: List<User>) {
         friendList.subList(0, friendCount)
             .forEach { friend ->
                 CircularAvatar(
-                    imageUrl = friend.avatarUrl,
+                    imageUrl = friend.avatarUrl?.toUri(),
                     modifier = Modifier.size(24.dp)
                 )
             }

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
@@ -86,7 +87,7 @@ private fun ChatDetails(
     chat: Chat?
 ) {
     val context: Context = LocalContext.current
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
     val interlocutor: User? by remember {
@@ -103,8 +104,7 @@ private fun ChatDetails(
     val lastMessageColor: Color = MaterialTheme.colorScheme.primary
     val lastMessageModifier = remember(hasUnreadMessages) {
         if (hasUnreadMessages) {
-            Modifier
-                .background(
+            Modifier.background(
                     color = lastMessageColor,
                     shape = RoundedCornerShape(16.dp)
                 )
@@ -129,7 +129,7 @@ private fun ChatDetails(
         }
     ) {
         CircularAvatar(
-            imageUrl = interlocutor?.avatarUrl,
+            imageUrl = interlocutor?.avatarUrl?.toUri(),
             modifier = Modifier.size(40.dp)
         )
     }

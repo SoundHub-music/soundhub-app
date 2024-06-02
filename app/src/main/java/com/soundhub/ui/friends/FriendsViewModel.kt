@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
@@ -35,9 +33,7 @@ class FriendsViewModel @Inject constructor(
     private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
     appDb: AppDatabase,
-    userCredsStore: UserCredsStore
 ): ViewModel() {
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     private var searchUsersJob: Job? = null
     private val userDao: UserDao = appDb.userDao()
     private val authorizedUser: MutableStateFlow<User?> = MutableStateFlow(null)
@@ -57,35 +53,30 @@ class FriendsViewModel @Inject constructor(
 
     fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
         friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
-        userCreds.collect { creds ->
-            userRepository.getRecommendedFriends(creds.accessToken)
-                .onSuccess { response ->
-                friendsUiState.update {
-                    it.copy(
-                        recommendedFriends = response.body.orEmpty(),
-                        status = ApiStatus.SUCCESS
-                    )
-                }
-            }.onFailure { error ->
-                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                uiStateDispatcher.sendUiEvent(errorEvent)
-                friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
+        userRepository.getRecommendedFriends()
+            .onSuccess { response ->
+            friendsUiState.update {
+                it.copy(
+                    recommendedFriends = response.body.orEmpty(),
+                    status = ApiStatus.SUCCESS
+                )
             }
+        }.onFailure { error ->
+            val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+            uiStateDispatcher.sendUiEvent(errorEvent)
+            friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
         }
     }
 
     fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
-        userCreds.collect { creds ->
-            authorizedUser.value?.let {  user ->
-                val chat: Chat? = getOrCreateChatByUserUseCase(
-                    interlocutor = interlocutor,
-                    accessToken = creds.accessToken,
-                    userId = user.id
-                )
-                emit(chat)
+        authorizedUser.value?.let {  user ->
+            val chat: Chat? = getOrCreateChatByUserUseCase(
+                interlocutor = interlocutor,
+                userId = user.id
+            )
+            emit(chat)
 
-            } ?: emit(null)
-        }
+        } ?: emit(null)
     }
 
     fun filterFriendsList(occurrenceString: String, users: List<User>): List<User> {
@@ -103,10 +94,8 @@ class FriendsViewModel @Inject constructor(
         }
 
         searchUsersJob = viewModelScope.launch(Dispatchers.IO) {
-             userRepository.searchUserByFullName(
-                 accessToken = userCreds.firstOrNull()?.accessToken,
-                 name = username
-             ).onSuccess { response ->
+             userRepository.searchUserByFullName(username)
+                 .onSuccess { response ->
                  val otherUsers: List<User> = response.body
                      ?.filter { user -> user.id != authorizedUser.firstOrNull()?.id }
                      .orEmpty()

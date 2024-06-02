@@ -2,45 +2,40 @@ package com.soundhub.domain.usecases.user
 
 import android.util.Log
 import com.soundhub.data.api.UserService
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.utils.HttpUtils
-import kotlinx.coroutines.flow.firstOrNull
+import com.soundhub.utils.enums.MediaFolder
 import retrofit2.Response
 import javax.inject.Inject
 
 class LoadAllUserDataUseCase @Inject constructor(
     private val musicRepository: MusicRepository,
     private val fileRepository: FileRepository,
-    private val userService: UserService,
-    private val userCredsStore: UserCredsStore
+    private val userService: UserService
 ) {
     suspend operator fun invoke(user: User) {
-        val userCreds: UserPreferences? = userCredsStore.getCreds().firstOrNull()
-        loadAllUserData(user, userCreds?.accessToken)
+        loadAllUserData(user)
     }
 
-    private suspend fun loadAllUserData(user: User, accessToken: String?) {
-        loadUserFriends(user, accessToken)
-        user.friends.forEach { f -> loadUserFriends(f, accessToken) }
+    private suspend fun loadAllUserData(user: User) {
+        loadUserFriends(user)
+        user.friends.forEach { f -> loadUserFriends(f) }
         loadUserFavoriteArtists(user)
-        loadUserAvatar(user, accessToken)
+        loadUserAvatar(user)
     }
 
-    private suspend fun loadUserFriends(user: User, accessToken: String?) {
+    private suspend fun loadUserFriends(user: User) {
         val response: Response<List<User>> = userService.getFriendsByUserId(
-            accessToken = HttpUtils.getBearerToken(accessToken),
             userId = user.id
         )
 
         if (!response.isSuccessful) {
             Log.e("LoadAllUserDataUseCase", "message: ${response.message()}\ncode: ${response.code()}")
+            return
         }
-
-        user.friends = response.body().orEmpty()
+        val friends = response.body().orEmpty()
+        user.friends = friends
     }
 
     private suspend fun loadUserFavoriteArtists(user: User) {
@@ -48,10 +43,10 @@ class LoadAllUserDataUseCase @Inject constructor(
             .mapNotNull { artistId -> musicRepository.getArtistById(artistId).getOrNull() }
     }
 
-    private suspend fun loadUserAvatar(user: User, accessToken: String?) {
+    private suspend fun loadUserAvatar(user: User) {
         fileRepository.getFile(
-            accessToken = accessToken,
-            fileNameUrl = user.avatarUrl
+            fileNameUrl = user.avatarUrl,
+            folderName = MediaFolder.AVATAR.folderName
         )
     }
 }

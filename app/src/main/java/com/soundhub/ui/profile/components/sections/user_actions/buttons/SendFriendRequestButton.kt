@@ -20,14 +20,18 @@ import com.soundhub.R
 import com.soundhub.data.model.User
 import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
+import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun SendFriendRequestButton(
     modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel,
+    uiStateDispatcher: UiStateDispatcher,
     profileOwner: User?
 ) {
+    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
     val isRequestSent: Boolean = profileUiState.isRequestSent
 
@@ -35,13 +39,13 @@ internal fun SendFriendRequestButton(
     var buttonIconRes by rememberSaveable { mutableIntStateOf(R.drawable.baseline_person_add) }
 
     LaunchedEffect(key1 = profileUiState) {
-        profileViewModel.checkInvite()
+        if (profileOwner?.id != uiState.authorizedUser?.id)
+            profileViewModel.checkInvite()
     }
 
     LaunchedEffect(key1 = isRequestSent) {
         Log.d("SendFriendRequestButton", "was request sent: $isRequestSent")
         buttonIconRes = getSendRequestBtnIconRes(isRequestSent)
-//        profileViewModel.loadAllInvitesByAuthorizedUser()
     }
 
     FilledTonalIconToggleButton(

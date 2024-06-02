@@ -33,7 +33,7 @@ fun ChatTopBarDropdownMenu(
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val currentRoute: String? = uiState.currentRoute
 
     LaunchedEffect(key1 = currentRoute) {

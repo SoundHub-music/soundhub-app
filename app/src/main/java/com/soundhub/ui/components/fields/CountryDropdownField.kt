@@ -32,8 +32,8 @@ fun CountryDropdownField(
 ) {
     var isCountryDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
-    val countries: List<Country> = userDataFormViewModel.countryList.collectAsState().value
-    val isLoading = userDataFormViewModel.isLoading.collectAsState().value
+    val countries: List<Country> by userDataFormViewModel.countryList.collectAsState()
+    val isLoading by userDataFormViewModel.isLoading.collectAsState()
     var filteredCountries: List<Country> by rememberSaveable { mutableStateOf(countries) }
 
     LaunchedEffect(key1 = isLoading, key2 = countries) {

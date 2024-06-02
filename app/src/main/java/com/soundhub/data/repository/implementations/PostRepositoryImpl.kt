@@ -12,7 +12,7 @@ import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -35,15 +35,9 @@ class PostRepositoryImpl @Inject constructor(
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
         .create()
 
-    override suspend fun getPostById(
-        accessToken: String?,
-        postId: UUID
-    ): HttpResult<Post?> {
+    override suspend fun getPostById(postId: UUID): HttpResult<Post?> {
         try {
-            val response: Response<Post?> = postService.getPostById(
-                id = postId,
-                accessToken = HttpUtils.getBearerToken(accessToken)
-            )
+            val response: Response<Post?> = postService.getPostById(postId)
             Log.d("PostRepository", "getPostById[1]: $response")
 
             if (!response.isSuccessful) {
@@ -73,15 +67,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPostsByAuthorId(
-        accessToken: String?,
-        authorId: UUID
-    ): HttpResult<List<Post>> {
+    override suspend fun getPostsByAuthorId(authorId: UUID): HttpResult<List<Post>> {
         try {
-            val response: Response<List<Post>> = postService.getPostsByAuthorId(
-                authorId = authorId,
-                accessToken = HttpUtils.getBearerToken(accessToken)
-            )
+            val response: Response<List<Post>> = postService.getPostsByAuthorId(authorId,)
             Log.d("PostRepository", "getPostsByAuthorId[1]: $response")
 
             if (!response.isSuccessful) {
@@ -111,7 +99,7 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addPost(post: Post, accessToken: String?): HttpResult<Post> {
+    override suspend fun addPost(post: Post): HttpResult<Post> {
         try {
             val imagesFormDataList: List<MultipartBody.Part> = post.images.mapNotNull {
                 HttpUtils.prepareMediaFormData(it, context)
@@ -121,7 +109,6 @@ class PostRepositoryImpl @Inject constructor(
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
             val response: Response<Post> = postService.addPost(
-                accessToken = HttpUtils.getBearerToken(accessToken),
                 post = postRequestBody,
                 files = imagesFormDataList
             )
@@ -151,12 +138,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun toggleLike(accessToken: String?, postId: UUID): HttpResult<Post> {
+    override suspend fun toggleLike(postId: UUID): HttpResult<Post> {
         try {
-            val response: Response<Post> = postService.toggleLike(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                postId = postId
-            )
+            val response: Response<Post> = postService.toggleLike(postId)
             Log.d("PostRepository", "toggleLike[1]: $response")
 
             if (!response.isSuccessful) {
@@ -180,12 +164,9 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deletePost(accessToken: String?, postId: UUID): HttpResult<UUID> {
+    override suspend fun deletePost(postId: UUID): HttpResult<UUID> {
         try {
-            val response: Response<UUID> = postService.deletePost(
-                accessToken = HttpUtils.getBearerToken(accessToken),
-                postId = postId
-            )
+            val response: Response<UUID> = postService.deletePost(postId)
             Log.d("PostRepository", "deletePost[1]: $response")
 
             if (!response.isSuccessful) {
@@ -207,7 +188,6 @@ class PostRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updatePost(
-        accessToken: String?,
         postId: UUID,
         post: Post,
         newImages: List<String>,
@@ -230,7 +210,6 @@ class PostRepositoryImpl @Inject constructor(
             Log.d("PostRepository", "updatePost[3]: request body: $imagesToBeDeletedRequestBody")
 
             val response: Response<Post> = postService.updatePost(
-                accessToken = HttpUtils.getBearerToken(accessToken),
                 postId = postId,
                 post = postRequestBody,
                 images = imageFormData,

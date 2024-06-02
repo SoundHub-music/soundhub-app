@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
@@ -70,7 +71,7 @@ fun FriendCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CircularAvatar(
-                    imageUrl = user.avatarUrl,
+                    imageUrl = user.avatarUrl?.toUri(),
                     modifier = Modifier.size(64.dp)
                 )
 

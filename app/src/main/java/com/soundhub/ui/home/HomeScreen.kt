@@ -20,7 +20,6 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.components.bars.bottom.BottomNavigationBar
 import com.soundhub.ui.components.bars.top.TopAppBarBuilder
-import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.navigation.NavigationHost
 import com.soundhub.ui.notifications.NotificationViewModel
@@ -35,13 +34,12 @@ fun HomeScreen(
     uiStateDispatcher: UiStateDispatcher,
     registrationViewModel: RegistrationViewModel,
     messengerViewModel: MessengerViewModel,
-    editUserProfileViewModel: EditUserProfileViewModel,
     notificationViewModel: NotificationViewModel
 ) {
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
     val topBarTitle: MutableState<String?> = rememberSaveable { mutableStateOf(null) }
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
     val authorizedUser: User? = uiState.authorizedUser
 
@@ -55,6 +53,7 @@ fun HomeScreen(
                 topBarTitle = topBarTitle.value,
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
+                notificationViewModel = notificationViewModel
             )
         },
         bottomBar = {
@@ -73,7 +72,6 @@ fun HomeScreen(
             registrationViewModel = registrationViewModel,
             uiStateDispatcher = uiStateDispatcher,
             messengerViewModel = messengerViewModel,
-            editUserProfileViewModel = editUserProfileViewModel,
             notificationViewModel = notificationViewModel,
             topBarTitle = topBarTitle,
             authorizedUser = authorizedUser

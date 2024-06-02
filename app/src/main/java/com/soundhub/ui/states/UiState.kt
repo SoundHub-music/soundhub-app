@@ -14,5 +14,4 @@ data class UiState(
 
     val isCheckMessagesMode: Boolean = false,
     val checkedMessages: List<Message> = emptyList(),
-    val webSocketClient: WebSocketClient? = null
 )

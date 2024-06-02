@@ -7,6 +7,5 @@ interface FileRepository {
     suspend fun getFile(
         folderName: String? = null,
         fileNameUrl: String?,
-        accessToken: String?
     ): HttpResult<File>
 }

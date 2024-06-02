@@ -3,8 +3,6 @@ package com.soundhub.ui.notifications
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
@@ -29,9 +27,7 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val inviteRepository: InviteRepository,
     private val uiStateDispatcher: UiStateDispatcher,
-    userCredsStore: UserCredsStore
 ): ViewModel() {
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     private val uiState: Flow<UiState> = uiStateDispatcher.uiState
 
     private val _notificationUiState = MutableStateFlow(NotificationUiState())
@@ -39,14 +35,13 @@ class NotificationViewModel @Inject constructor(
 
     init { loadInvites() }
 
-    fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
-        _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
-        userCreds.firstOrNull()
-            ?.accessToken
-            ?.let { accessToken ->
-            inviteRepository.getAllInvites(accessToken)
+    fun loadInvites() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
+
+            inviteRepository.getAllInvites()
                 .onSuccess { response ->
-                    val invites = response.body.orEmpty()
+                    val invites: List<Invite> = response.body.orEmpty()
                     _notificationUiState.update {
                         it.copy(
                             notifications = invites,
@@ -57,9 +52,7 @@ class NotificationViewModel @Inject constructor(
                 .onFailure { error ->
                     val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                     uiStateDispatcher.sendUiEvent(errorEvent)
-                    _notificationUiState.update {
-                     it.copy(status = ApiStatus.ERROR)
-                    }
+                    _notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
                 }
         }
     }
@@ -68,11 +61,7 @@ class NotificationViewModel @Inject constructor(
         val toastText = UiText.StringResource(R.string.toast_invite_accepted_successfully)
         val uiEvent = UiEvent.ShowToast(toastText)
 
-        val creds: UserPreferences? = userCreds.firstOrNull()
-        inviteRepository.acceptInvite(
-            accessToken = creds?.accessToken,
-            inviteId = invite.id
-        )
+        inviteRepository.acceptInvite(invite.id)
             .onSuccess {
                 deleteNotificationById(invite.id)
                 val authorizedUser: User? = uiState.map { it.authorizedUser }
@@ -91,7 +80,6 @@ class NotificationViewModel @Inject constructor(
                     R.string.toast_accept_invite_error
                 )
                 uiStateDispatcher.sendUiEvent(errorEvent)
-//                toastText.srcId = R.string.toast_accept_invite_error
             }
             .finally {
                 uiStateDispatcher.sendUiEvent(uiEvent)
@@ -102,11 +90,7 @@ class NotificationViewModel @Inject constructor(
         val toastText = UiText.StringResource(R.string.toast_invite_rejected_successfully)
         val uiEvent = UiEvent.ShowToast(toastText)
 
-        val creds: UserPreferences? = userCreds.firstOrNull()
-        inviteRepository.rejectInvite(
-            accessToken = creds?.accessToken,
-            inviteId = invite.id
-        )
+        inviteRepository.rejectInvite(invite.id)
             .onSuccess {
                 deleteNotificationById(invite.id)
             }

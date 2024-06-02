@@ -31,7 +31,7 @@ import com.soundhub.Route
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.MedialFolder
+import com.soundhub.utils.enums.MediaFolder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlin.math.absoluteValue
@@ -47,7 +47,7 @@ fun ImageHorizontalPager(
     contentScale: ContentScale = ContentScale.Crop,
     height: Dp = 300.dp,
     clickable: Boolean = true,
-    mediaFolder: MedialFolder = MedialFolder.POST_PICTURE
+    mediaFolder: MediaFolder = MediaFolder.POST_PICTURE
 ) {
     val context: Context = LocalContext.current
     val userCredsFlow: Flow<UserPreferences> = UserCredsStore(context).getCreds()
@@ -90,9 +90,7 @@ fun ImageHorizontalPager(
                         )
                     }
                     .alpha(getImageOpacity(pagerState, page)),
-            ) {
-                it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, images[page]))
-            }
+            )
         }
     }
 }

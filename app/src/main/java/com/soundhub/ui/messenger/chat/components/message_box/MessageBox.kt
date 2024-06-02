@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -35,7 +36,7 @@ fun MessageBox(
 ) {
     var contentAlignment by remember { mutableStateOf(Alignment.CenterEnd) }
 
-    val uiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val isCheckMessagesMode = uiState.isCheckMessagesMode
     val checkedMessages = uiState.checkedMessages
 

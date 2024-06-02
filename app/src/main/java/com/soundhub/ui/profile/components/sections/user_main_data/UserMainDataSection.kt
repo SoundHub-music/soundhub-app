@@ -27,24 +27,26 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.model.User
 import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
+import com.soundhub.utils.DateFormatter
 
 @Composable
 internal fun UserMainDataSection(profileOwner: User?) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
         UserNameWithDescription(profileOwner)
         OnlineStatusBlock(profileOwner)
         UserLocationText(profileOwner)
     }
 }
 
-// TODO: implement last online time
 @Composable
 private fun OnlineStatusBlock(profileOwner: User?) {
     val context: Context = LocalContext.current
 
     var indicatorColor: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
     var onlineIndicatorText: String by rememberSaveable {
-        mutableStateOf(context.getString(R.string.online_indicator_user_offline_with_time))
+        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
     }
 
     LaunchedEffect(key1 = profileOwner?.isOnline) {
@@ -53,8 +55,17 @@ private fun OnlineStatusBlock(profileOwner: User?) {
             onlineIndicatorText = context.getString(R.string.online_indicator_user_online)
         }
         else {
+            val lastOnlineText: String = profileOwner
+                ?.lastOnline?.let {
+                    DateFormatter.getRelativeDate(it).lowercase()
+            } ?: ""
+
             indicatorColor = R.color.offline_status
-            onlineIndicatorText = context.getString(R.string.online_indicator_user_offline_with_time)
+            onlineIndicatorText = if (lastOnlineText.isNotEmpty()) context.getString(
+                R.string.online_indicator_user_offline_with_time,
+                lastOnlineText
+            )
+            else context.getString(R.string.online_indicator_user_offline)
         }
     }
 

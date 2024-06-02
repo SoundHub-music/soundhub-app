@@ -28,7 +28,7 @@ internal fun ProfileButtonsSection(
     profileOwner: User?,
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
     val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
@@ -57,6 +57,7 @@ internal fun ProfileButtonsSection(
                 )
             else SendFriendRequestButton(
                 profileViewModel = profileViewModel,
+                uiStateDispatcher = uiStateDispatcher,
                 profileOwner = profileOwner
             )
         }

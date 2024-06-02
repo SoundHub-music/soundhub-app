@@ -15,7 +15,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
-import com.soundhub.utils.ContentTypes
+import com.soundhub.utils.enums.ContentTypes
 
 @Composable
 internal fun AvatarDropdownMenu(

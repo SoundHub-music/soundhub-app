@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
+import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -24,9 +25,10 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 fun DefaultTopAppBar(
     topBarTitle: String?,
     navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher
+    uiStateDispatcher: UiStateDispatcher,
+    notificationViewModel: NotificationViewModel
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState()
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val isSearchBarActive = uiState.isSearchBarActive
 
     TopAppBar(
@@ -46,7 +48,8 @@ fun DefaultTopAppBar(
         },
         actions = { TopBarActions(
             navController = navController,
-            uiStateDispatcher = uiStateDispatcher
+            uiStateDispatcher = uiStateDispatcher,
+            notificationViewModel = notificationViewModel
         ) }
     )
 }

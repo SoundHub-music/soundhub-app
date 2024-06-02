@@ -1,6 +1,5 @@
 package com.soundhub.ui.post_editor.components
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -31,7 +29,7 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.post_editor.PostEditorState
 import com.soundhub.ui.post_editor.PostEditorViewModel
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.MedialFolder
+import com.soundhub.utils.enums.MediaFolder
 
 @Composable
 internal fun ImagePreviewRow(
@@ -83,7 +81,7 @@ private fun ImageItem(
             )
         }
         GlideImage(
-            model = HttpUtils.prepareGlideUrl(userCreds, imageUri, MedialFolder.POST_PICTURE),
+            model = HttpUtils.prepareGlideUrl(userCreds, imageUri, MediaFolder.POST_PICTURE),
             contentDescription = imageUri,
             contentScale = ContentScale.Crop,
             modifier = Modifier

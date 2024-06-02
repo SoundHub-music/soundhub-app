@@ -41,13 +41,9 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
     private val uiStateDispatcher: UiStateDispatcher,
-    private val userDao: UserDao,
-    userCredsStore: UserCredsStore
+    private val webSocketClient: WebSocketClient,
+    private val userDao: UserDao
 ) : ViewModel() {
-
-    private lateinit var webSocketClient: WebSocketClient
-    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-
     private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
     val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
@@ -56,21 +52,14 @@ class ChatViewModel @Inject constructor(
         .registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
         .create()
 
-    init {
-        viewModelScope.launch {
-            initializeWebSocket(userCreds.firstOrNull()?.accessToken)
-        }
-    }
+    init { viewModelScope.launch { initializeWebSocket() } }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("ChatViewModel", "ViewModel was cleared")
     }
 
-    private suspend fun initializeWebSocket(accessToken: String?) {
-        webSocketClient = WebSocketClient(accessToken)
-        uiStateDispatcher.setWebSocketClient(webSocketClient)
-
+    private suspend fun initializeWebSocket() {
         val chatIdFlow: Flow<UUID?> = chatUiState.map { it.chat?.id }
 
         webSocketClient.apply {
@@ -91,6 +80,7 @@ class ChatViewModel @Inject constructor(
                 messageListener = ::onReadMessageListener,
                 errorListener = ::onSubscribeErrorListener
             )
+
             subscribe(
                 topic = WS_DELETE_MESSAGE_TOPIC,
                 messageListener = ::onDeleteMessageListener,
@@ -106,13 +96,11 @@ class ChatViewModel @Inject constructor(
     private fun onReceiveMessageListener(message: StompMessage) = viewModelScope.launch {
         try {
             Log.i("ChatViewModel", "Received message: $message")
-            val creds: UserPreferences? = userCreds.firstOrNull()
             val receivedMessageResponse: ReceivedMessageResponse = gson
                 .fromJson(message.payload, ReceivedMessageResponse::class.java)
 
             val receivedMessage = messageRepository.getMessageById(
-                accessToken = creds?.accessToken,
-                messageId = receivedMessageResponse.id
+                receivedMessageResponse.id
             ).getOrNull()
 
             receivedMessage?.let {
@@ -177,14 +165,11 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun getChatById(id: UUID): Flow<HttpResult<Chat?>> = flow {
-        userCreds.collect { creds ->
-            emit(chatRepository.getChatById(creds.accessToken, id))
-        }
+        emit(chatRepository.getChatById(id))
     }
 
     fun deleteChat(chatId: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        val creds = userCreds.firstOrNull()
-        chatRepository.deleteChatById(creds?.accessToken, chatId)
+        chatRepository.deleteChatById(chatId)
             .onSuccess  {
                 uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Messenger))
             }
@@ -241,5 +226,16 @@ class ChatViewModel @Inject constructor(
 
     private fun readMessage(message: Message) = webSocketClient.readMessage(message.id)
 
-    fun deleteMessage(message: Message) = webSocketClient.deleteMessage(message.id)
+    fun deleteMessage(message: Message, deleterId: UUID) = webSocketClient
+        .deleteMessage(
+            messageId = message.id,
+            deleterId = deleterId,
+            onComplete = {
+                _chatUiState.update {
+                    val chat: Chat? = it.chat?.copy()
+                    chat?.messages = chat?.messages.orEmpty().filter { msg -> msg.id != message.id }
+                    it.copy(chat = chat)
+                }
+            }
+        )
 }

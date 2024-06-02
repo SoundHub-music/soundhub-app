@@ -7,23 +7,8 @@ import com.soundhub.data.model.Chat
 import java.util.UUID
 
 interface ChatRepository {
-    suspend fun getAllChatsByUserId(
-        accessToken: String?,
-        userId: UUID
-    ): HttpResult<List<Chat>>
-
-    suspend fun getChatById(
-        accessToken: String?,
-        chatId: UUID
-    ): HttpResult<Chat?>
-
-    suspend fun deleteChatById(
-        accessToken: String?,
-        chatId: UUID
-    ): HttpResult<ApiStateResponse>
-
-    suspend fun createChat(
-        accessToken: String?,
-        body: CreateChatRequestBody
-    ): HttpResult<Chat>
+    suspend fun getAllChatsByUserId(userId: UUID): HttpResult<List<Chat>>
+    suspend fun getChatById(chatId: UUID): HttpResult<Chat?>
+    suspend fun deleteChatById(chatId: UUID): HttpResult<ApiStateResponse>
+    suspend fun createChat(body: CreateChatRequestBody): HttpResult<Chat>
 }

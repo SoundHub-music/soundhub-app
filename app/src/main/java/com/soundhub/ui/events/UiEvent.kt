@@ -10,7 +10,6 @@ sealed class UiEvent {
     data object SearchButtonClick: UiEvent()
     data class Navigate(val route: Route): UiEvent()
     data class ShowToast(val uiText: UiText): UiEvent()
-    data object UpdateUserAction: UiEvent()
     data class Error(
         val response: ErrorResponse,
         val throwable: Throwable? = null,

@@ -8,13 +8,11 @@ class GetImageUseCase @Inject constructor(
     private val fileRepository: FileRepository
 ) {
     suspend operator fun invoke(
-        accessToken: String?,
         fileName: String?,
         folderName: String
     ): File? {
         var file: File? = null
         fileRepository.getFile(
-            accessToken = accessToken,
             fileNameUrl = fileName,
             folderName = folderName
         )

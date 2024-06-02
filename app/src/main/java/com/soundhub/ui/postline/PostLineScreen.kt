@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +49,10 @@ fun PostLineScreen(
     var isLoading: Boolean by rememberSaveable { mutableStateOf(true) }
     var messageScreenText: String by rememberSaveable { mutableStateOf("") }
 
+    LaunchedEffect(key1 = true) {
+        postLineViewModel.loadPosts()
+    }
+
     LaunchedEffect(key1 = fetchStatus) {
         isError = fetchStatus == ApiStatus.ERROR
         isLoading = fetchStatus == ApiStatus.LOADING
@@ -66,14 +71,15 @@ fun PostLineScreen(
             Text(
                 text = messageScreenText,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
         else {
             LazyColumn(
                 modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(items = posts, key = { it.id }) { post ->
+                items(items = posts) { post ->
                     PostCard(
                         navController = navController,
                         post = post,

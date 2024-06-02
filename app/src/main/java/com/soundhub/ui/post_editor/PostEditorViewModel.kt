@@ -3,12 +3,11 @@ package com.soundhub.ui.post_editor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import com.soundhub.utils.mappers.PostMapper
@@ -46,12 +45,8 @@ class PostEditorViewModel @Inject constructor(
     }
 
     suspend fun loadPost(postId: UUID) {
-        val creds: UserPreferences? = userCreds.firstOrNull()
-
-        postRepository.getPostById(
-            accessToken = creds?.accessToken,
-            postId = postId
-        ).onSuccess { response ->
+        postRepository.getPostById(postId)
+            .onSuccess { response ->
             val post: Post? = response.body
             post?.let {
                 val newState: PostEditorState = PostMapper.impl
@@ -102,7 +97,6 @@ class PostEditorViewModel @Inject constructor(
     }
 
     suspend fun createPost(author: User?) {
-        val creds: UserPreferences? = userCreds.firstOrNull()
         var toastText: UiText = UiText.StringResource(R.string.toast_post_created_successfully)
         val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
             .apply {
@@ -110,10 +104,8 @@ class PostEditorViewModel @Inject constructor(
                 this.publishDate = LocalDateTime.now()
             }
 
-        postRepository.addPost(
-            post = post,
-            accessToken = creds?.accessToken
-        ).onSuccess {
+        postRepository.addPost(post)
+            .onSuccess {
             with(uiStateDispatcher) {
                 sendUiEvent(UiEvent.ShowToast(toastText))
                 sendUiEvent(UiEvent.PopBackStack)
@@ -128,12 +120,10 @@ class PostEditorViewModel @Inject constructor(
     }
 
     suspend fun updatePost() {
-        val creds: UserPreferences? = userCreds.firstOrNull()
         val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
         var toastText: UiText
 
         postRepository.updatePost(
-            accessToken = creds?.accessToken,
             postId = post.id,
             post = post,
             newImages = _postEditorState.value.newImages,

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
@@ -53,7 +54,7 @@ internal fun FriendRequestNotification(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 CircularAvatar(
-                    imageUrl = invite.sender.avatarUrl,
+                    imageUrl = invite.sender.avatarUrl?.toUri(),
                     modifier = Modifier.size(48.dp)
                 )
                 Text(
