@@ -8,17 +8,14 @@
 ```properties
 DISCOGS_KEY="Discogs key"
 DISCOGS_SECRET="Discogs secret"
-
+SOUNDHUB_API_HOSTNAME="your-host-address" // for example: https://example.com
 LAST_FM_API_KEY="last fm api key"
 LAST_FM_SHARED_SECRET="last fm shared secret"
 ```
-Также в файле `src/utils/constants/Constants.kt` указать адрес сервера приложения
-```kotlin
-object Constants {
-    //...
-    const val SOUNDHUB_API_HOSTNAME="real-server-host"
-    const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
-}
+
+ Также необходимо создать в корне проекта файл `gradle.properties` и установить свойство:
+```properties
+android.useAndroidX=true
 ```
 
 Все необходимые [Discogs](https://www.discogs.com/ru/applications/edit) и [Last.FM](https://www.last.fm/api/accounts?suspend=1) ключи можно получить при регистрации приложения API

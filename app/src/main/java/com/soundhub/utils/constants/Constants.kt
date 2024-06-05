@@ -120,7 +120,7 @@ object Constants {
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
+    const val SOUNDHUB_API = "${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 

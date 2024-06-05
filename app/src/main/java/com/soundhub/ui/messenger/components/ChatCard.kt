@@ -90,9 +90,7 @@ private fun ChatDetails(
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
-    var interlocutor: User? by rememberSaveable {
-        mutableStateOf(null)
-    }
+    var interlocutor: User? by remember { mutableStateOf(null) }
 
     val messengerUiState: MessengerUiState by messengerViewModel.messengerUiState.collectAsState()
     val messages: List<Message> = chat?.messages.orEmpty().sortedBy { it.timestamp }
