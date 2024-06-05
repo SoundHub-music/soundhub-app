@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.Chat
+import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.messenger.EmptyMessengerScreen
 import com.soundhub.ui.messenger.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun MessengerChatList(
@@ -41,8 +43,9 @@ internal fun MessengerChatList(
     val chats: List<Chat> = messengerUiState.chats
     val searchBarText: String = uiState.searchBarText
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
+    val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = messageChannel) {
         messengerViewModel.loadChats()
     }
 

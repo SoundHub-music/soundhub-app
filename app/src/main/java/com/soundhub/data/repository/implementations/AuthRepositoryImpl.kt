@@ -99,9 +99,15 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(authorizedUser: User?): HttpResult<LogoutResponse> {
+    override suspend fun logout(
+        authorizedUser: User?,
+        accessToken: String?
+    ): HttpResult<LogoutResponse> {
         try {
-            val logoutResponse: Response<LogoutResponse> = authService.logout()
+            val logoutResponse: Response<LogoutResponse> = authService.logout(
+                HttpUtils.getBearerToken(accessToken)
+            )
+
             Log.d("AuthRepository", "logout[1]: $logoutResponse")
 
             if (!logoutResponse.isSuccessful) {

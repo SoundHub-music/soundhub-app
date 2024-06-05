@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,15 +27,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
 import com.soundhub.utils.DateFormatter
 
 @Composable
-internal fun UserMainDataSection(profileOwner: User?) {
+internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        UserNameWithDescription(profileOwner)
+        UserNameWithDescription(profileViewModel)
         OnlineStatusBlock(profileOwner)
         UserLocationText(profileOwner)
     }

@@ -112,7 +112,7 @@ class ProfileViewModel @Inject constructor(
             }
     }
 
-    fun sendInviteToFriends(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+    fun sendInviteToFriend(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
         val showToastEvent: UiEvent = UiEvent.ShowToast(text)
 
@@ -151,8 +151,8 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = userDao.getCurrentUser()
+    fun loadProfileOwner(id: UUID) = viewModelScope.launch {
+        val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
         val profileOwner: User? = if (authorizedUser?.id == id)
             authorizedUser
         else getUserByIdUseCase(id)
@@ -163,12 +163,15 @@ class ProfileViewModel @Inject constructor(
     private fun setProfileOwner(
         profileOwner: User?,
         authorizedUser: User?
-    ) = viewModelScope.launch(Dispatchers.IO) {
-        val isFriend: Boolean = authorizedUser
-            ?.friends?.any { it.id == profileOwner?.id } == true
+    ) {
+        if (profileOwner?.id == null || authorizedUser?.id == null)
+            return
 
-        _profileUiState.update {
-            it.copy(
+        val isFriend: Boolean = authorizedUser
+            .friends.any { it.id == profileOwner.id }
+
+        _profileUiState.update { state ->
+            state.copy(
                 isUserAFriendToAuthorizedUser = isFriend,
                 profileOwner = profileOwner
             )
@@ -177,7 +180,10 @@ class ProfileViewModel @Inject constructor(
 
     fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
         val ( profileOwner: User? ) = _profileUiState.value
-        _profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+        val posts: List<Post> = _profileUiState.value.userPosts
+
+        if (posts.isEmpty())
+            _profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
 
         profileOwner?.let {
             when (val result = getPostsByUserUseCase(profileOwner)) {

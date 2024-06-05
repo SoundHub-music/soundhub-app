@@ -39,7 +39,7 @@ fun FriendsScreen(
 
     val searchBarText: String = uiState.searchBarText
 
-    LaunchedEffect(key1 = authorizedUser) {
+    LaunchedEffect(key1 = true) {
         friendsViewModel.loadRecommendedFriends()
     }
 
@@ -64,7 +64,6 @@ fun FriendsScreen(
            selectedTabState = selectedTabState,
            tabs = tabState
        )
-
        FriendsScreenPager(
            selectedTabState = selectedTabState,
            navController = navController,

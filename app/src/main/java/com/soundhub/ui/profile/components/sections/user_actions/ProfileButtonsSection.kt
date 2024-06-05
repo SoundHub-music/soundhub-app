@@ -25,11 +25,11 @@ internal fun ProfileButtonsSection(
     profileViewModel: ProfileViewModel,
     uiStateDispatcher: UiStateDispatcher,
     isOriginProfile: Boolean,
-    profileOwner: User?,
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
+    val profileOwner: User? = profileUiState.profileOwner
 
     val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
 

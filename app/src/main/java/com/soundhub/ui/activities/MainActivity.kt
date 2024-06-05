@@ -43,6 +43,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.NavigationUtils
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -185,16 +186,13 @@ class MainActivity : ComponentActivity() {
             is UiEvent.PopBackStack -> navController.popBackStack()
             is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
             is UiEvent.Error -> {
-                if (event.response.status == Constants.UNAUTHORIZED_USER_ERROR_CODE)
-                    authViewModel.tryRefreshToken()
-                else {
-                    val message: String = event.response.detail
-                        ?: event.throwable?.localizedMessage
-                        ?: event.customMessageStringRes?.let { getString(it) }
-                        ?: getString(R.string.toast_common_error)
+                val message: String = event.response.detail
+                    ?: event.throwable?.localizedMessage
+                    ?: event.customMessageStringRes?.let { getString(it) }
+                    ?: getString(R.string.toast_common_error)
 
+                if (event.throwable !is CancellationException)
                     Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
-                }
             }
         }
     }

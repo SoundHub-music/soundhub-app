@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
+import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.favorite_genres.FavoriteGenresSection
 import com.soundhub.ui.profile.components.sections.friend_list.FriendMiniatureSection
@@ -32,20 +33,23 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun UserProfileContainer(
-    profileOwner: User?,
     navController: NavHostController,
     uiStateDispatcher: UiStateDispatcher,
     profileViewModel: ProfileViewModel
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+
     val authorizedUser: User? = uiState.authorizedUser
+    val profileOwner: User? = profileUiState.profileOwner
     var isOriginProfile: Boolean by rememberSaveable {
         mutableStateOf(authorizedUser?.id == profileOwner?.id)
     }
 
     LaunchedEffect(key1 = authorizedUser, key2 = profileOwner) {
         isOriginProfile = authorizedUser?.id == profileOwner?.id
-        Log.d("UserProfileContainer", "authorized user: $authorizedUser")
     }
 
     Box(
@@ -61,19 +65,18 @@ fun UserProfileContainer(
                 .padding(start = 16.dp, end = 16.dp, top = 30.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            item { UserMainDataSection(profileOwner) }
+            item { UserMainDataSection(profileViewModel) }
             item {
                 ProfileButtonsSection(
                     profileViewModel = profileViewModel,
                     uiStateDispatcher = uiStateDispatcher,
                     isOriginProfile = isOriginProfile,
                     navController = navController,
-                    profileOwner = profileOwner
                 )
             }
             item {
                 FriendMiniatureSection(
-                    profileOwner = profileOwner,
+                    profileViewModel = profileViewModel,
                     navController = navController
                 )
             }

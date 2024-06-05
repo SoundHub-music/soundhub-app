@@ -13,7 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -29,13 +29,14 @@ import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
 import com.soundhub.ui.states.UserFormState
 import com.soundhub.utils.constants.Constants
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun UserDataForm(
     modifier: Modifier = Modifier,
-    formState: State<IUserDataFormState>,
+    formStateFlow: MutableStateFlow<IUserDataFormState>,
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onBirthdayChange: (LocalDate?) -> Unit = {},
@@ -48,6 +49,7 @@ fun UserDataForm(
 ) {
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
+    val formState = formStateFlow.collectAsState()
 
     LaunchedEffect(formState.value) {
         Log.d("UserDataForm", formState.value.toString())
@@ -69,7 +71,7 @@ fun UserDataForm(
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = formState.value.firstName ?: "",
+            value = formState.value.firstName,
             onValueChange = onFirstNameChange,
             singleLine = true,
             label = { Text(text = stringResource(id = R.string.text_field_name_label)) },
@@ -82,7 +84,7 @@ fun UserDataForm(
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = formState.value.lastName ?: "",
+            value = formState.value.lastName,
             onValueChange = onLastNameChange,
             singleLine = true,
             label = { Text(stringResource(id = R.string.text_field_last_name_label)) },
@@ -117,20 +119,22 @@ fun UserDataForm(
             onLanguagesChange = onLanguagesChange
         )
 
-        DatePicker(
-            modifier = Modifier.fillMaxWidth(),
-            value = formState.value.birthday?.toString() ?: "",
-            label = stringResource(id = R.string.text_field_birthdate),
-            onValueChange = { value ->
-                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
-                onBirthdayChange(date)
-            },
-            isError = !formState.value.isBirthdayValid,
-            supportingText = {
-                if (!formState.value.isBirthdayValid)
-                    Text(text = stringResource(id = R.string.user_form_birthday_error_message))
-            }
-        )
+        formState.value.birthday?.let {
+            DatePicker(
+                modifier = Modifier.fillMaxWidth(),
+                value = formState.value.birthday.toString(),
+                label = stringResource(id = R.string.text_field_birthdate),
+                onValueChange = { value ->
+                    val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
+                    onBirthdayChange(date)
+                },
+                isError = !formState.value.isBirthdayValid,
+                supportingText = {
+                    if (!formState.value.isBirthdayValid)
+                        Text(text = stringResource(id = R.string.user_form_birthday_error_message))
+                }
+            )
+        }
 
         OutlinedTextField(
             modifier = Modifier

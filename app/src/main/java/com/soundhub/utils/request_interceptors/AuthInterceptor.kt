@@ -7,6 +7,7 @@ import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response as HttpResponse
 
 class AuthInterceptor(
@@ -16,10 +17,13 @@ class AuthInterceptor(
         val tokens: UserPreferences? = runBlocking { userCredsStore.getCreds().firstOrNull() }
         val bearerToken: String = HttpUtils.getBearerToken(tokens?.accessToken)
 
-        val request = chain.request()
-            .newBuilder()
-            .addHeader(AUTHORIZATION_HEADER, bearerToken)
-            .build()
+        val request: Request = chain.request()
+
+        if (!request.headers.names().contains(AUTHORIZATION_HEADER) && tokens?.accessToken != null)
+            return chain.proceed(chain.request()
+                .newBuilder()
+                .addHeader(AUTHORIZATION_HEADER, bearerToken)
+                .build())
 
         return chain.proceed(request)
     }

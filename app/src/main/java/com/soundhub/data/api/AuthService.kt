@@ -8,10 +8,12 @@ import com.soundhub.utils.ApiEndpoints.Authentication.LOGOUT
 import com.soundhub.utils.ApiEndpoints.Authentication.REFRESH_TOKEN
 import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_IN
 import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_UP
+import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -30,7 +32,10 @@ interface AuthService {
     ): Response<UserPreferences>
 
     @POST(LOGOUT)
-    suspend fun logout(): Response<LogoutResponse>
+    suspend fun logout(
+        @Header(AUTHORIZATION_HEADER)
+        accessToken: String?
+    ): Response<LogoutResponse>
 
     @POST(REFRESH_TOKEN)
     suspend fun refreshToken(

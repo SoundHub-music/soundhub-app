@@ -18,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +36,7 @@ class MessengerViewModel @Inject constructor(
     val messengerUiState = _messengerUiState.asStateFlow()
 
     init {
-        viewModelScope.launch { loadChats() }
+        viewModelScope.launch(Dispatchers.IO) { loadChats() }
     }
 
     override fun onCleared() {
@@ -46,12 +48,26 @@ class MessengerViewModel @Inject constructor(
     fun updateUnreadMessageCount(cachedChatList: List<Chat> = emptyList()) = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         val chats = cachedChatList.ifEmpty { getChats().firstOrNull().orEmpty() }
-        val unreadMessageCount = chats.flatMap { it.messages }
-            .count { !it.isRead && it.sender?.id != authorizedUser?.id }
+        val unreadMessageCount = chats.count {
+            chat -> chat.messages.any {
+                m -> !m.isRead && m.sender?.id != authorizedUser?.id
+            }
+        }
 
         _messengerUiState.update {
             it.copy(unreadMessagesCount = unreadMessageCount)
         }
+    }
+
+    fun getUnreadMessageCountByChatId(chatId: UUID?): UInt {
+        val authorizedUser: User? = runBlocking { userDao.getCurrentUser() }
+        val ( chats: List<Chat> ) = _messengerUiState.value
+
+        return chats.find { chat -> chat.id == chatId}
+            ?.messages
+            ?.count { message ->
+                !message.isRead && message.sender?.id != authorizedUser?.id
+            }?.toUInt() ?: 0u
     }
 
     fun filterChats(chats: List<Chat>, searchBarText: String, authorizedUser: User?): List<Chat> {

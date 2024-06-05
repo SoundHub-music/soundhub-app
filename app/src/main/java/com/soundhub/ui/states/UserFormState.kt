@@ -7,16 +7,16 @@ import java.util.UUID
 
 data class UserFormState(
     override var id: UUID = UUID.randomUUID(),
-    override var firstName: String? = "",
-    override var lastName: String? = "",
+    override var firstName: String = "",
+    override var lastName: String = "",
     override var gender: Gender = Gender.UNKNOWN,
     override var country: String? = null,
     override var birthday: LocalDate? = null,
     override var city: String? = null,
     override var description: String? = "",
     override var avatarUrl: String? = null,
-    override var languages: List<String> = emptyList(),
-    var email: String? = "",
+    override var languages: MutableList<String> = mutableListOf(),
+    var email: String = "",
 
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,

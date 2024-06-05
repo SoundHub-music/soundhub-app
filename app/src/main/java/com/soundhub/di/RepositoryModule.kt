@@ -59,7 +59,6 @@ object RepositoryModule {
         context = context
     )
 
-
     @Provides
     @Singleton
     fun providesUserRepository(
@@ -75,8 +74,8 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providesPostRepository(
-        postService: PostService,
         @ApplicationContext context: Context,
+        postService: PostService,
         loadAllUserDataUseCase: LoadAllUserDataUseCase
     ): PostRepository = PostRepositoryImpl(
         postService = postService,

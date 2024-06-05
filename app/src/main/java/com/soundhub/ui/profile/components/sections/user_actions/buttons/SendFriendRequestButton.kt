@@ -77,7 +77,7 @@ private fun onSendRequestButtonClick(
     if (isRequestSent)
         profileViewModel.deleteInviteToFriends()
     else
-        profileViewModel.sendInviteToFriends(recipientId = user.id)
+        profileViewModel.sendInviteToFriend(recipientId = user.id)
 }
 
 private fun getSendRequestBtnIconRes(isRequestSent: Boolean): Int =

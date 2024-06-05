@@ -10,6 +10,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,12 +24,19 @@ import com.soundhub.R
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.Route
 import com.soundhub.data.model.User
+import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.ui.profile.ProfileViewModel
 
 @Composable
 fun FriendMiniatureSection(
-    profileOwner: User?,
+    profileViewModel: ProfileViewModel,
     navController: NavHostController
 ) {
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+
+    val profileOwner: User? = profileUiState.profileOwner
     val friendList: List<User> = profileOwner?.friends.orEmpty()
 
     ElevatedCard(

@@ -28,8 +28,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.components.forms.IUserDataFormState
 import com.soundhub.ui.components.forms.UserDataForm
 import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun EditUserProfileScreen(
@@ -37,7 +39,7 @@ fun EditUserProfileScreen(
     editUserProfileViewModel: EditUserProfileViewModel = hiltViewModel(),
     navController: NavHostController,
 ) {
-    val formState = editUserProfileViewModel.formState.collectAsState()
+    val formState = editUserProfileViewModel.formState
     var isLoading by rememberSaveable { mutableStateOf(true) }
     val isDialogOpened: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 
@@ -57,7 +59,7 @@ fun EditUserProfileScreen(
         if (!isLoading)
             UserDataForm(
                 modifier = Modifier.padding(it),
-                formState = formState,
+                formStateFlow = formState as MutableStateFlow<IUserDataFormState>,
                 onFirstNameChange = editUserProfileViewModel::setFirstName,
                 onLastNameChange = editUserProfileViewModel::setLastName,
                 onBirthdayChange = editUserProfileViewModel::setBirthday,

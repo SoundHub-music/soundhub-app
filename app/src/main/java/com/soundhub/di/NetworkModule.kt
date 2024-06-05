@@ -3,7 +3,15 @@ package com.soundhub.di
 import android.content.Context
 import com.google.gson.GsonBuilder
 import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.AUTHORIZED_HTTP_CLIENT
+import com.soundhub.utils.constants.Constants.AUTHORIZED_SOUNDHUB_API_RETROFIT
+import com.soundhub.utils.constants.Constants.COUNTRIES_API_RETROFIT
+import com.soundhub.utils.constants.Constants.LAST_FM_API_RETROFIT
+import com.soundhub.utils.constants.Constants.MUSIC_API_RETROFIT
+import com.soundhub.utils.constants.Constants.UNATHORIZED_HTTP_CLIENT
+import com.soundhub.utils.constants.Constants.UNAUTHORIZED_SOUNDHUB_API_RETROFIT
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.request_interceptors.AuthInterceptor
@@ -38,12 +46,14 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesHttpAuthenticator(
-        userCredsStore: UserCredsStore
-    ): HttpAuthenticator = HttpAuthenticator(userCredsStore)
+        userCredsStore: UserCredsStore,
+        uiStateDispatcher: UiStateDispatcher
+    ): HttpAuthenticator = HttpAuthenticator(userCredsStore, uiStateDispatcher)
 
 
     @Provides
     @Singleton
+    @Named(AUTHORIZED_HTTP_CLIENT)
     fun providesOkHttpClient(
         @ApplicationContext context: Context,
         authInterceptor: AuthInterceptor,
@@ -63,7 +73,7 @@ object NetworkModule {
             .addNetworkInterceptor(CacheInterceptor())
             .authenticator(authenticator)
             .followRedirects(false)
-            .followSslRedirects(true)
+            .followSslRedirects(false)
             .retryOnConnectionFailure(true)
             .connectTimeout(30, TimeUnit.SECONDS)
             .cache(cache)
@@ -72,8 +82,36 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named(Constants.SOUNDHUB_API_RETROFIT)
-    fun providesSoundHubApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named(UNATHORIZED_HTTP_CLIENT)
+    fun providesUnauthorizedOkHttpClient(
+        @ApplicationContext context: Context
+    ): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        val cacheSize: Long = 10 * 1024 * 1024 // 10 MB
+        val cacheDirectory = File(context.cacheDir, "http-cache")
+        val cache = Cache(cacheDirectory, cacheSize)
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(ForceCacheInterceptor(context))
+            .addNetworkInterceptor(CacheInterceptor())
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .retryOnConnectionFailure(true)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .cache(cache)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named(AUTHORIZED_SOUNDHUB_API_RETROFIT)
+    fun providesSoundHubApiRetrofit(
+        @Named(AUTHORIZED_HTTP_CLIENT)
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         val gson = GsonBuilder()
             .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
@@ -88,8 +126,30 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named(Constants.COUNTRIES_API_RETROFIT)
-    fun providesCountryApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named(UNAUTHORIZED_SOUNDHUB_API_RETROFIT)
+    fun providesUnauthorizedSoundHubApiRetrofit(
+        @Named(UNATHORIZED_HTTP_CLIENT)
+        okHttpClient: OkHttpClient
+    ): Retrofit {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+            .create()
+
+        return Retrofit.Builder()
+            .baseUrl(Constants.SOUNDHUB_API)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named(COUNTRIES_API_RETROFIT)
+    fun providesCountryApiRetrofit(
+        @Named(UNATHORIZED_HTTP_CLIENT)
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.COUNTRIES_API)
             .client(okHttpClient)
@@ -99,8 +159,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named(Constants.MUSIC_API_RETROFIT)
-    fun providesMusicApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named(MUSIC_API_RETROFIT)
+    fun providesMusicApiRetrofit(
+        @Named(UNATHORIZED_HTTP_CLIENT)
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.DISCOGS_API)
             .client(okHttpClient)
@@ -110,8 +173,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named(Constants.LAST_FM_API_RETROFIT)
-    fun providesLastFmRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named(LAST_FM_API_RETROFIT)
+    fun providesLastFmRetrofit(
+        @Named(UNATHORIZED_HTTP_CLIENT)
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Constants.LAST_FM_API)
             .client(okHttpClient)

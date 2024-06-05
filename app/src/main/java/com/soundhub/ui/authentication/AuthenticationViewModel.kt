@@ -67,7 +67,7 @@ class AuthenticationViewModel @Inject constructor(
         val authorizedUser: User? = userDao.getCurrentUser()
 
         authRepository
-            .logout(authorizedUser)
+            .logout(authorizedUser, userCreds.firstOrNull()?.accessToken)
             .onFailure { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
                     response = error.errorBody,
@@ -93,10 +93,9 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     private suspend fun getCurrentUser(): Flow<User?> = flow {
-        var authorizedUser: User? = null
-        userRepository.getCurrentUser()
-            .onSuccess { authorizedUser = it.body }
-            .onFailure { tryRefreshToken() }
+        val authorizedUser: User? = userRepository
+            .getCurrentUser()
+            .onSuccessReturn()
 
         emit(authorizedUser)
     }
@@ -172,7 +171,7 @@ class AuthenticationViewModel @Inject constructor(
                     "user will be ${if (setOnline) "online" else "offline"} in ${delayTime / 1000} seconds"
         )
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             delay(delayTime)
             userDao.getCurrentUser()?.let { user ->
                 if (setOnline != user.isOnline) {

@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,15 +16,16 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
-import com.soundhub.ui.authentication.registration.states.RegistrationState
+import com.soundhub.ui.components.forms.IUserDataFormState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun FillUserDataScreen(
     modifier: Modifier = Modifier,
     registrationViewModel: RegistrationViewModel
 ) {
-    val registerState: State<RegistrationState> = registrationViewModel
-        .registerState.collectAsState()
+    val registerState = registrationViewModel
+        .registerState
 
     Box(
         modifier = modifier
@@ -44,7 +43,7 @@ fun FillUserDataScreen(
            )
 
             UserDataForm(
-                formState = registerState,
+                formStateFlow = registerState as MutableStateFlow<IUserDataFormState>,
                 onFirstNameChange = registrationViewModel::setFirstName,
                 onLastNameChange = registrationViewModel::setLastName,
                 onBirthdayChange = registrationViewModel::setBirthday,

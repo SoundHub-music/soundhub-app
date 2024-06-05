@@ -90,8 +90,8 @@ private fun ChatDetails(
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
-    val interlocutor: User? by remember {
-        mutableStateOf(chat?.participants?.firstOrNull { it.id != authorizedUser?.id })
+    var interlocutor: User? by rememberSaveable {
+        mutableStateOf(null)
     }
 
     val messengerUiState: MessengerUiState by messengerViewModel.messengerUiState.collectAsState()
@@ -104,12 +104,17 @@ private fun ChatDetails(
     val lastMessageColor: Color = MaterialTheme.colorScheme.primary
     val lastMessageModifier = remember(hasUnreadMessages) {
         if (hasUnreadMessages) {
-            Modifier.background(
+            Modifier
+                .background(
                     color = lastMessageColor,
                     shape = RoundedCornerShape(16.dp)
                 )
                 .padding(vertical = 2.dp, horizontal = 6.dp)
         } else Modifier
+    }
+
+    LaunchedEffect(key1 = authorizedUser, key2 = chat) {
+        interlocutor = chat?.participants?.find { it.id != authorizedUser?.id }
     }
 
     LaunchedEffect(messages) {
@@ -123,7 +128,7 @@ private fun ChatDetails(
         badge = {
             if (hasUnreadMessages) {
                 Badge(modifier = Modifier.offset(x = (-35).dp)) {
-                    Text(text = unreadMessageCount.toString())
+                    Text(text = messengerViewModel.getUnreadMessageCountByChatId(chat?.id).toString())
                 }
             }
         }

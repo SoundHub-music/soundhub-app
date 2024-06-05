@@ -31,6 +31,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.model.User
+import com.soundhub.ui.messenger.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -45,14 +46,12 @@ fun BottomNavigationBar(
     val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
-    val defaultSelectedItem = uiState.currentRoute ?: Route.PostLine.route
-    val selectedItemState: MutableState<String> = remember { mutableStateOf(defaultSelectedItem) }
-
-    val messengerUiState by messengerViewModel.messengerUiState.collectAsState()
+    val defaultSelectedItem: String = uiState.currentRoute ?: Route.PostLine.route
+    val selectedItemState: MutableState<String?> = remember { mutableStateOf(defaultSelectedItem) }
     val receivedMessageChannel = uiStateDispatcher.receivedMessages
 
     LaunchedEffect(key1 = true) {
-        receivedMessageChannel.collect { msg ->
+        receivedMessageChannel.collect { _ ->
             messengerViewModel.updateUnreadMessageCount()
         }
     }
@@ -62,8 +61,8 @@ fun BottomNavigationBar(
     LaunchedEffect(key1 = selectedItemState.value) {
         val stringNavBarItems: List<String> = navBarItems.map { it.route }
         if (selectedItemState.value !in stringNavBarItems)
-            selectedItemState.value = Route.PostLine.route
-        Log.d("BottomNavigationBar", selectedItemState.value)
+            selectedItemState.value = null
+        Log.d("BottomNavigationBar", "selected page: ${selectedItemState.value}")
     }
 
     NavigationBar(
@@ -82,22 +81,38 @@ fun BottomNavigationBar(
             Log.d("BottomNavigationBar", "menuItem: $menuItem")
             NavigationBarItem(
                 icon = {
-                    BadgedBox(
-                        badge = {
-                            if (messengerUiState.unreadMessagesCount > 0 && menuItem.route == Route.Messenger.route)
-                                Badge { Text(text = messengerUiState.unreadMessagesCount.toString()) }
-                        }
-                    ) { Icon(menuItem.icon, contentDescription = menuItem.route) }
+                    NavBarItemBadgeBox(
+                        messengerViewModel = messengerViewModel,
+                        menuItem = menuItem
+                    )
                 },
                 selected = selectedItemState.value == menuItem.route,
-                onClick = { onMenuItemClick(selectedItemState, menuItem, navController) }
+                onClick = { onMenuItemClick(selectedItemState, menuItem, navController)
+                }
             )
         }
     }
 }
 
+@Composable
+private fun NavBarItemBadgeBox(
+    messengerViewModel: MessengerViewModel,
+    menuItem: NavBarItem
+) {
+    val messengerUiState: MessengerUiState by messengerViewModel
+        .messengerUiState
+        .collectAsState()
+
+    BadgedBox(
+        badge = {
+            if (messengerUiState.unreadMessagesCount > 0 && menuItem.route == Route.Messenger.route)
+                Badge { Text(text = messengerUiState.unreadMessagesCount.toString()) }
+        }
+    ) { Icon(menuItem.icon, contentDescription = menuItem.route) }
+}
+
 private fun onMenuItemClick(
-    selectedItemState: MutableState<String>,
+    selectedItemState: MutableState<String?>,
     menuItem: NavBarItem,
     navController: NavController
 ) {
@@ -129,17 +144,13 @@ private fun getNavBarItems(userId: UUID?): List<NavBarItem> {
         NavBarItem(
             route = Route.Messenger.route,
             icon = Icons.Rounded.Email
+        ),
+        NavBarItem(
+            route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
+            icon = Icons.Rounded.AccountCircle
         )
     )
 
-    userId?.let {
-        navBarButtons.add(
-            NavBarItem(
-                route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
-                icon = Icons.Rounded.AccountCircle
-            )
-        )
-    }
 
     return navBarButtons
 }

@@ -11,6 +11,9 @@ import com.soundhub.data.model.User
 interface AuthRepository {
     suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?>
     suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences?>
-    suspend fun logout(authorizedUser: User?): HttpResult<LogoutResponse>
+    suspend fun logout(
+        authorizedUser: User?,
+        accessToken: String?
+    ): HttpResult<LogoutResponse>
     suspend fun refreshToken(body: RefreshTokenRequestBody): HttpResult<UserPreferences?>
 }

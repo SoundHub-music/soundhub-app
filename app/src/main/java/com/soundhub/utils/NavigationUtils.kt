@@ -30,7 +30,7 @@ class NavigationUtils {
                 controller = controller
             )
 
-            setCurrentRouteState(
+            updateCurrentRouteState(
                 appBundleState = navArguments,
                 uiStateDispatcher = uiStateDispatcher,
                 route = route
@@ -52,7 +52,7 @@ class NavigationUtils {
                 controller.navigate(Route.PostLine.route)
         }
 
-        private fun setCurrentRouteState(
+        private fun updateCurrentRouteState(
             appBundleState: Bundle?,
             route: String?,
             uiStateDispatcher: UiStateDispatcher

@@ -6,15 +6,15 @@ import java.util.UUID
 
 interface IUserDataFormState {
     var id: UUID
-    var firstName: String?
-    var lastName: String?
+    var firstName: String
+    var lastName: String
     var gender: Gender
     var country: String?
     var birthday: LocalDate?
     var city: String?
     var description: String?
     var avatarUrl: String?
-    var languages: List<String>
+    var languages: MutableList<String>
 
     var isFirstNameValid: Boolean
     var isLastNameValid: Boolean

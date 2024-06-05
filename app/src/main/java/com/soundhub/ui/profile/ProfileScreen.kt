@@ -6,12 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -28,13 +24,8 @@ fun ProfileScreen(
 ) {
     val profileUiState by profileViewModel.profileUiState.collectAsState()
     val profileOwner: User? = profileUiState.profileOwner
-    var isLoading: Boolean by rememberSaveable { mutableStateOf(true) }
 
-    LaunchedEffect(key1 = profileOwner) {
-        profileOwner?.let { isLoading = false }
-    }
-
-    if (!isLoading) Column(
+    Column(
         modifier = Modifier
             .fillMaxHeight()
             .background(MaterialTheme.colorScheme.background),
@@ -49,7 +40,6 @@ fun ProfileScreen(
         )
 
         UserProfileContainer(
-            profileOwner = profileOwner,
             navController = navController,
             uiStateDispatcher = uiStateDispatcher,
             profileViewModel = profileViewModel

@@ -10,11 +10,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.soundhub.R
 import com.soundhub.data.api.responses.ReceivedMessageResponse
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
+import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.websocket.WebSocketClient
@@ -22,6 +24,8 @@ import com.soundhub.ui.activities.MainActivity
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.ApiEndpoints
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.converters.json.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.StompMessage
+import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,7 +78,7 @@ class MessengerAndroidService: Service() {
         return null
     }
 
-    private suspend fun subscribeToAllChats() {
+    private suspend fun subscribeToAllChats() = coroutineScope.launch {
         userDao.getCurrentUser()?.let { user ->
             val chats: List<Chat> = chatRepository.getAllChatsByUserId(
                 userId = user.id

@@ -38,13 +38,19 @@ class EditUserProfileViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        authorizedUser.update { null }
+    }
+
     fun hasStateChanges(): Boolean = authorizedUser.value?.let { user ->
         val mappedUser = UserMapper.impl.mergeUserWithFormState(formState.value, user.copy())
         mappedUser != authorizedUser.value
     } ?: false
 
     private fun updateFormStateFromUser(user: User) = formState.update {
-        UserMapper.impl.toFormState(user.copy())
+        val formState = UserMapper.impl.toFormState(user.copy())
+        formState.copy(languages = formState.languages.filter { it.isNotEmpty() }.toMutableList())
     }
 
     fun updateUser() = viewModelScope.launch(Dispatchers.IO) {
@@ -53,7 +59,10 @@ class EditUserProfileViewModel @Inject constructor(
             UserMapper.impl.mergeUserWithFormState(formState.value, user)
         }
 
-        updateUserUseCase(updatedUser)
+        updatedUser?.let {
+            updateUserUseCase(updatedUser)
+            userDao.saveUser(updatedUser)
+        }
 
         Log.d("EditUserProfileViewModel", "current user after update: $updatedUser")
         isLoading.update { false }
@@ -99,6 +108,6 @@ class EditUserProfileViewModel @Inject constructor(
     }
 
     fun setLanguages(languages: List<String>) = formState.update {
-        it.copy(languages = languages)
+        it.copy(languages = languages.toMutableList())
     }
 }

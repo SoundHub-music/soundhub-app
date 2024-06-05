@@ -34,8 +34,10 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.Route
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.menu.AvatarDropdownMenu
+import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -100,10 +102,11 @@ private fun Avatar(
     profileOwner: User?,
     profileViewModel: ProfileViewModel
 ) {
-    val state by profileViewModel.profileUiState.collectAsState()
-    val creds = state.userCreds
-    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
     val userFullName: String = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
+    val creds: UserPreferences? = profileUiState.userCreds
+
+    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
     GlideImage(
         model = HttpUtils.prepareGlideUrl(creds, profileOwner?.avatarUrl, MediaFolder.AVATAR),
@@ -113,7 +116,5 @@ private fun Avatar(
         modifier = Modifier
             .fillMaxSize()
             .clickable { isAvatarMenuExpandedState.value = true },
-    ) /*{
-        it.thumbnail(HttpUtils.prepareGlideRequestBuilder(context, profileOwner?.avatarUrl))
-    }*/
+    )
 }

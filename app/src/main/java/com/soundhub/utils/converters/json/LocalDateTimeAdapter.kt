@@ -3,11 +3,13 @@ package com.soundhub.utils.converters.json
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.google.gson.JsonNull
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.soundhub.utils.constants.Constants
 import java.lang.reflect.Type
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,8 +20,8 @@ class LocalDateTimeAdapter : JsonSerializer<LocalDateTime?>, JsonDeserializer<Lo
         src: LocalDateTime?,
         typeOfSrc: Type?,
         context: JsonSerializationContext?
-    ): JsonElement? = src?.format(formatter)
-        ?.let { JsonPrimitive(it) }
+    ): JsonElement? = if (src == null) JsonNull.INSTANCE
+        else JsonPrimitive(src.toString())
 
     override fun deserialize(
         json: JsonElement?,

@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,11 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDate
 
 @Composable
-internal fun UserNameWithDescription(profileOwner: User?) {
+internal fun UserNameWithDescription(profileViewModel: ProfileViewModel) {
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
     var userFullName by rememberSaveable { mutableStateOf("") }
     var isDescriptionButtonChecked: Boolean by rememberSaveable {
         mutableStateOf(false)

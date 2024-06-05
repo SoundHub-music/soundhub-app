@@ -37,40 +37,43 @@ fun DatePicker(
     isError: Boolean = false,
     supportingText: @Composable () -> Unit = {}
 ) {
-    var currentDate: String by rememberSaveable { mutableStateOf(value) }
+    var stringDate: String by rememberSaveable { mutableStateOf(value) }
+    var date: LocalDate? by rememberSaveable { mutableStateOf(null) }
     val context = LocalContext.current
     val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
 
-    LaunchedEffect(true) {
+    LaunchedEffect(value) {
+        date = parseLocalDate(value, pattern)
         Log.d("DatePicker", "current value: $value")
     }
-    val date: LocalDate = parseLocalDate(value, pattern)
 
 
-    val dialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-            if (selectedDate.plusYears(14) <= LocalDate.now()) {
-                onValueChange(selectedDate.toString())
-                currentDate = selectedDate.toString()
-            }
-            else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
-        },
-        date.year,
-        date.monthValue - 1,
-        date.dayOfMonth,
-    )
+    val dialog = date?.let { d ->
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+                if (selectedDate.plusYears(14) <= LocalDate.now()) {
+                    onValueChange(selectedDate.toString())
+                    stringDate = selectedDate.toString()
+                }
+                else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
+            },
+            d.year,
+            d.monthValue - 1,
+            d.dayOfMonth,
+        )
+    }
 
     OutlinedTextField(
         label = { Text(text = label) },
         onValueChange = onValueChange,
-        value = currentDate,
+        value = stringDate,
         readOnly = true,
         modifier = modifier
-            .clickable { dialog.show() }
+            .clickable { dialog?.show() }
             .onFocusChanged {
-                if (it.isFocused) dialog.show()
+                if (it.isFocused) dialog?.show()
             },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,

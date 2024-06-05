@@ -6,13 +6,16 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.soundhub.data.model.User
 import com.soundhub.utils.converters.json.LocalDateAdapter
+import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import java.lang.reflect.Type
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class UserListRoomConverter {
     private val gson: Gson
         get() = GsonBuilder()
             .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
             .create()
 
     private val userListType: Type

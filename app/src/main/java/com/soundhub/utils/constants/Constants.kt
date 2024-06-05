@@ -9,7 +9,7 @@ import java.lang.reflect.Type
 object Constants {
     const val PASSWORD_MIN_LENGTH: Int = 8
     const val DATE_FORMAT = "yyyy-MM-dd"
-    const val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+    const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
 
     // online status
     const val SET_OFFLINE_DELAY_ON_DESTROY: Long = 60 * 1000
@@ -110,19 +110,22 @@ object Constants {
 
     // named hilt injections
     const val COUNTRIES_API_RETROFIT = "countries_api"
-    const val SOUNDHUB_API_RETROFIT = "soundhub_api"
+    const val AUTHORIZED_SOUNDHUB_API_RETROFIT = "authorized_soundhub_api"
+    const val UNAUTHORIZED_SOUNDHUB_API_RETROFIT = "soundhub_api"
     const val LAST_FM_API_RETROFIT = "lastfm_api"
     const val MUSIC_API_RETROFIT = "music_api"
 
+    const val UNATHORIZED_HTTP_CLIENT = "unauthorized_http_client"
+    const val AUTHORIZED_HTTP_CLIENT = "authorized_http_client"
+
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    private const val SOUNDHUB_API_HOSTNAME = "192.168.1.41:8080"
-    const val SOUNDHUB_API = "http://$SOUNDHUB_API_HOSTNAME/api/v1/"
+    const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 
     // websocket constants
-    const val SOUNDHUB_WEBSOCKET = "ws://$SOUNDHUB_API_HOSTNAME/ws"
+    const val SOUNDHUB_WEBSOCKET = "ws://${BuildConfig.SOUNDHUB_API_HOSTNAME}/ws"
     const val DELETER_ID_HEADER = "DeleterId"
     const val DESTINATION_HEADER = "destination"
 

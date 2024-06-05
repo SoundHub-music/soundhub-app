@@ -69,7 +69,7 @@ class PostRepositoryImpl @Inject constructor(
 
     override suspend fun getPostsByAuthorId(authorId: UUID): HttpResult<List<Post>> {
         try {
-            val response: Response<List<Post>> = postService.getPostsByAuthorId(authorId,)
+            val response: Response<List<Post>> = postService.getPostsByAuthorId(authorId)
             Log.d("PostRepository", "getPostsByAuthorId[1]: $response")
 
             if (!response.isSuccessful) {
