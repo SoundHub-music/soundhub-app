@@ -76,7 +76,7 @@ sealed class ApiEndpoints {
 
         const val GET_CHATS_BY_CURRENT_USER = "$CHATS_ENDPOINT/user/{$USER_ID_DYNAMIC_PARAM}"
         const val GET_CHAT_BY_ID = "$CHATS_ENDPOINT/{$CHAT_ID_DYNAMIC_PARAM}"
-        const val DELETE_CHAT = "$CHATS_ENDPOINT/delete/{$CHATS_ENDPOINT}"
+        const val DELETE_CHAT = "$CHATS_ENDPOINT/delete/{$CHAT_ID_DYNAMIC_PARAM}"
 
         const val CREATE_CHAT = "$CHATS_ENDPOINT/single"
         const val CREATE_GROUP_CHAT = "$CHATS_ENDPOINT/group"

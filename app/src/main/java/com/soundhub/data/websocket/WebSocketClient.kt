@@ -37,15 +37,13 @@ class WebSocketClient @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     fun connect(url: String) = coroutineScope.launch {
-        val creds: UserPreferences? = userCredsFlow.firstOrNull()
-        val bearerToken: String = getBearerToken(creds?.accessToken)
-
+        val bearerToken: String = getBearerToken(userCredsFlow.firstOrNull()?.accessToken)
         val header: Map<String, String> = mapOf(AUTHORIZATION_HEADER to bearerToken)
         val stompHeader = StompHeader(AUTHORIZATION_HEADER, bearerToken)
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url, header)
         stompClient?.connect(listOf(stompHeader))
-        Log.i("WebSocketClient", "Connected successfully")
+        Log.i("WebSocketClient", "connect[1]: connected successfully")
     }
 
     fun sendMessage(
@@ -56,16 +54,33 @@ class WebSocketClient @Inject constructor(
         val jsonObject: String = gson.toJson(messageRequest)
         return stompClient
             ?.send(WS_SEND_MESSAGE_ENDPOINT, jsonObject)
-            ?.subscribe({ onComplete() }, { onError(it) })
+            ?.subscribe({ onComplete() }, {
+                Log.e("WebSocketClient", "sendMessage[error]: ${it.stackTraceToString()}")
+                onError(it)
+            })
     }
 
     fun readMessage(
         messageId: UUID,
+        onComplete: () -> Unit = {},
+        onError: (e: Throwable) -> Unit = {}
     ): Disposable? {
         val endpoint: String = replaceParam(messageId, WS_READ_MESSAGE_ENDPOINT)
+        val stompMessage = StompMessage(
+            StompCommand.SEND,
+            listOf(StompHeader(DESTINATION_HEADER, endpoint),),
+            null
+        )
+
         return stompClient
-            ?.send(endpoint, null)
-            ?.subscribe()
+            ?.send(stompMessage)
+            ?.subscribe(
+                { onComplete() },
+                { e ->
+                    Log.e("WebSocketClient", "readMessage[error]: ${e.stackTraceToString()}")
+                    onError(e)
+                }
+            )
     }
 
     fun deleteMessage(
@@ -73,21 +88,19 @@ class WebSocketClient @Inject constructor(
         deleterId: UUID,
         onComplete: () -> Unit = {},
         onError: (e: Throwable) -> Unit = {}
-    ) = coroutineScope.launch {
-        val creds: UserPreferences? = userCredsFlow.firstOrNull()
+    ): Disposable? {
         val endpoint: String = replaceParam(messageId, WS_DELETE_MESSAGE_ENDPOINT)
-        val bearerToken: String = getBearerToken(creds?.accessToken)
 
         val stompMessage = StompMessage(
             StompCommand.SEND,
             listOf(
-                StompHeader(AUTHORIZATION_HEADER, bearerToken),
                 StompHeader(DESTINATION_HEADER, endpoint),
                 StompHeader(DELETER_ID_HEADER, deleterId.toString())
             ),
             null
         )
-        stompClient
+
+        return stompClient
             ?.send(stompMessage)
             ?.subscribe(
                 {

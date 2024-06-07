@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,21 +29,20 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
+import com.soundhub.ui.components.avatar.AvatarViewModel
 import com.soundhub.ui.components.menu.AvatarDropdownMenu
-import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.enums.MediaFolder
 
 @Composable
 internal fun UserProfileAvatar(
@@ -67,7 +67,7 @@ internal fun UserProfileAvatar(
             .fillMaxWidth()
             .fillMaxHeight(0.45f)
     ) {
-        Avatar(isAvatarMenuExpandedState, profileOwner, profileViewModel)
+        Avatar(isAvatarMenuExpandedState, profileOwner)
         AvatarDropdownMenu(
             modifier = Modifier.align(Alignment.Center),
             isAvatarMenuExpandedState = isAvatarMenuExpandedState,
@@ -100,16 +100,18 @@ private fun UserSettingsButton(isAuthorizedUser: Boolean, navController: NavHost
 private fun Avatar(
     isAvatarMenuExpandedState: MutableState<Boolean>,
     profileOwner: User?,
-    profileViewModel: ProfileViewModel
+    avatarViewModel: AvatarViewModel = hiltViewModel()
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
     val userFullName: String = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
-    val creds: UserPreferences? = profileUiState.userCreds
-
+    val glideUrl: Any? by avatarViewModel.imageUrl.collectAsState()
     val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
+    LaunchedEffect(key1 = profileOwner) {
+        avatarViewModel.loadGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
+    }
+
     GlideImage(
-        model = HttpUtils.prepareGlideUrl(creds, profileOwner?.avatarUrl, MediaFolder.AVATAR),
+        model = glideUrl,
         contentScale = ContentScale.Crop,
         failure = placeholder(defaultAvatar),
         contentDescription = userFullName,

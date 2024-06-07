@@ -31,9 +31,8 @@ object DomainModule {
     @Provides
     @Singleton
     fun providesUpdateUserUseCase(
-        userRepository: UserRepository,
-        uiStateDispatcher: UiStateDispatcher
-    ): UpdateUserUseCase = UpdateUserUseCase(userRepository, uiStateDispatcher)
+        userRepository: UserRepository
+    ): UpdateUserUseCase = UpdateUserUseCase(userRepository)
 
     @Provides
     @Singleton

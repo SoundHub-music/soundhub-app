@@ -2,7 +2,7 @@ package com.soundhub.data.repository.implementations
 
 import android.content.Context
 import android.util.Log
-import com.google.gson.GsonBuilder
+import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.PostService
 import com.soundhub.data.api.responses.ErrorResponse
@@ -13,28 +13,20 @@ import com.soundhub.data.repository.PostRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
-import com.soundhub.utils.converters.json.LocalDateAdapter
-import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
     private val postService: PostService,
     private val context: Context,
-    private val loadAllUserDataUseCase: LoadAllUserDataUseCase
+    private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
+    private val gson: Gson
 ): PostRepository {
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-        .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-        .create()
-
     override suspend fun getPostById(postId: UUID): HttpResult<Post?> {
         try {
             val response: Response<Post?> = postService.getPostById(postId)

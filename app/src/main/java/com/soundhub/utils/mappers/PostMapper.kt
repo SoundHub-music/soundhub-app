@@ -12,7 +12,6 @@ interface PostMapper {
     fun fromPostEditorStateToPost(state: PostEditorState): Post
 
     @Mapping(target = "postId", source = "id")
-    @Mapping(target = "userCreds", ignore = true)
     @Mapping(target = "newImages", ignore = true)
     @Mapping(target = "imagesToBeDeleted", ignore = true)
     @Mapping(target = "doesPostExist", ignore = true)

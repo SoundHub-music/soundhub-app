@@ -10,7 +10,10 @@ import kotlinx.coroutines.launch
 class SplashScreenViewModel: ViewModel() {
     val isLoading = MutableStateFlow(true)
 
-    fun setLoading() = isLoading.update { true }
+    override fun onCleared() {
+        super.onCleared()
+        isLoading.update { true }
+    }
 
     init {
         viewModelScope.launch {

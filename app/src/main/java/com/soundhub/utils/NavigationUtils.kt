@@ -1,6 +1,7 @@
 package com.soundhub.utils
 
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -22,6 +23,8 @@ class NavigationUtils {
             val backStackEntry: NavBackStackEntry? = controller.currentBackStackEntry
             val navArguments: Bundle? = backStackEntry?.arguments
             val route: String? = destination.route
+
+            Log.d("NavigationUtils", "onNavDestinationChangedListener[current_route]: $route")
 
             navigateToPostLineIfUserCredsIsNotNull(
                 route = route,

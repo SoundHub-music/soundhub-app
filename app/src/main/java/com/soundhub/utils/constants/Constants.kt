@@ -12,7 +12,9 @@ object Constants {
     const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
 
     // online status
+    // after destroy: 1 minute
     const val SET_OFFLINE_DELAY_ON_DESTROY: Long = 60 * 1000
+    // after stop: 5 minutes
     const val SET_OFFLINE_DELAY_ON_STOP: Long = 5 * 60 * 1000
 
     // regular expressions
@@ -114,13 +116,15 @@ object Constants {
     const val UNAUTHORIZED_SOUNDHUB_API_RETROFIT = "soundhub_api"
     const val LAST_FM_API_RETROFIT = "lastfm_api"
     const val MUSIC_API_RETROFIT = "music_api"
+    const val SOUNDHUB_AUTH_SERVICE_RETROFIT = "auth_service_api"
 
-    const val UNATHORIZED_HTTP_CLIENT = "unauthorized_http_client"
-    const val AUTHORIZED_HTTP_CLIENT = "authorized_http_client"
+    const val UNATHORIZED_HTTP_CLIENT_WITH_CACHE = "unauthorized_http_client"
+    const val SIMPLE_HTTP_CLIENT = "simple_http_client"
+    const val AUTHORIZED_HTTP_CLIENT_WITH_CACHE = "authorized_http_client"
 
     // API constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
-    const val SOUNDHUB_API = "${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
+    const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
     const val DISCOGS_API = "https://api.discogs.com/"
 

@@ -2,6 +2,7 @@ package com.soundhub.ui.messenger.chat
 
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
+import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 
 data class ChatUiState(
@@ -10,4 +11,6 @@ data class ChatUiState(
     val unreadMessageCount: Int = 0,
     val status: ApiStatus = ApiStatus.LOADING,
     val interlocutor: User? = null,
+    val checkedMessages: List<Message> = emptyList(),
+    val isCheckMessageModeEnabled: Boolean = false
 )

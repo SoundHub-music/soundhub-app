@@ -90,8 +90,9 @@ internal fun ChatTopBarCheckMessagesActions(
     chatViewModel: ChatViewModel,
     uiStateDispatcher: UiStateDispatcher
 ) {
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val checkedMessages: List<Message> = uiState.checkedMessages
+    val checkedMessages: List<Message> = chatUiState.checkedMessages
     val authorizedUser: User? = uiState.authorizedUser
 
     var hasOnlyOwnMessages by remember { mutableStateOf(false) }
@@ -109,7 +110,7 @@ internal fun ChatTopBarCheckMessagesActions(
                         message -> chatViewModel.deleteMessage(message, user.id)
                     }
                 }
-                uiStateDispatcher.setCheckMessagesMode(false)
+                chatViewModel.setCheckMessageMode(false)
             }
         ) {
             Icon(

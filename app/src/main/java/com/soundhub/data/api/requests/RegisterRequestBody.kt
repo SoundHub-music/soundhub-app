@@ -3,6 +3,7 @@ package com.soundhub.data.api.requests
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class RegisterRequestBody(
     var email: String = "",
@@ -17,5 +18,7 @@ data class RegisterRequestBody(
     var description: String? = "",
     var languages: List<String> = emptyList(),
     var favoriteGenres: List<Genre> = emptyList(),
-    var favoriteArtistsIds: List<Int> = emptyList()
+    var favoriteArtistsIds: List<Int> = emptyList(),
+    var isOnline: Boolean = false,
+    var lastOnline: LocalDateTime? = null
 )

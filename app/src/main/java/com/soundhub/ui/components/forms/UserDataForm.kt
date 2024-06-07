@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,14 +30,14 @@ import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
 import com.soundhub.ui.states.UserFormState
 import com.soundhub.utils.constants.Constants
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun UserDataForm(
     modifier: Modifier = Modifier,
-    formStateFlow: MutableStateFlow<IUserDataFormState>,
+    formStateFlow: Flow<IUserDataFormState>,
     onFirstNameChange: (String) -> Unit = {},
     onLastNameChange: (String) -> Unit = {},
     onBirthdayChange: (LocalDate?) -> Unit = {},
@@ -49,9 +50,9 @@ fun UserDataForm(
 ) {
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
-    val formState = formStateFlow.collectAsState()
+    val formState: State<IUserDataFormState> = formStateFlow.collectAsState(initial = EmptyFormState())
 
-    LaunchedEffect(formState.value) {
+    LaunchedEffect(formState) {
         Log.d("UserDataForm", formState.value.toString())
         if (formState.value is UserFormState)
             avatarUri.value = (formState.value as UserFormState).avatarUrl?.toUri()
@@ -119,22 +120,20 @@ fun UserDataForm(
             onLanguagesChange = onLanguagesChange
         )
 
-        formState.value.birthday?.let {
-            DatePicker(
-                modifier = Modifier.fillMaxWidth(),
-                value = formState.value.birthday.toString(),
-                label = stringResource(id = R.string.text_field_birthdate),
-                onValueChange = { value ->
-                    val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
-                    onBirthdayChange(date)
-                },
-                isError = !formState.value.isBirthdayValid,
-                supportingText = {
-                    if (!formState.value.isBirthdayValid)
-                        Text(text = stringResource(id = R.string.user_form_birthday_error_message))
-                }
-            )
-        }
+        DatePicker(
+            modifier = Modifier.fillMaxWidth(),
+            value = formState.value.birthday,
+            label = stringResource(id = R.string.text_field_birthdate),
+            onValueChange = { value ->
+                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
+                onBirthdayChange(date)
+            },
+            isError = !formState.value.isBirthdayValid,
+            supportingText = {
+                if (!formState.value.isBirthdayValid)
+                    Text(text = stringResource(id = R.string.user_form_birthday_error_message))
+            }
+        )
 
         OutlinedTextField(
             modifier = Modifier

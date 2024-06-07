@@ -10,14 +10,12 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.Route
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
-import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -42,14 +40,12 @@ class AuthenticationViewModel @Inject constructor(
     val authFormState = _authFormState.asStateFlow()
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    init { initializeUser() }
-
     override fun onCleared() {
         super.onCleared()
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
-    private fun initializeUser() = viewModelScope.launch(Dispatchers.IO) {
+    fun initializeUser() = viewModelScope.launch(Dispatchers.IO) {
         getCurrentUser().collect { currentUser ->
             currentUser?.let {
                 // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
@@ -63,7 +59,6 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     fun logout() = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("AuthenticationViewModel", "logout: $userCreds")
         val authorizedUser: User? = userDao.getCurrentUser()
 
         authRepository
@@ -100,33 +95,6 @@ class AuthenticationViewModel @Inject constructor(
         emit(authorizedUser)
     }
 
-    suspend fun tryRefreshToken() {
-        userCreds.collect { creds ->
-            val requestBody = RefreshTokenRequestBody(creds.refreshToken)
-
-            if (creds.refreshToken == null) {
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
-                return@collect
-            }
-            authRepository.refreshToken(requestBody)
-                .onSuccess { response ->
-                        userCredsStore.updateCreds(response.body)
-                        initializeUser()
-                }.onFailure { error ->
-                    if (error.errorBody.status == Constants.UNAUTHORIZED_USER_ERROR_CODE) {
-                        val route = Route.Authentication
-                        deleteUserData()
-                        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
-                    }
-                    val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                    with(uiStateDispatcher) {
-                        sendUiEvent(errorEvent)
-                        sendUiEvent(UiEvent.Navigate(Route.Authentication))
-                    }
-                }
-        }
-    }
-
     fun signIn() = viewModelScope.launch(Dispatchers.IO) {
         val toastErrorMessage: UiText.StringResource = UiText.StringResource(R.string.toast_authorization_error)
         _authFormState.update { it.copy(isLoading = true) }
@@ -155,7 +123,7 @@ class AuthenticationViewModel @Inject constructor(
             }
     }
 
-    private fun toggleUserOnline() = viewModelScope.launch {
+    private suspend fun toggleUserOnline() {
         userRepository.toggleUserOnline()
             .onSuccess { response -> uiStateDispatcher.setAuthorizedUser(response.body) }
             .onFailure { error ->

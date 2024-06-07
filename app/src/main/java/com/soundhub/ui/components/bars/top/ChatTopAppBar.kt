@@ -1,6 +1,7 @@
 package com.soundhub.ui.components.bars.top
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,7 +29,6 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
@@ -41,30 +41,29 @@ fun ChatTopAppBar(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val isCheckMessageMode = uiState.isCheckMessagesMode
+    val isCheckMessageModeEnabled = chatUiState.isCheckMessageModeEnabled
 
     TopAppBar(
         title = {
-            if (!isCheckMessageMode) InterlocutorDetails(chatViewModel, navController)
+            if (!isCheckMessageModeEnabled) InterlocutorDetails(chatViewModel, navController)
         },
         navigationIcon = {
             IconButton(onClick = {
-                if (isCheckMessageMode) {
-                    uiStateDispatcher.unsetCheckMessagesMode()
+                if (isCheckMessageModeEnabled) {
+                    chatViewModel.unsetCheckMessagesMode()
                 } else {
                     navController.popBackStack()
                 }
             }) {
                 Icon(
-                    imageVector = if (isCheckMessageMode) Icons.Rounded.Close else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+                    imageVector = if (isCheckMessageModeEnabled) Icons.Rounded.Close else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.btn_description_back),
                     modifier = Modifier.size(28.dp)
                 )
             }
         },
         actions = {
-            if (isCheckMessageMode) {
+            if (isCheckMessageModeEnabled) {
                 ChatTopBarCheckMessagesActions(chatViewModel, uiStateDispatcher)
             } else {
                 ChatTopBarActions(navController, chatUiState, chatViewModel, uiStateDispatcher)
@@ -81,6 +80,7 @@ private fun InterlocutorDetails(
     val context: Context = LocalContext.current
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor
+    val interlocutorAvatarUrl: Uri? = remember(interlocutor) { interlocutor?.avatarUrl?.toUri() }
     val friendName: String = "${interlocutor?.firstName.orEmpty()} ${interlocutor?.lastName.orEmpty()}".trim()
 
     var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.isOnline ?: false) }
@@ -104,7 +104,10 @@ private fun InterlocutorDetails(
             .clickable { interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) } }
             .padding(horizontal = 10.dp)
     ) {
-        CircularAvatar(modifier = Modifier.size(40.dp), imageUrl = interlocutor?.avatarUrl?.toUri())
+        CircularAvatar(
+            modifier = Modifier.size(40.dp),
+            imageUrl = interlocutorAvatarUrl
+        )
         Column {
             Text(
                 text = friendName,

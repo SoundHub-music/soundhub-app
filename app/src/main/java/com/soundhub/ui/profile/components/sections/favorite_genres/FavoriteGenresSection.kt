@@ -10,12 +10,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.data.model.Genre
+import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.SectionLabel
 
 @Composable
 fun FavoriteGenresSection(
-    genreList: List<Genre>,
+    profileViewModel: ProfileViewModel,
     isOriginProfile: Boolean,
     navController: NavHostController
 ) {
@@ -28,7 +28,7 @@ fun FavoriteGenresSection(
             )
 
             GenresFlowRow(
-                genreList = genreList,
+                profileViewModel = profileViewModel,
                 isOriginProfile = isOriginProfile,
                 navController = navController
             )

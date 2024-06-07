@@ -1,13 +1,11 @@
 package com.soundhub.ui.post_editor
 
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import java.time.LocalDateTime
 import java.util.UUID
 
 data class PostEditorState(
-    var userCreds: UserPreferences? = null,
     var postId: UUID = UUID.randomUUID(),
     var content: String = "",
     var author: User? = null,

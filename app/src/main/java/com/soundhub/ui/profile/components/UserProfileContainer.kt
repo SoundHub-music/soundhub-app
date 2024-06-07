@@ -1,6 +1,5 @@
 package com.soundhub.ui.profile.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,7 +81,7 @@ fun UserProfileContainer(
             }
             item {
                 FavoriteGenresSection(
-                    genreList = profileOwner?.favoriteGenres.orEmpty(),
+                    profileViewModel = profileViewModel,
                     isOriginProfile = isOriginProfile,
                     navController = navController
                 )

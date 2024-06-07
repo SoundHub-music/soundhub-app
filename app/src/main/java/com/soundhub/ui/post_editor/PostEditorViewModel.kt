@@ -1,9 +1,7 @@
 package com.soundhub.ui.post_editor
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
@@ -14,9 +12,7 @@ import com.soundhub.utils.mappers.PostMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -25,20 +21,9 @@ import javax.inject.Inject
 class PostEditorViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val uiStateDispatcher: UiStateDispatcher,
-    userCredsStore: UserCredsStore
 ): ViewModel() {
-    private val userCreds = userCredsStore.getCreds()
-
-    private val _postEditorState: MutableStateFlow<PostEditorState> = MutableStateFlow(PostEditorState())
+    private val _postEditorState = MutableStateFlow(PostEditorState())
     val postEditorState = _postEditorState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _postEditorState.update {
-                it.copy(userCreds = userCreds.firstOrNull())
-            }
-        }
-    }
 
     fun setContent(value: String) = _postEditorState.update {
         it.copy(content = value)
@@ -64,20 +49,15 @@ class PostEditorViewModel @Inject constructor(
     fun setImages(list: List<String>) {
         val doesPostExist: Boolean = _postEditorState.value.doesPostExist
 
-        if (doesPostExist) {
-            _postEditorState.update {
-                it.copy(newImages = list)
-            }
-        }
+        if (doesPostExist)
+            _postEditorState.update { it.copy(newImages = list) }
         else {
             var images: MutableList<String> = _postEditorState.value.images.toMutableList()
             if (images.isNotEmpty())
                 images += list
             else images = list.toMutableList()
 
-            _postEditorState.update {
-                it.copy(images = images)
-            }
+            _postEditorState.update { it.copy(images = images) }
         }
     }
 

@@ -12,6 +12,7 @@ import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.PostService
 import com.soundhub.data.api.UserService
 import com.soundhub.utils.constants.Constants.AUTHORIZED_SOUNDHUB_API_RETROFIT
+import com.soundhub.utils.constants.Constants.SOUNDHUB_AUTH_SERVICE_RETROFIT
 import com.soundhub.utils.constants.Constants.COUNTRIES_API_RETROFIT
 import com.soundhub.utils.constants.Constants.LAST_FM_API_RETROFIT
 import com.soundhub.utils.constants.Constants.MUSIC_API_RETROFIT
@@ -37,7 +38,7 @@ object HttpServiceModule {
     @Provides
     @Singleton
     fun providesAuthService(
-        @Named(UNAUTHORIZED_SOUNDHUB_API_RETROFIT)
+        @Named(SOUNDHUB_AUTH_SERVICE_RETROFIT)
         retrofit: Retrofit
     ): AuthService = retrofit.create(AuthService::class.java)
 

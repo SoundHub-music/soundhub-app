@@ -1,6 +1,5 @@
 package com.soundhub.ui.messenger.chat
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,10 +57,6 @@ fun ChatScreen(
             index -= 1
 
         chatViewModel.readVisibleMessagesFromIndex(index)
-    }
-
-    LaunchedEffect(key1 = chatUiState) {
-        Log.d("ChatScreen", "chat state: $chatUiState")
     }
 
     LaunchedEffect(key1 = chatId) {

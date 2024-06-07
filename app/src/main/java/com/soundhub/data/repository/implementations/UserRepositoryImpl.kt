@@ -1,8 +1,10 @@
 package com.soundhub.data.repository.implementations
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
-import com.google.gson.GsonBuilder
+import androidx.core.net.toUri
+import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.User
@@ -13,28 +15,21 @@ import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
-import com.soundhub.utils.converters.json.LocalDateAdapter
-import com.soundhub.utils.converters.json.LocalDateTimeAdapter
+import com.soundhub.utils.enums.UriScheme
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userService: UserService,
     private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
-    private val context: Context
+    private val context: Context,
+    private val gson: Gson
 ): UserRepository {
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-        .create()
-
     override suspend fun getUserById(id: UUID?): HttpResult<User?> {
         try {
             val response: Response<User?> = userService.getUserById(id)
@@ -101,8 +96,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserById(user: User?): HttpResult<User> {
         try {
-            val avatarFormData: MultipartBody.Part? = HttpUtils
-                .prepareMediaFormData(user?.avatarUrl, context)
+            val avatarUri: Uri? = user?.avatarUrl?.toUri()
+            var avatarFormData: MultipartBody.Part? = null
+
+            // if user has an avatar with path from server we do not a form data
+            if (avatarUri?.scheme != UriScheme.HTTP.scheme)
+                avatarFormData = HttpUtils.prepareMediaFormData(user?.avatarUrl, context)
 
             val userRequestBody: RequestBody = gson.toJson(user)
                 .toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())

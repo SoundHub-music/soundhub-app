@@ -8,10 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +36,7 @@ import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
 import com.soundhub.ui.friends.FriendsScreen
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.gallery.GalleryScreen
+import com.soundhub.ui.home.MainViewModel
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.messenger.chat.ChatScreen
@@ -54,7 +51,6 @@ import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
-import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Composable
@@ -67,27 +63,29 @@ fun NavigationHost(
     messengerViewModel: MessengerViewModel,
     notificationViewModel: NotificationViewModel,
     topBarTitle: MutableState<String?>,
-    authorizedUser: User?
+    mainViewModel: MainViewModel
 ) {
-    var startDestination: String by rememberSaveable { mutableStateOf(Route.Authentication.route) }
-    val userCredsFlow: Flow<UserPreferences> = authViewModel.userCreds
-    var userCreds: UserPreferences? by remember { mutableStateOf(null) }
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(UiState())
+    val authorizedUser: User? = uiState.authorizedUser
+
+    val userCreds: UserPreferences? by mainViewModel.userCreds.collectAsState(initial = null)
+    val startDestination: String by mainViewModel.startDestination.collectAsState()
 
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
+
     val editMusicPrefViewModel: EditMusicPreferencesViewModel = hiltViewModel()
 
-    LaunchedEffect(key1 = currentRoute) {
+    LaunchedEffect(currentRoute) {
         Log.d("NavigationHost", "current_route: $currentRoute")
-        Log.d("NavigationHost", "authorized_user: $authorizedUser")
-        Log.d("NavigationHost", "user_creds: $userCreds")
     }
 
-    LaunchedEffect(key1 = true) {
-        userCredsFlow.collect { creds ->
-            userCreds = creds
-            startDestination = defineStartDestination(userCreds = creds)
-        }
+    LaunchedEffect(authorizedUser) {
+        Log.d("NavigationHost", "authorized_user: $authorizedUser")
+    }
+
+    LaunchedEffect(userCreds) {
+        Log.d("NavigationHost", "user_creds: $userCreds")
     }
 
     NavHost(
@@ -187,6 +185,9 @@ fun NavigationHost(
                     )
                 }
             }
+                .onFailure {  error ->
+                    Log.d("NavigationHost", "ChatScreen[error]: ${error.stackTraceToString()}")
+                }
         }
 
         composable(
@@ -355,11 +356,3 @@ fun NavigationHost(
         }
     }
 }
-
-private fun defineStartDestination(
-    userCreds: UserPreferences?
-): String =
-    if (userCreds?.accessToken.isNullOrEmpty())
-        Route.Authentication.route
-    else
-        Route.PostLine.route

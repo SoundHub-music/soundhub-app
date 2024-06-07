@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
+import com.soundhub.ui.components.forms.EmptyFormState
+import com.soundhub.ui.components.forms.IUserDataFormState
 import com.soundhub.ui.edit_profile.profile.EditUserProfileViewModel
 import kotlinx.coroutines.launch
 
@@ -24,7 +26,7 @@ fun EditProfileTopBarButton(
     editUserProfileViewModel: EditUserProfileViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val formState by editUserProfileViewModel.formState.collectAsState()
+    val formState: IUserDataFormState by editUserProfileViewModel.formState.collectAsState(initial = EmptyFormState())
     var hasChanges: Boolean by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = formState) {

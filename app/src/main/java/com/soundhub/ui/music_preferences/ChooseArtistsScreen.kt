@@ -92,7 +92,7 @@ fun ChooseArtistsScreen(
                 contentPadding = PaddingValues(all = 10.dp),
                 state = lazyGridState
             ) {
-                items(items = artistState.artists, key = { it.id }) { artist ->
+                items(items = artistState.artists) { artist ->
                     MusicItemPlate(
                         modifier = Modifier.padding(bottom = 20.dp),
                         caption = artist.title ?: "",

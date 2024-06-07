@@ -1,6 +1,7 @@
 package com.soundhub.di
 
 import android.content.Context
+import com.google.gson.Gson
 import com.soundhub.data.api.AuthService
 import com.soundhub.data.api.ChatService
 import com.soundhub.data.api.CountryService
@@ -50,64 +51,75 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providesAuthRepository(
+        @ApplicationContext
+        context: Context,
         authService: AuthService,
         userRepository: UserRepository,
-        @ApplicationContext context: Context
+        gson: Gson
     ): AuthRepository = AuthRepositoryImpl(
         authService = authService,
         userRepository = userRepository,
-        context = context
+        context = context,
+        gson = gson
     )
 
     @Provides
     @Singleton
     fun providesUserRepository(
+        @ApplicationContext
+        context: Context,
         userService: UserService,
         loadAllUserDataUseCase: LoadAllUserDataUseCase,
-        @ApplicationContext context: Context
+        gson: Gson
     ): UserRepository = UserRepositoryImpl(
         userService = userService,
         loadAllUserDataUseCase = loadAllUserDataUseCase,
-        context = context
+        context = context,
+        gson = gson
     )
 
     @Provides
     @Singleton
     fun providesPostRepository(
-        @ApplicationContext context: Context,
+        @ApplicationContext
+        context: Context,
         postService: PostService,
-        loadAllUserDataUseCase: LoadAllUserDataUseCase
+        loadAllUserDataUseCase: LoadAllUserDataUseCase,
+        gson: Gson
     ): PostRepository = PostRepositoryImpl(
         postService = postService,
         loadAllUserDataUseCase = loadAllUserDataUseCase,
-        context = context
+        context = context,
+        gson = gson
     )
 
     @Provides
     @Singleton
-    fun providesCountryRepository(countryService: CountryService): CountryRepository =
-        CountryRepositoryImpl(countryService)
+    fun providesCountryRepository(
+        countryService: CountryService
+    ): CountryRepository = CountryRepositoryImpl(countryService)
 
     @Provides
     @Singleton
     fun providesChatRepository(
         chatService: ChatService
-    ): ChatRepository =
-        ChatRepositoryImpl(chatService)
+    ): ChatRepository = ChatRepositoryImpl(chatService)
 
     @Provides
     @Singleton
     fun providesFileRepository(
-        fileService: FileService,
-        @ApplicationContext context: Context
+        @ApplicationContext
+        context: Context,
+        fileService: FileService
     ): FileRepository = FileRepositoryImpl(fileService, context)
 
     @Provides
     @Singleton
     fun providesMusicRepository(
+        @ApplicationContext
+        context: Context,
         musicService: MusicService,
-        genreService: GenreService,
-        @ApplicationContext context: Context
+        genreService: GenreService
     ): MusicRepository = MusicRepositoryImpl(musicService, genreService, context)
 
     @Provides

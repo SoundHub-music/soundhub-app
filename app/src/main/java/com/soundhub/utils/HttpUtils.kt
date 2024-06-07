@@ -30,7 +30,8 @@ class HttpUtils {
         private const val FILE_REQUEST_NAME = "files"
 
         /**
-         * transforms an access token to bearer token
+         * Transforms string access token to bearer token.
+         * Returns string without changes if it has bearer token format
          * @param token access token
          */
         fun getBearerToken(token: String?): String =
@@ -117,7 +118,7 @@ class HttpUtils {
          * @param imageUrl image url (get file endpoint)
          * @param folder enum type with certain folder
          */
-        fun prepareGlideUrl(userCreds: UserPreferences?, imageUrl: String?, folder: MediaFolder): GlideUrl? {
+        fun prepareGlideUrWithAccessToken(userCreds: UserPreferences?, imageUrl: String?, folder: MediaFolder): GlideUrl? {
             return imageUrl?.let { url ->
                 var urlWithParam: String = url
 
@@ -134,8 +135,20 @@ class HttpUtils {
             }
         }
 
+        // TODO: implement glide url builder for discogs api
+//        fun prepareGlideUrl(imageUrl: String?): GlideUrl? {
+//            return imageUrl?.let { url ->
+//                val headers = LazyHeaders.Builder()
+//                    .addHeader("mode", "no-cors")
+//                    .addHeader(AUTHORIZATION_HEADER, Constants.DISCOGS_AUTHORIZATION)
+//                    .build()
+//
+//                GlideUrl(url, headers)
+//            }
+//        }
+
         /**
-         * prepares request builder for glide by adding cache parameters
+         * Prepares request builder for glide by adding cache parameters
          * @param context android app context
          * @param imageUrl image url (get file endpoint)
          */

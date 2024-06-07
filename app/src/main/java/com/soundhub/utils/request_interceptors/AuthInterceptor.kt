@@ -18,8 +18,10 @@ class AuthInterceptor(
         val bearerToken: String = HttpUtils.getBearerToken(tokens?.accessToken)
 
         val request: Request = chain.request()
+        if (tokens?.refreshToken == null && tokens?.accessToken == null)
+            return chain.proceed(request)
 
-        if (!request.headers.names().contains(AUTHORIZATION_HEADER) && tokens?.accessToken != null)
+        if (!request.headers.names().contains(AUTHORIZATION_HEADER))
             return chain.proceed(chain.request()
                 .newBuilder()
                 .addHeader(AUTHORIZATION_HEADER, bearerToken)

@@ -1,5 +1,7 @@
 package com.soundhub.ui.authentication.registration.components
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +37,9 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.soundhub.R
+import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.data.datastore.UserPreferences
+import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
 fun MusicItemPlate(
@@ -48,6 +55,16 @@ fun MusicItemPlate(
     var itemBoxModifier: Modifier = Modifier
         .width(width)
         .height(height)
+    val context: Context = LocalContext.current
+    val userCredsFlow = UserCredsStore(context).getCreds()
+    var userCreds: UserPreferences? by remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(key1 = true) {
+        Log.d("MusicItemPlate", "url: $thumbnailUrl")
+        userCreds = userCredsFlow.firstOrNull()
+    }
 
     if (isItemChosen)
         itemBoxModifier = itemBoxModifier
@@ -72,6 +89,7 @@ fun MusicItemPlate(
         ) {
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
+                    .addHeader("mode", "no-cors")
                     .data(thumbnailUrl)
                     .crossfade(true)
                     .build(),
@@ -86,6 +104,13 @@ fun MusicItemPlate(
                         painter = painterResource(id = R.drawable.musical_note)
                     )
             }
+//            GlideImage(
+//                model = HttpUtils.prepareGlideUrl(thumbnailUrl),
+//                failure = placeholder(painterResource(id = R.drawable.musical_note)),
+//                contentScale = ContentScale.Crop,
+//                contentDescription = thumbnailUrl,
+//                modifier = Modifier.fillMaxSize()
+//            )
         }
         Text(
            text = caption,

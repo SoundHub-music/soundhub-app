@@ -46,9 +46,11 @@ fun BottomNavigationBar(
     val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
-    val defaultSelectedItem: String = uiState.currentRoute ?: Route.PostLine.route
+    val defaultSelectedItem: String? = uiState.currentRoute
     val selectedItemState: MutableState<String?> = remember { mutableStateOf(defaultSelectedItem) }
     val receivedMessageChannel = uiStateDispatcher.receivedMessages
+    val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) { getNavBarItems(authorizedUser?.id) }
+    val navBarRoutes: List<String> = remember(navBarItems) { navBarItems.map { it.route } }
 
     LaunchedEffect(key1 = true) {
         receivedMessageChannel.collect { _ ->
@@ -56,12 +58,9 @@ fun BottomNavigationBar(
         }
     }
 
-    val navBarItems: List<NavBarItem> = getNavBarItems(authorizedUser?.id)
-
-    LaunchedEffect(key1 = selectedItemState.value) {
-        val stringNavBarItems: List<String> = navBarItems.map { it.route }
-        if (selectedItemState.value !in stringNavBarItems)
-            selectedItemState.value = null
+    LaunchedEffect(key1 = uiState.currentRoute) {
+        selectedItemState.value = if (uiState.currentRoute !in navBarRoutes) null
+            else uiState.currentRoute
         Log.d("BottomNavigationBar", "selected page: ${selectedItemState.value}")
     }
 

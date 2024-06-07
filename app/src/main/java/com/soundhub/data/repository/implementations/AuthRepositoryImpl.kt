@@ -2,7 +2,7 @@ package com.soundhub.data.repository.implementations
 
 import android.content.Context
 import android.util.Log
-import com.google.gson.GsonBuilder
+import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.AuthService
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
@@ -18,24 +18,19 @@ import com.soundhub.data.repository.UserRepository
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
-import com.soundhub.utils.converters.json.LocalDateAdapter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import java.time.LocalDate
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authService: AuthService,
     private val userRepository: UserRepository,
-    private val context: Context
+    private val context: Context,
+    private val gson: Gson
 ): AuthRepository {
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-        .create()
-
     override suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences?> {
         try {
             val signInResponse: Response<UserPreferences> = authService.signIn(body)

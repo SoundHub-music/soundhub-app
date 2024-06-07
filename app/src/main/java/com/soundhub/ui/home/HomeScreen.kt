@@ -6,15 +6,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.authentication.registration.RegistrationViewModel
@@ -23,7 +22,6 @@ import com.soundhub.ui.components.bars.top.TopAppBarBuilder
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.navigation.NavigationHost
 import com.soundhub.ui.notifications.NotificationViewModel
-import com.soundhub.ui.states.UiState
 import com.soundhub.utils.constants.Constants
 
 @Composable
@@ -34,14 +32,12 @@ fun HomeScreen(
     uiStateDispatcher: UiStateDispatcher,
     registrationViewModel: RegistrationViewModel,
     messengerViewModel: MessengerViewModel,
-    notificationViewModel: NotificationViewModel
+    notificationViewModel: NotificationViewModel,
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val navBackStackEntry: NavBackStackEntry? by navController.currentBackStackEntryAsState()
     val currentRoute: String? = navBackStackEntry?.destination?.route
     val topBarTitle: MutableState<String?> = rememberSaveable { mutableStateOf(null) }
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-
-    val authorizedUser: User? = uiState.authorizedUser
 
     Scaffold(
         modifier = modifier
@@ -74,7 +70,7 @@ fun HomeScreen(
             messengerViewModel = messengerViewModel,
             notificationViewModel = notificationViewModel,
             topBarTitle = topBarTitle,
-            authorizedUser = authorizedUser
+            mainViewModel = mainViewModel
         )
     }
 }

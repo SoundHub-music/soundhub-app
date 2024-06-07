@@ -45,12 +45,15 @@ internal fun MessengerChatList(
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
     val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 
-    LaunchedEffect(key1 = messageChannel) {
-        messengerViewModel.loadChats()
+    LaunchedEffect(key1 = true) {
+        messengerViewModel.loadChatsAndUpdateUnreadMessageCount()
     }
 
-    LaunchedEffect(key1 = chats) {
-        messengerViewModel.updateUnreadMessageCount()
+    LaunchedEffect(key1 = messageChannel) {
+        messageChannel.collect {
+            messengerViewModel.loadChatsAndUpdateUnreadMessageCount()
+            filteredChats = chats
+        }
     }
 
     LaunchedEffect(key1 = searchBarText, key2 = chats) {
@@ -64,7 +67,10 @@ internal fun MessengerChatList(
     }
 
     if (filteredChats.isEmpty())
-        EmptyMessengerScreen(navController = navController)
+        EmptyMessengerScreen(
+            navController = navController,
+            uiStateDispatcher = uiStateDispatcher
+        )
     else LazyColumn(
         modifier = modifier
             .fillMaxWidth()

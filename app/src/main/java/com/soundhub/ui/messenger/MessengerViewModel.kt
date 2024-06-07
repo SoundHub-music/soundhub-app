@@ -35,9 +35,7 @@ class MessengerViewModel @Inject constructor(
     private val _messengerUiState = MutableStateFlow(MessengerUiState())
     val messengerUiState = _messengerUiState.asStateFlow()
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) { loadChats() }
-    }
+    init { loadChatsAndUpdateUnreadMessageCount() }
 
     override fun onCleared() {
         super.onCleared()
@@ -94,7 +92,7 @@ class MessengerViewModel @Inject constructor(
         return lastMessageContent
     }
 
-    suspend fun loadChats() {
+    fun loadChatsAndUpdateUnreadMessageCount() = viewModelScope.launch(Dispatchers.IO) {
         val chats = getChats()
             .firstOrNull()
             .orEmpty()

@@ -65,4 +65,4 @@ data class User(
     @Ignore
     @SerializedName("favoriteArtistsIds")
     var favoriteArtistsIds: List<Int> = emptyList()
-)
+): Serializable

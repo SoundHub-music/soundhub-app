@@ -6,9 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.DATASTORE_ACCESS_TOKEN
+import com.soundhub.utils.constants.Constants.DATASTORE_REFRESH_TOKEN
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -19,8 +19,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 
 class UserCredsStore(private val context: Context) {
      private object PreferenceKeys {
-         val accessToken: Preferences.Key<String> = stringPreferencesKey(Constants.DATASTORE_ACCESS_TOKEN)
-         val refreshToken: Preferences.Key<String> = stringPreferencesKey(Constants.DATASTORE_REFRESH_TOKEN)
+         val accessToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_ACCESS_TOKEN)
+         val refreshToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_REFRESH_TOKEN)
      }
 
     suspend fun updateCreds(creds: UserPreferences?) {
@@ -38,8 +38,6 @@ class UserCredsStore(private val context: Context) {
             )
         }
     }
-
-    fun getCredsAsLiveData(): LiveData<UserPreferences> = getCreds().asLiveData()
 
     suspend fun clear() = context.dataStore.edit { it.clear() }
 }

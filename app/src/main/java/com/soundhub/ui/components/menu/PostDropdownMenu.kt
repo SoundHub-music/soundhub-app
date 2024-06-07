@@ -38,6 +38,7 @@ fun PostDropdownMenu(
         )
         EditPostMenuItem(
             navController = navController,
+            isMenuExpandedState = isMenuExpandedState,
             post = post
         )
     }
@@ -64,6 +65,7 @@ private fun DeletePostMenuItem(
 @Composable
 private fun EditPostMenuItem(
     navController: NavHostController,
+    isMenuExpandedState: MutableState<Boolean>,
     post: Post
 ) {
     DropdownMenuItem(
@@ -72,14 +74,12 @@ private fun EditPostMenuItem(
             imageVector = Icons.Rounded.Edit,
             contentDescription = "edit post"
         )},
-        onClick = { onEditPostMenuClick(navController = navController, postId = post.id) }
+        onClick = {
+            isMenuExpandedState.value = false
+            onEditPostMenuClick(navController = navController, postId = post.id)
+        }
     )
 }
-
-//private fun onDeletePostMenuClick(
-//    postViewModel: PostViewModel,
-//    post: Post
-//) = postViewModel.deletePostById(post.id)
 
 private fun onEditPostMenuClick(
     postId: UUID,

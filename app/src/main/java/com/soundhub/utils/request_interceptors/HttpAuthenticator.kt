@@ -1,7 +1,7 @@
 package com.soundhub.utils.request_interceptors
 
 import android.util.Log
-import com.google.gson.Gson
+import com.soundhub.Route
 import com.soundhub.data.api.AuthService
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.datastore.UserCredsStore
@@ -9,88 +9,85 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.constants.Constants
-import com.soundhub.Route as AppRoute
+import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Authenticator
-import okhttp3.OkHttpClient
+import okhttp3.Route as HttpRoute
 import okhttp3.Request
 import okhttp3.Response as HttpResponse
 import retrofit2.Response
-import okhttp3.Route
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
 class HttpAuthenticator @Inject constructor(
     private val userCredsStore: UserCredsStore,
-    private val uiStateDispatcher: UiStateDispatcher
-): Authenticator {
-    private val authService: AuthService = buildAuthService()
+    private val uiStateDispatcher: UiStateDispatcher,
+    private val authService: AuthService
+) : Authenticator {
+    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val refreshMutex = Mutex()
+    private var isRefreshing = false
+    private var refreshResult: UserPreferences? = null
 
-    private fun buildAuthService(): AuthService {
-        val client = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .build()
+    override fun authenticate(route: HttpRoute?, response: HttpResponse): Request? {
+        Log.d("HttpAuthenticator", "authenticate[response]: $response")
+        val oldCreds: UserPreferences? = runBlocking { userCreds.firstOrNull() }
 
-        val retrofit = Retrofit.Builder()
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create(Gson()))
-            .baseUrl(Constants.SOUNDHUB_API)
-            .build()
+        if (oldCreds?.refreshToken == null) {
+            clearCredsAndNavigateToAuthForm()
+            return null
+        }
 
-        return retrofit.create(AuthService::class.java)
+        if (response.code == UNAUTHORIZED_USER_ERROR_CODE) {
+            val newCreds: UserPreferences? = runBlocking { refreshTokenIfNeeded(oldCreds) }
+            val bearerToken: String = HttpUtils.getBearerToken(newCreds?.accessToken)
 
-    }
-
-    override fun authenticate(route: Route?, response: HttpResponse): Request? {
-        val oldCreds: UserPreferences? = runBlocking { userCredsStore.getCreds().firstOrNull() }
-        if (oldCreds?.refreshToken == null)
-            return response.request
-
-        val newCreds: UserPreferences? = runBlocking { refreshToken() }
-        val request: Request = response.request
-
-        newCreds?.let {
-            val bearerToken: String = HttpUtils.getBearerToken(newCreds.accessToken)
-
-            if (!request.headers.names().contains(HttpUtils.AUTHORIZATION_HEADER))
+            if (!response.request.headers.names().contains(AUTHORIZATION_HEADER))
                 return response.request
                     .newBuilder()
-                    .addHeader(HttpUtils.AUTHORIZATION_HEADER, bearerToken)
+                    .header(AUTHORIZATION_HEADER, bearerToken)
                     .build()
         }
 
-        return request
+        return null
     }
 
-    private suspend fun refreshToken(): UserPreferences? {
-        val oldCreds: UserPreferences? = userCredsStore.getCreds().firstOrNull()
-        val requestBody = RefreshTokenRequestBody(oldCreds?.refreshToken)
-        val newCreds = UserPreferences()
+    private suspend fun refreshTokenIfNeeded(oldCreds: UserPreferences): UserPreferences? {
+        return refreshMutex.withLock {
+            if (!isRefreshing) {
+                isRefreshing = true
+                try { refreshResult = refreshTokenAndUpdateCreds(oldCreds) }
+                finally { isRefreshing = false }
+            }
+            refreshResult
+        }
+    }
 
+    private suspend fun refreshTokenAndUpdateCreds(oldCreds: UserPreferences): UserPreferences? {
+        val requestBody = RefreshTokenRequestBody(oldCreds.refreshToken)
         val refreshTokenResponse: Response<UserPreferences> = authService.refreshToken(requestBody)
         Log.d("HttpAuthenticator", "refreshToken[1]: response = $refreshTokenResponse")
 
         if (!refreshTokenResponse.isSuccessful) {
-            val route = AppRoute.Authentication
-            uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
-            userCredsStore.clear()
+            clearCredsAndNavigateToAuthForm()
             return null
         }
 
-        val body: UserPreferences? = refreshTokenResponse.body()
-
-        with(newCreds) {
-            accessToken = body?.accessToken
-            refreshToken = body?.refreshToken
-        }
-
+        val newCreds: UserPreferences? = refreshTokenResponse.body()
         Log.d("HttpAuthenticator", "refreshToken[2]: creds = $newCreds")
         userCredsStore.updateCreds(newCreds)
 
         return newCreds
+    }
+
+    private fun clearCredsAndNavigateToAuthForm() = coroutineScope.launch {
+        val route = Route.Authentication
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
+        userCredsStore.clear()
     }
 }

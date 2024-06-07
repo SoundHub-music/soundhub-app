@@ -1,6 +1,5 @@
 package com.soundhub.ui.gallery
 
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,30 +9,20 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.Route
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.enums.MediaFolder
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
@@ -47,16 +36,9 @@ fun ImageHorizontalPager(
     contentScale: ContentScale = ContentScale.Crop,
     height: Dp = 300.dp,
     clickable: Boolean = true,
-    mediaFolder: MediaFolder = MediaFolder.POST_PICTURE
+    mediaFolder: MediaFolder = MediaFolder.POST_PICTURE,
+    imageGalleryViewModel: ImageGalleryViewModel = hiltViewModel()
 ) {
-    val context: Context = LocalContext.current
-    val userCredsFlow: Flow<UserPreferences> = UserCredsStore(context).getCreds()
-    var userCreds: UserPreferences? by remember { mutableStateOf(null) }
-
-    LaunchedEffect(key1 = userCredsFlow) {
-        userCreds = userCredsFlow.firstOrNull()
-    }
-
     HorizontalPager(
         state = pagerState,
         modifier = modifier
@@ -74,7 +56,7 @@ fun ImageHorizontalPager(
                 .clip(RoundedCornerShape(16.dp))
         ) {
             GlideImage(
-                model = HttpUtils.prepareGlideUrl(userCreds, images[page], mediaFolder),
+                model = imageGalleryViewModel.prepareGlideImage(images[page], mediaFolder),
                 contentDescription = images[page],
                 contentScale = contentScale,
                 modifier = Modifier

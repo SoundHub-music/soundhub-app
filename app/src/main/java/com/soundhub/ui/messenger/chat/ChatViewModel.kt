@@ -1,6 +1,8 @@
 package com.soundhub.ui.messenger.chat
 
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
@@ -8,8 +10,6 @@ import com.soundhub.Route
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.ReceivedMessageResponse
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
@@ -27,6 +27,7 @@ import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
 import com.soundhub.utils.mappers.MessageMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -47,31 +48,34 @@ class ChatViewModel @Inject constructor(
     private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
     val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
+    private val chatSubscription = MutableStateFlow<Disposable?>(null)
     private val gson = GsonBuilder()
         .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
         .registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
         .create()
 
-    init { viewModelScope.launch { initializeWebSocket() } }
+    init { initializeWebSocket() }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("ChatViewModel", "ViewModel was cleared")
     }
 
-    private suspend fun initializeWebSocket() {
+    private fun initializeWebSocket() = viewModelScope.launch {
         val chatIdFlow: Flow<UUID?> = chatUiState.map { it.chat?.id }
-
         webSocketClient.apply {
             connect(SOUNDHUB_WEBSOCKET)
 
             chatIdFlow.collect { id ->
                 id?.let {
-                    subscribe(
-                        topic = "$WS_GET_MESSAGES_TOPIC/$id",
-                        messageListener = ::onReceiveMessageListener,
-                        errorListener = ::onSubscribeErrorListener
-                    )
+                    if (chatSubscription.value == null)
+                        chatSubscription.update {
+                            subscribe(
+                                topic = "$WS_GET_MESSAGES_TOPIC/$id",
+                                messageListener = ::onReceiveMessageListener,
+                                errorListener = ::onSubscribeErrorListener
+                            )
+                        }
                 }
             }
 
@@ -143,10 +147,11 @@ class ChatViewModel @Inject constructor(
     fun loadChatById(chatId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         getChatById(chatId).firstOrNull()
             ?.onSuccess { response ->
-                val currentUser = userDao.getCurrentUser()
-                val messages = response.body?.messages.orEmpty()
-                val unreadMessageCount = messages.count { it.sender?.id != currentUser?.id && !it.isRead }
-                val interlocutor = response.body?.participants?.find { it.id != currentUser?.id }
+                val currentUser: User? = userDao.getCurrentUser()
+                val chat: Chat? = response.body
+                val messages: List<Message> = chat?.messages.orEmpty()
+                val unreadMessageCount: Int = messages.count { it.sender?.id != currentUser?.id && !it.isRead }
+                val interlocutor: User? = chat?.participants?.find { it.id != currentUser?.id }
 
                 _chatUiState.update {
                     it.copy(
@@ -181,7 +186,11 @@ class ChatViewModel @Inject constructor(
 
     fun setMessageContent(message: String) = _chatUiState.update { it.copy(messageContent = message) }
 
-    fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
+    private fun clearMessageContent() = _chatUiState.update {
+        it.copy(messageContent = "")
+    }
+
+    fun sendMessage() = viewModelScope.launch {
         val authorizedUser: User? = userDao.getCurrentUser()
         val (chat, messageContent) = _chatUiState.value
         if (messageContent.isEmpty() || messageContent.isBlank())
@@ -193,7 +202,7 @@ class ChatViewModel @Inject constructor(
             content = messageContent
         )
 
-        _chatUiState.update { it.copy(messageContent = "") }
+        clearMessageContent()
         webSocketClient.sendMessage(
             messageRequest = sendMessageRequest,
             onComplete = {
@@ -238,4 +247,47 @@ class ChatViewModel @Inject constructor(
                 }
             }
         )
+
+    fun setCheckMessageMode(check: Boolean) = _chatUiState.update {
+        it.copy(isCheckMessageModeEnabled = check)
+    }
+
+    fun unsetCheckMessagesMode() = _chatUiState.update {
+        it.copy(isCheckMessageModeEnabled = false, checkedMessages = emptyList())
+    }
+
+    fun uncheckMessage(message: Message) {
+        if (_chatUiState.value.isCheckMessageModeEnabled) {
+            _chatUiState.update {
+                val messages: List<Message> = it.checkedMessages.filter { msg -> msg != message }
+                val isCheckMessagesMode = messages.isNotEmpty()
+                it.copy(checkedMessages = messages, isCheckMessageModeEnabled = isCheckMessagesMode)
+            }
+        }
+    }
+
+    private fun addCheckedMessage(message: Message) = _chatUiState.update {
+        it.copy(checkedMessages = it.checkedMessages + message)
+    }
+
+    suspend fun onMessagePointerInputEvent(
+        scope: PointerInputScope,
+        message: Message,
+        isCheckMessagesMode: Boolean,
+        checkedMessages: List<Message>
+    ) {
+        scope.detectTapGestures(
+            onLongPress = {
+                setCheckMessageMode(true)
+                addCheckedMessage(message)
+            },
+            onTap = {
+                if (isCheckMessagesMode) {
+                    if (message in checkedMessages)
+                        uncheckMessage(message)
+                    else addCheckedMessage(message)
+                }
+            }
+        )
+    }
 }

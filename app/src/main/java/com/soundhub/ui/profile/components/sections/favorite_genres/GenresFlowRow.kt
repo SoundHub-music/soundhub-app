@@ -12,22 +12,35 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.Genre
+import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.ui.profile.ProfileViewModel
 import kotlin.random.Random
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun GenresFlowRow(
-    genreList: List<Genre> = emptyList(),
+    profileViewModel: ProfileViewModel,
     isOriginProfile: Boolean,
     navController: NavHostController
 ) {
     val maxItemsPerRow = 3
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState.collectAsState()
+
+    val genreList: List<Genre> = profileUiState.profileOwner?.favoriteGenres.orEmpty()
+    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+    val colors = remember(genreList) {
+        List(genreList.size) { generateContrastColor(onPrimaryColor) }
+    }
 
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
@@ -36,14 +49,14 @@ internal fun GenresFlowRow(
         maxItemsInEachRow = maxItemsPerRow,
 
         ) {
-        genreList.forEach { genre ->
+        genreList.forEachIndexed { index, genre ->
             genre.name?.let {
                 FavoriteGenreItem(
                     modifier = Modifier
                         .wrapContentWidth()
                         .weight(1f),
                     genreName = it,
-                    genreColor = generateContrastColor(MaterialTheme.colorScheme.onPrimary)
+                    genreColor = colors[index]
                 )
             }
         }

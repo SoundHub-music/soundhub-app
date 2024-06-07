@@ -28,7 +28,8 @@ fun SendMessageButton(
         enabled = messageContent.isNotEmpty(),
         onClick = {
             chatViewModel.sendMessage()
-            scope.launch { lazyListState.scrollToItem(messageCount - 1) }
+            if (messageCount > 0)
+                scope.launch { lazyListState.scrollToItem(messageCount - 1) }
         }) {
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.Send,

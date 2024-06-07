@@ -9,7 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,26 +28,18 @@ import java.time.format.DateTimeParseException
 fun DatePicker(
     modifier: Modifier = Modifier,
     label: String = "",
-    value: String = "",
+    value: LocalDate?,
     onValueChange: (String) -> Unit = {},
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    pattern: String = "yyyy-MM-dd",
     isError: Boolean = false,
     supportingText: @Composable () -> Unit = {}
 ) {
-    var stringDate: String by rememberSaveable { mutableStateOf(value) }
-    var date: LocalDate? by rememberSaveable { mutableStateOf(null) }
+    var stringDate: String by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
 
-    LaunchedEffect(value) {
-        date = parseLocalDate(value, pattern)
-        Log.d("DatePicker", "current value: $value")
-    }
-
-
-    val dialog = date?.let { d ->
+    val dialog = value?.let { d ->
         DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->
@@ -68,7 +59,7 @@ fun DatePicker(
     OutlinedTextField(
         label = { Text(text = label) },
         onValueChange = onValueChange,
-        value = stringDate,
+        value = value.toString(),
         readOnly = true,
         modifier = modifier
             .clickable { dialog?.show() }
@@ -98,5 +89,5 @@ private fun parseLocalDate(stringDate: String, pattern: String): LocalDate {
 @Preview
 private fun DatePickerPreview() {
     var value by remember { mutableStateOf("") }
-    DatePicker(value = value, onValueChange = { value = it })
+    DatePicker(value = LocalDate.now(), onValueChange = { value = it })
 }

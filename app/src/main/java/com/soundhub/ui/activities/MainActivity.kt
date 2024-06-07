@@ -24,11 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
-import com.soundhub.data.dao.UserDao
-import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.repository.ChatRepository
-import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.registration.RegistrationViewModel
@@ -58,30 +54,20 @@ class MainActivity : ComponentActivity() {
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val notificationViewModel: NotificationViewModel by viewModels()
 
-    @Inject
-    lateinit var chatRepository: ChatRepository
-    @Inject
-    lateinit var userCredsStore: UserCredsStore
-    @Inject
-    lateinit var userDao: UserDao
-    @Inject
-    lateinit var webSocketClient: WebSocketClient
-
     private lateinit var navController: NavHostController
     private lateinit var uiEventState: Flow<UiEvent>
-    private lateinit var uiState: Flow<UiState>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSplashScreen()
         startAndroidService(MessengerAndroidService::class.java)
+        authViewModel.initializeUser()
 
         if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, arrayOf(POST_NOTIFICATIONS), 1);
         }
 
         uiEventState = uiStateDispatcher.uiEvent
-        uiState = uiStateDispatcher.uiState
 
         lifecycleScope.launch {
             uiEventState.collect { event -> handleUiEvent(event, navController) }

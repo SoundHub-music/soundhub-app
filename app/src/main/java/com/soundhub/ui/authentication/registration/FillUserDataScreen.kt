@@ -16,16 +16,13 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.forms.UserDataForm
-import com.soundhub.ui.components.forms.IUserDataFormState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun FillUserDataScreen(
     modifier: Modifier = Modifier,
     registrationViewModel: RegistrationViewModel
 ) {
-    val registerState = registrationViewModel
-        .registerState
+    val registerState = registrationViewModel.registerState
 
     Box(
         modifier = modifier
@@ -43,7 +40,7 @@ fun FillUserDataScreen(
            )
 
             UserDataForm(
-                formStateFlow = registerState as MutableStateFlow<IUserDataFormState>,
+                formStateFlow = registerState,
                 onFirstNameChange = registrationViewModel::setFirstName,
                 onLastNameChange = registrationViewModel::setLastName,
                 onBirthdayChange = registrationViewModel::setBirthday,

@@ -41,7 +41,7 @@ fun MessageBoxContainer(
     val messages: List<Message> = chatUiState.chat?.messages ?: emptyList()
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
-    val user: User? = uiState.authorizedUser
+    val authorizedUser: User? = uiState.authorizedUser
     var messagesGroupedByDate: Map<LocalDate, List<Message>> by rememberSaveable {
         mutableStateOf(emptyMap())
     }
@@ -63,6 +63,7 @@ fun MessageBoxContainer(
         scrollToLastMessage(totalMessageCount, lazyListState)
     }
 
+    // it allows to navigate to the end of the message list when keyboard was hidden
     DisposableEffect(view) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             val isVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
@@ -94,8 +95,8 @@ fun MessageBoxContainer(
                 MessageBox(
                     modifier = Modifier,
                     message = message,
-                    isOwnMessage = message.sender?.id == user?.id,
-                    uiStateDispatcher = uiStateDispatcher
+                    isOwnMessage = message.sender?.id == authorizedUser?.id,
+                    chatViewModel = chatViewModel
                 )
             }
         }
