@@ -10,9 +10,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
 import com.soundhub.ui.profile.ProfileViewModel
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -46,10 +46,9 @@ private suspend fun onButtonClick(
     navController: NavHostController,
     user: User?
 ) {
-    val chat: Chat? = profileViewModel
+    profileViewModel
         .getOrCreateChatByUser(user)
-
-    chat?.let {
+        .firstOrNull()?.let {
         navController.navigate(
             Route.Messenger.Chat
                 .getStringRouteWithNavArg(it.id.toString())

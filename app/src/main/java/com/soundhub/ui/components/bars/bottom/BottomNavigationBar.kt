@@ -26,8 +26,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.model.User
@@ -45,8 +47,9 @@ fun BottomNavigationBar(
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
+    val navRoute: NavBackStackEntry? by navController.currentBackStackEntryAsState()
+    val defaultSelectedItem: String? = navRoute?.destination?.route
 
-    val defaultSelectedItem: String? = uiState.currentRoute
     val selectedItemState: MutableState<String?> = remember { mutableStateOf(defaultSelectedItem) }
     val receivedMessageChannel = uiStateDispatcher.receivedMessages
     val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) { getNavBarItems(authorizedUser?.id) }
@@ -58,7 +61,7 @@ fun BottomNavigationBar(
         }
     }
 
-    LaunchedEffect(key1 = uiState.currentRoute) {
+    LaunchedEffect(key1 = uiState.currentRoute, key2 = navRoute) {
         selectedItemState.value = if (uiState.currentRoute !in navBarRoutes) null
             else uiState.currentRoute
         Log.d("BottomNavigationBar", "selected page: ${selectedItemState.value}")

@@ -14,6 +14,7 @@ import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.enums.UriScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -93,8 +94,7 @@ class HttpUtils {
 
                 Log.d("HttpUtils", "createTempMediaFile[1]: fileExtension = $fileExtension")
                 return tempFile
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("HttpUtils", "createTempMediaFile[2]: ${e.stackTraceToString()}")
                 return null
             }
@@ -113,15 +113,34 @@ class HttpUtils {
         }
 
         /**
+         * returns GlideUrl if URI has http scheme else string image path
+         * @param userCreds UserPreferences object with access and refresh tokens
+         * @param imageUri image URI object
+         * @return GlideUrl or String or null
+         */
+        fun getGlideUrlOrImagePath(
+            userCreds: UserPreferences?,
+            imageUri: Uri?,
+            mediaFolder: MediaFolder
+        ): Any? = imageUri?.let {
+            if (imageUri.scheme == UriScheme.HTTP.scheme)
+                prepareGlideUrWithAccessToken(userCreds, imageUri.toString(), mediaFolder)
+            else imageUri.toString()
+        }
+
+        /**
          * prepares image url for glide by adding access token and media folder name
          * @param userCreds creds datastore container
          * @param imageUrl image url (get file endpoint)
          * @param folder enum type with certain folder
          */
-        fun prepareGlideUrWithAccessToken(userCreds: UserPreferences?, imageUrl: String?, folder: MediaFolder): GlideUrl? {
+        fun prepareGlideUrWithAccessToken(
+            userCreds: UserPreferences?,
+            imageUrl: String?,
+            folder: MediaFolder
+        ): GlideUrl? {
             return imageUrl?.let { url ->
                 var urlWithParam: String = url
-
                 if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(url)) {
                     urlWithParam += FOLDER_NAME_PARAM + folder.folderName
                 }
@@ -152,7 +171,10 @@ class HttpUtils {
          * @param context android app context
          * @param imageUrl image url (get file endpoint)
          */
-        fun prepareGlideRequestBuilder(context: Context, imageUrl: String?): RequestBuilder<Drawable> {
+        fun prepareGlideRequestBuilder(
+            context: Context,
+            imageUrl: String?
+        ): RequestBuilder<Drawable> {
             return Glide.with(context)
                 .asDrawable()
                 .load(imageUrl)

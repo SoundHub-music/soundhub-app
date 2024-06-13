@@ -47,7 +47,7 @@ internal fun UserCardSettings(
            ) {
                CircularAvatar(
                    modifier = Modifier.size(64.dp),
-                   imageUrl = authorizedUser?.avatarUrl?.toUri()
+                   imageUri = authorizedUser?.avatarUrl?.toUri()
                )
                Text(
                    text = userFullName,

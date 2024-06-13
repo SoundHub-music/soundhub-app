@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,14 +31,16 @@ import com.soundhub.R
 fun CircularAvatar(
     modifier: Modifier = Modifier,
     avatarViewModel: AvatarViewModel = hiltViewModel(),
-    imageUrl: Uri? = null,
+    imageUri: Uri?,
     contentDescription: String? = null,
     onClick: () -> Unit = {}
 ) {
-    val glideUrl by avatarViewModel.imageUrl.collectAsState()
+    var glideUrl: Any? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(imageUrl) {
-        avatarViewModel.loadGlideUrlOrImageUri(imageUrl)
+    LaunchedEffect(imageUri) {
+        imageUri?.let {
+            glideUrl = avatarViewModel.getGlideUrlOrImageUri(imageUri)
+        }
     }
 
     Box(
@@ -61,5 +66,6 @@ fun CircularAvatar(
 @Composable
 @Preview
 private fun CircularAvatarPreview() {
-    CircularAvatar()
+    val imageState: MutableState<Uri?> = remember { mutableStateOf(null) }
+    CircularAvatar(imageUri = imageState.value)
 }

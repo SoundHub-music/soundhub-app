@@ -38,7 +38,7 @@ internal fun FriendsMiniaturesRow(friendList: List<User>) {
         friendList.subList(0, friendCount)
             .forEach { friend ->
                 CircularAvatar(
-                    imageUrl = friend.avatarUrl?.toUri(),
+                    imageUri = friend.avatarUrl?.toUri(),
                     modifier = Modifier.size(24.dp)
                 )
             }

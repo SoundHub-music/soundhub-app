@@ -51,7 +51,7 @@ internal fun PostHeader(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 CircularAvatar(
-                    imageUrl = post.author?.avatarUrl?.toUri(),
+                    imageUri = post.author?.avatarUrl?.toUri(),
                     contentDescription = userFullName,
                     modifier = Modifier,
                     onClick = {

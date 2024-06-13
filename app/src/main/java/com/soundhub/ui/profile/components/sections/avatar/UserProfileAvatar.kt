@@ -21,6 +21,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.AvatarViewModel
 import com.soundhub.ui.components.menu.AvatarDropdownMenu
+import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -47,10 +49,12 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 @Composable
 internal fun UserProfileAvatar(
     navController: NavHostController,
-    profileViewModel: ProfileViewModel,
     uiStateDispatcher: UiStateDispatcher,
-    profileOwner: User?
+    profileViewModel: ProfileViewModel,
 ) {
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+
     var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
@@ -67,7 +71,10 @@ internal fun UserProfileAvatar(
             .fillMaxWidth()
             .fillMaxHeight(0.45f)
     ) {
-        Avatar(isAvatarMenuExpandedState, profileOwner)
+        Avatar(
+            isAvatarMenuExpandedState = isAvatarMenuExpandedState,
+            profileViewModel = profileViewModel
+        )
         AvatarDropdownMenu(
             modifier = Modifier.align(Alignment.Center),
             isAvatarMenuExpandedState = isAvatarMenuExpandedState,
@@ -82,7 +89,10 @@ internal fun UserProfileAvatar(
 }
 
 @Composable
-private fun UserSettingsButton(isAuthorizedUser: Boolean, navController: NavHostController) {
+private fun UserSettingsButton(
+    isAuthorizedUser: Boolean,
+    navController: NavHostController
+) {
     if (isAuthorizedUser) Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,15 +109,18 @@ private fun UserSettingsButton(isAuthorizedUser: Boolean, navController: NavHost
 @Composable
 private fun Avatar(
     isAvatarMenuExpandedState: MutableState<Boolean>,
-    profileOwner: User?,
-    avatarViewModel: AvatarViewModel = hiltViewModel()
+    avatarViewModel: AvatarViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel
 ) {
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+
     val userFullName: String = "${profileOwner?.firstName} ${profileOwner?.lastName}".trim()
-    val glideUrl: Any? by avatarViewModel.imageUrl.collectAsState()
+    var glideUrl: Any? by remember { mutableStateOf(null) }
     val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
     LaunchedEffect(key1 = profileOwner) {
-        avatarViewModel.loadGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
+        glideUrl = avatarViewModel.getGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
     }
 
     GlideImage(
@@ -117,6 +130,8 @@ private fun Avatar(
         contentDescription = userFullName,
         modifier = Modifier
             .fillMaxSize()
-            .clickable { isAvatarMenuExpandedState.value = true },
+            .clickable {
+                isAvatarMenuExpandedState.value = true
+            },
     )
 }

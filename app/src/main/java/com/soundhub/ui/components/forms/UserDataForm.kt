@@ -28,7 +28,6 @@ import com.soundhub.ui.components.fields.CountryDropdownField
 import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
-import com.soundhub.ui.states.UserFormState
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -52,10 +51,9 @@ fun UserDataForm(
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val formState: State<IUserDataFormState> = formStateFlow.collectAsState(initial = EmptyFormState())
 
-    LaunchedEffect(formState) {
+    LaunchedEffect(formState.value) {
         Log.d("UserDataForm", formState.value.toString())
-        if (formState.value is UserFormState)
-            avatarUri.value = (formState.value as UserFormState).avatarUrl?.toUri()
+        avatarUri.value = formState.value.avatarUrl?.toUri()
     }
 
     LaunchedEffect(key1 = avatarUri.value) {
@@ -68,7 +66,10 @@ fun UserDataForm(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        AvatarPicker(imageUriState = avatarUri)
+        AvatarPicker(
+            imageUriState = avatarUri,
+            onImagePick = { avatarUri.value = it }
+        )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),

@@ -3,7 +3,6 @@ package com.soundhub.ui.authentication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.R
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.User
@@ -14,7 +13,6 @@ import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.utils.UiText
 import com.soundhub.utils.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +38,8 @@ class AuthenticationViewModel @Inject constructor(
     val authFormState = _authFormState.asStateFlow()
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
+    init { initializeUser() }
+
     override fun onCleared() {
         super.onCleared()
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
@@ -51,7 +51,6 @@ class AuthenticationViewModel @Inject constructor(
                 // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
                 // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
                 //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
-
                 userDao.saveUser(it)
                 uiStateDispatcher.setAuthorizedUser(it)
             }
@@ -63,7 +62,7 @@ class AuthenticationViewModel @Inject constructor(
 
         authRepository
             .logout(authorizedUser, userCreds.firstOrNull()?.accessToken)
-            .onFailure { error ->
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
                     response = error.errorBody,
                     throwable = error.throwable
@@ -96,7 +95,6 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     fun signIn() = viewModelScope.launch(Dispatchers.IO) {
-        val toastErrorMessage: UiText.StringResource = UiText.StringResource(R.string.toast_authorization_error)
         _authFormState.update { it.copy(isLoading = true) }
 
         val ( email: String, password: String ) = authFormState.value
@@ -104,29 +102,23 @@ class AuthenticationViewModel @Inject constructor(
 
         authRepository.signIn(signInRequestBody)
             .onSuccess { response ->
+                initializeUser()
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.PostLine))
                 userCredsStore.updateCreds(response.body)
-
-                getCurrentUser().firstOrNull()?.let { user ->
-                    userDao.saveUser(user)
-                    with(uiStateDispatcher) {
-                        setAuthorizedUser(user)
-                        sendUiEvent(UiEvent.Navigate(Route.PostLine))
-                    }
-                } ?: uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastErrorMessage))
             }
-            .onFailure { error ->
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
-            .finally {
+            .finallyWithContext {
                 _authFormState.update { it.copy(isLoading = false) }
             }
     }
 
     private suspend fun toggleUserOnline() {
         userRepository.toggleUserOnline()
-            .onSuccess { response -> uiStateDispatcher.setAuthorizedUser(response.body) }
-            .onFailure { error ->
+            .onSuccessWithContext { response -> uiStateDispatcher.setAuthorizedUser(response.body) }
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }

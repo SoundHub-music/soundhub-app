@@ -39,7 +39,7 @@ import java.util.UUID
 @Composable
 fun PostEditorScreen(
     postEditorViewModel: PostEditorViewModel = hiltViewModel(),
-    user: User?,
+    profileOwner: User?,
     postId: UUID? = null
 ) {
     val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
@@ -72,7 +72,7 @@ fun PostEditorScreen(
         )
 
         Column {
-            ImagePreviewRow(postEditorViewModel = postEditorViewModel)
+            ImagePreviewRow(postEditorViewModel)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +98,7 @@ fun PostEditorScreen(
                             if (postId == null)
                                 onCreatePostButtonClick(
                                     postEditorViewModel = postEditorViewModel,
-                                    user = user
+                                    user = profileOwner
                                 )
                             else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
                         }

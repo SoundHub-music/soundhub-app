@@ -46,7 +46,10 @@ object RepositoryModule {
     fun providesInviteRepository(
         inviteService: InviteService,
         loadAllUserDataUseCase: LoadAllUserDataUseCase
-    ): InviteRepository = InviteRepositoryImpl(inviteService, loadAllUserDataUseCase)
+    ): InviteRepository = InviteRepositoryImpl(
+        inviteService,
+        loadAllUserDataUseCase
+    )
 
     @Provides
     @Singleton
@@ -120,12 +123,19 @@ object RepositoryModule {
         context: Context,
         musicService: MusicService,
         genreService: GenreService
-    ): MusicRepository = MusicRepositoryImpl(musicService, genreService, context)
+    ): MusicRepository = MusicRepositoryImpl(
+        musicService,
+        genreService,
+        context
+    )
 
     @Provides
     @Singleton
     fun providesMessageRepository(
         messageService: MessageService,
         loadAllUserDataUseCase: LoadAllUserDataUseCase
-    ): MessageRepository = MessageRepositoryImpl(messageService, loadAllUserDataUseCase)
+    ): MessageRepository = MessageRepositoryImpl(
+        messageService,
+        loadAllUserDataUseCase
+    )
 }

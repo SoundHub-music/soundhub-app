@@ -1,7 +1,6 @@
 package com.soundhub.ui.components.bars.top
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,7 +29,6 @@ import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.DateFormatter
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,79 +75,79 @@ private fun InterlocutorDetails(
     chatViewModel: ChatViewModel,
     navController: NavHostController
 ) {
-    val context: Context = LocalContext.current
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor
-    val interlocutorAvatarUrl: Uri? = remember(interlocutor) { interlocutor?.avatarUrl?.toUri() }
-    val friendName: String = "${interlocutor?.firstName.orEmpty()} ${interlocutor?.lastName.orEmpty()}".trim()
-
-    var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.isOnline ?: false) }
-    var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
-    var onlineIndicatorText: String by rememberSaveable { mutableStateOf("") }
-    val lastOnline: LocalDateTime? = interlocutor?.lastOnline
-
-    LaunchedEffect(interlocutor) {
-        isOnline = interlocutor?.isOnline ?: false
-        updateOnlineStatus(isOnline, lastOnline, context) { indicator, text ->
-            onlineIndicator = indicator
-            onlineIndicatorText = text
-        }
-    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(5.dp))
-            .clickable { interlocutor?.let { navController.navigate(Route.Profile.getStringRouteWithNavArg(it.id.toString())) } }
+            .clickable {
+                interlocutor?.let {
+                    val route = Route.Profile.getStringRouteWithNavArg(it.id.toString())
+                    navController.navigate(route)
+                }
+            }
             .padding(horizontal = 10.dp)
     ) {
         CircularAvatar(
             modifier = Modifier.size(40.dp),
-            imageUrl = interlocutorAvatarUrl
+            imageUri = interlocutor?.avatarUrl?.toUri()
         )
-        Column {
-            Text(
-                text = friendName,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 18.sp,
-                lineHeight = 28.sp
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = onlineIndicator),
-                    contentDescription = "online indicator",
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = onlineIndicatorText,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    fontSize = 12.sp
-                )
-            }
-        }
+        InterlocutorFullNameWithOnlineIndicator(chatViewModel)
     }
 }
 
-private fun updateOnlineStatus(
-    isOnline: Boolean,
-    lastOnline: LocalDateTime?,
-    context: Context,
-    update: (Int, String) -> Unit
+@Composable
+private fun InterlocutorFullNameWithOnlineIndicator(
+    chatViewModel: ChatViewModel,
+
 ) {
-    val (indicator, text) = if (isOnline) {
-        R.drawable.online_indicator to context.getString(R.string.online_indicator_user_online)
-    } else {
-        val lastOnlineString = lastOnline?.let { DateFormatter.getRelativeDate(it) } ?: ""
-        val statusText = if (lastOnline == null) {
-            context.getString(R.string.online_indicator_user_offline)
-        } else {
-            context.getString(R.string.online_indicator_user_offline_with_time, lastOnlineString)
+    val context: Context = LocalContext.current
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val interlocutor: User? = chatUiState.interlocutor
+    val lastOnline: LocalDateTime? = interlocutor?.lastOnline
+
+    val friendName: String = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
+
+    var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.isOnline ?: false) }
+    var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
+    var onlineIndicatorText: String by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(interlocutor) {
+        isOnline = interlocutor?.isOnline ?: false
+        chatViewModel.updateOnlineStatusIndicator(
+            isOnline = isOnline,
+            lastOnline = lastOnline,
+            context = context
+        ) { indicator, text ->
+            onlineIndicator = indicator
+            onlineIndicatorText = text
         }
-        R.drawable.offline_indicator to statusText
     }
-    update(indicator, text)
+
+    Column {
+        Text(
+            text = friendName,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 18.sp,
+            lineHeight = 28.sp
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Image(
+                painter = painterResource(id = onlineIndicator),
+                contentDescription = "online indicator",
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = onlineIndicatorText,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontSize = 12.sp
+            )
+        }
+    }
 }

@@ -54,7 +54,7 @@ internal fun FriendRequestNotification(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 CircularAvatar(
-                    imageUrl = invite.sender.avatarUrl?.toUri(),
+                    imageUri = invite.sender.avatarUrl?.toUri(),
                     modifier = Modifier.size(48.dp)
                 )
                 Text(

@@ -8,7 +8,7 @@
 ```properties
 DISCOGS_KEY="Discogs key"
 DISCOGS_SECRET="Discogs secret"
-SOUNDHUB_API_HOSTNAME="your-host-address" // for example: https://example.com
+SOUNDHUB_API_HOSTNAME="your-host-address" // example.com or 192.168.xxx.xxx for localhost
 LAST_FM_API_KEY="last fm api key"
 LAST_FM_SHARED_SECRET="last fm shared secret"
 ```

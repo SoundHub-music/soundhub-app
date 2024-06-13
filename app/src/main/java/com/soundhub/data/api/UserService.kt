@@ -1,7 +1,10 @@
 package com.soundhub.data.api
 
+import com.soundhub.data.api.requests.CompatibleUsersRequestBody
+import com.soundhub.data.api.responses.CompatibleUsersResponse
 import com.soundhub.data.model.User
 import com.soundhub.utils.ApiEndpoints.Users.ADD_FRIEND
+import com.soundhub.utils.ApiEndpoints.Users.COMPATIBLE_USERS
 import com.soundhub.utils.ApiEndpoints.Users.CURRENT_USER
 import com.soundhub.utils.ApiEndpoints.Users.DELETE_FRIEND
 import com.soundhub.utils.ApiEndpoints.Users.FRIEND_ID_DYNAMIC_PARAM
@@ -16,8 +19,10 @@ import com.soundhub.utils.ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -57,6 +62,12 @@ interface UserService {
 
     @GET(GET_RECOMMENDED_FRIENDS)
     suspend fun getRecommendedFriends(): Response<List<User>>
+
+    @POST(COMPATIBLE_USERS)
+    suspend fun getUsersCompatibilityPercentage(
+        @Body
+        listUsersCompareWith: CompatibleUsersRequestBody
+    ): Response<CompatibleUsersResponse>
 
     @GET(GET_FRIENDS)
     suspend fun getFriendsByUserId(

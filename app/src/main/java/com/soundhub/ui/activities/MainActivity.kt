@@ -1,8 +1,6 @@
 package com.soundhub.ui.activities
 
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -17,13 +15,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.authentication.AuthenticationViewModel
@@ -38,8 +36,10 @@ import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.NavigationUtils
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -54,24 +54,15 @@ class MainActivity : ComponentActivity() {
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val notificationViewModel: NotificationViewModel by viewModels()
 
+    @Inject
+    lateinit var userDao: UserDao
     private lateinit var navController: NavHostController
     private lateinit var uiEventState: Flow<UiEvent>
+    private lateinit var uiState: Flow<UiState>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initSplashScreen()
-        startAndroidService(MessengerAndroidService::class.java)
-        authViewModel.initializeUser()
-
-        if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this, arrayOf(POST_NOTIFICATIONS), 1);
-        }
-
-        uiEventState = uiStateDispatcher.uiEvent
-
-        lifecycleScope.launch {
-            uiEventState.collect { event -> handleUiEvent(event, navController) }
-        }
+        startOnCreateActivities()
 
         setContent {
             SoundHubTheme(dynamicColor = false) {
@@ -120,6 +111,18 @@ class MainActivity : ComponentActivity() {
         authViewModel.updateUserOnlineStatusDelayed(setOnline = true)
     }
 
+    private fun startOnCreateActivities() {
+        uiEventState = uiStateDispatcher.uiEvent
+        uiState = uiStateDispatcher.uiState
+        initSplashScreen()
+        startAndroidService(MessengerAndroidService::class.java)
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            uiEventState.collect { event -> handleUiEvent(event, navController) }
+        }
+    }
+
+
     @Composable
     private fun NavigationListener() {
         val coroutineScope = rememberCoroutineScope()
@@ -155,7 +158,7 @@ class MainActivity : ComponentActivity() {
         stopService(intent)
     }
 
-    private fun handleUiEvent(event: UiEvent, navController: NavHostController) = lifecycleScope.launch {
+    private fun handleUiEvent(event: UiEvent, navController: NavHostController) {
         Log.d("MainActivity", "handleUiEvent: $event")
         when (event) {
             is UiEvent.ShowToast -> {
@@ -177,9 +180,10 @@ class MainActivity : ComponentActivity() {
                     ?: event.customMessageStringRes?.let { getString(it) }
                     ?: getString(R.string.toast_common_error)
 
-                if (event.throwable !is CancellationException)
+                if (event.throwable !is CancellationException && event.response.status != UNAUTHORIZED_USER_ERROR_CODE)
                     Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
             }
+            is UiEvent.UpdateUserInstance -> authViewModel.initializeUser()
         }
     }
 }

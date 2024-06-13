@@ -38,33 +38,32 @@ fun DatePicker(
     var stringDate: String by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
+    val defaultDate: LocalDate = LocalDate.now().minusYears(14)
 
-    val dialog = value?.let { d ->
-        DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-                if (selectedDate.plusYears(14) <= LocalDate.now()) {
-                    onValueChange(selectedDate.toString())
-                    stringDate = selectedDate.toString()
-                }
-                else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
-            },
-            d.year,
-            d.monthValue - 1,
-            d.dayOfMonth,
-        )
-    }
+    val dialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            if (selectedDate.plusYears(14) <= LocalDate.now()) {
+                onValueChange(selectedDate.toString())
+                stringDate = selectedDate.toString()
+            }
+            else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
+        },
+        value?.year ?: defaultDate.year,
+        value?.monthValue?.minus(1) ?: defaultDate.monthValue,
+        value?.dayOfMonth ?: defaultDate.dayOfMonth,
+    )
 
     OutlinedTextField(
         label = { Text(text = label) },
         onValueChange = onValueChange,
-        value = value.toString(),
+        value = value?.toString() ?: "",
         readOnly = true,
         modifier = modifier
-            .clickable { dialog?.show() }
+            .clickable { dialog.show() }
             .onFocusChanged {
-                if (it.isFocused) dialog?.show()
+                if (it.isFocused) dialog.show()
             },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,

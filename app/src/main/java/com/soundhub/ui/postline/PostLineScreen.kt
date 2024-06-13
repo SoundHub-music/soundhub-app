@@ -26,10 +26,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
+import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.post_card.PostCard
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.PostViewModel
 
 @Composable
@@ -42,6 +44,9 @@ fun PostLineScreen(
 ) {
     val context: Context = LocalContext.current
     val postLineUiState by postLineViewModel.postLineUiState.collectAsState(initial = PostLineUiState())
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val authorizedUser: User? = uiState.authorizedUser
+
     val posts = postLineUiState.posts
     val fetchStatus: ApiStatus = postLineUiState.status
 
@@ -49,7 +54,7 @@ fun PostLineScreen(
     var isLoading: Boolean by rememberSaveable { mutableStateOf(true) }
     var messageScreenText: String by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = authorizedUser) {
         postLineViewModel.loadPosts()
     }
 

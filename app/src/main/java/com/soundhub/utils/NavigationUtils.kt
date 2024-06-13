@@ -50,6 +50,7 @@ class NavigationUtils {
             // it doesn't allow to navigate to the auth screen if there are access token and user instance
             if (route?.contains(Route.Authentication.route) == true
                 && !userCreds?.accessToken.isNullOrEmpty()
+                && !userCreds?.refreshToken.isNullOrEmpty()
                 && userInstance != null
             )
                 controller.navigate(Route.PostLine.route)

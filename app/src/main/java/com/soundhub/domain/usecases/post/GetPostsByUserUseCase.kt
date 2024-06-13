@@ -4,16 +4,15 @@ import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
-import com.soundhub.domain.usecases.UseCaseResult
 import javax.inject.Inject
 
 class GetPostsByUserUseCase @Inject constructor(
     private val postRepository: PostRepository,
 ) {
-    suspend operator fun invoke(user: User): UseCaseResult<List<Post>> {
-
+    suspend operator fun invoke(user: User): Result<List<Post>> = runCatching {
         val posts: MutableList<Post> = mutableListOf()
         var errorResponse: ErrorResponse? = null
+        var throwable: Throwable? = null
 
         postRepository.getPostsByAuthorId(
             authorId = user.id
@@ -24,10 +23,15 @@ class GetPostsByUserUseCase @Inject constructor(
             )
 
         }
-        .onFailure { error -> errorResponse = error.errorBody }
+        .onFailure { error ->
+            errorResponse = error.errorBody
+            throwable = error.throwable
+        }
 
-        return if (errorResponse != null)
-            UseCaseResult.Failure(errorResponse)
-        else UseCaseResult.Success(posts)
+        if (errorResponse != null || throwable != null) {
+            throw Exception(errorResponse?.detail, throwable)
+        }
+
+        return@runCatching posts
     }
 }

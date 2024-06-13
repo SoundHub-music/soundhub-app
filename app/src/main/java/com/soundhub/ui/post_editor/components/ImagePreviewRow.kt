@@ -1,6 +1,5 @@
 package com.soundhub.ui.post_editor.components
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,20 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.model.GlideUrl
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.ui.post_editor.PostEditorState
 import com.soundhub.ui.post_editor.PostEditorViewModel
-import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.enums.MediaFolder
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 
 @Composable
 internal fun ImagePreviewRow(
@@ -71,17 +63,10 @@ private fun ImageItem(
     postEditorViewModel: PostEditorViewModel,
     imageUrl: String
 ) {
-    val context: Context = LocalContext.current
-    val userCredsFlow: Flow<UserPreferences> = UserCredsStore(context).getCreds()
-    var userCreds: UserPreferences? by remember {
-        mutableStateOf(null)
-    }
-    val glideUrl: GlideUrl? = remember(userCreds) {
-        HttpUtils.prepareGlideUrWithAccessToken(userCreds, imageUrl, MediaFolder.POST_PICTURE)
-    }
+    var glideUrl: Any? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(key1 = userCredsFlow) {
-        userCreds = userCredsFlow.firstOrNull()
+    LaunchedEffect(imageUrl) {
+        glideUrl = postEditorViewModel.getGlideUrl(imageUrl.toUri())
     }
 
     Box(

@@ -15,6 +15,8 @@ interface RegisterDataMapper {
         source = "favoriteArtists",
         qualifiedByName = ["mapArtistsToIds"]
     )
+    @Mapping(target = "online", ignore = true)
+    @Mapping(target = "lastOnline", ignore = true)
     fun registerStateToRegisterRequestBody(
         registrationState: RegistrationState?
     ): RegisterRequestBody

@@ -14,6 +14,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +33,7 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
+import com.soundhub.ui.friends.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.profile.components.sections.user_main_data.getUserLocation
@@ -71,11 +75,15 @@ fun FriendCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CircularAvatar(
-                    imageUrl = user.avatarUrl?.toUri(),
+                    imageUri = user.avatarUrl?.toUri(),
                     modifier = Modifier.size(64.dp)
                 )
 
-                UserDescriptionColumn(user = user, chosenPage = chosenPage)
+                UserDescriptionColumn(
+                    user = user,
+                    chosenPage = chosenPage,
+                    friendsViewModel = friendsViewModel
+                )
             }
 
             NavigateToChatButton(
@@ -88,10 +96,23 @@ fun FriendCard(
 }
 
 @Composable
-private fun UserDescriptionColumn(user: User, chosenPage: FriendListPage) {
+private fun UserDescriptionColumn(
+    user: User,
+    chosenPage: FriendListPage,
+    friendsViewModel: FriendsViewModel
+) {
+    val userFullName = remember(user) { "${user.firstName} ${user.lastName}".trim() }
+    val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+    val usersCompatibility = friendsUiState.userCompatibilityPercentage
+    val userCompatibility = remember(usersCompatibility) {
+        usersCompatibility?.userCompatibilities.orEmpty()
+            .filter { it.user.id == user.id }
+            .firstNotNullOfOrNull { it }
+    }
+
     Column(modifier = Modifier.fillMaxWidth(0.8f)) {
         Text(
-            text = "${user.firstName} ${user.lastName}".trim(),
+            text = userFullName,
             fontWeight = FontWeight.Medium,
             fontSize = 20.sp,
             overflow = TextOverflow.Ellipsis
@@ -103,7 +124,7 @@ private fun UserDescriptionColumn(user: User, chosenPage: FriendListPage) {
                     getUserLocation(city = user.city, country = user.country)
                 FriendListPage.RECOMMENDATIONS ->
                     // TODO: implement the logic of determining user similarity
-                    stringResource(R.string.friends_recommendation_page_card_caption, 98)
+                    stringResource(R.string.friends_recommendation_page_card_caption, userCompatibility?.compatibility ?: 0.0f)
                 else -> ""
             },
             fontSize = 12.sp,

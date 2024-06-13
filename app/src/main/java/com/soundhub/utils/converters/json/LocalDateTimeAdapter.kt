@@ -1,5 +1,6 @@
 package com.soundhub.utils.converters.json
 
+import android.util.Log
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -7,14 +8,15 @@ import com.google.gson.JsonNull
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.FALLBACK_LOCAL_DATETIME_PATTERN
+import com.soundhub.utils.constants.Constants.LOCAL_DATETIME_PATTERN
 import java.lang.reflect.Type
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class LocalDateTimeAdapter : JsonSerializer<LocalDateTime?>, JsonDeserializer<LocalDateTime?> {
-    private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(Constants.DATETIME_FORMAT)
+    private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(LOCAL_DATETIME_PATTERN)
+    private val fallbackFormatter = DateTimeFormatter.ofPattern(FALLBACK_LOCAL_DATETIME_PATTERN)
 
     override fun serialize(
         src: LocalDateTime?,
@@ -27,6 +29,11 @@ class LocalDateTimeAdapter : JsonSerializer<LocalDateTime?>, JsonDeserializer<Lo
         json: JsonElement?,
         typeOfT: Type?,
         context: JsonDeserializationContext?
-    ): LocalDateTime? = json?.asString
-        ?.let { LocalDateTime.parse(it, formatter) }
+    ): LocalDateTime? = try {
+        json?.asString?.let { LocalDateTime.parse(it, formatter) }
+    }
+    catch (e: Exception) {
+        Log.d("LocalDateTimeAdapter", "deserialize[error]: ${e.stackTraceToString()}")
+        json?.asString?.let { LocalDateTime.parse(it, fallbackFormatter) }
+    }
 }

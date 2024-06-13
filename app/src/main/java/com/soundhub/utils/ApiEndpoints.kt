@@ -16,6 +16,7 @@ sealed class ApiEndpoints {
         const val GET_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/friends"
         const val SEARCH_USER = "$USERS_ENDPOINT/search"
         const val TOGGLE_ONLINE = "$USERS_ENDPOINT/toggleOnline"
+        const val COMPATIBLE_USERS = "$USERS_ENDPOINT/compatibleUsers"
 
         const val SEARCH_PARAM_NAME = "name"
     }
@@ -102,7 +103,6 @@ sealed class ApiEndpoints {
 
     data object ChatWebSocket {
         private const val MESSAGE_DYNAMIC_ID = "messageId"
-        const val CHAT_DYNAMIC_ID = "chatId"
 
         // topics
         private const val ROOT_MESSAGE_TOPIC = "/queue/messages"

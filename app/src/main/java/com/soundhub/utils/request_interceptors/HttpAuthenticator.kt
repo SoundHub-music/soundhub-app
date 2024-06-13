@@ -81,6 +81,7 @@ class HttpAuthenticator @Inject constructor(
         val newCreds: UserPreferences? = refreshTokenResponse.body()
         Log.d("HttpAuthenticator", "refreshToken[2]: creds = $newCreds")
         userCredsStore.updateCreds(newCreds)
+        uiStateDispatcher.sendUiEvent(UiEvent.UpdateUserInstance)
 
         return newCreds
     }

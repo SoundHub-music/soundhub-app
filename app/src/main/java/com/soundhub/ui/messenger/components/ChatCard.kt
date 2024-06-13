@@ -110,7 +110,7 @@ private fun ChatDetails(
         }
     ) {
         CircularAvatar(
-            imageUrl = interlocutorAvatarUrl,
+            imageUri = interlocutorAvatarUrl,
             modifier = Modifier.size(40.dp)
         )
     }

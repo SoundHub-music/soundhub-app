@@ -34,22 +34,21 @@ import com.soundhub.utils.DateFormatter
 
 @Composable
 internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState
-        .collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
-
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         UserNameWithDescription(profileViewModel)
-        OnlineStatusBlock(profileOwner)
-        UserLocationText(profileOwner)
+        OnlineStatusBlock(profileViewModel)
+        UserLocationText(profileViewModel)
     }
 }
 
 @Composable
-private fun OnlineStatusBlock(profileOwner: User?) {
+private fun OnlineStatusBlock(profileViewModel: ProfileViewModel) {
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
     val context: Context = LocalContext.current
 
     var indicatorColor: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
@@ -95,8 +94,15 @@ private fun OnlineStatusBlock(profileOwner: User?) {
 }
 
 @Composable
-private fun UserLocationText(user: User?) {
-    val userLocation: String = getUserLocation(user?.city, user?.country)
+private fun UserLocationText(profileViewModel: ProfileViewModel) {
+    val profileUiState: ProfileUiState by profileViewModel
+        .profileUiState
+        .collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+    val userLocation: String = rememberSaveable(profileOwner) {
+        getUserLocation(profileOwner?.city, profileOwner?.country)
+    }
+
     if (userLocation.isNotEmpty())
         Text(
             text = userLocation,

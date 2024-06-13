@@ -19,6 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
@@ -36,9 +38,10 @@ class FriendsViewModel @Inject constructor(
 ): ViewModel() {
     private var searchUsersJob: Job? = null
     private val userDao: UserDao = appDb.userDao()
-    private val authorizedUser: MutableStateFlow<User?> = MutableStateFlow(null)
+    private val authorizedUser = MutableStateFlow<User?>(null)
 
-    val friendsUiState: MutableStateFlow<FriendsUiState> = MutableStateFlow(FriendsUiState())
+    private val _friendsUiState = MutableStateFlow(FriendsUiState())
+    val friendsUiState: StateFlow<FriendsUiState> = _friendsUiState.asStateFlow()
     val tabs: List<FriendListPage> = listOf(
         FriendListPage.MAIN,
         FriendListPage.RECOMMENDATIONS,
@@ -52,10 +55,10 @@ class FriendsViewModel @Inject constructor(
     }
 
     fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
-        friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
+        _friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
         userRepository.getRecommendedFriends()
             .onSuccess { response ->
-            friendsUiState.update {
+            _friendsUiState.update {
                 it.copy(
                     recommendedFriends = response.body.orEmpty(),
                     status = ApiStatus.SUCCESS
@@ -64,7 +67,7 @@ class FriendsViewModel @Inject constructor(
         }.onFailure { error ->
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
             uiStateDispatcher.sendUiEvent(errorEvent)
-            friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
+            _friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
         }
     }
 
@@ -89,7 +92,7 @@ class FriendsViewModel @Inject constructor(
         searchUsersJob?.cancel()
 
         if (username.isEmpty() || username.isBlank()) {
-            friendsUiState.update { it.copy(foundUsers = emptyList()) }
+            _friendsUiState.update { it.copy(foundUsers = emptyList()) }
             return
         }
 
@@ -100,7 +103,7 @@ class FriendsViewModel @Inject constructor(
                      ?.filter { user -> user.id != authorizedUser.firstOrNull()?.id }
                      .orEmpty()
 
-                 friendsUiState.update {
+                 _friendsUiState.update {
                      it.copy(
                          foundUsers = otherUsers,
                          status = ApiStatus.SUCCESS
@@ -110,7 +113,7 @@ class FriendsViewModel @Inject constructor(
              .onFailure { error ->
                  val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                  uiStateDispatcher.sendUiEvent(errorEvent)
-                 friendsUiState.update { it.copy(
+                 _friendsUiState.update { it.copy(
                      status = ApiStatus.ERROR,
                      foundUsers = emptyList()
                  ) }
@@ -119,7 +122,7 @@ class FriendsViewModel @Inject constructor(
     }
 
     private fun setProfileOwner(user: User?) = viewModelScope.launch(Dispatchers.IO) {
-        friendsUiState.update {
+        _friendsUiState.update {
             it.copy(profileOwner = user)
         }
     }
@@ -131,5 +134,20 @@ class FriendsViewModel @Inject constructor(
         else getUserByIdUseCase(id)
 
         setProfileOwner(profileOwner)
+    }
+
+    fun loadUsersCompatibility(userIds: List<UUID>) = viewModelScope.launch(Dispatchers.IO) {
+        userRepository.getUsersCompatibilityPercentage(userIds)
+            .onSuccess { response ->
+                _friendsUiState.update {
+                    it.copy(
+                        userCompatibilityPercentage = response.body
+                    )
+                }
+            }
+            .onFailure { error ->
+                val uiEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                 uiStateDispatcher.sendUiEvent(uiEvent)
+            }
     }
 }

@@ -9,7 +9,8 @@ import java.lang.reflect.Type
 object Constants {
     const val PASSWORD_MIN_LENGTH: Int = 8
     const val DATE_FORMAT = "yyyy-MM-dd"
-    const val DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
+    const val LOCAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss"
+    const val FALLBACK_LOCAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm"
 
     // online status
     // after destroy: 1 minute

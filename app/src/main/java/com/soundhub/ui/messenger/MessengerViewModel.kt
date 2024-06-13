@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -43,7 +44,9 @@ class MessengerViewModel @Inject constructor(
         _messengerUiState.update { MessengerUiState() }
     }
 
-    fun updateUnreadMessageCount(cachedChatList: List<Chat> = emptyList()) = viewModelScope.launch(Dispatchers.IO) {
+    suspend fun updateUnreadMessageCount(
+        cachedChatList: List<Chat> = emptyList()
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         val chats = cachedChatList.ifEmpty { getChats().firstOrNull().orEmpty() }
         val unreadMessageCount = chats.count {
@@ -52,8 +55,10 @@ class MessengerViewModel @Inject constructor(
             }
         }
 
-        _messengerUiState.update {
-            it.copy(unreadMessagesCount = unreadMessageCount)
+        withContext(Dispatchers.Main) {
+            _messengerUiState.update {
+                it.copy(unreadMessagesCount = unreadMessageCount)
+            }
         }
     }
 
@@ -97,11 +102,13 @@ class MessengerViewModel @Inject constructor(
             .firstOrNull()
             .orEmpty()
 
-        _messengerUiState.update {
-            it.copy(
-                chats = chats,
-                status = ApiStatus.SUCCESS
-            )
+        withContext(Dispatchers.Main) {
+            _messengerUiState.update {
+                it.copy(
+                    chats = chats,
+                    status = ApiStatus.SUCCESS
+                )
+            }
         }
 
         updateUnreadMessageCount(chats)

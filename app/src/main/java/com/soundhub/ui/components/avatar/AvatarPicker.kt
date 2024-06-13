@@ -22,11 +22,12 @@ import com.soundhub.utils.enums.ContentTypes
 @Composable
 fun AvatarPicker(
     modifier: Modifier = Modifier,
-    imageUriState: MutableState<Uri?>
+    imageUriState: MutableState<Uri?>,
+    onImagePick: (Uri?) -> Unit
 ) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { imageUriState.value = it } }
+    ) { uri -> onImagePick(uri) }
 
     LaunchedEffect(key1 = imageUriState.value) {
         Log.d("AvatarPicker", imageUriState.value?.scheme.toString())
@@ -40,7 +41,7 @@ fun AvatarPicker(
     ) {
         CircularAvatar(
             modifier = Modifier.size(150.dp),
-            imageUrl = imageUriState.value,
+            imageUri = imageUriState.value,
             onClick = { launcher.launch(ContentTypes.IMAGE_ALL.type) }
         )
     }
@@ -52,5 +53,6 @@ private fun AvatarPickerPreview() {
     val imageUri: MutableState<Uri?> = remember { mutableStateOf(null) }
     AvatarPicker(
         imageUriState = imageUri,
+        onImagePick = { imageUri.value = it }
     )
 }

@@ -1,15 +1,18 @@
 package com.soundhub.ui.messenger.chat
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
+import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.ReceivedMessageResponse
 import com.soundhub.data.dao.UserDao
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
@@ -19,9 +22,9 @@ import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
+import com.soundhub.utils.DateFormatter
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
@@ -31,6 +34,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ua.naiksoftware.stomp.dto.StompMessage
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -42,9 +46,10 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
     private val uiStateDispatcher: UiStateDispatcher,
-    private val webSocketClient: WebSocketClient,
+    private val userCredsStore: UserCredsStore,
     private val userDao: UserDao
 ) : ViewModel() {
+    private lateinit var webSocketClient: WebSocketClient
     private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
     val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
@@ -62,9 +67,15 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun initializeWebSocket() = viewModelScope.launch {
-        val chatIdFlow: Flow<UUID?> = chatUiState.map { it.chat?.id }
+        val chatIdFlow: Flow<UUID?> = _chatUiState.map { it.chat?.id }
+        webSocketClient = WebSocketClient(userCredsStore)
         webSocketClient.apply {
             connect(SOUNDHUB_WEBSOCKET)
+            subscribe(
+                topic = WS_READ_MESSAGE_TOPIC,
+                messageListener = ::onReadMessageListener,
+                errorListener = ::onSubscribeErrorListener
+            )
 
             chatIdFlow.collect { id ->
                 id?.let {
@@ -78,18 +89,6 @@ class ChatViewModel @Inject constructor(
                         }
                 }
             }
-
-            subscribe(
-                topic = WS_READ_MESSAGE_TOPIC,
-                messageListener = ::onReadMessageListener,
-                errorListener = ::onSubscribeErrorListener
-            )
-
-            subscribe(
-                topic = WS_DELETE_MESSAGE_TOPIC,
-                messageListener = ::onDeleteMessageListener,
-                errorListener = ::onSubscribeErrorListener
-            )
         }
     }
 
@@ -97,27 +96,29 @@ class ChatViewModel @Inject constructor(
         Log.e("ChatViewModel", "onSubscribeErrorListener: $error")
     }
 
-    private fun onReceiveMessageListener(message: StompMessage) = viewModelScope.launch {
-        try {
-            Log.i("ChatViewModel", "Received message: $message")
-            val receivedMessageResponse: ReceivedMessageResponse = gson
-                .fromJson(message.payload, ReceivedMessageResponse::class.java)
+    private fun onReceiveMessageListener(message: StompMessage) = viewModelScope.launch(Dispatchers.IO) {
+        Log.i("ChatViewModel", "Received message: $message")
+        val receivedMessageResponse: ReceivedMessageResponse = gson
+            .fromJson(message.payload, ReceivedMessageResponse::class.java)
 
-            val receivedMessage = messageRepository.getMessageById(
-                receivedMessageResponse.id
-            ).getOrNull()
+        val receivedMessage = messageRepository.getMessageById(
+            receivedMessageResponse.id
+        ).getOrNull()
 
+        withContext(Dispatchers.Main) {
             receivedMessage?.let {
                 _chatUiState.update { state ->
                     val updatedMessages = state.chat?.messages.orEmpty().toMutableList()
                     if (updatedMessages.none { it.id == receivedMessage.id }) {
                         updatedMessages.add(receivedMessage)
                     }
-                    state.copy(chat = state.chat?.copy(messages = updatedMessages))
+
+                    val updatedChat = state.chat?.copy()?.apply {
+                        messages = updatedMessages
+                    }
+                    state.copy(chat = updatedChat)
                 }
             }
-        } catch (e: Exception) {
-            Log.e("ChatViewModel", "WebSocket error: ${e.stackTraceToString()}")
         }
     }
 
@@ -133,20 +134,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun onDeleteMessageListener(message: StompMessage) {
-        Log.i("ChatViewModel", "Deleted message: $message")
-        val deletedMessage: Message = gson.fromJson(message.payload, Message::class.java)
-
-        _chatUiState.update {
-            val updatedMessages = it.chat?.messages.orEmpty()
-                .filter { msg -> msg.id != deletedMessage.id }
-            it.copy(chat = it.chat?.copy(messages = updatedMessages))
-        }
-    }
-
     fun loadChatById(chatId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         getChatById(chatId).firstOrNull()
-            ?.onSuccess { response ->
+            ?.onSuccessWithContext { response ->
                 val currentUser: User? = userDao.getCurrentUser()
                 val chat: Chat? = response.body
                 val messages: List<Message> = chat?.messages.orEmpty()
@@ -162,7 +152,7 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
-            ?.onFailure { error ->
+            ?.onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 uiStateDispatcher.sendUiEvent(errorEvent)
                 _chatUiState.update { it.copy(status = ApiStatus.ERROR) }
@@ -175,10 +165,10 @@ class ChatViewModel @Inject constructor(
 
     fun deleteChat(chatId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         chatRepository.deleteChatById(chatId)
-            .onSuccess  {
+            .onSuccessWithContext {
                 uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Messenger))
             }
-            .onFailure { error ->
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
@@ -190,7 +180,7 @@ class ChatViewModel @Inject constructor(
         it.copy(messageContent = "")
     }
 
-    fun sendMessage() = viewModelScope.launch {
+    fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         val (chat, messageContent) = _chatUiState.value
         if (messageContent.isEmpty() || messageContent.isBlank())
@@ -256,7 +246,7 @@ class ChatViewModel @Inject constructor(
         it.copy(isCheckMessageModeEnabled = false, checkedMessages = emptyList())
     }
 
-    fun uncheckMessage(message: Message) {
+    private fun uncheckMessage(message: Message) {
         if (_chatUiState.value.isCheckMessageModeEnabled) {
             _chatUiState.update {
                 val messages: List<Message> = it.checkedMessages.filter { msg -> msg != message }
@@ -289,5 +279,25 @@ class ChatViewModel @Inject constructor(
                 }
             }
         )
+    }
+
+    fun updateOnlineStatusIndicator(
+        isOnline: Boolean,
+        lastOnline: LocalDateTime?,
+        context: Context,
+        update: (Int, String) -> Unit
+    ) {
+        val (indicator, text) = if (isOnline) {
+            R.drawable.online_indicator to context.getString(R.string.online_indicator_user_online)
+        } else {
+            val lastOnlineString = lastOnline?.let { DateFormatter.getRelativeDate(it) } ?: ""
+            val statusText = if (lastOnline == null) {
+                context.getString(R.string.online_indicator_user_offline)
+            } else {
+                context.getString(R.string.online_indicator_user_offline_with_time, lastOnlineString)
+            }
+            R.drawable.offline_indicator to statusText
+        }
+        update(indicator, text)
     }
 }

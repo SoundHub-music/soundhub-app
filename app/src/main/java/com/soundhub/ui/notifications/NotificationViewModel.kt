@@ -40,7 +40,7 @@ class NotificationViewModel @Inject constructor(
             _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
 
             inviteRepository.getAllInvites()
-                .onSuccess { response ->
+                .onSuccessWithContext { response ->
                     val invites: List<Invite> = response.body.orEmpty()
                     _notificationUiState.update {
                         it.copy(
@@ -49,7 +49,7 @@ class NotificationViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure { error ->
+                .onFailureWithContext { error ->
                     val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                     uiStateDispatcher.sendUiEvent(errorEvent)
                     _notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
@@ -62,7 +62,7 @@ class NotificationViewModel @Inject constructor(
         val uiEvent = UiEvent.ShowToast(toastText)
 
         inviteRepository.acceptInvite(invite.id)
-            .onSuccess {
+            .onSuccessWithContext {
                 deleteNotificationById(invite.id)
                 val authorizedUser: User? = uiState.map { it.authorizedUser }
                     .firstOrNull()
@@ -73,7 +73,7 @@ class NotificationViewModel @Inject constructor(
                     }
                 }
             }
-            .onFailure { error ->
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
                     error.errorBody,
                     error.throwable,
@@ -91,10 +91,10 @@ class NotificationViewModel @Inject constructor(
         val uiEvent = UiEvent.ShowToast(toastText)
 
         inviteRepository.rejectInvite(invite.id)
-            .onSuccess {
+            .onSuccessWithContext {
                 deleteNotificationById(invite.id)
             }
-            .onFailure { error ->
+            .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
                     error.errorBody,
                     error.throwable,

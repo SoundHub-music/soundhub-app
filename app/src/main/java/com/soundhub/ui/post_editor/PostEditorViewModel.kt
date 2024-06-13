@@ -1,17 +1,25 @@
 package com.soundhub.ui.post_editor
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.soundhub.R
+import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.UiText
+import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.enums.UriScheme
 import com.soundhub.utils.mappers.PostMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,7 +29,9 @@ import javax.inject.Inject
 class PostEditorViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val uiStateDispatcher: UiStateDispatcher,
+    userCredsStore: UserCredsStore
 ): ViewModel() {
+    private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
     private val _postEditorState = MutableStateFlow(PostEditorState())
     val postEditorState = _postEditorState.asStateFlow()
 
@@ -31,18 +41,18 @@ class PostEditorViewModel @Inject constructor(
 
     suspend fun loadPost(postId: UUID) {
         postRepository.getPostById(postId)
-            .onSuccess { response ->
-            val post: Post? = response.body
-            post?.let {
-                val newState: PostEditorState = PostMapper.impl
-                    .fromPostToPostEditorState(post)
-                    .apply {
-                        this.doesPostExist = true
-                        this.oldPostState = post
-                    }
+            .onSuccessWithContext { response ->
+                val post: Post? = response.body
+                post?.let {
+                    val newState: PostEditorState = PostMapper.impl
+                        .fromPostToPostEditorState(post)
+                        .apply {
+                            this.doesPostExist = true
+                            this.oldPostState = post
+                        }
 
-                _postEditorState.update { newState }
-            }
+                    _postEditorState.update { newState }
+                }
         }
     }
 
@@ -85,13 +95,12 @@ class PostEditorViewModel @Inject constructor(
             }
 
         postRepository.addPost(post)
-            .onSuccess {
-            with(uiStateDispatcher) {
-                sendUiEvent(UiEvent.ShowToast(toastText))
-                sendUiEvent(UiEvent.PopBackStack)
-            }
-        }
-        .onFailure { response ->
+            .onSuccessWithContext {
+                with(uiStateDispatcher) {
+                    sendUiEvent(UiEvent.ShowToast(toastText))
+                    sendUiEvent(UiEvent.PopBackStack)
+                }
+        }.onFailureWithContext { response ->
             response.errorBody.detail?.let { message ->
                 toastText = UiText.DynamicString(message)
                 uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
@@ -109,16 +118,24 @@ class PostEditorViewModel @Inject constructor(
             newImages = _postEditorState.value.newImages,
             imagesToBeDeleted = _postEditorState.value.imagesToBeDeleted
         )
-            .onSuccess {
+            .onSuccessWithContext {
                 toastText = UiText.StringResource(R.string.toast_post_updated_successfully)
                 with(uiStateDispatcher) {
                     sendUiEvent(UiEvent.ShowToast(toastText))
                     sendUiEvent(UiEvent.PopBackStack)
                 }
             }
-            .onFailure {
+            .onFailureWithContext {
                 toastText = UiText.StringResource(R.string.toast_update_post_error)
                 uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
             }
+
+    }
+
+    suspend fun getGlideUrl(imageUrl: Uri?): Any? {
+        val creds: UserPreferences? = userCreds.firstOrNull()
+        return if (imageUrl?.scheme == UriScheme.HTTP.scheme)
+            HttpUtils.prepareGlideUrWithAccessToken(creds, imageUrl.toString(), MediaFolder.POST_PICTURE)
+        else imageUrl.toString()
     }
 }

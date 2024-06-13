@@ -21,7 +21,9 @@ import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.ApiEndpoints
+import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
+import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
+import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
@@ -94,7 +96,7 @@ class MessengerAndroidService: Service() {
 
                 chats.map { it.id }.forEach { id ->
                     val subscription = subscribe(
-                        topic = "${ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC}/$id",
+                        topic = "$WS_GET_MESSAGES_TOPIC/$id",
                         messageListener = ::onReceiveMessageListener,
                         errorListener = ::onSubscribeErrorListener
                     )
@@ -102,12 +104,22 @@ class MessengerAndroidService: Service() {
                 }
 
                 subscribe(
-                    topic = ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC,
+                    topic = WS_READ_MESSAGE_TOPIC,
                     messageListener = ::onReadMessageListener,
+                    errorListener = ::onSubscribeErrorListener
+                )
+
+                subscribe(
+                    topic = WS_DELETE_MESSAGE_TOPIC,
+                    messageListener = ::onDeleteMessageListener,
                     errorListener = ::onSubscribeErrorListener
                 )
             }
         }
+    }
+
+    private fun onDeleteMessageListener(message: StompMessage) {
+        Log.i("MessengerAndroidService", "onDeleteMessageListener: $message")
     }
 
     private fun onSubscribeErrorListener(throwable: Throwable) {

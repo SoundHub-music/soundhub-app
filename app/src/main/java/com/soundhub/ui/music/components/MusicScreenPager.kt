@@ -22,7 +22,7 @@ internal fun MusicScreenPager(selectedTabState: PagerState, navController: NavHo
             .padding(top = 10.dp)
     ) { page ->
         when (page) {
-            0 -> MusicMainPage(navController = navController)
+            0 -> MusicMainPage()
             1 -> MusicLibraryPage(navController = navController)
         }
     }

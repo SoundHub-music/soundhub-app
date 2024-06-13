@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -38,18 +39,18 @@ class EditUserProfileViewModel @Inject constructor(
     var isLoading = MutableStateFlow(false)
         private set
 
-    init {
-        viewModelScope.launch {
-            userDao.getCurrentUser()?.let { user ->
-                authorizedUser.update { user }
-                updateFormStateFromUser(user)
-            }
-        }
-    }
+    init { initState() }
 
     override fun onCleared() {
         super.onCleared()
         authorizedUser.update { null }
+    }
+
+    private fun initState() = viewModelScope.launch(Dispatchers.Main) {
+        userDao.getCurrentUser()?.let { user ->
+            authorizedUser.update { user }
+            updateFormStateFromUser(user)
+        }
     }
 
     fun hasStateChanges(): Boolean = authorizedUser.value?.let { user ->
@@ -58,7 +59,7 @@ class EditUserProfileViewModel @Inject constructor(
     } ?: false
 
     private fun updateFormStateFromUser(user: User) = _formState.update {
-        val formState = UserMapper.impl.toFormState(user.copy())
+        val formState: UserFormState = UserMapper.impl.toFormState(user.copy())
         formState.copy(languages = formState.languages.filter { it.isNotEmpty() }.toMutableList())
     }
 
@@ -71,12 +72,16 @@ class EditUserProfileViewModel @Inject constructor(
         updatedUser?.let {
             updateUserUseCase(updatedUser)
                 .onSuccess {
-                    userDao.saveUser(updatedUser)
-                    uiStateDispatcher.setAuthorizedUser(updatedUser)
+                    withContext(Dispatchers.Main) {
+                        userDao.saveUser(updatedUser)
+                        uiStateDispatcher.setAuthorizedUser(updatedUser)
+                    }
                 }
                 .onFailure {
-                    val toastText = UiText.StringResource(R.string.toast_update_error)
-                    uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                    withContext(Dispatchers.Main) {
+                        val toastText = UiText.StringResource(R.string.toast_update_error)
+                        uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                    }
                 }
         }
 
@@ -119,7 +124,7 @@ class EditUserProfileViewModel @Inject constructor(
     }
 
     fun setAvatar(avatarUri: Uri) = _formState.update {
-        Log.d("EditUserProfileViewModel", "setAvatar[uri]: ${avatarUri.toString()}")
+        Log.d("EditUserProfileViewModel", "setAvatar[uri]: $avatarUri")
         it.copy(avatarUrl = avatarUri.toString())
     }
 

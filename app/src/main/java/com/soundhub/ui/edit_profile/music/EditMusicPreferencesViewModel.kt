@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +56,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
         Log.d("EditMusicPreferencesViewModel", "viewmodel was cleared")
     }
 
-    fun onNextButtonClick() = viewModelScope.launch {
+    fun onNextButtonClick() = viewModelScope.launch(Dispatchers.Main) {
         val state: UiState? = uiState.firstOrNull()
         when (state?.currentRoute) {
             Route.EditFavoriteGenres.route -> handleFavoriteGenres()
@@ -116,18 +117,18 @@ class EditMusicPreferencesViewModel @Inject constructor(
 
         updateUserUseCase(user)
 
-        user?.let {
-            val route: Route = Route.Profile.getRouteWithNavArg(user.id.toString())
-            with(uiStateDispatcher) {
-                setAuthorizedUser(user)
-                sendUiEvent(
-                    UiEvent.Navigate(route)
-                )
+        withContext(Dispatchers.Main) {
+            user?.let {
+                val route: Route = Route.Profile.getRouteWithNavArg(user.id.toString())
+                with(uiStateDispatcher) {
+                    setAuthorizedUser(user)
+                    sendUiEvent(UiEvent.Navigate(route))
+                }
             }
         }
     }
 
-    private fun handleFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
+    private fun handleFavoriteGenres() = viewModelScope.launch(Dispatchers.Main) {
         loadArtists()
         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.EditFavoriteArtists))
     }

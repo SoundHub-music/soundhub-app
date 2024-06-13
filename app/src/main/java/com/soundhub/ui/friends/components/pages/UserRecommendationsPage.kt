@@ -49,6 +49,10 @@ internal fun UserRecommendationsPage(
         )
     }
 
+    LaunchedEffect(key1 = users) {
+        friendsViewModel.loadUsersCompatibility(users.map { it.id })
+    }
+
     when (friendsUiState.status) {
         ApiStatus.LOADING -> Row(
             modifier = Modifier.fillMaxWidth(),

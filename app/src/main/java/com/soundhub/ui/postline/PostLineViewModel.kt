@@ -7,7 +7,6 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.PostRepository
-import com.soundhub.domain.usecases.UseCaseResult
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.ui.events.UiEvent
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -38,9 +38,10 @@ class PostLineViewModel @Inject constructor(
         val authorizedUser: User? = userDao.getCurrentUser()
         val friends: List<User> = authorizedUser?.friends.orEmpty()
 
-        if (friends.isEmpty())
-            _postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
-        friends.forEach { user -> fetchAndProcessPosts(user) }
+        friends.forEach { user -> fetchAndProcessPosts(user) }.also {
+            if (friends.isEmpty())
+                _postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
+        }
     }
 
     private suspend fun fetchAndProcessPosts(user: User) {
@@ -48,20 +49,20 @@ class PostLineViewModel @Inject constructor(
         if (posts.isEmpty())
             _postLineUiState.update { it.copy(status = ApiStatus.LOADING) }
 
-        postRepository.getPostsByAuthorId(user.id).onSuccess { response ->
-            val postsFromResponse: List<Post> = response.body.orEmpty()
-            if (posts.isNotEmpty())
-                posts.addAll(postsFromResponse.filter { p -> p.id !in posts.map { it.id } })
-            else {
-                _postLineUiState.update { state ->
-                    state.copy(
-                        posts = response.body.orEmpty().sortedBy { it.publishDate },
-                        status = ApiStatus.SUCCESS
-                    )
+        postRepository.getPostsByAuthorId(user.id)
+            .onSuccessWithContext { response ->
+                val postsFromResponse: List<Post> = response.body.orEmpty()
+                if (posts.isNotEmpty())
+                    posts.addAll(postsFromResponse.filter { p -> p.id !in posts.map { it.id } })
+                else {
+                    _postLineUiState.update { state ->
+                        state.copy(
+                            posts = response.body.orEmpty().sortedBy { it.publishDate },
+                            status = ApiStatus.SUCCESS
+                        )
+                    }
                 }
-            }
-
-        }.onFailure { error ->
+        }.onFailureWithContext { error ->
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
             uiStateDispatcher.sendUiEvent(errorEvent)
             _postLineUiState.update { it.copy(status = ApiStatus.ERROR) }
@@ -70,30 +71,43 @@ class PostLineViewModel @Inject constructor(
 
 
     fun deletePostById(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        when (val result = deletePostByIdUseCase(postId)) {
-            is UseCaseResult.Success -> _postLineUiState.update { state ->
-                val deletedPostId: UUID? = result.data
-                state.copy(
-                    posts = state.posts.filter { deletedPostId != it.id },
-                    status = ApiStatus.SUCCESS
-                )
+        deletePostByIdUseCase(postId)
+            .onSuccess { response ->
+                withContext(Dispatchers.Main) {
+                    _postLineUiState.update { state ->
+                        val deletedPostId: UUID? = response
+                        state.copy(
+                            posts = state.posts.filter { deletedPostId != it.id },
+                            status = ApiStatus.SUCCESS
+                        )
+                    }
+                }
             }
-            else -> _postLineUiState.update { it.copy(status = ApiStatus.ERROR) }
-        }
+            .onFailure {
+                withContext(Dispatchers.Main) {
+                   _postLineUiState.update { state -> state.copy(status = ApiStatus.ERROR) }
+                }
+            }
     }
 
     fun togglePostLikeAndUpdatePostList(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         val ( posts: List<Post> ) = _postLineUiState.value
-
-        when (val result = togglePostLikeAndUpdateListUseCase(postId, posts)) {
-            is UseCaseResult.Success -> _postLineUiState.update {
-                val updatedPostList: List<Post> = result.data.orEmpty()
-                it.copy(posts = updatedPostList)
+        togglePostLikeAndUpdateListUseCase(postId, posts)
+            .onSuccess { response ->
+                withContext(Dispatchers.Main) {
+                    _postLineUiState.update {
+                        val updatedPostList: List<Post> = response
+                        it.copy(posts = updatedPostList)
+                    }
+                }
             }
-            is UseCaseResult.Failure -> {
-                val toastText: UiText = UiText.DynamicString(result.error?.detail ?: "")
-                uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+            .onFailure { error ->
+                withContext(Dispatchers.Main) {
+                    error.message?.let {
+                        val toastText: UiText = UiText.DynamicString(it)
+                        uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
+                    }
+                }
             }
-        }
     }
 }

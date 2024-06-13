@@ -9,6 +9,8 @@ import com.soundhub.R
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.User
 import com.soundhub.data.api.UserService
+import com.soundhub.data.api.requests.CompatibleUsersRequestBody
+import com.soundhub.data.api.responses.CompatibleUsersResponse
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
@@ -214,6 +216,40 @@ class UserRepositoryImpl @Inject constructor(
         }
         catch (e: Exception) {
             Log.e("UserRepository", "getRecommendedFriends[3]: ${e.stackTraceToString()}")
+            return HttpResult.Error(
+                errorBody = ErrorResponse(detail = e.localizedMessage),
+                throwable = e
+            )
+        }
+    }
+
+    override suspend fun getUsersCompatibilityPercentage(
+        userIds: List<UUID>
+    ): HttpResult<CompatibleUsersResponse> {
+        try {
+            val requestBody = CompatibleUsersRequestBody(userIds)
+            Log.d("getUsersCompatibilityPercentage", "body json: ${gson.toJson(requestBody)}")
+
+            val response: Response<CompatibleUsersResponse> = userService.getUsersCompatibilityPercentage(requestBody)
+            Log.d("UserRepository", "getUsersCompatibilityPercentage[1]: $response")
+
+            if (!response.isSuccessful) {
+                val errorBody: ErrorResponse = gson
+                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+                    ?: ErrorResponse(
+                        status = response.code(),
+                        detail = context.getString(R.string.toast_common_error)
+                    )
+
+                Log.e("UserRepository", "getUsersCompatibilityPercentage[2]: $errorBody")
+                return HttpResult.Error(errorBody = errorBody)
+            }
+
+            Log.d("getUsersCompatibilityPercentage[3]", "response: ${response.body()}")
+            return HttpResult.Success(body = response.body())
+        }
+        catch (e: Exception) {
+            Log.e("UserRepository", "getUsersCompatibilityPercentage[4]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

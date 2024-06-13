@@ -22,6 +22,8 @@ class FileRepositoryImpl @Inject constructor(
     private val fileService: FileService,
     private val context: Context
 ): FileRepository {
+    private val gson = Gson()
+
     override suspend fun getFile(
         folderName: String?,
         fileNameUrl: String?,
@@ -34,7 +36,7 @@ class FileRepositoryImpl @Inject constructor(
             Log.d("FileRepository", "getFile[1]: response is $response")
 
             if (!response.isSuccessful) {
-                val errorBody: ErrorResponse = Gson()
+                val errorBody: ErrorResponse = gson
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
                         status = response.code(),

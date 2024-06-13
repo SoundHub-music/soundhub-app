@@ -56,7 +56,7 @@ fun ImageHorizontalPager(
                 .clip(RoundedCornerShape(16.dp))
         ) {
             GlideImage(
-                model = imageGalleryViewModel.prepareGlideImage(images[page], mediaFolder),
+                model = imageGalleryViewModel.getGlideUrlOrImageUri(images[page], mediaFolder),
                 contentDescription = images[page],
                 contentScale = contentScale,
                 modifier = Modifier

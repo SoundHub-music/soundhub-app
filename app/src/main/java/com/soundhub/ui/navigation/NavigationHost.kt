@@ -314,7 +314,7 @@ fun NavigationHost(
                 navController = navController
             ) {
                 topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
-                PostEditorScreen(user = authorizedUser)
+                PostEditorScreen(profileOwner = authorizedUser)
             }
         }
 
@@ -333,7 +333,7 @@ fun NavigationHost(
                 ) {
                     topBarTitle.value = stringResource(id = R.string.screen_title_update_post)
                     PostEditorScreen(
-                        user = authorizedUser,
+                        profileOwner = authorizedUser,
                         postId = postId
                     )
                 }
