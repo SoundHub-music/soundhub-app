@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen
@@ -22,7 +20,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.registration.RegistrationViewModel
@@ -34,14 +31,11 @@ import com.soundhub.ui.states.UiState
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.NavigationUtils
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private val messengerViewModel: MessengerViewModel by viewModels()
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val notificationViewModel: NotificationViewModel by viewModels()
+    private val navigationViewModel: NavigationViewModel by viewModels()
 
     @Inject
     lateinit var userDao: UserDao
@@ -126,18 +121,13 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun NavigationListener() {
         val coroutineScope = rememberCoroutineScope()
-        val userCreds: Flow<UserPreferences> = authViewModel.userCreds
-        val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
         navController = rememberNavController()
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             coroutineScope.launch {
-                NavigationUtils.onNavDestinationChangedListener(
+                navigationViewModel.onNavDestinationChangedListener(
                     controller = controller,
                     destination = destination,
-                    userCreds = userCreds.firstOrNull(),
-                    userInstance = uiState.authorizedUser,
-                    uiStateDispatcher = uiStateDispatcher
                 )
             }
         }
@@ -180,10 +170,12 @@ class MainActivity : ComponentActivity() {
                     ?: event.customMessageStringRes?.let { getString(it) }
                     ?: getString(R.string.toast_common_error)
 
-                if (event.throwable !is CancellationException && event.response.status != UNAUTHORIZED_USER_ERROR_CODE)
+                if (event.throwable !is CancellationException)
                     Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
             }
-            is UiEvent.UpdateUserInstance -> authViewModel.initializeUser()
+            is UiEvent.UpdateUserInstance -> lifecycleScope.launch {
+                authViewModel.initializeUser()
+            }
         }
     }
 }

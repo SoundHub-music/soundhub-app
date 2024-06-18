@@ -44,7 +44,7 @@ import com.soundhub.ui.authentication.AuthenticationViewModel
 import com.soundhub.ui.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.components.loaders.CircleLoader
-import com.soundhub.utils.Validator
+import com.soundhub.utils.AuthValidator
 
 @Composable
 fun AuthForm(
@@ -108,7 +108,7 @@ fun AuthForm(
             supportingText = { ErrorPasswordFieldMessage(authFormState) }
         )
 
-        // repeat password field
+        // repeated password field
         AnimatedVisibility(
             visible = authFormState.isRegisterForm,
             enter = slideInVertically(initialOffsetY = { with(density) { -40.dp.roundToPx() } }) +
@@ -120,7 +120,7 @@ fun AuthForm(
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = authFormState.repeatedPassword ?: "",
+                value = authFormState.repeatedPassword,
                 singleLine = true,
                 onValueChange = authViewModel::setRepeatedPassword,
                 label = { Text(stringResource(id = R.string.repeat_password_label)) },
@@ -149,7 +149,7 @@ fun AuthForm(
                     authViewModel = authViewModel
                 )
             },
-            enabled = Validator.validateAuthForm(authFormState)
+            enabled = AuthValidator.validateAuthForm(authFormState)
         ) {
             if (authFormState.isLoading)
                 CircleLoader(modifier = Modifier.size(24.dp))

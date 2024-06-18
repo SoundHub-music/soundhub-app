@@ -29,7 +29,7 @@ import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import java.time.LocalDateTime
+import com.soundhub.utils.UserUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +107,6 @@ private fun InterlocutorFullNameWithOnlineIndicator(
     val context: Context = LocalContext.current
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor
-    val lastOnline: LocalDateTime? = interlocutor?.lastOnline
 
     val friendName: String = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
 
@@ -117,12 +116,11 @@ private fun InterlocutorFullNameWithOnlineIndicator(
 
     LaunchedEffect(interlocutor) {
         isOnline = interlocutor?.isOnline ?: false
-        chatViewModel.updateOnlineStatusIndicator(
-            isOnline = isOnline,
-            lastOnline = lastOnline,
-            context = context
-        ) { indicator, text ->
-            onlineIndicator = indicator
+        UserUtils.updateOnlineStatusIndicator(
+            context = context,
+            user = interlocutor
+        ) { indicatorIcon, _ , text ->
+            onlineIndicator = indicatorIcon
             onlineIndicatorText = text
         }
     }

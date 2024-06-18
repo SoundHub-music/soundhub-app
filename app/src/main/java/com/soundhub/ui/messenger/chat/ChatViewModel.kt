@@ -1,13 +1,11 @@
 package com.soundhub.ui.messenger.chat
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
-import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.ReceivedMessageResponse
@@ -24,7 +22,6 @@ import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
-import com.soundhub.utils.DateFormatter
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
@@ -279,25 +276,5 @@ class ChatViewModel @Inject constructor(
                 }
             }
         )
-    }
-
-    fun updateOnlineStatusIndicator(
-        isOnline: Boolean,
-        lastOnline: LocalDateTime?,
-        context: Context,
-        update: (Int, String) -> Unit
-    ) {
-        val (indicator, text) = if (isOnline) {
-            R.drawable.online_indicator to context.getString(R.string.online_indicator_user_online)
-        } else {
-            val lastOnlineString = lastOnline?.let { DateFormatter.getRelativeDate(it) } ?: ""
-            val statusText = if (lastOnline == null) {
-                context.getString(R.string.online_indicator_user_offline)
-            } else {
-                context.getString(R.string.online_indicator_user_offline_with_time, lastOnlineString)
-            }
-            R.drawable.offline_indicator to statusText
-        }
-        update(indicator, text)
     }
 }

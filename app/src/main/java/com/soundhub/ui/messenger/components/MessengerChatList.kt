@@ -40,7 +40,7 @@ internal fun MessengerChatList(
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
     val authorizedUser: User? = uiState.authorizedUser
 
-    val chats: List<Chat> = messengerUiState.chats
+    val chats: List<Chat> = messengerUiState.chats.filter { it.messages.isNotEmpty() }
     val searchBarText: String = uiState.searchBarText
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
     val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages

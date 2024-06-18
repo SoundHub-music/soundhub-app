@@ -21,20 +21,20 @@ class ChatRepositoryImpl @Inject constructor(
         try {
             val response: Response<List<Chat>> = chatService
                 .getAllChatsByUserId(userId)
-            Log.d("ChatRepository", "getAllChatsByCurrentUser[1]: $response")
+            Log.d("ChatRepository", "getAllChatsByUserId[1]: $response")
 
             if (!response.isSuccessful) {
                 val errorBody: ErrorResponse = Gson()
                     .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(status = response.code())
 
-                Log.e("ChatRepository", "getAllChatsByCurrentUser[2]: $errorBody")
+                Log.e("ChatRepository", "getAllChatsByUserId[2]: $errorBody")
                 return HttpResult.Error(errorBody = errorBody)
             }
             return HttpResult.Success(body = response.body())
         }
         catch (e: Exception) {
-            Log.e("ChatRepository", "getAllChatsByCurrentUser[3]: ${e.stackTraceToString()}")
+            Log.e("ChatRepository", "getAllChatsByUserId[3]: ${e.stackTraceToString()}")
             return HttpResult.Error(
                 errorBody = ErrorResponse(detail = e.localizedMessage),
                 throwable = e

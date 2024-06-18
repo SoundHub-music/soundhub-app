@@ -4,7 +4,7 @@ import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.utils.constants.Constants
 
-sealed class Validator {
+sealed class AuthValidator {
     companion object {
         fun validateEmail(text: String): Boolean {
             val mask: String = Constants.EMAIL_REGEX
@@ -12,8 +12,9 @@ sealed class Validator {
             return text.matches(mask.toRegex())
         }
 
-        fun arePasswordsEqual(password: String, repeatPassword: String): Boolean {
-            return password == repeatPassword && (password.isNotEmpty() && repeatPassword.isNotEmpty())
+        fun arePasswordsEqual(password: String, repeatedPassword: String): Boolean {
+            if (password.isEmpty() && repeatedPassword.isEmpty()) return true
+            return password == repeatedPassword
         }
 
         fun validatePassword(password: String): Boolean {
@@ -36,7 +37,7 @@ sealed class Validator {
             if (authFormState.isRegisterForm)
                 return isLoginFormValid
                         && authFormState.arePasswordsEqual
-                        && authFormState.repeatedPassword?.isNotEmpty() ?: false
+                        && authFormState.repeatedPassword.isNotEmpty()
 
             return isLoginFormValid
         }

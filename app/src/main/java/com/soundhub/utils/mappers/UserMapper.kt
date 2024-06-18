@@ -1,17 +1,23 @@
 package com.soundhub.utils.mappers
 
+import com.soundhub.data.model.Artist
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.states.UserFormState
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
+import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
 
 @Mapper
 interface UserMapper {
     @Mapping(target = "friends", ignore = true)
-    @Mapping(target = "favoriteArtistsIds", ignore = true)
+    @Mapping(
+        target = "favoriteArtistsIds",
+        source = "favoriteArtists",
+        qualifiedByName = ["mapArtistsToIds"]
+    )
     fun fromRegistrationState(state: RegistrationState): User
 
     @Mapping(target = "firstNameValid", ignore = true)
@@ -40,5 +46,9 @@ interface UserMapper {
 
     companion object {
         val impl: UserMapper = Mappers.getMapper(UserMapper::class.java)
+
+        @JvmStatic
+        @Named("mapArtistsToIds")
+        fun mapArtistsToIds(list: List<Artist>): List<Int> = list.map { it.id }
     }
 }

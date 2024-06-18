@@ -20,7 +20,7 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.ui.friends.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
-import com.soundhub.ui.friends.components.FriendCard
+import com.soundhub.ui.friends.components.friend_card.FriendCard
 import com.soundhub.ui.friends.enums.FriendListPage
 
 @Composable

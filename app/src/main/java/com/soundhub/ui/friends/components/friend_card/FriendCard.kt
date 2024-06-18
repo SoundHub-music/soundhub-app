@@ -1,4 +1,4 @@
-package com.soundhub.ui.friends.components
+package com.soundhub.ui.friends.components.friend_card
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,18 +9,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,9 +32,7 @@ import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.friends.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
-import com.soundhub.ui.profile.components.sections.user_main_data.getUserLocation
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import com.soundhub.utils.UserUtils
 
 @Composable
 fun FriendCard(
@@ -88,7 +82,6 @@ fun FriendCard(
 
             NavigateToChatButton(
                 user = user,
-                navController = navController,
                 friendsViewModel = friendsViewModel
             )
         }
@@ -103,11 +96,23 @@ private fun UserDescriptionColumn(
 ) {
     val userFullName = remember(user) { "${user.firstName} ${user.lastName}".trim() }
     val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-    val usersCompatibility = friendsUiState.userCompatibilityPercentage
-    val userCompatibility = remember(usersCompatibility) {
-        usersCompatibility?.userCompatibilities.orEmpty()
+
+    val userCompatibilities = friendsUiState.userCompatibilityPercentage
+    val userCompatibility = remember(userCompatibilities) {
+        userCompatibilities?.userCompatibilities.orEmpty()
             .filter { it.user.id == user.id }
             .firstNotNullOfOrNull { it }
+    }
+
+    val additionalText: String = when(chosenPage) {
+        in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
+            UserUtils.getUserLocation(city = user.city, country = user.country)
+        FriendListPage.RECOMMENDATIONS ->
+            stringResource(
+                R.string.friends_recommendation_page_card_caption,
+                userCompatibility?.compatibility ?: 0.0f
+            )
+        else -> ""
     }
 
     Column(modifier = Modifier.fillMaxWidth(0.8f)) {
@@ -118,51 +123,13 @@ private fun UserDescriptionColumn(
             overflow = TextOverflow.Ellipsis
         )
 
-        Text(
-            text = when (chosenPage) {
-                in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
-                    getUserLocation(city = user.city, country = user.country)
-                FriendListPage.RECOMMENDATIONS ->
-                    // TODO: implement the logic of determining user similarity
-                    stringResource(R.string.friends_recommendation_page_card_caption, userCompatibility?.compatibility ?: 0.0f)
-                else -> ""
-            },
-            fontSize = 12.sp,
-            fontWeight = FontWeight.ExtraLight,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Left,
-
-        )
-    }
-}
-
-@Composable
-private fun NavigateToChatButton(
-    user: User,
-    navController: NavHostController,
-    friendsViewModel: FriendsViewModel
-) {
-    val coroutineScope = rememberCoroutineScope()
-
-    FilledTonalIconButton(
-        onClick = {
-            coroutineScope.launch {
-                friendsViewModel.getOrCreateChat(user)
-                    .firstOrNull()
-                    ?.let {
-                        val route: String = Route.Messenger.Chat
-                            .getStringRouteWithNavArg(it.id.toString())
-
-                        navController.navigate(route)
-                }
-            }
-        },
-        shape = RoundedCornerShape(5.dp),
-        modifier = Modifier,
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
-            contentDescription = "send message"
-        )
+        if (additionalText.isNotEmpty())
+            Text(
+                text = additionalText,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraLight,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Left,
+            )
     }
 }

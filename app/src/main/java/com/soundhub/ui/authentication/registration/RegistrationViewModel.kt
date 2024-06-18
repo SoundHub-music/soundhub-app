@@ -12,9 +12,9 @@ import com.soundhub.data.model.Genre
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
@@ -26,8 +26,7 @@ import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.components.forms.IUserDataFormState
-import com.soundhub.ui.events.UiEvent.*
-import com.soundhub.utils.Validator
+import com.soundhub.utils.AuthValidator
 import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,10 +50,9 @@ class RegistrationViewModel @Inject constructor(
     private val loadGenresUseCase: LoadGenresUseCase,
     private val loadArtistsUseCase: LoadArtistsUseCase,
     private val searchArtistsUseCase: SearchArtistsUseCase,
-    appDb: AppDatabase
+    private val userDao: UserDao
 ): ViewModel() {
     private val uiState = uiStateDispatcher.uiState
-    private val userDao: UserDao = appDb.userDao()
 
     private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
     val genreUiState = _genreUiState.asStateFlow()
@@ -68,14 +66,14 @@ class RegistrationViewModel @Inject constructor(
     private var searchJob: Job? = null
     private var loadArtistsJob = MutableStateFlow<List<Job?>>(emptyList())
 
-    init { viewModelScope.launch { loadGenres() } }
+    init { loadGenres() }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("PostRegistrationViewModel", "viewmodel was cleared")
     }
 
-    private suspend fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
+    private fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
         loadGenresUseCase(
             countPerPage = 50,
             genreUiState = _genreUiState
@@ -90,6 +88,9 @@ class RegistrationViewModel @Inject constructor(
                 page = page
             )
         }
+
+        if (job.isCompleted && _artistUiState.value.artists.isEmpty())
+            _artistUiState.update { it.copy(status = ApiStatus.SUCCESS) }
 
         loadArtistsJob.update { it + job }
     }
@@ -119,15 +120,17 @@ class RegistrationViewModel @Inject constructor(
         _registerState.update {
             it.copy(favoriteGenres = _genreUiState.value.chosenGenres)
         }
+
         loadArtists()
-        uiStateDispatcher.sendUiEvent(Navigate(Authentication.ChooseArtists))
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Authentication.ChooseArtists))
     }
 
     private fun handleChooseArtists() = viewModelScope.launch(Dispatchers.Main) {
         _registerState.update {
             it.copy(favoriteArtists = _artistUiState.value.chosenArtists)
         }
-        uiStateDispatcher.sendUiEvent(Navigate(Authentication.FillUserData))
+
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Authentication.FillUserData))
     }
 
     private fun handleFillUserData() = viewModelScope.launch(Dispatchers.Main) {
@@ -144,10 +147,8 @@ class RegistrationViewModel @Inject constructor(
             )
         }
 
-        if (Validator.validateRegistrationState(_registerState.value)) {
+        if (AuthValidator.validateRegistrationState(_registerState.value)) {
             val user: User = UserMapper.impl.fromRegistrationState(_registerState.value)
-            user.favoriteArtistsIds = user.favoriteArtists.map { it.id }
-
             handleRegister(user)
         }
     }
@@ -161,8 +162,8 @@ class RegistrationViewModel @Inject constructor(
                 password = authForm.password
             )
         }
-
-        uiStateDispatcher.sendUiEvent(Navigate(Authentication.ChooseGenres))
+        val uiEvent = UiEvent.Navigate(Authentication.ChooseGenres)
+        uiStateDispatcher.sendUiEvent(uiEvent)
     }
 
 
@@ -172,11 +173,9 @@ class RegistrationViewModel @Inject constructor(
 
         authRepository
             .signUp(registerRequestBody)
-            .onSuccessWithContext(Dispatchers.IO) { response ->
-                saveUserCreds(response.body, user)
-            }
+            .onSuccess { response -> saveUserCreds(response.body, user) }
             .onFailureWithContext { error ->
-                val errorEvent: UiEvent = Error(error.errorBody, error.throwable)
+                val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
     }
@@ -190,7 +189,7 @@ class RegistrationViewModel @Inject constructor(
 
         with(uiStateDispatcher) {
             setAuthorizedUser(user)
-            sendUiEvent(Navigate(Route.PostLine))
+            sendUiEvent(UiEvent.Navigate(Route.PostLine))
         }
     }
 
@@ -223,9 +222,7 @@ class RegistrationViewModel @Inject constructor(
 
     fun setGender(value: String) {
         try {
-            _registerState.update {
-                it.copy(gender = Gender.valueOf(value))
-            }
+            _registerState.update { it.copy(gender = Gender.valueOf(value)) }
         }
         catch (e: IllegalArgumentException) {
             Log.e("RegistrationViewModel", "setGender: ${e.message}")

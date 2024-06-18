@@ -1,6 +1,7 @@
 package com.soundhub.ui.music_preferences
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,7 +45,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun ChooseArtistsScreen(
-    artistState: ArtistUiState,
+    artistUiState: ArtistUiState,
     onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
     uiStateDispatcher: UiStateDispatcher,
     onNextButtonClick: () -> Unit,
@@ -51,6 +53,10 @@ fun ChooseArtistsScreen(
     lazyGridState: LazyGridState
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+
+    LaunchedEffect(key1 = artistUiState) {
+        Log.d("ChooseArtistsScreen", "ui state: $artistUiState")
+    }
 
     ContentContainer(
         modifier = Modifier
@@ -92,20 +98,20 @@ fun ChooseArtistsScreen(
                 contentPadding = PaddingValues(all = 10.dp),
                 state = lazyGridState
             ) {
-                items(items = artistState.artists) { artist ->
+                items(items = artistUiState.artists) { artist ->
                     MusicItemPlate(
                         modifier = Modifier.padding(bottom = 20.dp),
                         caption = artist.title ?: "",
                         thumbnailUrl = artist.thumb,
                         onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
-                        isChosen = artist in artistState.chosenArtists,
+                        isChosen = artist in artistUiState.chosenArtists,
                         width = 90.dp,
                         height = 90.dp
                     )
                 }
             }
 
-            if (artistState.artists.isEmpty() || artistState.status == ApiStatus.LOADING)
+            if (artistUiState.artists.isEmpty() || artistUiState.status == ApiStatus.LOADING)
                 CircleLoader(
                     modifier = Modifier
                         .size(64.dp)
@@ -130,7 +136,7 @@ fun ChooseArtistsScreen(
 )
 private fun ChooseArtistsPreview() {
     ChooseArtistsScreen(
-        artistState = ArtistUiState(),
+        artistUiState = ArtistUiState(),
         onItemPlateClick = {_, _ ->  },
         uiStateDispatcher = UiStateDispatcher(),
         onNextButtonClick = {},

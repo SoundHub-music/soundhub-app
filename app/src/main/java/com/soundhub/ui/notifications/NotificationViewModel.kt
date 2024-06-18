@@ -64,11 +64,10 @@ class NotificationViewModel @Inject constructor(
         inviteRepository.acceptInvite(invite.id)
             .onSuccessWithContext {
                 deleteNotificationById(invite.id)
-                val authorizedUser: User? = uiState.map { it.authorizedUser }
-                    .firstOrNull()
+                val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
                 authorizedUser?.let { user ->
                     with(user) {
-                        this.friends += invite.sender
+                        friends += invite.sender
                         uiStateDispatcher.setAuthorizedUser(this)
                     }
                 }
@@ -81,7 +80,7 @@ class NotificationViewModel @Inject constructor(
                 )
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
-            .finally {
+            .finallyWithContext {
                 uiStateDispatcher.sendUiEvent(uiEvent)
             }
     }
@@ -102,9 +101,7 @@ class NotificationViewModel @Inject constructor(
                 )
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
-            .finally {
-                uiStateDispatcher.sendUiEvent(uiEvent)
-            }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(uiEvent) }
     }
 
     private fun deleteNotificationById(notificationId: UUID) = _notificationUiState.update {

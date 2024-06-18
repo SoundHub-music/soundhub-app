@@ -97,9 +97,7 @@ class ProfileViewModel @Inject constructor(
                 )
                 uiStateDispatcher.sendUiEvent(errorEvent)
             }
-            .finallyWithContext {
-                uiStateDispatcher.sendUiEvent(showToastEvent)
-            }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(showToastEvent) }
     }
 
     fun deleteFriend(user: User) = viewModelScope.launch(Dispatchers.IO) {
@@ -114,18 +112,16 @@ class ProfileViewModel @Inject constructor(
         val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
         val showToastEvent: UiEvent = UiEvent.ShowToast(text)
 
-        inviteRepository.createInvite(recipientId).onSuccessWithContext {
-            _profileUiState.update { it.copy(isRequestSent = true) }
-        }.onFailureWithContext { error ->
-            val errorEvent: UiEvent = UiEvent.Error(
-                error.errorBody,
-                error.throwable
-            )
-            uiStateDispatcher.sendUiEvent(errorEvent)
-        }
-        .finallyWithContext {
-            uiStateDispatcher.sendUiEvent(showToastEvent)
-        }
+        inviteRepository.createInvite(recipientId)
+            .onSuccessWithContext { _profileUiState.update { it.copy(isRequestSent = true) } }
+            .onFailureWithContext { error ->
+                val errorEvent: UiEvent = UiEvent.Error(
+                    error.errorBody,
+                    error.throwable
+                )
+                uiStateDispatcher.sendUiEvent(errorEvent)
+            }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(showToastEvent) }
     }
 
     fun checkInvite() = viewModelScope.launch(Dispatchers.IO) {

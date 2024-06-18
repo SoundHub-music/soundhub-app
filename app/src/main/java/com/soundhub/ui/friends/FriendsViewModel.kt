@@ -2,8 +2,8 @@ package com.soundhub.ui.friends
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
@@ -34,10 +34,9 @@ class FriendsViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
-    appDb: AppDatabase,
+    private val userDao: UserDao,
 ): ViewModel() {
     private var searchUsersJob: Job? = null
-    private val userDao: UserDao = appDb.userDao()
     private val authorizedUser = MutableStateFlow<User?>(null)
 
     private val _friendsUiState = MutableStateFlow(FriendsUiState())
@@ -52,6 +51,17 @@ class FriendsViewModel @Inject constructor(
 
     private suspend fun initializeFriendsUiState() = authorizedUser.update {
         userDao.getCurrentUser()
+    }
+
+    fun onNavigateToChatBtnClick(user: User) = viewModelScope.launch(Dispatchers.Main) {
+        getOrCreateChat(user)
+            .firstOrNull()
+            ?.let {
+                val route: Route = Route.Messenger.Chat
+                    .getRouteWithNavArg(it.id.toString())
+
+                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
+            }
     }
 
     fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {

@@ -1,5 +1,6 @@
 package com.soundhub.ui.authentication.registration
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
@@ -30,8 +31,12 @@ fun PostRegisterChooseArtistsScreen(
         }
     }
 
+    LaunchedEffect(key1 = artistUiState) {
+        Log.d("PostRegisterChooseArtistsScreen", "ui state: $artistUiState")
+    }
+
     ChooseArtistsScreen(
-        artistState = artistUiState,
+        artistUiState = artistUiState,
         onItemPlateClick = { isChosen, artist ->
             if (isChosen) registrationViewModel.addChosenArtist(artist)
             else registrationViewModel.addChosenArtist(

@@ -30,7 +30,7 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.profile.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.user_actions.UserNameWithDescription
-import com.soundhub.utils.DateFormatter
+import com.soundhub.utils.UserUtils
 
 @Composable
 internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
@@ -48,31 +48,22 @@ private fun OnlineStatusBlock(profileViewModel: ProfileViewModel) {
     val profileUiState: ProfileUiState by profileViewModel
         .profileUiState
         .collectAsState()
+
     val profileOwner: User? = profileUiState.profileOwner
     val context: Context = LocalContext.current
 
-    var indicatorColor: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
-    var onlineIndicatorText: String by rememberSaveable {
+    var indicatorColorState: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
+    var onlineIndicatorTextState: String by rememberSaveable {
         mutableStateOf(context.getString(R.string.online_indicator_user_offline))
     }
 
     LaunchedEffect(key1 = profileOwner?.isOnline) {
-        if (profileOwner?.isOnline == true) {
-            indicatorColor = R.color.online_status
-            onlineIndicatorText = context.getString(R.string.online_indicator_user_online)
-        }
-        else {
-            val lastOnlineText: String = profileOwner
-                ?.lastOnline?.let {
-                    DateFormatter.getRelativeDate(it).lowercase()
-            } ?: ""
-
-            indicatorColor = R.color.offline_status
-            onlineIndicatorText = if (lastOnlineText.isNotEmpty()) context.getString(
-                R.string.online_indicator_user_offline_with_time,
-                lastOnlineText
-            )
-            else context.getString(R.string.online_indicator_user_offline)
+        UserUtils.updateOnlineStatusIndicator(
+            context = context,
+            user = profileOwner
+        ) { _, indicatorColor , onlineIndicatorText ->
+            indicatorColorState = indicatorColor
+            onlineIndicatorTextState = onlineIndicatorText
         }
     }
 
@@ -84,10 +75,10 @@ private fun OnlineStatusBlock(profileViewModel: ProfileViewModel) {
             modifier = Modifier
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(colorResource(id = indicatorColor))
+                .background(colorResource(id = indicatorColorState))
         )
         Text(
-            text = onlineIndicatorText,
+            text = onlineIndicatorTextState,
             fontWeight = FontWeight.Light
         )
     }
@@ -100,7 +91,7 @@ private fun UserLocationText(profileViewModel: ProfileViewModel) {
         .collectAsState()
     val profileOwner: User? = profileUiState.profileOwner
     val userLocation: String = rememberSaveable(profileOwner) {
-        getUserLocation(profileOwner?.city, profileOwner?.country)
+        UserUtils.getUserLocation(profileOwner?.city, profileOwner?.country)
     }
 
     if (userLocation.isNotEmpty())
@@ -109,10 +100,4 @@ private fun UserLocationText(profileViewModel: ProfileViewModel) {
             fontWeight = FontWeight.Light,
             fontSize = 14.sp
         )
-}
-
-internal fun getUserLocation(city: String?, country: String?): String {
-    return if (city.isNullOrEmpty() && country.isNullOrEmpty()) ""
-    else if (country?.isNotEmpty() == true && city.isNullOrEmpty()) country
-    else "$country, $city"
 }

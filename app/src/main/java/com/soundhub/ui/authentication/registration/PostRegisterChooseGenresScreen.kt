@@ -16,28 +16,32 @@ import com.soundhub.ui.music_preferences.ChooseGenresScreen
 fun PostRegisterChooseGenresScreen(
     registrationViewModel: RegistrationViewModel 
 ) {
-    val genreState: GenreUiState by registrationViewModel
+    val genreUiState: GenreUiState by registrationViewModel
         .genreUiState
         .collectAsState()
 
     val context = LocalContext.current
     val toastWarningText: String = stringResource(id = R.string.choose_genres_warning)
 
-    LaunchedEffect(key1 = genreState.chosenGenres) {
-        Log.d("ChooseGenresScreen", "chosen genres: ${genreState.chosenGenres}")
+    LaunchedEffect(key1 = genreUiState.chosenGenres) {
+        Log.d("PostRegisterChooseGenresScreen", "chosen genres: ${genreUiState.chosenGenres}")
+    }
+
+    LaunchedEffect(key1 = genreUiState) {
+        Log.d("PostRegisterChooseGenresScreen", "ui state: $genreUiState")
     }
 
     ChooseGenresScreen(
-        genreState = genreState,
+        genreUiState = genreUiState,
         onItemPlateClick = { isChosen, genre ->
             if (isChosen)
                 registrationViewModel.addChosenGenre(genre)
             else registrationViewModel.addChosenGenre(
-                genreState.chosenGenres.filter { it.id != genre.id }
+                genreUiState.chosenGenres.filter { it.id != genre.id }
             )
         },
         onNextButtonClick = {
-            if (genreState.chosenGenres.isNotEmpty())
+            if (genreUiState.chosenGenres.isNotEmpty())
                 registrationViewModel
                     .onPostRegisterNextBtnClick()
             else Toast.makeText(

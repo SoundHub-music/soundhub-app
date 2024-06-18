@@ -33,7 +33,7 @@ fun EditFavoriteArtistsScreen(
     }
 
     ChooseArtistsScreen(
-        artistState = artistUiState,
+        artistUiState = artistUiState,
         onItemPlateClick = { isChosen, artist ->
             if (isChosen)
                 editMusicPrefViewModel.addChosenArtist(artist)

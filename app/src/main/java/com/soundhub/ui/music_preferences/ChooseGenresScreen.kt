@@ -29,11 +29,11 @@ import com.soundhub.ui.components.loaders.CircleLoader
 
 @Composable
 fun ChooseGenresScreen(
-    genreState: GenreUiState,
+    genreUiState: GenreUiState,
     onItemPlateClick: (isChosen: Boolean, genre: Genre) -> Unit,
     onNextButtonClick: () -> Unit
 ) {
-    val isLoading: Boolean = genreState.status == ApiStatus.LOADING
+    val isLoading: Boolean = genreUiState.status == ApiStatus.LOADING
 
     Box(
         modifier = Modifier
@@ -60,13 +60,13 @@ fun ChooseGenresScreen(
                 columns = GridCells.Adaptive(minSize = 100.dp),
                 contentPadding = PaddingValues(all = 10.dp),
                 content = {
-                    items(items = genreState.genres, key = { it.id }) {genre ->
+                    items(items = genreUiState.genres, key = { it.id }) { genre ->
                         MusicItemPlate(
                             modifier = Modifier.padding(bottom = 20.dp),
                             caption = genre.name ?: "",
                             thumbnailUrl = genre.pictureUrl,
                             onClick = { isChosen -> onItemPlateClick(isChosen, genre) },
-                            isChosen = genre in genreState.chosenGenres,
+                            isChosen = genre in genreUiState.chosenGenres,
                             width = 90.dp,
                             height = 90.dp
                         )

@@ -24,7 +24,7 @@ fun EditFavoriteGenresScreen(
     }
 
     ChooseGenresScreen(
-        genreState = genreUiState,
+        genreUiState = genreUiState,
         onItemPlateClick = { isChosen, genre ->
            if (isChosen)
                editMusicPrefViewModel.addChosenGenre(genre)
