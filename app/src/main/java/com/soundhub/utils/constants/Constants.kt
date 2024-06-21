@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken
 import com.soundhub.BuildConfig
 import com.soundhub.Route
 import com.soundhub.data.api.responses.ErrorResponse
+import java.io.File
 import java.lang.reflect.Type
 
 object Constants {
@@ -123,7 +124,7 @@ object Constants {
     const val SIMPLE_HTTP_CLIENT = "simple_http_client"
     const val AUTHORIZED_HTTP_CLIENT_WITH_CACHE = "authorized_http_client"
 
-    // API constants
+    // newtwork constants
     const val COUNTRIES_API = "https://restcountries.com/v3.1/"
     const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
     const val LAST_FM_API = "https://ws.audioscrobbler.com/"
@@ -135,6 +136,9 @@ object Constants {
     const val DESTINATION_HEADER = "destination"
 
     const val UNAUTHORIZED_USER_ERROR_CODE = 401
+    const val CONNECTION_TIMEOUT = 10L
+
+    const val CACHE_SIZE: Long = 10 * 1024 * 1024
 
     // Discogs API authorization header
     const val DISCOGS_AUTHORIZATION = "Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"

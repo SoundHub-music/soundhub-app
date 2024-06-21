@@ -8,6 +8,7 @@ import com.soundhub.utils.ApiEndpoints.Authentication.LOGOUT
 import com.soundhub.utils.ApiEndpoints.Authentication.REFRESH_TOKEN
 import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_IN
 import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_UP
+import com.soundhub.utils.ApiEndpoints.Authentication.USER_DATA_REQUEST_BODY_NAME
 import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -22,7 +23,7 @@ interface AuthService {
     @POST(SIGN_UP)
     @Multipart
     suspend fun signUp(
-        @Part(value = "userData") userData: RequestBody,
+        @Part(USER_DATA_REQUEST_BODY_NAME) userData: RequestBody,
         @Part file: MultipartBody.Part?
     ): Response<UserPreferences>
 

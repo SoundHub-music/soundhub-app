@@ -80,7 +80,6 @@ internal fun MessengerChatList(
         items(items = filteredChats, key = { it.id }) { chat ->
             ChatCard(
                 chat = chat,
-                navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
                 messengerViewModel = messengerViewModel
             )

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.data.model.Message
+import com.soundhub.ui.messenger.chat.ChatUiState
 import com.soundhub.ui.messenger.chat.ChatViewModel
 
 @Composable
@@ -27,13 +28,13 @@ fun MessageBox(
     modifier: Modifier = Modifier,
     message: Message,
     isOwnMessage: Boolean,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
 ) {
     var contentAlignment by remember { mutableStateOf(Alignment.CenterEnd) }
 
-    val chatUiState by chatViewModel.chatUiState.collectAsState()
-    val isCheckMessagesModeEnabled = chatUiState.isCheckMessageModeEnabled
-    val checkedMessages = chatUiState.checkedMessages
+    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+    val isCheckMessagesModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
+    val checkedMessages: List<Message> = chatUiState.checkedMessages
 
     LaunchedEffect(key1 = isCheckMessagesModeEnabled) {
         Log.d("MessageBox", "isCheckedMessagesMode: $isCheckMessagesModeEnabled")
@@ -71,7 +72,7 @@ fun MessageBox(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(isCheckMessagesModeEnabled, checkedMessages) {
-                chatViewModel.onMessagePointerInputEvent(
+                if (isOwnMessage) chatViewModel.onMessagePointerInputEvent(
                     scope = this,
                     checkedMessages = checkedMessages,
                     isCheckMessagesMode = isCheckMessagesModeEnabled,

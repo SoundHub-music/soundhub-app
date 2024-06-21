@@ -19,13 +19,15 @@ import com.soundhub.ui.friends.components.FriendsScreenPager
 import com.soundhub.ui.friends.components.FriendsScreenTabs
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.states.UiState
+import java.util.UUID
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendsScreen(
     uiStateDispatcher: UiStateDispatcher,
     navController: NavHostController,
-    friendsViewModel: FriendsViewModel
+    friendsViewModel: FriendsViewModel,
+    userId: UUID?
 ) {
     val tabs = friendsViewModel.tabs
     val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
@@ -38,6 +40,10 @@ fun FriendsScreen(
     var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(friendsViewModel.tabs) }
 
     val searchBarText: String = uiState.searchBarText
+
+    LaunchedEffect(key1 = userId, key2 = authorizedUser) {
+        userId?.let { friendsViewModel.loadProfileOwner(it) }
+    }
 
     LaunchedEffect(key1 = true) {
         friendsViewModel.loadRecommendedFriends()

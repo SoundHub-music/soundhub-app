@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,18 +20,27 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.profile.components.sections.avatar.UserProfileAvatar
 import com.soundhub.ui.profile.components.UserProfileContainer
+import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import java.util.UUID
 
 @Composable
 fun ProfileScreen(
     navController: NavHostController,
+    userId: UUID?,
     uiStateDispatcher: UiStateDispatcher,
     profileViewModel: ProfileViewModel,
 ) {
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val authorizedUser: User? = uiState.authorizedUser
     val profileUiState by profileViewModel.profileUiState.collectAsState()
     val profileOwner: User? = profileUiState.profileOwner
     val isLoading: Boolean = remember(profileOwner) {
         profileOwner == null
+    }
+
+    LaunchedEffect(key1 = userId, key2 = authorizedUser) {
+        userId?.let { userId -> profileViewModel.loadProfileOwner(userId) }
     }
 
     Column(

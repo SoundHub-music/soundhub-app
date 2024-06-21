@@ -16,6 +16,7 @@ import com.soundhub.utils.ApiEndpoints.Users.SEARCH_USER
 import com.soundhub.utils.ApiEndpoints.Users.TOGGLE_ONLINE
 import com.soundhub.utils.ApiEndpoints.Users.UPDATE_USER
 import com.soundhub.utils.ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM
+import com.soundhub.utils.ApiEndpoints.Users.USER_REQUEST_BODY_NAME
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -44,7 +45,7 @@ interface UserService {
     suspend fun updateUserById(
         @Path(USER_ID_DYNAMIC_PARAM)
         id: UUID?,
-        @Part("userDto") user: RequestBody,
+        @Part(USER_REQUEST_BODY_NAME) user: RequestBody,
         @Part userAvatar: MultipartBody.Part?
     ): Response<User>
 

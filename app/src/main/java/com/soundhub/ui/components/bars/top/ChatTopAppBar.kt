@@ -40,21 +40,27 @@ fun ChatTopAppBar(
 ) {
     val chatUiState by chatViewModel.chatUiState.collectAsState()
     val isCheckMessageModeEnabled = chatUiState.isCheckMessageModeEnabled
+    val checkedMessagesCount: Int = remember(chatUiState.checkedMessages) {
+        chatUiState.checkedMessages.size
+    }
 
     TopAppBar(
         title = {
             if (!isCheckMessageModeEnabled) InterlocutorDetails(chatViewModel, navController)
+            else Text(
+                text = stringResource(id = R.string.chat_check_mode_count, checkedMessagesCount),
+                fontSize = 16.sp
+            )
         },
         navigationIcon = {
             IconButton(onClick = {
                 if (isCheckMessageModeEnabled) {
                     chatViewModel.unsetCheckMessagesMode()
-                } else {
-                    navController.popBackStack()
-                }
+                } else navController.popBackStack()
             }) {
                 Icon(
-                    imageVector = if (isCheckMessageModeEnabled) Icons.Rounded.Close else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+                    imageVector = if (isCheckMessageModeEnabled) Icons.Rounded.Close
+                        else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = stringResource(id = R.string.btn_description_back),
                     modifier = Modifier.size(28.dp)
                 )

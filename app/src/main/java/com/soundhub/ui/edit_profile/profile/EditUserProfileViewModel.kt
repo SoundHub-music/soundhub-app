@@ -67,14 +67,12 @@ class EditUserProfileViewModel @Inject constructor(
         isLoading.update { true }
         val updatedUser: User? = userDao.getCurrentUser()?.let { user ->
             UserMapper.impl.mergeUserWithFormState(_formState.value, user)
-        }
-
-        updatedUser?.let {
-            updateUserUseCase(updatedUser)
+        }?.also { user ->
+            updateUserUseCase(user)
                 .onSuccess {
                     withContext(Dispatchers.Main) {
-                        userDao.saveUser(updatedUser)
-                        uiStateDispatcher.setAuthorizedUser(updatedUser)
+                        userDao.saveUser(user)
+                        uiStateDispatcher.setAuthorizedUser(user)
                     }
                 }
                 .onFailure {

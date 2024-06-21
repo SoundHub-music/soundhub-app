@@ -72,7 +72,7 @@ fun PostLineScreen(
         modifier = Modifier.padding(top = 10.dp)
     ) {
         if (isLoading) CircleLoader(modifier = Modifier.size(72.dp))
-        else if (messageScreenText.isNotEmpty())
+        else if (messageScreenText.isNotEmpty() || isError)
             Text(
                 text = messageScreenText,
                 fontSize = 20.sp,

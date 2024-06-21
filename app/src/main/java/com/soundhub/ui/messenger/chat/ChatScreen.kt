@@ -1,5 +1,6 @@
 package com.soundhub.ui.messenger.chat
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,12 +45,19 @@ fun ChatScreen(
     val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val isCheckMessageModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
 
     val authorizedUser: User? = uiState.authorizedUser
     val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
 
     val lazyListState: LazyListState = rememberLazyListState()
     val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
+
+    BackHandler {
+        if (isCheckMessageModeEnabled)
+            chatViewModel.unsetCheckMessagesMode()
+        else navController.popBackStack()
+    }
 
     LaunchedEffect(firstVisibleMessageIndex, messages, authorizedUser) {
         var index = firstVisibleMessageIndex

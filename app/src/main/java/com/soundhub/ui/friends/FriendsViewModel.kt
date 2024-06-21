@@ -68,12 +68,12 @@ class FriendsViewModel @Inject constructor(
         _friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
         userRepository.getRecommendedFriends()
             .onSuccess { response ->
-            _friendsUiState.update {
-                it.copy(
-                    recommendedFriends = response.body.orEmpty(),
-                    status = ApiStatus.SUCCESS
-                )
-            }
+                _friendsUiState.update {
+                    it.copy(
+                        recommendedFriends = response.body.orEmpty(),
+                        status = ApiStatus.SUCCESS
+                    )
+                }
         }.onFailure { error ->
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
             uiStateDispatcher.sendUiEvent(errorEvent)
@@ -81,8 +81,8 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
-        authorizedUser.value?.let {  user ->
+    private fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
+        authorizedUser.value?.let { user ->
             val chat: Chat? = getOrCreateChatByUserUseCase(
                 interlocutor = interlocutor,
                 userId = user.id

@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startOnCreateActivities()
-
         setContent {
             SoundHubTheme(dynamicColor = false) {
                 Surface(
@@ -170,7 +169,7 @@ class MainActivity : ComponentActivity() {
                     ?: event.customMessageStringRes?.let { getString(it) }
                     ?: getString(R.string.toast_common_error)
 
-                if (event.throwable !is CancellationException)
+                if (event.throwable !is CancellationException && message.isNotEmpty())
                     Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
             }
             is UiEvent.UpdateUserInstance -> lifecycleScope.launch {

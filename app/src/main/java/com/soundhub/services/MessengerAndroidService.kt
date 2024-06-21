@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.StompMessage
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -77,7 +78,7 @@ class MessengerAndroidService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        coroutineScope.launch { webSocketClient.disconnect() }
+        webSocketClient.disconnect()
         Log.i("WebSocketService", "Service destroyed")
     }
 
@@ -119,7 +120,12 @@ class MessengerAndroidService: Service() {
     }
 
     private fun onDeleteMessageListener(message: StompMessage) {
-        Log.i("MessengerAndroidService", "onDeleteMessageListener: $message")
+        Log.i("MessengerAndroidService", "onDeleteMessageListener[1]: $message")
+        coroutineScope.launch {
+            runCatching { gson.fromJson(message.payload, UUID::class.java) }
+                .onFailure { Log.e("MessengerAndroidService", "onDeleteMessageListener[2]: ${it.stackTraceToString()}") }
+                .onSuccess{ uiStateDispatcher.sendDeletedMessage(it) }
+        }
     }
 
     private fun onSubscribeErrorListener(throwable: Throwable) {

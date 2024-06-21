@@ -2,6 +2,8 @@ package com.soundhub.utils
 
 sealed class ApiEndpoints {
     data object Users {
+        const val USER_REQUEST_BODY_NAME = "userDto"
+
         private const val USERS_ENDPOINT: String = "users"
         const val USER_ID_DYNAMIC_PARAM: String = "userId"
         const val FRIEND_ID_DYNAMIC_PARAM: String = "friendId"
@@ -31,6 +33,8 @@ sealed class ApiEndpoints {
     }
 
     data object Authentication {
+        const val USER_DATA_REQUEST_BODY_NAME = "userData"
+
         private const val AUTH_ENDPOINT: String = "auth"
         const val SIGN_UP: String = "$AUTH_ENDPOINT/sign-up"
         const val SIGN_IN: String = "$AUTH_ENDPOINT/sign-in"
@@ -57,6 +61,9 @@ sealed class ApiEndpoints {
     }
 
     data object Posts {
+        const val POST_REQUEST_BODY_NAME =  "postDto"
+        const val IMAGES_TO_DELETE_NAME = "deleteFiles"
+
         private const val POSTS_ENDPOINT = "posts"
         const val POST_ID_DYNAMIC_PARAM = "postId"
         const val AUTHOR_ID_DYNAMIC_PARAM = "authorId"

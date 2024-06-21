@@ -3,6 +3,7 @@ package com.soundhub.ui.messenger
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
@@ -60,6 +61,11 @@ class MessengerViewModel @Inject constructor(
                 it.copy(unreadMessagesCount = unreadMessageCount)
             }
         }
+    }
+
+    fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
+        val route = Route.Messenger.Chat.getRouteWithNavArg(chat.id.toString())
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
     }
 
     fun getUnreadMessageCountByChatId(chatId: UUID?): UInt {

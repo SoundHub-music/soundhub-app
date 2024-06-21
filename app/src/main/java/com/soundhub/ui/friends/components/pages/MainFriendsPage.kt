@@ -15,7 +15,7 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.friends.EmptyFriendsScreen
 import com.soundhub.ui.friends.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
-import com.soundhub.ui.friends.components.UserFriendsPage
+import com.soundhub.ui.friends.components.UserFriendsContainer
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -53,7 +53,7 @@ internal fun MainFriendsPage(
             selectedTabState = selectedTabState,
             tabs = tabs
         )
-    } else UserFriendsPage(
+    } else UserFriendsContainer(
         friendList = filteredFriendList,
         navController = navController,
         chosenPage = tabs[page],

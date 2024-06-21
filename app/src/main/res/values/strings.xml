@@ -86,6 +86,8 @@
     <string name="chat_menu_search">Поиск</string>
     <string name="chat_menu_delete_history">Удалить историю</string>
 
+    <string name="chat_check_mode_count">Выбрано: %d</string>
+
     <!-- toast error messages-->
     <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
     <string name="toast_authorization_error">Ошибка авторизации</string>

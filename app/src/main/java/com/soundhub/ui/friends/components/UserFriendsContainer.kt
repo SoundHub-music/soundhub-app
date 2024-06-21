@@ -14,7 +14,7 @@ import com.soundhub.ui.friends.components.friend_card.FriendCard
 import com.soundhub.ui.friends.enums.FriendListPage
 
 @Composable
-fun UserFriendsPage(
+fun UserFriendsContainer(
     friendList: List<User>,
     navController: NavHostController,
     chosenPage: FriendListPage,

@@ -9,6 +9,8 @@ import com.soundhub.utils.ApiEndpoints.Posts.GET_POST_BY_ID
 import com.soundhub.utils.ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM
 import com.soundhub.utils.ApiEndpoints.Posts.TOGGLE_LIKE
 import com.soundhub.utils.ApiEndpoints.Posts.UPDATE_POST
+import com.soundhub.utils.ApiEndpoints.Posts.IMAGES_TO_DELETE_NAME
+import com.soundhub.utils.ApiEndpoints.Posts.POST_REQUEST_BODY_NAME
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -37,7 +39,7 @@ interface PostService {
     @POST(ADD_POST)
     @Multipart
     suspend fun addPost(
-        @Part("postDto") post: RequestBody,
+        @Part(POST_REQUEST_BODY_NAME) post: RequestBody,
         @Part files: List<MultipartBody.Part>
     ): Response<Post>
 
@@ -58,8 +60,8 @@ interface PostService {
     suspend fun updatePost(
         @Path(POST_ID_DYNAMIC_PARAM)
         postId: UUID,
-        @Part(value = "postDto") post: RequestBody,
+        @Part(POST_REQUEST_BODY_NAME) post: RequestBody,
         @Part images: List<MultipartBody.Part?> = emptyList(),
-        @Part(value = "deleteFiles") deleteFiles: RequestBody? = null
+        @Part(IMAGES_TO_DELETE_NAME) deleteFiles: RequestBody? = null
     ): Response<Post>
 }

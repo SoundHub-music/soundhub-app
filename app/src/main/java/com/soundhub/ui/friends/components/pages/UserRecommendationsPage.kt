@@ -25,7 +25,7 @@ import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.friends.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
-import com.soundhub.ui.friends.components.UserFriendsPage
+import com.soundhub.ui.friends.components.UserFriendsContainer
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -38,19 +38,19 @@ internal fun UserRecommendationsPage(
     page: Int
 ) {
     val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-    val users: List<User> = friendsUiState.recommendedFriends
-    var filteredUserList by rememberSaveable { mutableStateOf(users) }
+    val recommendedUsers: List<User> = friendsUiState.recommendedFriends
+    var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
     val searchBarText: String = uiStateDispatcher.getSearchBarText()
 
     LaunchedEffect(key1 = searchBarText) {
         filteredUserList = friendsViewModel.filterFriendsList(
             occurrenceString = searchBarText,
-            users = users
+            users = recommendedUsers
         )
     }
 
-    LaunchedEffect(key1 = users) {
-        friendsViewModel.loadUsersCompatibility(users.map { it.id })
+    LaunchedEffect(key1 = recommendedUsers) {
+        friendsViewModel.loadUsersCompatibility(recommendedUsers.map { it.id })
     }
 
     when (friendsUiState.status) {
@@ -67,8 +67,8 @@ internal fun UserRecommendationsPage(
             )
         }
         ApiStatus.SUCCESS -> {
-            UserFriendsPage(
-                friendList = users,
+            UserFriendsContainer(
+                friendList = recommendedUsers,
                 navController = navController,
                 chosenPage = tabs[page],
                 friendsViewModel = friendsViewModel

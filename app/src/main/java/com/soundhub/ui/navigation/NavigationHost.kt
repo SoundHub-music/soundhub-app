@@ -8,6 +8,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,7 +69,9 @@ fun NavigationHost(
     mainViewModel: MainViewModel
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(UiState())
-    val authorizedUser: User? = uiState.authorizedUser
+    var authorizedUser: User? by remember(uiState.authorizedUser) {
+        mutableStateOf(uiState.authorizedUser)
+    }
 
     val userCreds: UserPreferences? by mainViewModel.userCreds.collectAsState(initial = null)
     val startDestination: String by mainViewModel.startDestination.collectAsState()
@@ -199,10 +204,6 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(argument) }
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
-                LaunchedEffect(key1 = userId) {
-                    userId?.let { userId -> profileViewModel.loadProfileOwner(userId) }
-                }
-
                 ScreenContainer(
                     userCreds = userCreds,
                     navController = navController
@@ -210,7 +211,8 @@ fun NavigationHost(
                     ProfileScreen(
                         navController = navController,
                         uiStateDispatcher = uiStateDispatcher,
-                        profileViewModel = profileViewModel
+                        profileViewModel = profileViewModel,
+                        userId = userId
                     )
                 }
             }
@@ -225,10 +227,6 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(it) }
                 val friendsViewModel: FriendsViewModel = hiltViewModel()
 
-                LaunchedEffect(key1 = userId) {
-                    userId?.let { friendsViewModel.loadProfileOwner(it) }
-                }
-
                 ScreenContainer(
                     userCreds = userCreds,
                     navController = navController
@@ -237,7 +235,8 @@ fun NavigationHost(
                     FriendsScreen(
                         uiStateDispatcher = uiStateDispatcher,
                         navController = navController,
-                        friendsViewModel = friendsViewModel
+                        friendsViewModel = friendsViewModel,
+                        userId = userId
                     )
                 }
             }

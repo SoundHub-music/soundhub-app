@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,8 +31,8 @@ class UiStateDispatcher @Inject constructor() : ViewModel() {
     private val _readMessages = Channel<Message>(Channel.BUFFERED)
     val readMessages: Flow<Message> = _readMessages.receiveAsFlow()
 
-    private val _deletedMessages = Channel<Message>(Channel.BUFFERED)
-    val deletedMessages: Flow<Message> = _deletedMessages.receiveAsFlow()
+    private val _deletedMessages = Channel<UUID>(Channel.BUFFERED)
+    val deletedMessages: Flow<UUID> = _deletedMessages.receiveAsFlow()
 
     override fun onCleared() {
         super.onCleared()
@@ -45,7 +46,7 @@ class UiStateDispatcher @Inject constructor() : ViewModel() {
             _receivedMessages.send(message)
     }
 
-    suspend fun sendDeletedMessage(message: Message) = _deletedMessages.send(message)
+    suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.send(messageId)
 
     suspend fun sendReadMessage(message: Message) = _readMessages.send(message)
 

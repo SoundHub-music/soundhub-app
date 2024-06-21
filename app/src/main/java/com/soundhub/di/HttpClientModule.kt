@@ -4,7 +4,10 @@ import android.content.Context
 import com.soundhub.data.api.AuthService
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.constants.Constants.AUTHORIZED_HTTP_CLIENT_WITH_CACHE
+import com.soundhub.utils.constants.Constants.CACHE_SIZE
+import com.soundhub.utils.constants.Constants.CONNECTION_TIMEOUT
 import com.soundhub.utils.constants.Constants.SIMPLE_HTTP_CLIENT
 import com.soundhub.utils.constants.Constants.UNATHORIZED_HTTP_CLIENT_WITH_CACHE
 import com.soundhub.utils.request_interceptors.AuthInterceptor
@@ -44,7 +47,6 @@ object HttpClientModule {
         authService
     )
 
-
     @Provides
     @Singleton
     @Named(AUTHORIZED_HTTP_CLIENT_WITH_CACHE)
@@ -56,9 +58,8 @@ object HttpClientModule {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val cacheSize: Long = 10 * 1024 * 1024 // 10 MB
         val cacheDirectory = File(context.cacheDir, "http-cache")
-        val cache = Cache(cacheDirectory, cacheSize)
+        val cache = Cache(cacheDirectory, CACHE_SIZE)
 
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -69,7 +70,7 @@ object HttpClientModule {
             .followRedirects(false)
             .followSslRedirects(false)
             .retryOnConnectionFailure(true)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
             .cache(cache)
             .build()
     }
@@ -83,9 +84,8 @@ object HttpClientModule {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val cacheSize: Long = 10 * 1024 * 1024 // 10 MB
         val cacheDirectory = File(context.cacheDir, "http-cache")
-        val cache = Cache(cacheDirectory, cacheSize)
+        val cache = Cache(cacheDirectory, CACHE_SIZE)
 
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -94,7 +94,7 @@ object HttpClientModule {
             .followRedirects(false)
             .followSslRedirects(false)
             .retryOnConnectionFailure(true)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
             .cache(cache)
             .build()
     }
@@ -111,7 +111,7 @@ object HttpClientModule {
             .followRedirects(false)
             .followSslRedirects(false)
             .retryOnConnectionFailure(true)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
             .build()
     }
 }

@@ -52,7 +52,9 @@ fun BottomNavigationBar(
 
     val selectedItemState: MutableState<String?> = remember { mutableStateOf(defaultSelectedItem) }
     val receivedMessageChannel = uiStateDispatcher.receivedMessages
-    val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) { getNavBarItems(authorizedUser?.id) }
+    val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) {
+        getNavBarItems(authorizedUser?.id)
+    }
     val navBarRoutes: List<String> = remember(navBarItems) { navBarItems.map { it.route } }
 
     LaunchedEffect(key1 = true) {
@@ -121,15 +123,16 @@ private fun onMenuItemClick(
     selectedItemState.value = menuItem.route
     Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
 
-    navController.navigate(menuItem.route) {
-        popUpTo(navController.graph.findStartDestination().id) {
-            saveState = true
-            inclusive = true
-        }
+    if (!menuItem.route.contains("null"))
+        navController.navigate(menuItem.route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+                inclusive = true
+            }
 
-        launchSingleTop = true
-        restoreState = true
-    }
+            launchSingleTop = true
+            restoreState = true
+        }
 }
 
 

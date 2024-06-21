@@ -1,9 +1,7 @@
 package com.soundhub.ui.components.fields
 
 import android.app.DatePickerDialog
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -15,14 +13,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.soundhub.R
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 @Composable
 fun DatePicker(
@@ -38,7 +38,10 @@ fun DatePicker(
     var stringDate: String by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
-    val defaultDate: LocalDate = LocalDate.now().minusYears(14)
+    val defaultDate: LocalDate = LocalDate.now().minusYears(14).minusMonths(1)
+
+    val focusManager: FocusManager = LocalFocusManager.current
+    val focusRequester: FocusRequester = remember { FocusRequester() }
 
     val dialog = DatePickerDialog(
         context,
@@ -55,33 +58,21 @@ fun DatePicker(
         value?.dayOfMonth ?: defaultDate.dayOfMonth,
     )
 
+    dialog.setOnCancelListener { focusManager.clearFocus() }
+
     OutlinedTextField(
         label = { Text(text = label) },
         onValueChange = onValueChange,
         value = value?.toString() ?: "",
         readOnly = true,
         modifier = modifier
-            .clickable { dialog.show() }
-            .onFocusChanged {
-                if (it.isFocused) dialog.show()
-            },
+            .focusRequester(focusRequester)
+            .onFocusChanged { if (it.isFocused) dialog.show() },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         supportingText = supportingText,
         isError = isError
     )
-}
-
-private fun parseLocalDate(stringDate: String, pattern: String): LocalDate {
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
-    return try {
-        if (stringDate.isNotEmpty()) LocalDate.parse(stringDate, formatter)
-        else LocalDate.now().minusYears(14)
-    }
-    catch (e: DateTimeParseException) {
-        Log.e("DatePicker", e.stackTraceToString())
-        LocalDate.now().minusYears(14)
-    }
 }
 
 @Composable

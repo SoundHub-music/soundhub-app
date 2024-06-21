@@ -14,7 +14,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -28,7 +27,9 @@ import com.soundhub.ui.messenger.chat.ChatViewModel
 import com.soundhub.ui.messenger.chat.components.MessageDateChip
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.util.UUID
 
 @Composable
 fun MessageBoxContainer(
@@ -38,11 +39,17 @@ fun MessageBoxContainer(
     uiStateDispatcher: UiStateDispatcher
 ) {
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val messages: List<Message> = chatUiState.chat?.messages ?: emptyList()
+    val messages: List<Message> = remember(chatUiState.chat?.messages) {
+        chatUiState.chat?.messages.orEmpty().sortedBy { it.timestamp }
+    }
+
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val readMessageChannel: Flow<Message> = uiStateDispatcher.readMessages
+    val deletedMessageChannel: Flow<UUID> = uiStateDispatcher.deletedMessages
 
     val authorizedUser: User? = uiState.authorizedUser
-    var messagesGroupedByDate: Map<LocalDate, List<Message>> by rememberSaveable {
+
+    var messagesGroupedByDate: Map<LocalDate, List<Message>> by remember {
         mutableStateOf(emptyMap())
     }
 
@@ -50,20 +57,40 @@ fun MessageBoxContainer(
         derivedStateOf { lazyListState.layoutInfo.totalItemsCount }
     }
 
-    var isKeyboardActive by rememberSaveable { mutableStateOf(false) }
+    var isKeyboardActive by remember { mutableStateOf(false) }
     val view: View = LocalView.current
 
-    LaunchedEffect(key1 = messages) {
+    LaunchedEffect(messages) {
         messagesGroupedByDate = messages
             .groupBy { it.timestamp.toLocalDate() }
             .toSortedMap()
     }
 
-    LaunchedEffect(key1 = totalMessageCount, key2 = isKeyboardActive) {
-        scrollToLastMessage(totalMessageCount, lazyListState)
+
+    // we listen to event when interlocutor reads our message
+    LaunchedEffect(key1 = readMessageChannel) {
+        readMessageChannel.collect { msg ->
+            messagesGroupedByDate = messagesGroupedByDate.mapValues { entry ->
+                entry.value.map { if (it.id == msg.id) msg else it }
+            }
+        }
     }
 
-    // it allows to navigate to the end of the message list when keyboard was hidden
+    // we listen to event when interlocutor deletes his own message
+    LaunchedEffect(key1 = deletedMessageChannel) {
+        deletedMessageChannel.collect { msgId ->
+            messagesGroupedByDate = messagesGroupedByDate.mapValues { entry ->
+                entry.value.filter { it.id != msgId }
+            }.filter { it.value.isNotEmpty() }
+        }
+    }
+
+    // when keyboard state is changing it scrolls to the last message
+    LaunchedEffect(totalMessageCount, isKeyboardActive) {
+        chatViewModel.scrollToLastMessage(totalMessageCount, lazyListState)
+    }
+
+    // it sets the keyboard state that allows to navigate to the end of the message list when keyboard was hidden
     DisposableEffect(view) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             val isVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
@@ -86,28 +113,17 @@ fun MessageBoxContainer(
         messagesGroupedByDate.forEach { (date, messages) ->
             if (lastDate != date) {
                 lastDate = date
-                lastDate?.let {
-                    item { MessageDateChip(date = date) }
-                }
+                item { MessageDateChip(date = date) }
             }
 
-            items(messages.sortedBy { it.timestamp }, key = { it.id }) { message ->
+            items(messages, key = { it.id }) { message ->
                 MessageBox(
                     modifier = Modifier,
                     message = message,
                     isOwnMessage = message.sender?.id == authorizedUser?.id,
-                    chatViewModel = chatViewModel
+                    chatViewModel = chatViewModel,
                 )
             }
         }
     }
-}
-
-
-private suspend fun scrollToLastMessage(
-    totalMessageCount: Int,
-    lazyListState: LazyListState
-) {
-    if (totalMessageCount > 0 && !lazyListState.isScrollInProgress)
-        lazyListState.scrollToItem(totalMessageCount - 1)
 }

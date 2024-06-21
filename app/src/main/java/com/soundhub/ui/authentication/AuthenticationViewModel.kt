@@ -39,7 +39,7 @@ class AuthenticationViewModel @Inject constructor(
     private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
 
     init {
-        viewModelScope.launch { initializeUser() }
+        viewModelScope.launch(Dispatchers.IO) { initializeUser() }
     }
 
     override fun onCleared() {
@@ -49,10 +49,10 @@ class AuthenticationViewModel @Inject constructor(
 
     suspend fun initializeUser() {
         getCurrentUser().collect { currentUser ->
+            // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
+            // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
+            //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
             currentUser?.let {
-                // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
-                // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
-                //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
                 userDao.saveUser(currentUser)
                 uiStateDispatcher.setAuthorizedUser(currentUser)
             }

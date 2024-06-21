@@ -2,6 +2,7 @@ package com.soundhub.ui.messenger.chat
 
 import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -131,6 +132,15 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    suspend fun scrollToLastMessage(
+        totalMessageCount: Int,
+        lazyListState: LazyListState
+    ) {
+        if (totalMessageCount > 0 && !lazyListState.isScrollInProgress) {
+            lazyListState.scrollToItem(totalMessageCount - 1)
+        }
+    }
+
     fun loadChatById(chatId: UUID) = viewModelScope.launch(Dispatchers.IO) {
         getChatById(chatId).firstOrNull()
             ?.onSuccessWithContext { response ->
@@ -201,7 +211,6 @@ class ChatViewModel @Inject constructor(
         )
     }
 
-
     fun readVisibleMessagesFromIndex(startIndex: Int) = viewModelScope.launch(Dispatchers.IO) {
         val messages: List<Message> = chatUiState.map { it.chat?.messages }
             .firstOrNull()
@@ -262,11 +271,12 @@ class ChatViewModel @Inject constructor(
         message: Message,
         isCheckMessagesMode: Boolean,
         checkedMessages: List<Message>
-    ) {
-        scope.detectTapGestures(
+    ) = scope.detectTapGestures(
             onLongPress = {
-                setCheckMessageMode(true)
-                addCheckedMessage(message)
+//                if (message.sender?.id == authorizedUser?.id) {
+                    setCheckMessageMode(true)
+                    addCheckedMessage(message)
+//                }
             },
             onTap = {
                 if (isCheckMessagesMode) {
@@ -276,5 +286,4 @@ class ChatViewModel @Inject constructor(
                 }
             }
         )
-    }
 }
