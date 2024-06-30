@@ -1,0 +1,100 @@
+[versions]
+androidxCore = "1.13.1"
+gradle = "8.5.0"
+lifecycle = "2.8.2"
+activity = "1.9.0"
+composeBom = "2024.06.00"
+compose = "1.6.8"
+material3 = "1.2.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+annotation = "1.8.0"
+constraintlayout = "2.1.4"
+navigation = "2.7.7"
+hilt = "2.51"
+kotlinxSerialization = "1.6.0"
+kotlin = "2.0.0"
+junit = "4.13.2"
+espresso = "3.6.1"
+coroutines = "1.7.1"
+glide = "4.14.2"
+datastore = "1.1.1"
+protobuf = "3.18.0"
+retrofit = "2.9.0"
+okhttp = "4.12.0"
+splashscreen = "1.0.1"
+mapstruct = "1.5.5.Final"
+coil = "2.6.0"
+room = "2.6.1"
+stomp = "1.6.6"
+rxandroid = "2.1.1"
+
+[libraries]
+androidCoreKtx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+lifecycleRuntimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
+composeBom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+composeUi = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
+composeUiGraphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose" }
+composeUiToolingPreview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+lifecycleLivedataKtx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycleViewmodelKtx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+navigationCompose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+navigationFragmentKtx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
+navigationUiKtx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
+hiltNavigationCompose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
+
+serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+activityKtx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
+
+hiltAndroidTesting = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+hiltAndroidCompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+composeUiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose" }
+testExtJunit = { group = "androidx.test.ext", name = "junit", version = "1.2.1" }
+espressoCore = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+composeUiTooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
+composeUiTestManifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
+coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.8.1-Beta" }
+
+coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+
+hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hiltCompiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+
+glideCompose = { group = "com.github.bumptech.glide", name = "compose", version = "1.0.0-beta01" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version = "4.12.0" }
+glideKsp = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
+
+datastorePreferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+lifecycleRuntimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
+protobufJavalite = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobuf" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converterGson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+loggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version = "4.9.1" }
+
+coreSplashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
+
+mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
+mapstructProcessor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
+
+coilCompose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
+roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+stompProtocolAndroid = { group = "com.github.NaikSoftware", name = "StompProtocolAndroid", version.ref = "stomp" }
+rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rxandroid" }

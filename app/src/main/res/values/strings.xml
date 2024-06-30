@@ -76,6 +76,7 @@
     <string name="profile_screen_user_posts">Посты</string>
     <string name="profile_screen_edit_profile_btn_content">Редактировать профиль</string>
     <string name="profile_screen_write_message_btn_content">Написать сообщение</string>
+    <string name="toast_friend_deleted_successfully">%s удалён из друзей</string>
 
     <!-- menu actions-->
     <string name="menu_action_open_avatar">Открыть фото</string>
@@ -99,7 +100,8 @@
     <string name="toast_file_loading_error">Ошибка загрузки файла</string>
     <string name="toast_common_error">Произошла ошибка</string>
     <string name="toast_update_error">Ошибка обновления данных</string>
-    <string name="toast_delete_post_error_message">Ошибка удаления поста</string>
+    <string name="toast_delete_post_error">Ошибка удаления поста</string>
+    <string name="toast_delete_friend_error">Возникла ошибка удаления %s из друзей</string>
 
     <!-- invite toast messages -->
     <string name="toast_reject_invite_error">Ошибка отклонения заявки</string>
@@ -183,6 +185,7 @@
     <string name="notification_screen_reject_invite_text">Отклонить</string>
 
     <!-- edit user profile -->
+    <string name="toast_profile_edited_successfully">Профиль успешно обновлён</string>
     <string name="edit_profile_alert_dialog_title">Отменить изменения?</string>
     <string name="edit_profile_alert_dialog_content">Есть несохраненные изменения вашего профиля. Вы действительно хотите отменить их?</string>
     <string name="edit_profile_alert_dialog_dismiss_btn">Продолжить редактирование</string>

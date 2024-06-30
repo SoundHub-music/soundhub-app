@@ -91,8 +91,7 @@ fun BottomNavigationBar(
                     )
                 },
                 selected = selectedItemState.value == menuItem.route,
-                onClick = { onMenuItemClick(selectedItemState, menuItem, navController)
-                }
+                onClick = { onMenuItemClick(selectedItemState, menuItem, navController) }
             )
         }
     }

@@ -55,7 +55,7 @@ fun PostLineScreen(
     var messageScreenText: String by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(key1 = authorizedUser) {
-        postLineViewModel.loadPosts()
+        authorizedUser?.let { postLineViewModel.loadPosts() }
     }
 
     LaunchedEffect(key1 = fetchStatus) {
@@ -72,19 +72,18 @@ fun PostLineScreen(
         modifier = Modifier.padding(top = 10.dp)
     ) {
         if (isLoading) CircleLoader(modifier = Modifier.size(72.dp))
-        else if (messageScreenText.isNotEmpty() || isError)
+        else if (messageScreenText.isNotEmpty() && isError)
             Text(
                 text = messageScreenText,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
-        else {
-            LazyColumn(
+        else LazyColumn(
                 modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(items = posts) { post ->
+                items(items = posts, key = { it.id }) { post ->
                     PostCard(
                         navController = navController,
                         post = post,
@@ -94,7 +93,6 @@ fun PostLineScreen(
                         onLikePost = { id -> postLineViewModel.togglePostLikeAndUpdatePostList(id) }
                     )
                 }
-            }
         }
     }
 }

@@ -32,39 +32,50 @@ class EditUserProfileViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val userDao: UserDao,
 ): ViewModel() {
-    private val authorizedUser: MutableStateFlow<User?> = MutableStateFlow(null)
     private val _formState: MutableStateFlow<UserFormState> = MutableStateFlow(UserFormState())
     val formState: Flow<IUserDataFormState> = _formState.asStateFlow()
 
-    var isLoading = MutableStateFlow(false)
-        private set
+    private val _isDialogOpened = MutableStateFlow(false)
+    val isDialogOpened: Flow<Boolean> = _isDialogOpened.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
     init { initState() }
 
-    override fun onCleared() {
-        super.onCleared()
-        authorizedUser.update { null }
-    }
 
     private fun initState() = viewModelScope.launch(Dispatchers.Main) {
-        userDao.getCurrentUser()?.let { user ->
-            authorizedUser.update { user }
-            updateFormStateFromUser(user)
-        }
+        userDao.getCurrentUser()?.let { user -> updateFormStateFromUser(user) }
     }
 
-    fun hasStateChanges(): Boolean = authorizedUser.value?.let { user ->
-        val mappedUser = UserMapper.impl.mergeUserWithFormState(_formState.value, user.copy())
-        mappedUser != authorizedUser.value
-    } ?: false
+    suspend fun hasStateChanges(): Boolean {
+        val authorizedUser: User? = userDao.getCurrentUser()
+
+        return authorizedUser?.let {
+            val mappedUser = UserMapper.impl.mergeUserWithFormState(
+                _formState.value,
+                authorizedUser.copy(
+                    languages = it.languages.toMutableList(),
+                    friends = it.friends.map { f -> f.copy() },
+                    favoriteArtistsIds = it.favoriteArtistsIds.toList(),
+                    favoriteArtists = it.favoriteArtists.map { a -> a.copy() },
+                    favoriteGenres = it.favoriteGenres.map { g -> g.copy() }
+                )
+            )
+
+            return mappedUser != authorizedUser
+        } ?: false
+    }
 
     private fun updateFormStateFromUser(user: User) = _formState.update {
         val formState: UserFormState = UserMapper.impl.toFormState(user.copy())
         formState.copy(languages = formState.languages.filter { it.isNotEmpty() }.toMutableList())
     }
 
-    fun updateUser() = viewModelScope.launch(Dispatchers.IO) {
-        isLoading.update { true }
+    private fun updateUser() = viewModelScope.launch(Dispatchers.IO) {
+        _isLoading.update { true }
+        var toastText = UiText.StringResource(R.string.toast_profile_edited_successfully)
+
         val updatedUser: User? = userDao.getCurrentUser()?.let { user ->
             UserMapper.impl.mergeUserWithFormState(_formState.value, user)
         }?.also { user ->
@@ -72,20 +83,37 @@ class EditUserProfileViewModel @Inject constructor(
                 .onSuccess {
                     withContext(Dispatchers.Main) {
                         userDao.saveUser(user)
-                        uiStateDispatcher.setAuthorizedUser(user)
+                        with(uiStateDispatcher) {
+                            setAuthorizedUser(user)
+                            sendUiEvent(UiEvent.ShowToast(toastText))
+                        }
                     }
                 }
                 .onFailure {
                     withContext(Dispatchers.Main) {
-                        val toastText = UiText.StringResource(R.string.toast_update_error)
+                        toastText = UiText.StringResource(R.string.toast_update_error)
                         uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
                     }
                 }
         }
 
         Log.d("EditUserProfileViewModel", "current user after update: $updatedUser")
-        isLoading.update { false }
+        _isLoading.update { false }
     }
+
+    fun onTopNavigationButtonClick() = viewModelScope.launch(Dispatchers.Main) {
+        if (hasStateChanges())
+            _isDialogOpened.update { true }
+        else uiStateDispatcher.sendUiEvent(UiEvent.PopBackStack)
+    }
+
+    fun onSaveChangesButtonClick() = viewModelScope.launch(Dispatchers.Main) {
+        updateUser().also {
+            uiStateDispatcher.sendUiEvent(UiEvent.PopBackStack)
+        }
+    }
+
+    fun setDialogVisibility(state: Boolean) = _isDialogOpened.update { state }
 
     fun setFirstName(value: String) = _formState.update {
         it.copy(firstName = value)

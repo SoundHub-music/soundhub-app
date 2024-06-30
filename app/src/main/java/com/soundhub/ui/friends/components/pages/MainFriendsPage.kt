@@ -35,8 +35,12 @@ internal fun MainFriendsPage(
 
     val profileOwner: User? = friendsUiState.profileOwner
     val searchBarText: String = uiState.searchBarText
-    val friends: List<User> = profileOwner?.friends.orEmpty()
+    val friends: List<User> = profileOwner?.friends.orEmpty().distinct()
     var filteredFriendList: List<User> by rememberSaveable { mutableStateOf(friends) }
+
+    LaunchedEffect(key1 = friends) {
+        Log.d("MainFriendsPage", "friends: ${friends.size}")
+    }
 
     LaunchedEffect(key1 = searchBarText) {
         Log.d("MainFriendsPage", "text: $searchBarText")

@@ -5,17 +5,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,7 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.components.dialogs.DismissChangesDialog
 import com.soundhub.ui.components.forms.UserDataForm
+import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
 
 @Composable
@@ -37,8 +37,8 @@ fun EditUserProfileScreen(
     navController: NavHostController,
 ) {
     val formState = editUserProfileViewModel.formState
+    val isDialogOpened by editUserProfileViewModel.isDialogOpened.collectAsState(initial = false)
     var isLoading by rememberSaveable { mutableStateOf(true) }
-    val isDialogOpened: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 
     /*
     At the initial moment of time the user state doesn't have time to load.
@@ -48,11 +48,7 @@ fun EditUserProfileScreen(
         authorizedUser?.let { isLoading = false }
     }
 
-    EditUserProfileScaffold(
-        editUserProfileViewModel = editUserProfileViewModel,
-        navController = navController,
-        isDialogOpened = isDialogOpened
-    ) {
+    EditUserProfileScaffold(editUserProfileViewModel) {
         if (!isLoading)
             UserDataForm(
                 modifier = Modifier.padding(it),
@@ -68,10 +64,12 @@ fun EditUserProfileScreen(
                 onLanguagesChange = editUserProfileViewModel::setLanguages,
             )
 
-        if (isDialogOpened.value)
+        if (isDialogOpened)
             DismissChangesDialog(
-                isDialogOpened = isDialogOpened,
-                navController = navController
+                navController = navController,
+                updateDialogStateCallback = { state ->
+                    editUserProfileViewModel.setDialogVisibility(state)
+                }
             )
     }
 }
@@ -81,8 +79,6 @@ fun EditUserProfileScreen(
 @Composable
 private fun EditUserProfileScaffold(
     editUserProfileViewModel: EditUserProfileViewModel,
-    navController: NavHostController,
-    isDialogOpened: MutableState<Boolean>,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -91,9 +87,7 @@ private fun EditUserProfileScaffold(
                 title = { Text(text = stringResource(id = R.string.screen_title_edit_profile)) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (editUserProfileViewModel.hasStateChanges())
-                            isDialogOpened.value = true
-                        else navController.popBackStack()
+                        editUserProfileViewModel.onTopNavigationButtonClick()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -102,36 +96,8 @@ private fun EditUserProfileScaffold(
                         )
                     }
                 },
-                actions = {
-                    EditProfileTopBarButton(
-                        editUserProfileViewModel = editUserProfileViewModel,
-                        navController = navController
-                    )
-                }
+                actions = { EditProfileTopBarButton(editUserProfileViewModel) }
             )
         }
     ) { content(it) }
-}
-
-@Composable
-private fun DismissChangesDialog(
-    isDialogOpened: MutableState<Boolean>,
-    navController: NavHostController
-) {
-    AlertDialog(
-        onDismissRequest = { isDialogOpened.value = false },
-        dismissButton = {
-            TextButton(onClick = { isDialogOpened.value = false }) {
-                Text(text = stringResource(id = R.string.edit_profile_alert_dialog_dismiss_btn))
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                isDialogOpened.value = false
-                navController.popBackStack()
-            }) { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_confirm_btn)) }
-        },
-        title = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_title)) },
-        text = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_content)) }
-    )
 }

@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
+import com.soundhub.Route
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.enums.ApiStatus
@@ -47,6 +49,7 @@ class ProfileViewModel @Inject constructor(
     private val getPostsByUserUseCase: GetPostsByUserUseCase,
     private val deletePostByIdUseCase: DeletePostByIdUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val userDao: UserDao,
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val uiState: Flow<UiState> = uiStateDispatcher.uiState
@@ -73,12 +76,39 @@ class ProfileViewModel @Inject constructor(
         })
     }
 
+    // on click button listeners
+    fun onDeleteFriendBtnClick(user: User?) = viewModelScope.launch(Dispatchers.IO) {
+        user?.let {
+            val authorizedUser: User? = userDao.getCurrentUser()
+            if (authorizedUser?.friends?.map { it.id }.orEmpty().contains(user.id))
+                deleteFriend(user)
+        }
+    }
+
+    fun onFriendSectionClick() = viewModelScope.launch(Dispatchers.Main) {
+        val ( profileOwner: User? ) = _profileUiState.value
+        val userId: String = profileOwner?.id.toString()
+        val friendPage: Route = Route.Profile.Friends.getRouteWithNavArg(userId)
+        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(friendPage))
+    }
+
+
+    // invite logic
+    fun sendInviteToFriend(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+        val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
+        var toastEvent: UiEvent = UiEvent.ShowToast(text)
+
+        inviteRepository.createInvite(recipientId)
+            .onSuccessWithContext { _profileUiState.update { it.copy(isRequestSent = true) } }
+            .onFailureWithContext { error -> toastEvent = UiEvent.Error(error.errorBody, error.throwable) }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(toastEvent) }
+    }
+
     fun deleteInviteToFriends() = viewModelScope.launch(Dispatchers.IO) {
         val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_deleted_successfully)
-        val showToastEvent: UiEvent = UiEvent.ShowToast(text)
+        var toastEvent: UiEvent = UiEvent.ShowToast(text)
 
-        val profileOwner: User? = _profileUiState.map { it.profileOwner }
-            .firstOrNull()
+        val profileOwner: User? = _profileUiState.map { it.profileOwner }.firstOrNull()
 
         val invite: Invite = _profileUiState.map { it.inviteSentByCurrentUser }
             .firstOrNull()
@@ -90,38 +120,13 @@ class ProfileViewModel @Inject constructor(
                 _profileUiState.update { it.copy(isRequestSent = false) }
             }
             .onFailureWithContext { error ->
-                val errorEvent: UiEvent = UiEvent.Error(
+                toastEvent = UiEvent.Error(
                     error.errorBody,
                     error.throwable,
                     R.string.toast_delete_invite_error
                 )
-                uiStateDispatcher.sendUiEvent(errorEvent)
             }
-            .finallyWithContext { uiStateDispatcher.sendUiEvent(showToastEvent) }
-    }
-
-    fun deleteFriend(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        userRepository.deleteFriend(user.id)
-            .onSuccessWithContext { response ->
-                Log.d("ProfileViewModel", "deleted friend ${response.body}")
-                _profileUiState.update { it.copy(isRequestSent = false) }
-            }
-    }
-
-    fun sendInviteToFriend(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        val text: UiText.StringResource = UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
-        val showToastEvent: UiEvent = UiEvent.ShowToast(text)
-
-        inviteRepository.createInvite(recipientId)
-            .onSuccessWithContext { _profileUiState.update { it.copy(isRequestSent = true) } }
-            .onFailureWithContext { error ->
-                val errorEvent: UiEvent = UiEvent.Error(
-                    error.errorBody,
-                    error.throwable
-                )
-                uiStateDispatcher.sendUiEvent(errorEvent)
-            }
-            .finallyWithContext { uiStateDispatcher.sendUiEvent(showToastEvent) }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(toastEvent) }
     }
 
     fun checkInvite() = viewModelScope.launch(Dispatchers.IO) {
@@ -129,26 +134,51 @@ class ProfileViewModel @Inject constructor(
         val profileOwner: User? = _profileUiState.value.profileOwner
 
         authorizedUser.collect { user ->
-            val invite: Invite? = inviteRepository.getInviteBySenderAndRecipientId(
-                senderId = user?.id,
-                recipientId = profileOwner?.id
-            ).getOrNull()
-
-            val isRequestSent: Boolean = invite?.recipient?.id == profileOwner?.id
-            val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
-
-
-            withContext(Dispatchers.Main) {
-                _profileUiState.update { it.copy(
-                    isRequestSent = isRequestSent,
-                    inviteSentByCurrentUser = inviteSentByCurrentUser
-                ) }
+            if (user != null && profileOwner != null) {
+                inviteRepository.getInviteBySenderAndRecipientId(
+                    senderId = user.id,
+                    recipientId = profileOwner.id
+                )
+                    .onSuccessWithContext { response ->
+                        val invite = response.body
+                        val isRequestSent: Boolean = invite?.recipient?.id == profileOwner.id
+                        val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
+                        _profileUiState.update { it.copy(
+                            isRequestSent = isRequestSent,
+                            inviteSentByCurrentUser = inviteSentByCurrentUser
+                        ) }
+                    }
+                    .onFailureWithContext { error ->
+                        if (error.errorBody.status != 404) {
+                            val uiEvent = UiEvent.Error(error.errorBody, error.throwable)
+                            uiStateDispatcher.sendUiEvent(uiEvent)
+                        }
+                    }
             }
         }
     }
 
+    private fun deleteFriend(user: User) = viewModelScope.launch(Dispatchers.IO) {
+        val userFullName = "${user.firstName} ${user.lastName}".trim()
+        val successToastText = UiText.StringResource(R.string.toast_friend_deleted_successfully, userFullName)
+        var uiEvent: UiEvent = UiEvent.ShowToast(successToastText)
+
+        userRepository.deleteFriend(user.id)
+            .onSuccessWithContext { response ->
+                Log.d("ProfileViewModel", "deleted friend ${response.body}")
+                _profileUiState.update { it.copy(
+                    isUserAFriendToAuthorizedUser = false,
+                    isRequestSent = false
+                ) }
+            }
+            .onFailureWithContext { error ->
+                uiEvent = UiEvent.Error(error.errorBody, error.throwable)
+            }
+            .finallyWithContext { uiStateDispatcher.sendUiEvent(uiEvent) }
+    }
+
     fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.Main) {
-        val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
+        val authorizedUser: User? = userDao.getCurrentUser()
         val profileOwner: User? = if (authorizedUser?.id == id)
             authorizedUser
         else getUserByIdUseCase(id)
@@ -174,6 +204,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    // post logic
     fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
         val ( profileOwner: User? ) = _profileUiState.value
         val posts: List<Post> = _profileUiState.value.userPosts

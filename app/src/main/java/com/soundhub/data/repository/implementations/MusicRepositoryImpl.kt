@@ -5,12 +5,15 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.GenreService
+import com.soundhub.data.api.LastFmService
 import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
 import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
+import com.soundhub.data.api.responses.lastfm.ArtistsByTagResponse
+import com.soundhub.data.api.responses.lastfm.SearchArtistResponseBody
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
@@ -28,6 +31,7 @@ import javax.inject.Inject
 
 class MusicRepositoryImpl @Inject constructor(
     private val musicService: MusicService,
+    private val lastFmService: LastFmService,
     private val genreService: GenreService,
     private val context: Context
 ): MusicRepository {
@@ -65,31 +69,55 @@ class MusicRepositoryImpl @Inject constructor(
         artistState: MutableStateFlow<ArtistUiState>
     ): HttpResult<List<Artist>> {
         try {
-            val response: Response<DiscogsResponse> = musicService.searchData(
-                type = DiscogsSearchType.Release.type,
-                genre = genres.joinToString("|") { it.lowercase() },
-                style = styles.joinToString("|") { it.lowercase() },
-                countPerPage = countPerPage,
-                page = page
-            )
-            artistState.update { it.copy(status = ApiStatus.LOADING) }
-            Log.d("MusicRepository", "loadArtistByGenresToState[1]: $response")
-
-            if (!response.isSuccessful) {
-                val errorBody = ErrorResponse(
-                    status = response.code(),
-                    detail = response.message()
+            genres.forEach { genre ->
+                val response: Response<ArtistsByTagResponse> = lastFmService.getArtistsByGenre(
+                    tag = genre
                 )
 
-                Log.e("MusicRepository", "loadArtistByGenresToState[2]: $errorBody")
-                artistState.update { it.copy(status = ApiStatus.ERROR) }
-                return HttpResult.Error(errorBody = errorBody)
-            }
+                if (!response.isSuccessful) {
+                    Log.e("MusicRepository", "loadArtistByGenresToState[1]: ${response.message()}")
+                }
+                response.body()?.let { artistList ->
+                    artistList.topArtistsBody.artist.forEach { a ->
+                        if (a.name !in artistState.value.artists.map { it.title }) {
+                            val artist = Artist(
+                                title = a.name,
+                                genre = listOf(genre)
+                            )
+                            artistState.update {
+                                it.copy(artists = it.artists + artist)
+                            }
+                        }
+                    }
 
-            loadDataToArtistState(
-                data = response.body()?.results.orEmpty(),
-                state = artistState
-            )
+                }
+
+            }
+//            val response: Response<DiscogsResponse> = musicService.searchData(
+//                type = DiscogsSearchType.Release.type,
+//                genre = genres.joinToString("|") { it.lowercase() },
+//                style = styles.joinToString("|") { it.lowercase() },
+//                countPerPage = countPerPage,
+//                page = page
+//            )
+//            artistState.update { it.copy(status = ApiStatus.LOADING) }
+//            Log.d("MusicRepository", "loadArtistByGenresToState[1]: $response")
+//
+//            if (!response.isSuccessful) {
+//                val errorBody = ErrorResponse(
+//                    status = response.code(),
+//                    detail = response.message()
+//                )
+//
+//                Log.e("MusicRepository", "loadArtistByGenresToState[2]: $errorBody")
+//                artistState.update { it.copy(status = ApiStatus.ERROR) }
+//                return HttpResult.Error(errorBody = errorBody)
+//            }
+//
+//            loadDataToArtistState(
+//                data = response.body()?.results.orEmpty(),
+//                state = artistState
+//            )
 
             artistState.update { it.copy(status = ApiStatus.SUCCESS) }
             return HttpResult.Success(body = null)
@@ -236,37 +264,50 @@ class MusicRepositoryImpl @Inject constructor(
 
     override suspend fun searchArtists(artistName: String): HttpResult<List<Artist>> {
         try {
-            val response = musicService.searchData(
-                query = artistName,
-                type = DiscogsSearchType.Artist.type
+//            val response = musicService.searchData(
+//                query = artistName,
+//                type = DiscogsSearchType.Artist.type
+//            )
+//
+//            Log.d("MusicRepository", "searchArtists[1]: $response")
+//
+//            if (!response.isSuccessful) {
+//                val errorBody = Gson()
+//                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
+//                    ?: ErrorResponse(
+//                        status = response.code(),
+//                        detail = context.getString(R.string.toast_common_error)
+//                    )
+//
+//                Log.e("MusicRepository", "searchArtists[2]: $errorBody")
+//
+//                return HttpResult.Error(errorBody = errorBody)
+//            }
+//
+//            val desiredArtists: List<Artist> = response.body()
+//                ?.results
+//                ?.map {
+//                Artist(
+//                    id = it.id,
+//                    title = it.title,
+//                    genre = it.genre.orEmpty(),
+//                    style = it.style.orEmpty(),
+//                    thumb = it.thumb
+//                )
+//            }.orEmpty()
+
+            val response: Response<SearchArtistResponseBody> = lastFmService.searchArtist(
+                artist = artistName
             )
 
-            Log.d("MusicRepository", "searchArtists[1]: $response")
+            if (!response.isSuccessful)
+                Log.e("MusicRepository", "searchArtists[1]: ${response.message()}")
 
-            if (!response.isSuccessful) {
-                val errorBody = Gson()
-                    .fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-                    ?: ErrorResponse(
-                        status = response.code(),
-                        detail = context.getString(R.string.toast_common_error)
-                    )
-
-                Log.e("MusicRepository", "searchArtists[2]: $errorBody")
-
-                return HttpResult.Error(errorBody = errorBody)
+            val desiredArtists: MutableList<Artist> = mutableListOf()
+            response.body()?.results?.artistMatches?.artist?.forEach { artistBody ->
+                val artist = Artist(title = artistBody.name)
+                desiredArtists += artist
             }
-
-            val desiredArtists: List<Artist> = response.body()
-                ?.results
-                ?.map {
-                Artist(
-                    id = it.id,
-                    title = it.title,
-                    genre = it.genre.orEmpty(),
-                    style = it.style.orEmpty(),
-                    thumb = it.thumb
-                )
-            }.orEmpty()
 
             return HttpResult.Success(body = desiredArtists)
         }

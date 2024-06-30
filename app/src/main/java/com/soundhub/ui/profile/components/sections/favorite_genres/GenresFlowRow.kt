@@ -68,7 +68,6 @@ internal fun GenresFlowRow(
     }
 }
 
-// TODO: remake color generation
 private fun generateContrastColor(baseColor: Color): Color {
     val contrastFactor = 1f
     val r = (baseColor.red + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)

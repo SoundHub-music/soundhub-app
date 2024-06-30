@@ -52,6 +52,8 @@ sealed class ApiEndpoints {
         private const val ARTIST_ENDPOINT = "artists"
         private const val RELEASE_ENDPOINT = "releases"
 
+        const val LAST_FM_TOP_ARTISTS_BY_GENRE = "2.0/?method=tag.gettopartists"
+
         const val DATABASE_SEARCH = "database/search"
 
         const val GET_GENRES = "genres"

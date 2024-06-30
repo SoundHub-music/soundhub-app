@@ -8,6 +8,7 @@ import com.soundhub.data.api.CountryService
 import com.soundhub.data.api.FileService
 import com.soundhub.data.api.GenreService
 import com.soundhub.data.api.InviteService
+import com.soundhub.data.api.LastFmService
 import com.soundhub.data.api.MessageService
 import com.soundhub.data.api.MusicService
 import com.soundhub.data.api.PostService
@@ -122,11 +123,13 @@ object RepositoryModule {
         @ApplicationContext
         context: Context,
         musicService: MusicService,
-        genreService: GenreService
+        genreService: GenreService,
+        lastFmService: LastFmService
     ): MusicRepository = MusicRepositoryImpl(
-        musicService,
-        genreService,
-        context
+        musicService = musicService,
+        lastFmService = lastFmService,
+        genreService = genreService,
+        context = context
     )
 
     @Provides

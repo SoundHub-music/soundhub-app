@@ -23,7 +23,7 @@ class LocalDateTimeAdapter : JsonSerializer<LocalDateTime?>, JsonDeserializer<Lo
         typeOfSrc: Type?,
         context: JsonSerializationContext?
     ): JsonElement? = if (src == null) JsonNull.INSTANCE
-        else JsonPrimitive(src.toString())
+        else JsonPrimitive(src.format(formatter).toString())
 
     override fun deserialize(
         json: JsonElement?,

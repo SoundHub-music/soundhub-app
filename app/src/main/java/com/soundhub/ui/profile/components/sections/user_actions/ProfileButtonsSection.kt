@@ -16,7 +16,6 @@ import com.soundhub.ui.profile.components.sections.user_actions.buttons.EditProf
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.SendFriendRequestButton
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.WriteMessageButton
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.WritePostButton
-import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -27,8 +26,6 @@ internal fun ProfileButtonsSection(
     isOriginProfile: Boolean,
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
     val profileOwner: User? = profileUiState.profileOwner
 
     val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
@@ -50,11 +47,7 @@ internal fun ProfileButtonsSection(
             )
 
             if (isUserAFriendToAuthorizedUser)
-                DeleteFriendButton(
-                    profileViewModel = profileViewModel,
-                    authorizedUser = authorizedUser,
-                    user = profileOwner
-                )
+                DeleteFriendButton(profileViewModel)
             else SendFriendRequestButton(
                 profileViewModel = profileViewModel,
                 uiStateDispatcher = uiStateDispatcher,

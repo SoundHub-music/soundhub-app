@@ -46,7 +46,9 @@ fun FriendsScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        friendsViewModel.loadRecommendedFriends()
+        // loading recommended friends only in authorized user friends page
+        if (profileOwner?.id == authorizedUser?.id)
+            friendsViewModel.loadRecommendedFriends()
     }
 
     LaunchedEffect(key1 = searchBarText) {

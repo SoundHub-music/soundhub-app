@@ -28,7 +28,7 @@ import com.soundhub.ui.components.fields.CountryDropdownField
 import com.soundhub.ui.components.fields.DatePicker
 import com.soundhub.ui.components.fields.GenderDropdownField
 import com.soundhub.ui.components.fields.UserLanguagesField
-import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.DATE_FORMAT
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -126,7 +126,7 @@ fun UserDataForm(
             value = formState.value.birthday,
             label = stringResource(id = R.string.text_field_birthdate),
             onValueChange = { value ->
-                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(Constants.DATE_FORMAT))
+                val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(DATE_FORMAT))
                 onBirthdayChange(date)
             },
             isError = !formState.value.isBirthdayValid,

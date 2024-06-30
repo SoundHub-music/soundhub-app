@@ -97,7 +97,7 @@ class MessengerViewModel @Inject constructor(
         }
 
         lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {
-            prefix + lastMessageContent
+            "$prefix $lastMessageContent"
         } else "${lastMessage.sender?.firstName}: $lastMessageContent".trim()
 
         return lastMessageContent
@@ -121,8 +121,7 @@ class MessengerViewModel @Inject constructor(
     }
 
     private fun getChats(): Flow<List<Chat>> = flow {
-        val user = userDao.getCurrentUser()
-        user?.let {
+        userDao.getCurrentUser()?.let { user ->
             chatRepository.getAllChatsByUserId(user.id)
                 .onSuccess { response ->
                     val chats = response.body.orEmpty()

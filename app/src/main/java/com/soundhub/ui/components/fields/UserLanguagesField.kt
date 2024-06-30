@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,7 +30,9 @@ fun UserLanguagesField(
     onLanguagesChange: (List<String>) -> Unit = {},
     formState: State<IUserDataFormState>
 ) {
+    // TODO: make language field more intuitive
     var languageText by rememberSaveable { mutableStateOf("") }
+    val languages: List<String> = remember(formState.value) { formState.value.languages }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -41,24 +44,22 @@ fun UserLanguagesField(
             singleLine = true,
             keyboardActions = KeyboardActions(
                 onDone = {
-                    onLanguagesChange(formState.value.languages + languageText)
-                    languageText = ""
+                    if (languageText.isNotBlank()) {
+                        onLanguagesChange(languages + languageText)
+                        languageText = ""
+                    }
                 }
             ),
             value = languageText,
             onValueChange = { languageText = it },
         )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            formState.value.languages.forEach { lang ->
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            languages.forEach { lang ->
                 SuggestionChip(
                     colors = SuggestionChipDefaults.suggestionChipColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     ),
-                    onClick = {
-                        onLanguagesChange(formState.value.languages.filter { it != lang })
-                    },
+                    onClick = { onLanguagesChange(formState.value.languages.filter { it != lang }) },
                     label = { Text(text = lang) }
                 )
             }

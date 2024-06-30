@@ -46,6 +46,7 @@ fun DatePicker(
     val dialog = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
+            focusManager.clearFocus()
             val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
             if (selectedDate.plusYears(14) <= LocalDate.now()) {
                 onValueChange(selectedDate.toString())

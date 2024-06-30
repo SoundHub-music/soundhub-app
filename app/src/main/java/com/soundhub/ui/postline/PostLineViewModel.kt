@@ -47,20 +47,20 @@ class PostLineViewModel @Inject constructor(
     }
 
     private suspend fun fetchAndProcessPosts(user: User) {
-        val posts: MutableList<Post> = _postLineUiState.value.posts.toMutableList()
+        var posts: MutableList<Post> = _postLineUiState.value.posts.toMutableList()
 
         postRepository.getPostsByAuthorId(user.id)
             .onSuccessWithContext { response ->
                 val postsFromResponse: List<Post> = response.body.orEmpty()
                 if (posts.isNotEmpty())
                     posts.addAll(postsFromResponse.filter { p -> p.id !in posts.map { it.id } })
-                else {
-                    _postLineUiState.update { state ->
-                        state.copy(
-                            posts = response.body.orEmpty().sortedBy { it.publishDate },
-                            status = ApiStatus.SUCCESS
-                        )
-                    }
+                else posts = postsFromResponse.toMutableList()
+
+                _postLineUiState.update { state ->
+                    state.copy(
+                        posts = posts.sortedBy { it.publishDate },
+                        status = ApiStatus.SUCCESS
+                    )
                 }
         }.onFailureWithContext { error ->
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)

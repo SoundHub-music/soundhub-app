@@ -73,12 +73,7 @@ fun UserProfileContainer(
                     navController = navController,
                 )
             }
-            item {
-                FriendMiniatureSection(
-                    profileViewModel = profileViewModel,
-                    navController = navController
-                )
-            }
+            item { FriendMiniatureSection(profileViewModel) }
             item {
                 FavoriteGenresSection(
                     profileViewModel = profileViewModel,

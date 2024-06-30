@@ -45,6 +45,7 @@ object DataModule {
     @Provides
     @Singleton
     fun providesGsonWithDateConverters(): Gson = GsonBuilder()
+        .setPrettyPrinting()
         .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
         .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
         .create()
