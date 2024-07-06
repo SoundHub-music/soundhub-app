@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
+import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.post_card.PostCard
 import com.soundhub.ui.profile.ProfileUiState
@@ -37,12 +40,14 @@ internal fun UserWall(
     uiStateDispatcher: UiStateDispatcher,
     profileViewModel: ProfileViewModel,
     postViewModel: PostViewModel = hiltViewModel(),
+    lazyListScope: LazyListScope
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
     val posts: List<Post> = profileUiState.userPosts
     val isLoading = profileUiState.postStatus == ApiStatus.LOADING
 
-    LaunchedEffect(true) {
+    LaunchedEffect(profileOwner) {
         profileViewModel.loadPostsByUser()
         Log.d("UserWall", posts.toString())
     }
@@ -69,9 +74,9 @@ internal fun UserWall(
                 text = stringResource(id = R.string.empty_postline_screen),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
             )
-        else posts.forEach { post ->
+        else lazyListScope.items(items = posts, key = { it.id }) { post ->
             PostCard(
                 post = post,
                 navController = navController,

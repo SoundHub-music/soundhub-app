@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.CompatibleUsersResponse

@@ -1,6 +1,6 @@
 package com.soundhub.di
 
-import com.soundhub.data.api.UserService
+import com.soundhub.data.api.services.UserService
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository

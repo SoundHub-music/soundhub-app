@@ -59,7 +59,7 @@ fun FillUserDataScreen(
                 .padding(16.dp)
         ) {
             registrationViewModel
-            .onPostRegisterNextBtnClick()
+            .onNextButtonClick()
         }
     }
 }

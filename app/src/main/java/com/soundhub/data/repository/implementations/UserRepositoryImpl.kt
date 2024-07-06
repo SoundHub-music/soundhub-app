@@ -8,7 +8,7 @@ import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.User
-import com.soundhub.data.api.UserService
+import com.soundhub.data.api.services.UserService
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.CompatibleUsersResponse
 import com.soundhub.data.api.responses.ErrorResponse

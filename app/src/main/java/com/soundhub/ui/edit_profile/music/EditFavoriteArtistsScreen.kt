@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.soundhub.data.model.Artist
 import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.music_preferences.ChooseArtistsScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -19,7 +18,6 @@ fun EditFavoriteArtistsScreen(
     val artistUiState: ArtistUiState by editMusicPrefViewModel
         .artistUiState.collectAsState()
     val lazyGridState = rememberLazyGridState()
-    val chosenArtists: List<Artist> = artistUiState.chosenArtists
 
     LaunchedEffect(key1 = artistUiState) {
         Log.d("EditFavoriteArtistsScreen", "artist state: $artistUiState")
@@ -27,25 +25,19 @@ fun EditFavoriteArtistsScreen(
 
     LaunchedEffect(key1 = lazyGridState.canScrollForward) {
         if (!lazyGridState.canScrollForward) {
-            editMusicPrefViewModel.setCurrentArtistPage(artistUiState.currentPage + 1)
-            editMusicPrefViewModel.loadArtists(artistUiState.currentPage)
+            editMusicPrefViewModel.loadArtists(artistUiState.pagination?.urls?.next)
         }
+    }
+
+    LaunchedEffect(key1 = true) {
+        editMusicPrefViewModel.loadArtists()
     }
 
     ChooseArtistsScreen(
         artistUiState = artistUiState,
-        onItemPlateClick = { isChosen, artist ->
-            if (isChosen)
-                editMusicPrefViewModel.addChosenArtist(artist)
-            else editMusicPrefViewModel.setChosenArtists(
-                chosenArtists.filter { it.id != artist.id }
-            )
-        },
+        onItemPlateClick = editMusicPrefViewModel::onArtistItemClick,
         onNextButtonClick = editMusicPrefViewModel::onNextButtonClick,
-        onSearchFieldChange = { value ->
-            uiStateDispatcher.updateSearchBarText(value)
-            editMusicPrefViewModel.searchArtists(value)
-        },
+        onSearchFieldChange = editMusicPrefViewModel::onSearchFieldChange,
         uiStateDispatcher = uiStateDispatcher,
         lazyGridState = lazyGridState
     )

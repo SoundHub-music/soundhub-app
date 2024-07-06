@@ -10,9 +10,7 @@ import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.music_preferences.ChooseGenresScreen
 
 @Composable
-fun EditFavoriteGenresScreen(
-    editMusicPrefViewModel: EditMusicPreferencesViewModel
-) {
+fun EditFavoriteGenresScreen(editMusicPrefViewModel: EditMusicPreferencesViewModel) {
     val genreUiState: GenreUiState by editMusicPrefViewModel
         .genreUiState
         .collectAsState()
@@ -23,15 +21,13 @@ fun EditFavoriteGenresScreen(
         Log.d("EditFavoriteGenresScreen", "chosen genres: $chosenGenres")
     }
 
+    LaunchedEffect(key1 = true) {
+        editMusicPrefViewModel.loadGenres()
+    }
+
     ChooseGenresScreen(
         genreUiState = genreUiState,
-        onItemPlateClick = { isChosen, genre ->
-           if (isChosen)
-               editMusicPrefViewModel.addChosenGenre(genre)
-           else editMusicPrefViewModel.setChosenGenres(
-               chosenGenres.filter { it.id != genre.id }
-           )
-        },
+        onItemPlateClick = editMusicPrefViewModel::onGenreItemClick,
         onNextButtonClick = editMusicPrefViewModel::onNextButtonClick
     )
 }

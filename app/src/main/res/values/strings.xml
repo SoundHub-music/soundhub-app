@@ -65,6 +65,8 @@
     <string name="user_form_invalid_birthday_error_message">Некорректная дата рождения</string>
     <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
     <string name="choose_artist_warning">Сначала выберите хотя бы одного исполнителя</string>
+    <string name="toast_update_music_preferences_successful">Музыкальные предпочтения обновлены</string>
+    <string name="toast_update_music_preferences_failed">Ошибка обновления музыкальных предпочтений</string>
 
     <!-- profile screen -->
     <string name="profile_screen_photo_section_caption">Фотографии</string>

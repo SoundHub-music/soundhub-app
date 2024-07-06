@@ -2,7 +2,7 @@ package com.soundhub.utils.request_interceptors
 
 import android.util.Log
 import com.soundhub.Route
-import com.soundhub.data.api.AuthService
+import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences

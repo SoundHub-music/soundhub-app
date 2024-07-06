@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,7 +39,6 @@ import com.soundhub.ui.authentication.registration.components.MusicItemPlate
 import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.containers.ContentContainer
-import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -53,6 +52,10 @@ fun ChooseArtistsScreen(
     lazyGridState: LazyGridState
 ) {
     val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val artists = remember(artistUiState.artists) { artistUiState.artists }
+    val chosenArtistIds = remember(artistUiState.chosenArtists) {
+        artistUiState.chosenArtists.map { it.id }
+    }
 
     LaunchedEffect(key1 = artistUiState) {
         Log.d("ChooseArtistsScreen", "ui state: $artistUiState")
@@ -98,33 +101,26 @@ fun ChooseArtistsScreen(
                 contentPadding = PaddingValues(all = 10.dp),
                 state = lazyGridState
             ) {
-                items(items = artistUiState.artists) { artist ->
+                items(items = artists) { artist ->
                     MusicItemPlate(
                         modifier = Modifier.padding(bottom = 20.dp),
                         caption = artist.title ?: "",
                         thumbnailUrl = artist.thumb,
                         onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
-                        isChosen = artist in artistUiState.chosenArtists,
+                        isChosen = artist.id in chosenArtistIds,
                         width = 90.dp,
                         height = 90.dp
                     )
                 }
             }
-
-            if (artistUiState.artists.isEmpty() || artistUiState.status == ApiStatus.LOADING)
-                CircleLoader(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .padding(vertical = 20.dp),
-                    strokeWidth = 7.dp
-                )
         }
 
         FloatingNextButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            onClick = onNextButtonClick
+            onClick = onNextButtonClick,
+            isLoading = artistUiState.status == ApiStatus.LOADING
         )
     }
 }

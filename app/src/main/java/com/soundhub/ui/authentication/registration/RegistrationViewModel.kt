@@ -2,36 +2,32 @@ package com.soundhub.ui.authentication.registration
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.Route.Authentication
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
-import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
-import com.soundhub.ui.authentication.registration.states.ArtistUiState
-import com.soundhub.ui.authentication.registration.states.GenreUiState
 import com.soundhub.ui.authentication.AuthFormState
 import com.soundhub.ui.authentication.registration.states.RegistrationState
 import com.soundhub.ui.components.forms.IUserDataFormState
+import com.soundhub.ui.music_preferences.BaseMusicPreferencesViewModel
 import com.soundhub.utils.AuthValidator
+import com.soundhub.utils.UiText
 import com.soundhub.utils.mappers.RegisterDataMapper
 import com.soundhub.utils.mappers.UserMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,76 +43,36 @@ class RegistrationViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
     private val authRepository: AuthRepository,
     private val userCredsStore: UserCredsStore,
-    private val loadGenresUseCase: LoadGenresUseCase,
-    private val loadArtistsUseCase: LoadArtistsUseCase,
-    private val searchArtistsUseCase: SearchArtistsUseCase,
-    private val userDao: UserDao
-): ViewModel() {
+    private val userDao: UserDao,
+    loadGenresUseCase: LoadGenresUseCase,
+    loadArtistsUseCase: LoadArtistsUseCase,
+    searchArtistsUseCase: SearchArtistsUseCase,
+): BaseMusicPreferencesViewModel(
+    loadGenresUseCase,
+    loadArtistsUseCase,
+    searchArtistsUseCase
+) {
     private val uiState = uiStateDispatcher.uiState
-
-    private val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
-    val genreUiState = _genreUiState.asStateFlow()
-
-    private val _artistUiState: MutableStateFlow<ArtistUiState> = MutableStateFlow(ArtistUiState())
-    val artistUiState = _artistUiState.asStateFlow()
-
     private val _registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(RegistrationState())
     val registerState: Flow<IUserDataFormState> = _registerState.asStateFlow()
-
-    private var searchJob: Job? = null
-    private var loadArtistsJob = MutableStateFlow<List<Job?>>(emptyList())
-
-    init { loadGenres() }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("PostRegistrationViewModel", "viewmodel was cleared")
     }
 
-    private fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
-        loadGenresUseCase(
-            countPerPage = 50,
-            genreUiState = _genreUiState
-        )
-    }
-
-    suspend fun loadArtists(page: Int = 1) {
-        val job = viewModelScope.launch(Dispatchers.IO) {
-            loadArtistsUseCase(
-                genreUiState = _genreUiState,
-                artistUiState = _artistUiState,
-                page = page
-            )
-        }
-
-        if (job.isCompleted && _artistUiState.value.artists.isEmpty())
-            _artistUiState.update { it.copy(status = ApiStatus.SUCCESS) }
-
-        loadArtistsJob.update { it + job }
-    }
-
-    fun searchArtists(value: String) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch(Dispatchers.IO) {
-            searchArtistsUseCase(
-                searchBarValue = value,
-                artistStateFlow = _artistUiState
-            )
-        }
-    }
-
-    fun onPostRegisterNextBtnClick() = viewModelScope.launch(Dispatchers.Main) {
+    override fun onNextButtonClick() = viewModelScope.launch(Dispatchers.Main) {
         Log.d("RegistrationViewModel", "onPostRegisterNextButtonClick: ${_registerState.value}")
         val uiState = uiState.firstOrNull()
         when (uiState?.currentRoute) {
-            Authentication.ChooseGenres.route -> handleChooseGenres()
-            Authentication.ChooseArtists.route -> handleChooseArtists()
+            Authentication.ChooseGenres.route -> onChooseGenresNextButtonClick()
+            Authentication.ChooseArtists.route -> onChooseArtistsNextButtonClick()
             Authentication.FillUserData.route -> handleFillUserData()
             else -> Unit
         }
     }
 
-    private fun handleChooseGenres() = viewModelScope.launch(Dispatchers.Main) {
+    override fun onChooseGenresNextButtonClick() = viewModelScope.launch(Dispatchers.Main) {
         _registerState.update {
             it.copy(favoriteGenres = _genreUiState.value.chosenGenres)
         }
@@ -125,7 +81,13 @@ class RegistrationViewModel @Inject constructor(
         uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Authentication.ChooseArtists))
     }
 
-    private fun handleChooseArtists() = viewModelScope.launch(Dispatchers.Main) {
+    override fun onChooseArtistsNextButtonClick() = viewModelScope.launch(Dispatchers.Main) {
+        if (_artistUiState.value.chosenArtists.isEmpty()) {
+            val toastEvent = UiEvent.ShowToast(UiText.StringResource(R.string.choose_artist_warning))
+            uiStateDispatcher.sendUiEvent(toastEvent)
+            return@launch
+        }
+
         _registerState.update {
             it.copy(favoriteArtists = _artistUiState.value.chosenArtists)
         }
@@ -134,11 +96,9 @@ class RegistrationViewModel @Inject constructor(
     }
 
     private fun handleFillUserData() = viewModelScope.launch(Dispatchers.Main) {
-        loadArtistsJob.firstOrNull()
-            .orEmpty()
-            .forEach { j -> j?.cancel() }
-
+        loadArtistsJob?.cancel()
         searchJob?.cancel()
+
         _registerState.update {
             it.copy(
                 isFirstNameValid = it.firstName.isNotEmpty(),
@@ -193,18 +153,6 @@ class RegistrationViewModel @Inject constructor(
         }
     }
 
-    fun addChosenGenre(list: List<Genre>) = _genreUiState.update { it.copy(chosenGenres = list) }
-
-    fun addChosenGenre(genre: Genre) = _genreUiState.update {
-        it.copy(chosenGenres =  it.chosenGenres + genre)
-    }
-
-    fun addChosenArtist(list: List<Artist>) = _artistUiState.update { it.copy(chosenArtists = list) }
-
-    fun addChosenArtist(artist: Artist) = _artistUiState.update {
-        it.copy(chosenArtists = it.chosenArtists + artist)
-    }
-
     fun setFirstName(value: String) = _registerState.update {
         it.copy(firstName = value, isFirstNameValid = value.isNotEmpty())
     }
@@ -242,9 +190,5 @@ class RegistrationViewModel @Inject constructor(
 
     fun setAvatar(avatarUrl: Uri?) = _registerState.update {
         it.copy(avatarUrl = avatarUrl?.toString())
-    }
-
-    fun setCurrentArtistPage(page: Int) = _artistUiState.update {
-        it.copy(currentPage = page)
     }
 }

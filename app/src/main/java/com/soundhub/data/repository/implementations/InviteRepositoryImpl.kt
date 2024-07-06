@@ -2,7 +2,7 @@ package com.soundhub.data.repository.implementations
 
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.data.api.InviteService
+import com.soundhub.data.api.services.InviteService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Invite

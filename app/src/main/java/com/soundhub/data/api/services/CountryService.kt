@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Country
 import com.soundhub.utils.ApiEndpoints.Countries.ALL_COUNTRIES

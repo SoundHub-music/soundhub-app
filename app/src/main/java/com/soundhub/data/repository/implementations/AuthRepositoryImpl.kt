@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.R
-import com.soundhub.data.api.AuthService
+import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody

@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Post
 import com.soundhub.utils.ApiEndpoints.Posts.ADD_POST

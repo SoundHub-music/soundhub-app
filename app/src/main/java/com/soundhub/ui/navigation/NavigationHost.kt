@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -69,7 +68,7 @@ fun NavigationHost(
     mainViewModel: MainViewModel
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(UiState())
-    var authorizedUser: User? by remember(uiState.authorizedUser) {
+    val authorizedUser: User? by remember(uiState.authorizedUser) {
         mutableStateOf(uiState.authorizedUser)
     }
 
@@ -86,7 +85,8 @@ fun NavigationHost(
     }
 
     LaunchedEffect(authorizedUser) {
-        Log.d("NavigationHost", "authorized_user: $authorizedUser")
+        val gson = mainViewModel.getGson()
+        Log.d("NavigationHost", "authorized_user: ${gson.toJson(authorizedUser)}")
     }
 
     LaunchedEffect(userCreds) {

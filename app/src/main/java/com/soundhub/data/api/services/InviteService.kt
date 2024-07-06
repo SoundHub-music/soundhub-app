@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Invite
 import com.soundhub.utils.ApiEndpoints.Invites.ACCEPT_INVITE

@@ -2,7 +2,7 @@ package com.soundhub.data.repository.implementations
 
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.data.api.ChatService
+import com.soundhub.data.api.services.ChatService
 import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.responses.ApiStateResponse
 import com.soundhub.data.api.responses.ErrorResponse

@@ -2,6 +2,7 @@ package com.soundhub.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
@@ -19,8 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    userCredsStore: UserCredsStore,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val gson: Gson,
+    userCredsStore: UserCredsStore
 ): ViewModel() {
     private val _startDestination = MutableStateFlow<String>(Route.Authentication.route)
     val startDestination: StateFlow<String> = _startDestination.asStateFlow()
@@ -42,4 +44,6 @@ class MainViewModel @Inject constructor(
             _startDestination.update { Route.PostLine.route }
         else _startDestination.update { Route.Authentication.route }
     }
+
+    fun getGson(): Gson = gson
 }

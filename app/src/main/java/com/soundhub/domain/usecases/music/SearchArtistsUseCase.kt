@@ -2,23 +2,28 @@ package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.model.Artist
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.registration.states.ArtistUiState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class SearchArtistsUseCase @Inject constructor(
     private val musicRepository: MusicRepository
 ) {
-    suspend operator fun invoke(searchBarValue: String, artistStateFlow: MutableStateFlow<ArtistUiState>) {
+    suspend operator fun invoke(searchString: String): Result<List<Artist>> = runCatching {
+        var searchResult: List<Artist> = emptyList()
         delay(500)
-        if (searchBarValue.isNotEmpty()) {
-            musicRepository.searchArtists(searchBarValue)
+
+        if (searchString.isNotEmpty()) {
+            musicRepository.searchArtists(searchString)
                 .onSuccess { response ->
                     val artists: List<Artist> = response.body.orEmpty()
-                    artistStateFlow.update { it.copy(artists = artists) }
+                    searchResult = artists
+                }
+                .onFailure { error ->
+                    error.throwable?.let { throw error.throwable } ?:
+                    throw Exception(error.errorBody.detail)
                 }
         }
+
+        return@runCatching searchResult
     }
 }

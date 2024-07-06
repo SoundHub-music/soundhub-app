@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import okhttp3.ResponseBody
 import retrofit2.Response

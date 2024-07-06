@@ -1,5 +1,6 @@
 package com.soundhub.ui.components.buttons
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
@@ -10,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.soundhub.ui.components.loaders.CircleLoader
 
 @Composable
 fun FloatingNextButton(
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     onClick: () -> Unit,
 ) {
     FloatingActionButton(
@@ -22,7 +25,8 @@ fun FloatingNextButton(
         containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier
     ) {
-        Icon(
+        if (isLoading) CircleLoader(modifier = Modifier.size(20.dp))
+        else Icon(
             imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
             contentDescription = "arrow_forward"
         )

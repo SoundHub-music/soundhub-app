@@ -2,13 +2,11 @@ package com.soundhub.ui.profile.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,9 +35,7 @@ fun UserProfileContainer(
     profileViewModel: ProfileViewModel
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState
-        .collectAsState()
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
 
     val authorizedUser: User? = uiState.authorizedUser
     val profileOwner: User? = profileUiState.profileOwner
@@ -51,59 +47,46 @@ fun UserProfileContainer(
         isOriginProfile = authorizedUser?.id == profileOwner?.id
     }
 
-    Box(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
             )
+            .padding(16.dp),
+
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 30.dp),
-            verticalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
-            item { UserMainDataSection(profileViewModel) }
-            item {
-                ProfileButtonsSection(
-                    profileViewModel = profileViewModel,
-                    uiStateDispatcher = uiStateDispatcher,
-                    isOriginProfile = isOriginProfile,
-                    navController = navController,
-                )
-            }
-            item { FriendMiniatureSection(profileViewModel) }
-            item {
-                FavoriteGenresSection(
-                    profileViewModel = profileViewModel,
-                    isOriginProfile = isOriginProfile,
-                    navController = navController
-                )
-            }
+        item { UserMainDataSection(profileViewModel) }
 
-            // unconfirmed item
-//            HorizontalDivider(thickness = 1.dp)
-//            UserPhotoCarousel(
-//                images = listOf(
-//                    "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
-//                    "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g",
-//                    "https://play-lh.googleusercontent.com/y_-anVKl3ID25Je02J1dseqlAm41N8pwI-Gad7aDxPIPss3d7hUYF8c08SNCtwSPW5g"
-//                ),
-//                navController = navController,
-//                uiStateDispatcher = uiStateDispatcher
-//            )
+        item {
+            ProfileButtonsSection(
+                profileViewModel = profileViewModel,
+                uiStateDispatcher = uiStateDispatcher,
+                isOriginProfile = isOriginProfile,
+                navController = navController,
+            )
+        }
 
-            item {
-                profileOwner?.let {
-                    HorizontalDivider(thickness = 1.dp)
-                    UserWall(
-                        navController = navController,
-                        uiStateDispatcher = uiStateDispatcher,
-                        profileViewModel = profileViewModel
-                    )
-                }
-            }
+        item { FriendMiniatureSection(profileViewModel) }
+
+        item {
+            FavoriteGenresSection(
+                profileViewModel = profileViewModel,
+                isOriginProfile = isOriginProfile,
+                navController = navController
+            )
+        }
+
+        item {
+            HorizontalDivider(thickness = 1.dp)
+            UserWall(
+                navController = navController,
+                uiStateDispatcher = uiStateDispatcher,
+                profileViewModel = profileViewModel,
+                lazyListScope = this@LazyColumn
+            )
         }
     }
 }

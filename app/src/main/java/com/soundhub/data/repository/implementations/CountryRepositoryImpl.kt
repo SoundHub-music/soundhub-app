@@ -2,7 +2,7 @@ package com.soundhub.data.repository.implementations
 
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.data.api.CountryService
+import com.soundhub.data.api.services.CountryService
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Country
 import com.soundhub.data.api.responses.ErrorResponse

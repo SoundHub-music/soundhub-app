@@ -207,10 +207,7 @@ class ProfileViewModel @Inject constructor(
     // post logic
     fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
         val ( profileOwner: User? ) = _profileUiState.value
-        val posts: List<Post> = _profileUiState.value.userPosts
-
-        if (posts.isEmpty())
-            _profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+        _profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
 
         profileOwner?.let {
             getPostsByUserUseCase(profileOwner)

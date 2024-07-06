@@ -79,7 +79,8 @@ fun ChooseGenresScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            onClick = onNextButtonClick
+            onClick = onNextButtonClick,
+            isLoading = isLoading
         )
     }
 }

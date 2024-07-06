@@ -27,8 +27,7 @@ internal fun SectionLabel(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp)
     ) {
         if (labelIcon != null && iconTint != null)
             Icon(

@@ -18,19 +18,19 @@ class LoadGenresUseCase @Inject constructor(
         genreUiState: MutableStateFlow<GenreUiState>
     ) {
         musicRepository.getAllGenres(countPerPage)
-            .onSuccess { successResponse ->
+            .onSuccess { response ->
                 genreUiState.update {
                     it.copy(
-                        status = successResponse.status,
-                        genres = successResponse.body.orEmpty()
+                        status = response.status,
+                        genres = response.body.orEmpty()
                     )
                 }
             }
-            .onFailure { response ->
-                genreUiState.update { it.copy(status = response.status) }
-                response.errorBody.detail?.let { error ->
+            .onFailure { error ->
+                genreUiState.update { it.copy(status = error.status) }
+                error.errorBody.detail?.let { e ->
                     uiStateDispatcher.sendUiEvent(
-                        UiEvent.ShowToast(UiText.DynamicString(error))
+                        UiEvent.ShowToast(UiText.DynamicString(e))
                     )
                 }
             }

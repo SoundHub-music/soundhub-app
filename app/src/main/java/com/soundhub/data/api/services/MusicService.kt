@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
 import com.soundhub.data.api.responses.discogs.release.DiscogsReleaseResponse

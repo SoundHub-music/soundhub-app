@@ -1,7 +1,8 @@
 package com.soundhub.domain.usecases.user
 
 import android.util.Log
-import com.soundhub.data.api.UserService
+import com.soundhub.data.api.services.UserService
+import com.soundhub.data.model.Artist
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository
@@ -15,20 +16,17 @@ class LoadAllUserDataUseCase @Inject constructor(
     private val userService: UserService
 ) {
     suspend operator fun invoke(user: User) {
-        loadAllUserData(user)
-    }
-
-    private suspend fun loadAllUserData(user: User) {
         loadUserFriends(user)
-        user.friends.forEach { f -> loadUserFriends(f) }
+        user.friends.forEach { f ->
+            loadUserFriends(f)
+            loadUserFavoriteArtists(f)
+        }
         loadUserFavoriteArtists(user)
         loadUserAvatar(user)
     }
 
     private suspend fun loadUserFriends(user: User) {
-        val response: Response<List<User>> = userService.getFriendsByUserId(
-            userId = user.id
-        )
+        val response: Response<List<User>> = userService.getFriendsByUserId(user.id)
 
         if (!response.isSuccessful) {
             Log.e("LoadAllUserDataUseCase", "message: ${response.message()}\ncode: ${response.code()}")
@@ -39,8 +37,19 @@ class LoadAllUserDataUseCase @Inject constructor(
     }
 
     private suspend fun loadUserFavoriteArtists(user: User) {
-        user.favoriteArtists = user.favoriteArtistsIds
-            .mapNotNull { artistId -> musicRepository.getArtistById(artistId).getOrNull() }
+        val artists = mutableListOf<Artist>()
+
+        user.favoriteArtistsIds.forEach { id -> musicRepository.getArtistById(id)
+            .onSuccess { response -> response.body?.let { artists.add(it) }}
+            .onFailure { e ->
+                Log.e(
+                    "LoadAllUserDataUseCase",
+                    "loadUserFavoriteArtists: ${e.throwable?.stackTraceToString() ?: e.errorBody.detail}"
+                )
+            }
+        }
+
+        user.favoriteArtists = artists
     }
 
     private suspend fun loadUserAvatar(user: User) {

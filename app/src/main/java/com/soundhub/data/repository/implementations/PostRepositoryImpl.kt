@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.R
-import com.soundhub.data.api.PostService
+import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Post

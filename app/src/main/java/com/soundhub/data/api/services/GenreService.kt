@@ -1,4 +1,4 @@
-package com.soundhub.data.api
+package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Genre
 import com.soundhub.utils.ApiEndpoints.Music.GET_GENRES

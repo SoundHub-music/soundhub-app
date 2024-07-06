@@ -1,16 +1,16 @@
 package com.soundhub.di
 
-import com.soundhub.data.api.AuthService
-import com.soundhub.data.api.ChatService
-import com.soundhub.data.api.CountryService
-import com.soundhub.data.api.FileService
-import com.soundhub.data.api.GenreService
-import com.soundhub.data.api.InviteService
-import com.soundhub.data.api.LastFmService
-import com.soundhub.data.api.MessageService
-import com.soundhub.data.api.MusicService
-import com.soundhub.data.api.PostService
-import com.soundhub.data.api.UserService
+import com.soundhub.data.api.services.AuthService
+import com.soundhub.data.api.services.ChatService
+import com.soundhub.data.api.services.CountryService
+import com.soundhub.data.api.services.FileService
+import com.soundhub.data.api.services.GenreService
+import com.soundhub.data.api.services.InviteService
+import com.soundhub.data.api.services.LastFmService
+import com.soundhub.data.api.services.MessageService
+import com.soundhub.data.api.services.MusicService
+import com.soundhub.data.api.services.PostService
+import com.soundhub.data.api.services.UserService
 import com.soundhub.utils.constants.Constants.AUTHORIZED_SOUNDHUB_API_RETROFIT
 import com.soundhub.utils.constants.Constants.SOUNDHUB_AUTH_SERVICE_RETROFIT
 import com.soundhub.utils.constants.Constants.COUNTRIES_API_RETROFIT

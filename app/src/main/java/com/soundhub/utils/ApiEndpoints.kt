@@ -1,5 +1,7 @@
 package com.soundhub.utils
 
+import com.soundhub.BuildConfig
+
 sealed class ApiEndpoints {
     data object Users {
         const val USER_REQUEST_BODY_NAME = "userDto"
@@ -52,14 +54,27 @@ sealed class ApiEndpoints {
         private const val ARTIST_ENDPOINT = "artists"
         private const val RELEASE_ENDPOINT = "releases"
 
-        const val LAST_FM_TOP_ARTISTS_BY_GENRE = "2.0/?method=tag.gettopartists"
-
         const val DATABASE_SEARCH = "database/search"
 
         const val GET_GENRES = "genres"
         const val GET_ARTISTS = "$ARTIST_ENDPOINT/{$ARTIST_ID_DYNAMIC_PARAM}"
         const val GET_RELEASE_BY_ID = "$RELEASE_ENDPOINT/{$RELEASE_ID_DYNAMIC_PARAM}"
         const val GET_ARTIST_RELEASES = "$GET_ARTISTS/releases"
+    }
+
+    data object LastFm {
+        private const val API_VERSION = "2.0"
+        private const val JSON_RESPONSE_FORMAT = "format=json"
+        private const val LAST_FM_API_KEY = "api_key=${BuildConfig.LAST_FM_API_KEY}"
+
+        private const val GET_TOP_ARTISTS_METHOD = "method=tag.gettopartists"
+        private const val SEARCH_ARTISTS_METHOD = "method=artist.search"
+
+        const val GET_TOP_ARTISTS_BY_TAG_ENDPOINT = "$API_VERSION/?$GET_TOP_ARTISTS_METHOD&$LAST_FM_API_KEY&" +
+                JSON_RESPONSE_FORMAT
+
+        const val SEARCH_ARTISTS_ENDPOINT = "$API_VERSION/?$SEARCH_ARTISTS_METHOD&$LAST_FM_API_KEY&" +
+                JSON_RESPONSE_FORMAT
     }
 
     data object Posts {

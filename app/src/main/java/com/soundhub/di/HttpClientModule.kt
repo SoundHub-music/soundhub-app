@@ -1,10 +1,9 @@
 package com.soundhub.di
 
 import android.content.Context
-import com.soundhub.data.api.AuthService
+import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.constants.Constants.AUTHORIZED_HTTP_CLIENT_WITH_CACHE
 import com.soundhub.utils.constants.Constants.CACHE_SIZE
 import com.soundhub.utils.constants.Constants.CONNECTION_TIMEOUT

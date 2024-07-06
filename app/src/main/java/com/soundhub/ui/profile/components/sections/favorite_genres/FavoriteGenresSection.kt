@@ -2,8 +2,10 @@ package com.soundhub.ui.profile.components.sections.favorite_genres
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,7 +22,10 @@ fun FavoriteGenresSection(
     navController: NavHostController
 ) {
     ElevatedCard {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(5.dp)
+        ) {
             SectionLabel(
                 text = stringResource(id = R.string.profile_screen_favorite_genres_section_caption),
                 labelIcon = painterResource(id = R.drawable.round_music_note_24),

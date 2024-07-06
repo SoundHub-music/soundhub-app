@@ -155,16 +155,31 @@ class HttpUtils {
         }
 
         // TODO: implement glide url builder for discogs api
-//        fun prepareGlideUrl(imageUrl: String?): GlideUrl? {
-//            return imageUrl?.let { url ->
-//                val headers = LazyHeaders.Builder()
-//                    .addHeader("mode", "no-cors")
-//                    .addHeader(AUTHORIZATION_HEADER, Constants.DISCOGS_AUTHORIZATION)
-//                    .build()
-//
-//                GlideUrl(url, headers)
-//            }
-//        }
+        fun prepareGlideUrlDiscogs(imageUrl: String?): GlideUrl? {
+            return try {
+                if (imageUrl?.isNotEmpty() == true) {
+                    val headers = LazyHeaders.Builder()
+                    .addHeader(AUTHORIZATION_HEADER, Constants.DISCOGS_AUTHORIZATION)
+                        .addHeader("Accept", "*/*")
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                        .addHeader("Accept-Encoding", "gzip, deflate, br")
+                        .addHeader("Accept-Language", "ru,en;q=0.9,uk;q=0.8")
+                        .addHeader("Cookie", "__cf_bm=elNmsTxHnTIlr..xYvdJvwDb1JVQdwV8CLYZ2dMvRso-1719998487-1.0.1.1-cSDBn.eOwxlGJk0whxna7A56QtrjEWwpHgAtjVB7Fk7eEdWhw8pBY44tcNM0d2Auy6kKjJxiR5TOryyj691fiw")
+//                        .addHeader("Cache-Control", "max-age=0")
+//                        .addHeader("Referrer", "https://www.discogs.com/")
+//                        .addHeader("Origin", "https://i.discogs.com/")
+                        .build()
+
+                    val glideUrl = GlideUrl(imageUrl, headers)
+                    return glideUrl
+                }
+                else null
+            }
+            catch (e: Exception) {
+                Log.e("HttpUtils", "prepareGlideUrlDiscogs: ${e.stackTraceToString()}")
+                return null
+            }
+        }
 
         /**
          * Prepares request builder for glide by adding cache parameters

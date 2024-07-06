@@ -2,11 +2,11 @@ package com.soundhub.data.model
 
 import com.google.gson.annotations.SerializedName
 import com.soundhub.data.enums.InviteStatus
+import com.soundhub.data.enums.NotificationType
 import java.time.LocalDateTime
 import java.util.UUID
 
 data class Invite(
-//    val id: UUID,
     @SerializedName("createdDateTime")
     val createdDateTime: LocalDateTime = LocalDateTime.now(),
 
@@ -31,10 +31,4 @@ open class Notification(
     val dateTime: LocalDateTime = LocalDateTime.now(),
 ) {
 
-}
-
-enum class NotificationType {
-    FRIEND_REQUEST,
-    NEW_POST,
-    NEW_EVENT
 }

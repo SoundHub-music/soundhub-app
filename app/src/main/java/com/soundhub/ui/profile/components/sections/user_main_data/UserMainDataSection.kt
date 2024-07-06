@@ -34,9 +34,7 @@ import com.soundhub.utils.UserUtils
 
 @Composable
 internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         UserNameWithDescription(profileViewModel)
         OnlineStatusBlock(profileViewModel)
         UserLocationText(profileViewModel)
@@ -89,15 +87,15 @@ private fun UserLocationText(profileViewModel: ProfileViewModel) {
     val profileUiState: ProfileUiState by profileViewModel
         .profileUiState
         .collectAsState()
+
     val profileOwner: User? = profileUiState.profileOwner
     val userLocation: String = rememberSaveable(profileOwner) {
         UserUtils.getUserLocation(profileOwner?.city, profileOwner?.country)
     }
 
-    if (userLocation.isNotEmpty())
-        Text(
-            text = userLocation,
-            fontWeight = FontWeight.Light,
-            fontSize = 14.sp
-        )
+    Text(
+        text = userLocation,
+        fontWeight = FontWeight.Light,
+        fontSize = 14.sp,
+    )
 }
