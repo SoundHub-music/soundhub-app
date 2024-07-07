@@ -3,23 +3,27 @@ package com.soundhub.ui.activities
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.soundhub.Route
+import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
     private val uiStateDispatcher: UiStateDispatcher,
+    private val userDao: UserDao,
     userCredsStore: UserCredsStore
 ): ViewModel() {
     private val userCreds = userCredsStore.getCreds()
@@ -28,7 +32,6 @@ class NavigationViewModel @Inject constructor(
         controller: NavController,
         destination: NavDestination,
     ) {
-        val userInstance = uiStateDispatcher.uiState.map { it.authorizedUser }.firstOrNull()
         val userCreds = userCreds.firstOrNull()
         val backStackEntry: NavBackStackEntry? = controller.currentBackStackEntry
         val navArguments: Bundle? = backStackEntry?.arguments
@@ -36,10 +39,9 @@ class NavigationViewModel @Inject constructor(
 
         Log.d("NavigationUtils", "onNavDestinationChangedListener[current_route]: $route")
 
-        navigateToPostLineIfUserCredsIsNotNull(
+        checkAuthAndNavigate(
             route = route,
             userCreds = userCreds,
-            userInstance = userInstance,
             controller = controller
         )
 
@@ -51,12 +53,21 @@ class NavigationViewModel @Inject constructor(
         uiStateDispatcher.setSearchBarActive(false)
     }
 
-    private fun navigateToPostLineIfUserCredsIsNotNull(
+    private fun checkAuthAndNavigate(
         route: String?,
         userCreds: UserPreferences?,
-        userInstance: User?,
         controller: NavController
-    ) {
+    ) = viewModelScope.launch(Dispatchers.Main) {
+        val userInstance: User? = userDao.getCurrentUser()
+
+        if (
+            route?.contains(Route.Authentication.route) != true
+            && userCreds?.accessToken.isNullOrEmpty()
+            && userCreds?.refreshToken.isNullOrEmpty()
+            && userInstance == null
+        )
+            controller.navigate(Route.Authentication.route)
+
         // it doesn't allow to navigate to the auth screen if there are access token and user instance
         if (route?.contains(Route.Authentication.route) == true
             && !userCreds?.accessToken.isNullOrEmpty()

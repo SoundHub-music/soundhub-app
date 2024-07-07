@@ -25,7 +25,6 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Post
-import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.components.post_card.PostCard
 import com.soundhub.ui.profile.ProfileUiState
@@ -43,13 +42,11 @@ internal fun UserWall(
     lazyListScope: LazyListScope
 ) {
     val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
     val posts: List<Post> = profileUiState.userPosts
     val isLoading = profileUiState.postStatus == ApiStatus.LOADING
 
-    LaunchedEffect(profileOwner) {
-        profileViewModel.loadPostsByUser()
-        Log.d("UserWall", posts.toString())
+    LaunchedEffect(key1 = posts) {
+        Log.d("UserWall", "posts: $posts")
     }
 
     Column(
@@ -74,7 +71,9 @@ internal fun UserWall(
                 text = stringResource(id = R.string.empty_postline_screen),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
             )
         else lazyListScope.items(items = posts, key = { it.id }) { post ->
             PostCard(
