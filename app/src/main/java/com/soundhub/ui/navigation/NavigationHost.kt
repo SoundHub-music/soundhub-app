@@ -132,43 +132,28 @@ fun NavigationHost(
         }
 
         composable(Route.PostLine.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_postline)
-                PostLineScreen(
-                    navController = navController,
-                    uiStateDispatcher = uiStateDispatcher,
-                )
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_postline)
+            PostLineScreen(
+                navController = navController,
+                uiStateDispatcher = uiStateDispatcher,
+            )
         }
 
         composable(Route.Music.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_music)
-                MusicScreen(
-                    navController = navController,
-                    musicViewModel = MusicViewModel()
-                )
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_music)
+            MusicScreen(
+                navController = navController,
+                musicViewModel = MusicViewModel()
+            )
         }
 
         composable(Route.Messenger.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_messenger)
-                MessengerScreen(
-                    navController = navController,
-                    uiStateDispatcher = uiStateDispatcher,
-                    messengerViewModel = messengerViewModel,
-                )
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_messenger)
+            MessengerScreen(
+                navController = navController,
+                uiStateDispatcher = uiStateDispatcher,
+                messengerViewModel = messengerViewModel,
+            )
         }
 
         composable(
@@ -179,16 +164,11 @@ fun NavigationHost(
                 val argument: String? = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
                 val chatId: UUID = UUID.fromString(argument)
                 
-                ScreenContainer(
-                    userCreds = userCreds,
-                    navController = navController
-                ) {
-                    ChatScreen(
-                        chatId = chatId,
-                        navController = navController,
-                        uiStateDispatcher = uiStateDispatcher
-                    )
-                }
+                ChatScreen(
+                    chatId = chatId,
+                    navController = navController,
+                    uiStateDispatcher = uiStateDispatcher
+                )
             }
                 .onFailure {  error ->
                     Log.d("NavigationHost", "ChatScreen[error]: ${error.stackTraceToString()}")
@@ -204,17 +184,12 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(argument) }
                 val profileViewModel: ProfileViewModel = hiltViewModel()
 
-                ScreenContainer(
-                    userCreds = userCreds,
-                    navController = navController
-                ) {
-                    ProfileScreen(
-                        navController = navController,
-                        uiStateDispatcher = uiStateDispatcher,
-                        profileViewModel = profileViewModel,
-                        userId = userId
-                    )
-                }
+                ProfileScreen(
+                    navController = navController,
+                    uiStateDispatcher = uiStateDispatcher,
+                    profileViewModel = profileViewModel,
+                    userId = userId
+                )
             }
         }
 
@@ -227,94 +202,64 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(it) }
                 val friendsViewModel: FriendsViewModel = hiltViewModel()
 
-                ScreenContainer(
-                    userCreds = userCreds,
-                    navController = navController
-                ) {
-                    topBarTitle.value = stringResource(id = R.string.screen_title_friends)
-                    FriendsScreen(
-                        uiStateDispatcher = uiStateDispatcher,
-                        navController = navController,
-                        friendsViewModel = friendsViewModel,
-                        userId = userId
-                    )
-                }
+                topBarTitle.value = stringResource(id = R.string.screen_title_friends)
+                FriendsScreen(
+                    uiStateDispatcher = uiStateDispatcher,
+                    navController = navController,
+                    friendsViewModel = friendsViewModel,
+                    userId = userId
+                )
             }
         }
 
         composable(Route.Notifications.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_notifications)
-                NotificationScreen(
-                    navController = navController,
-                    notificationViewModel = notificationViewModel
-                )
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_notifications)
+            NotificationScreen(
+                navController = navController,
+                notificationViewModel = notificationViewModel
+            )
         }
 
         composable(Route.EditUserData.route) {
-            ScreenContainer(
-                userCreds = userCreds,
+            EditUserProfileScreen(
+                authorizedUser = authorizedUser,
                 navController = navController
-            ) {
-                EditUserProfileScreen(
-                    authorizedUser = authorizedUser,
-                    navController = navController
-                )
-            }
+            )
         }
 
         composable(Route.Settings.route) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_settings)
-                SettingsScreen(
-                    authViewModel = authViewModel,
-                    uiStateDispatcher = uiStateDispatcher
-                )
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_settings)
+            SettingsScreen(
+                authViewModel = authViewModel,
+                uiStateDispatcher = uiStateDispatcher
+            )
         }
 
         composable(
             route = "${Route.Gallery.route}/{${Constants.GALLERY_INITIAL_PAGE_NAV_ARG}}",
             arguments = listOf(navArgument(Constants.GALLERY_INITIAL_PAGE_NAV_ARG) { NavType.StringType})
         ) { entry ->
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = null
-                val images = uiStateDispatcher.uiState
-                    .collectAsState(initial = UiState())
-                    .value
-                    .galleryImageUrls
+            topBarTitle.value = null
+            val images = uiStateDispatcher.uiState
+                .collectAsState(initial = UiState())
+                .value
+                .galleryImageUrls
 
-                val initialPage: Int = entry.arguments
-                    ?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
-                    ?.toInt() ?: 0
+            val initialPage: Int = entry.arguments
+                ?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
+                ?.toInt() ?: 0
 
-                GalleryScreen(
-                    images = images,
-                    initialPage = initialPage,
-                    uiStateDispatcher = uiStateDispatcher
-                )
-            }
+            GalleryScreen(
+                images = images,
+                initialPage = initialPage,
+                uiStateDispatcher = uiStateDispatcher
+            )
         }
 
         // post creating route
         composable(route = Route.PostEditor.createPostRoute) {
-            ScreenContainer(
-                userCreds = userCreds,
-                navController = navController
-            ) {
-                topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
-                PostEditorScreen(profileOwner = authorizedUser)
-            }
+            topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
+            PostEditorScreen(profileOwner = authorizedUser)
         }
 
         // post editing route
@@ -326,32 +271,23 @@ fun NavigationHost(
                 val postArgument = entry.arguments?.getString(Constants.POST_EDITOR_NAV_ARG)
                 val postId: UUID? = postArgument?.let { UUID.fromString(it) }
 
-                ScreenContainer(
-                    userCreds = userCreds,
-                    navController = navController
-                ) {
-                    topBarTitle.value = stringResource(id = R.string.screen_title_update_post)
-                    PostEditorScreen(
-                        profileOwner = authorizedUser,
-                        postId = postId
-                    )
-                }
+                topBarTitle.value = stringResource(id = R.string.screen_title_update_post)
+                PostEditorScreen(
+                    profileOwner = authorizedUser,
+                    postId = postId
+                )
             }
         }
 
         composable(Route.EditFavoriteGenres.route) {
-            ScreenContainer(userCreds = userCreds, navController = navController) {
-                EditFavoriteGenresScreen(editMusicPrefViewModel)
-            }
+            EditFavoriteGenresScreen(editMusicPrefViewModel)
         }
 
         composable(Route.EditFavoriteArtists.route) {
-            ScreenContainer(userCreds = userCreds, navController = navController) {
-                EditFavoriteArtistsScreen(
-                    editMusicPrefViewModel = editMusicPrefViewModel,
-                    uiStateDispatcher = uiStateDispatcher
-                )
-            }
+            EditFavoriteArtistsScreen(
+                editMusicPrefViewModel = editMusicPrefViewModel,
+                uiStateDispatcher = uiStateDispatcher
+            )
         }
     }
 }

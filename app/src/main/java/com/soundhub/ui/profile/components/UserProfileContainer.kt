@@ -45,6 +45,7 @@ fun UserProfileContainer(
 
     LaunchedEffect(key1 = authorizedUser, key2 = profileOwner) {
         isOriginProfile = authorizedUser?.id == profileOwner?.id
+        profileViewModel.loadPostsByUser()
     }
 
     LazyColumn(
