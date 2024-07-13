@@ -1,16 +1,16 @@
 package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Post
-import com.soundhub.utils.ApiEndpoints.Posts.ADD_POST
-import com.soundhub.utils.ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM
-import com.soundhub.utils.ApiEndpoints.Posts.DELETE_POST
-import com.soundhub.utils.ApiEndpoints.Posts.GET_POSTS_BY_AUTHOR_ID
-import com.soundhub.utils.ApiEndpoints.Posts.GET_POST_BY_ID
-import com.soundhub.utils.ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM
-import com.soundhub.utils.ApiEndpoints.Posts.TOGGLE_LIKE
-import com.soundhub.utils.ApiEndpoints.Posts.UPDATE_POST
-import com.soundhub.utils.ApiEndpoints.Posts.IMAGES_TO_DELETE_NAME
-import com.soundhub.utils.ApiEndpoints.Posts.POST_REQUEST_BODY_NAME
+import com.soundhub.utils.constants.ApiEndpoints.Posts.ADD_POST
+import com.soundhub.utils.constants.ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Posts.DELETE_POST
+import com.soundhub.utils.constants.ApiEndpoints.Posts.GET_POSTS_BY_AUTHOR_ID
+import com.soundhub.utils.constants.ApiEndpoints.Posts.GET_POST_BY_ID
+import com.soundhub.utils.constants.ApiEndpoints.Posts.POST_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Posts.TOGGLE_LIKE
+import com.soundhub.utils.constants.ApiEndpoints.Posts.UPDATE_POST
+import com.soundhub.utils.constants.ApiEndpoints.Posts.IMAGES_TO_DELETE_NAME
+import com.soundhub.utils.constants.ApiEndpoints.Posts.POST_REQUEST_BODY_NAME
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response

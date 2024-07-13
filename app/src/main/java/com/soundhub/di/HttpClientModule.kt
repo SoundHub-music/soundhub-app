@@ -9,10 +9,10 @@ import com.soundhub.utils.constants.Constants.CACHE_SIZE
 import com.soundhub.utils.constants.Constants.CONNECTION_TIMEOUT
 import com.soundhub.utils.constants.Constants.SIMPLE_HTTP_CLIENT
 import com.soundhub.utils.constants.Constants.UNATHORIZED_HTTP_CLIENT_WITH_CACHE
-import com.soundhub.utils.request_interceptors.AuthInterceptor
-import com.soundhub.utils.request_interceptors.CacheInterceptor
-import com.soundhub.utils.request_interceptors.ForceCacheInterceptor
-import com.soundhub.utils.request_interceptors.HttpAuthenticator
+import com.soundhub.utils.interceptors.AuthInterceptor
+import com.soundhub.utils.interceptors.CacheInterceptor
+import com.soundhub.utils.interceptors.ForceCacheInterceptor
+import com.soundhub.utils.interceptors.HttpAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

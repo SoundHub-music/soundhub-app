@@ -26,8 +26,8 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
-import com.soundhub.ui.messenger.chat.ChatUiState
-import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.data.states.ChatUiState
+import com.soundhub.ui.chat.ChatViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UserUtils
 
@@ -109,7 +109,7 @@ private fun InterlocutorDetails(
 private fun InterlocutorFullNameWithOnlineIndicator(
     chatViewModel: ChatViewModel,
 
-) {
+    ) {
     val context: Context = LocalContext.current
     val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
     val interlocutor: User? = chatUiState.interlocutor

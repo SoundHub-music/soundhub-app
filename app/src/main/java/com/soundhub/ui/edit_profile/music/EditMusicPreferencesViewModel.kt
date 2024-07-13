@@ -12,8 +12,8 @@ import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.music_preferences.BaseMusicPreferencesViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.ui.viewmodels.BaseMusicPreferencesViewModel
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel

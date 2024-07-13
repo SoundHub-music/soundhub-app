@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.Genre
-import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import kotlin.random.Random
 

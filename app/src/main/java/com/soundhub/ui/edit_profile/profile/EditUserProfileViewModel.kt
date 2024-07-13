@@ -11,7 +11,7 @@ import com.soundhub.data.model.User
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.components.forms.IUserDataFormState
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.states.UserFormState
+import com.soundhub.data.states.UserFormState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import com.soundhub.utils.mappers.UserMapper

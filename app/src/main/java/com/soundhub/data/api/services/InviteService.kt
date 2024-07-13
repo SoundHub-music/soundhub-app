@@ -1,15 +1,15 @@
 package com.soundhub.data.api.services
 
 import com.soundhub.data.model.Invite
-import com.soundhub.utils.ApiEndpoints.Invites.ACCEPT_INVITE
-import com.soundhub.utils.ApiEndpoints.Invites.CREATE_INVITE
-import com.soundhub.utils.ApiEndpoints.Invites.DELETE_INVITE
-import com.soundhub.utils.ApiEndpoints.Invites.GET_INVITE_BY_SENDER_AND_RECIPIENT
-import com.soundhub.utils.ApiEndpoints.Invites.INVITES_ENDPOINT
-import com.soundhub.utils.ApiEndpoints.Invites.INVITE_ID_DYNAMIC_PARAM
-import com.soundhub.utils.ApiEndpoints.Invites.RECIPIENT_ID_DYNAMIC_PARAM
-import com.soundhub.utils.ApiEndpoints.Invites.REJECT_INVITE
-import com.soundhub.utils.ApiEndpoints.Invites.SENDER_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Invites.ACCEPT_INVITE
+import com.soundhub.utils.constants.ApiEndpoints.Invites.CREATE_INVITE
+import com.soundhub.utils.constants.ApiEndpoints.Invites.DELETE_INVITE
+import com.soundhub.utils.constants.ApiEndpoints.Invites.GET_INVITE_BY_SENDER_AND_RECIPIENT
+import com.soundhub.utils.constants.ApiEndpoints.Invites.INVITES_ENDPOINT
+import com.soundhub.utils.constants.ApiEndpoints.Invites.INVITE_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Invites.RECIPIENT_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Invites.REJECT_INVITE
+import com.soundhub.utils.constants.ApiEndpoints.Invites.SENDER_ID_DYNAMIC_PARAM
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET

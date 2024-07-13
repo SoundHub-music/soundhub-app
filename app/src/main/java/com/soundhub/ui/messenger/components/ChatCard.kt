@@ -23,7 +23,7 @@ import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
 import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable

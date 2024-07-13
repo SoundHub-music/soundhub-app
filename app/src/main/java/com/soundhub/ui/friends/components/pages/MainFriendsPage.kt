@@ -13,11 +13,11 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
 import com.soundhub.ui.friends.EmptyFriendsScreen
-import com.soundhub.ui.friends.FriendsUiState
+import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.components.UserFriendsContainer
 import com.soundhub.ui.friends.enums.FriendListPage
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)

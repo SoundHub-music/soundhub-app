@@ -29,7 +29,7 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.avatar.CircularAvatar
-import com.soundhub.ui.friends.FriendsUiState
+import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.enums.FriendListPage
 import com.soundhub.utils.UserUtils

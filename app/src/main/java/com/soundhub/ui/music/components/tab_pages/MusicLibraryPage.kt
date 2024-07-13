@@ -8,7 +8,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.ui.music.components.AuthorizedLibraryPage
 
 @Composable
 internal fun MusicLibraryPage(

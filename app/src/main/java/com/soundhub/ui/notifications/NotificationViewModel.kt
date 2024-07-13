@@ -7,8 +7,9 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
+import com.soundhub.data.states.NotificationUiState
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel

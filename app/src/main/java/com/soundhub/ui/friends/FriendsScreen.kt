@@ -14,11 +14,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
+import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.friends.components.FriendsScreenPager
 import com.soundhub.ui.friends.components.FriendsScreenTabs
 import com.soundhub.ui.friends.enums.FriendListPage
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import java.util.UUID
 
 @OptIn(ExperimentalFoundationApi::class)

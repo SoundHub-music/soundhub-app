@@ -6,8 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.soundhub.data.model.Genre
-import com.soundhub.ui.authentication.registration.states.GenreUiState
-import com.soundhub.ui.music_preferences.ChooseGenresScreen
+import com.soundhub.data.states.GenreUiState
+import com.soundhub.ui.components.layouts.music_preferences.ChooseGenresScreen
 
 @Composable
 fun EditFavoriteGenresScreen(editMusicPrefViewModel: EditMusicPreferencesViewModel) {

@@ -22,7 +22,7 @@ import com.soundhub.R
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.buttons.LikeButton
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID

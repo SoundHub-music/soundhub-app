@@ -21,9 +21,9 @@ import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter

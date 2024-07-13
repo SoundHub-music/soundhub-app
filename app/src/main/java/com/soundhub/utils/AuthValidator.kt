@@ -1,7 +1,7 @@
 package com.soundhub.utils
 
 import com.soundhub.ui.authentication.AuthFormState
-import com.soundhub.ui.authentication.registration.states.RegistrationState
+import com.soundhub.data.states.RegistrationState
 import com.soundhub.utils.constants.Constants
 
 sealed class AuthValidator {

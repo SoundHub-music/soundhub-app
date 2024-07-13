@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.soundhub.ui.authentication.registration.states.ArtistUiState
-import com.soundhub.ui.music_preferences.ChooseArtistsScreen
+import com.soundhub.data.states.ArtistUiState
+import com.soundhub.ui.components.layouts.music_preferences.ChooseArtistsScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable

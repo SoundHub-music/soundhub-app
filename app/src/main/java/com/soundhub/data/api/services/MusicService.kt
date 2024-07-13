@@ -3,12 +3,13 @@ package com.soundhub.data.api.services
 import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
 import com.soundhub.data.api.responses.discogs.release.DiscogsReleaseResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
-import com.soundhub.utils.ApiEndpoints
-import com.soundhub.utils.ApiEndpoints.Music.GET_ARTISTS
-import com.soundhub.utils.ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM
-import com.soundhub.utils.ApiEndpoints.Music.GET_ARTIST_RELEASES
-import com.soundhub.utils.ApiEndpoints.Music.DATABASE_SEARCH
+import com.soundhub.utils.constants.ApiEndpoints
+import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTISTS
+import com.soundhub.utils.constants.ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTIST_RELEASES
+import com.soundhub.utils.constants.ApiEndpoints.Music.DATABASE_SEARCH
 import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.constants.ApiEndpoints.Music.RELEASE_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.Constants.DISCOGS_AUTHORIZATION
 import retrofit2.Response
 import retrofit2.http.GET
@@ -49,7 +50,7 @@ interface MusicService {
 
     @GET(GET_ARTISTS)
     suspend fun getArtistById(
-        @Path(ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM) artistId: Int
+        @Path(ARTIST_ID_DYNAMIC_PARAM) artistId: Int
     ): Response<DiscogsArtistResponse>
 
     @GET(GET_ARTIST_RELEASES)
@@ -61,7 +62,7 @@ interface MusicService {
 
     @GET(ApiEndpoints.Music.GET_RELEASE_BY_ID)
     suspend fun getReleaseById(
-        @Path(ApiEndpoints.Music.RELEASE_ID_DYNAMIC_PARAM)
+        @Path(RELEASE_ID_DYNAMIC_PARAM)
         releaseId: Int
     ): Response<DiscogsReleaseResponse>
 }

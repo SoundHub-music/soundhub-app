@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.theme.borderColor
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher

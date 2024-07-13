@@ -22,7 +22,7 @@ import com.soundhub.R
 import com.soundhub.data.model.Post
 import com.soundhub.ui.components.containers.FetchStatusContainer
 import com.soundhub.ui.components.post_card.PostCard
-import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.ui.viewmodels.PostViewModel

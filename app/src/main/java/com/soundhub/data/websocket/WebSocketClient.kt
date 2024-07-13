@@ -5,9 +5,9 @@ import com.google.gson.Gson
 import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_ENDPOINT
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_ENDPOINT
-import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_SEND_MESSAGE_ENDPOINT
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_ENDPOINT
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_ENDPOINT
+import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_SEND_MESSAGE_ENDPOINT
 import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import com.soundhub.utils.HttpUtils.Companion.getBearerToken
 import com.soundhub.utils.constants.Constants.DELETER_ID_HEADER

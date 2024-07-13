@@ -30,7 +30,7 @@ import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.soundhub.ui.post_editor.PostEditorState
+import com.soundhub.data.states.PostEditorState
 import com.soundhub.ui.post_editor.PostEditorViewModel
 
 @Composable

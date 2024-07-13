@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.model.User
-import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.DeleteFriendButton
 import com.soundhub.ui.profile.components.sections.user_actions.buttons.EditProfileButton

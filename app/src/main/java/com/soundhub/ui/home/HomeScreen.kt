@@ -22,6 +22,7 @@ import com.soundhub.ui.components.bars.top.TopAppBarBuilder
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.navigation.NavigationHost
 import com.soundhub.ui.notifications.NotificationViewModel
+import com.soundhub.ui.viewmodels.MainViewModel
 import com.soundhub.utils.constants.Constants
 
 @Composable

@@ -4,11 +4,11 @@ import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.LogoutResponse
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.utils.ApiEndpoints.Authentication.LOGOUT
-import com.soundhub.utils.ApiEndpoints.Authentication.REFRESH_TOKEN
-import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_IN
-import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_UP
-import com.soundhub.utils.ApiEndpoints.Authentication.USER_DATA_REQUEST_BODY_NAME
+import com.soundhub.utils.constants.ApiEndpoints.Authentication.LOGOUT
+import com.soundhub.utils.constants.ApiEndpoints.Authentication.REFRESH_TOKEN
+import com.soundhub.utils.constants.ApiEndpoints.Authentication.SIGN_IN
+import com.soundhub.utils.constants.ApiEndpoints.Authentication.SIGN_UP
+import com.soundhub.utils.constants.ApiEndpoints.Authentication.USER_DATA_REQUEST_BODY_NAME
 import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

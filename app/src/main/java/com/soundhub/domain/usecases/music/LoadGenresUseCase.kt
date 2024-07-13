@@ -1,7 +1,7 @@
 package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.registration.states.GenreUiState
+import com.soundhub.data.states.GenreUiState
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText

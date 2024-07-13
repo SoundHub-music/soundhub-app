@@ -12,6 +12,7 @@ import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
+import com.soundhub.data.states.MessengerUiState
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.SearchUtils

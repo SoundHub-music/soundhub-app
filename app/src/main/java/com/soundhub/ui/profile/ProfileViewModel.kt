@@ -15,13 +15,14 @@ import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
 import com.soundhub.data.repository.UserRepository
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel

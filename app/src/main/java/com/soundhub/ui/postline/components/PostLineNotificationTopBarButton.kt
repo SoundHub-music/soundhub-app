@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.Notification
-import com.soundhub.ui.notifications.NotificationUiState
+import com.soundhub.data.states.NotificationUiState
 import com.soundhub.ui.notifications.NotificationViewModel
 
 @Composable

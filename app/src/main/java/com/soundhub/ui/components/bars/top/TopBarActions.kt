@@ -25,11 +25,11 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.buttons.SearchButton
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.components.menu.ChatTopBarDropdownMenu
-import com.soundhub.ui.messenger.chat.ChatUiState
-import com.soundhub.ui.messenger.chat.ChatViewModel
+import com.soundhub.data.states.ChatUiState
+import com.soundhub.ui.chat.ChatViewModel
 import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.ui.postline.components.PostLineNotificationTopBarButton
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 
 @Composable
 fun TopBarActions(

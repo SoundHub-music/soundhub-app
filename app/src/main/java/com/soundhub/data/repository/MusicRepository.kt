@@ -1,14 +1,11 @@
 package com.soundhub.data.repository
 
 import com.soundhub.data.api.responses.HttpResult
-import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.enums.DiscogsSortType
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Track
-import com.soundhub.ui.authentication.registration.states.ArtistUiState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface MusicRepository {
     suspend fun getAllGenres(countPerPage: Int = 50): HttpResult<List<Genre>>

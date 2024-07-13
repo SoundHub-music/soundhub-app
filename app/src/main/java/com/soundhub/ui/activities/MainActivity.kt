@@ -27,8 +27,9 @@ import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.home.HomeScreen
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.notifications.NotificationViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.theme.SoundHubTheme
+import com.soundhub.ui.viewmodels.NavigationViewModel
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants

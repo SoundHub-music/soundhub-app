@@ -22,9 +22,9 @@ import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.containers.FetchStatusContainer
 import com.soundhub.ui.messenger.EmptyMessengerScreen
-import com.soundhub.ui.messenger.MessengerUiState
+import com.soundhub.data.states.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.Flow
 

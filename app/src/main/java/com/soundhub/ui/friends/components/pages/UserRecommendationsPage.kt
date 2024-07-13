@@ -23,7 +23,7 @@ import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.loaders.CircleLoader
-import com.soundhub.ui.friends.FriendsUiState
+import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.friends.FriendsViewModel
 import com.soundhub.ui.friends.components.UserFriendsContainer
 import com.soundhub.ui.friends.enums.FriendListPage

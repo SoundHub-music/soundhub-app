@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.ui.profile.components.SectionLabel
 import com.soundhub.data.model.User
-import com.soundhub.ui.profile.ProfileUiState
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.profile.ProfileViewModel
 
 @Composable

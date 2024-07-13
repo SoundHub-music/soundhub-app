@@ -37,11 +37,11 @@ import com.soundhub.ui.post_editor.PostEditorScreen
 import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
 import com.soundhub.ui.friends.FriendsScreen
 import com.soundhub.ui.friends.FriendsViewModel
-import com.soundhub.ui.gallery.GalleryScreen
-import com.soundhub.ui.home.MainViewModel
+import com.soundhub.ui.components.gallery.GalleryScreen
+import com.soundhub.ui.viewmodels.MainViewModel
 import com.soundhub.ui.messenger.MessengerScreen
 import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.messenger.chat.ChatScreen
+import com.soundhub.ui.chat.ChatScreen
 import com.soundhub.ui.music.MusicScreen
 import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.notifications.NotificationScreen
@@ -50,7 +50,7 @@ import com.soundhub.ui.postline.PostLineScreen
 import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.settings.SettingsScreen
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import java.util.UUID

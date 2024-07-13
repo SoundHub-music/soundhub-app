@@ -4,8 +4,8 @@ import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Artist
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.ui.authentication.registration.states.ArtistUiState
-import com.soundhub.ui.authentication.registration.states.GenreUiState
+import com.soundhub.data.states.ArtistUiState
+import com.soundhub.data.states.GenreUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject

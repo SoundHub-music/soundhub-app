@@ -12,7 +12,7 @@ import com.soundhub.data.datastore.model.UserSettings
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.utils.enums.AppTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

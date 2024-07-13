@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.messenger.chat.ChatUiState
-import com.soundhub.ui.messenger.chat.ChatViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.ChatUiState
+import com.soundhub.ui.chat.ChatViewModel
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable

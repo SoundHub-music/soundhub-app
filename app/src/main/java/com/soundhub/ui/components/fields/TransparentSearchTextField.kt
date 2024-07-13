@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import kotlinx.coroutines.launch
 
 @Composable

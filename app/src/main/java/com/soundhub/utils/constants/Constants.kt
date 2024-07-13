@@ -4,7 +4,6 @@ import com.google.gson.reflect.TypeToken
 import com.soundhub.BuildConfig
 import com.soundhub.Route
 import com.soundhub.data.api.responses.ErrorResponse
-import java.io.File
 import java.lang.reflect.Type
 
 object Constants {

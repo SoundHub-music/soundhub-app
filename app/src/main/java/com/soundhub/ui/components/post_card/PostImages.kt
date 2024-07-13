@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.ui.components.pagination.PagerPaginationDots
-import com.soundhub.ui.gallery.ImageHorizontalPager
+import com.soundhub.ui.components.gallery.ImageHorizontalPager
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.data.states.PostEditorState
 import com.soundhub.ui.post_editor.components.ImagePreviewRow
 import com.soundhub.utils.enums.ContentTypes
 import kotlinx.coroutines.launch

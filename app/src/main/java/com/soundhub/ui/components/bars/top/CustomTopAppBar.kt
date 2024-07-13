@@ -27,7 +27,7 @@ import com.soundhub.R
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.fields.TransparentSearchTextField
 import com.soundhub.ui.notifications.NotificationViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 
 @Composable
 fun CustomTopAppBar(

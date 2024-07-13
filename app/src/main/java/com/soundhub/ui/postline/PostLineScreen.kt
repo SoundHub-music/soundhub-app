@@ -30,7 +30,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.ui.components.containers.FetchStatusContainer
 import com.soundhub.ui.components.post_card.PostCard
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.PostViewModel
 
 @Composable

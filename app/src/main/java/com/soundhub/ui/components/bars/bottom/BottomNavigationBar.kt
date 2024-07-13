@@ -33,9 +33,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.ui.components.icons.QueueMusic
 import com.soundhub.Route
 import com.soundhub.data.model.User
-import com.soundhub.ui.messenger.MessengerUiState
+import com.soundhub.data.states.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.states.UiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 

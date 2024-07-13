@@ -8,9 +8,9 @@ import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.registration.states.RegistrationState
-import com.soundhub.ui.post_editor.PostEditorState
-import com.soundhub.ui.states.UserFormState
+import com.soundhub.data.states.RegistrationState
+import com.soundhub.data.states.PostEditorState
+import com.soundhub.data.states.UserFormState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
