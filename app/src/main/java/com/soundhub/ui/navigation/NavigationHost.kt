@@ -22,7 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.authentication.AuthenticationScreen
 import com.soundhub.ui.authentication.AuthenticationViewModel

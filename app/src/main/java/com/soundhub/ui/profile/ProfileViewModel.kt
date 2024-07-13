@@ -7,7 +7,7 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Invite

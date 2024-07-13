@@ -25,6 +25,9 @@ object Constants {
     const val URL_WITH_PARAMS_REGEX: String = "/\\S+\\?\\w+=\\w+"
 
     // datastore identifiers
+    const val DATASTORE_USER_SETTINGS = "user_settings"
+    const val DATASTORE_APP_THEME = "settings_app_theme"
+
     const val DATASTORE_USER_CREDS = "user_creds"
     const val DATASTORE_ACCESS_TOKEN = "user_access_token"
     const val DATASTORE_REFRESH_TOKEN = "user_refresh_token"

@@ -10,7 +10,7 @@ import androidx.navigation.NavDestination
 import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
@@ -59,21 +59,18 @@ class NavigationViewModel @Inject constructor(
         controller: NavController
     ) = viewModelScope.launch(Dispatchers.Main) {
         val userInstance: User? = userDao.getCurrentUser()
+        val isUserAuthorized: Boolean = !userCreds?.accessToken.isNullOrEmpty()
+                && !userCreds?.refreshToken.isNullOrEmpty()
+                && userInstance != null
 
-        if (
-            route?.contains(Route.Authentication.route) != true
-            && userCreds?.accessToken.isNullOrEmpty()
-            && userCreds?.refreshToken.isNullOrEmpty()
-            && userInstance == null
-        )
+        val containsAuthFormRoute: Boolean = route?.contains(Route.Authentication.route) == true
+
+        // it navigates to the auth form if user is not authorized
+        if (!containsAuthFormRoute && !isUserAuthorized)
             controller.navigate(Route.Authentication.route)
 
-        // it doesn't allow to navigate to the auth screen if there are access token and user instance
-        if (route?.contains(Route.Authentication.route) == true
-            && !userCreds?.accessToken.isNullOrEmpty()
-            && !userCreds?.refreshToken.isNullOrEmpty()
-            && userInstance != null
-        )
+        // it doesn't allow to navigate to the auth screen if user is authorized
+        if (containsAuthFormRoute && isUserAuthorized)
             controller.navigate(Route.PostLine.route)
     }
 

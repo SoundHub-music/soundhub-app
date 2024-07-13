@@ -6,7 +6,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.events.UiEvent
 import kotlinx.coroutines.launch
@@ -26,5 +28,6 @@ fun MessengerSearchTopBarButton(
 @Composable
 @Preview(name = "MessengerSearchButton", showBackground = true)
 private fun MessengerSearchTopBarButtonPreview() {
-    MessengerSearchTopBarButton(UiStateDispatcher())
+    val context = LocalContext.current
+    MessengerSearchTopBarButton(UiStateDispatcher(UserSettingsStore(context)))
 }

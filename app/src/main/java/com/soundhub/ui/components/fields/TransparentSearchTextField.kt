@@ -22,9 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.states.UiState
@@ -95,10 +97,11 @@ private fun CloseSearchBarButton(uiStateDispatcher: UiStateDispatcher) {
 @Preview(name = "SearchTextField", showBackground = true)
 private fun SearchTextFieldPreview() {
     var text by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     TransparentSearchTextField(
         onValueChange = { text = it },
         value = text,
-        uiStateDispatcher = UiStateDispatcher()
+        uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context))
     )
 }

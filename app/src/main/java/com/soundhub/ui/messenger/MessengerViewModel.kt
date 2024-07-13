@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
@@ -37,7 +37,7 @@ class MessengerViewModel @Inject constructor(
     private val _messengerUiState = MutableStateFlow(MessengerUiState())
     val messengerUiState = _messengerUiState.asStateFlow()
 
-    init { loadChatsAndUpdateUnreadMessageCount() }
+    init { loadChats() }
 
     override fun onCleared() {
         super.onCleared()
@@ -103,21 +103,14 @@ class MessengerViewModel @Inject constructor(
         return lastMessageContent
     }
 
-    fun loadChatsAndUpdateUnreadMessageCount() = viewModelScope.launch(Dispatchers.IO) {
-        val chats = getChats()
-            .firstOrNull()
-            .orEmpty()
-
-        withContext(Dispatchers.Main) {
-            _messengerUiState.update {
-                it.copy(
-                    chats = chats,
-                    status = ApiStatus.SUCCESS
-                )
+    fun loadChats() = viewModelScope.launch(Dispatchers.IO) {
+        getChats().collect { chats ->
+            withContext(Dispatchers.Main) {
+                _messengerUiState.update {
+                    it.copy(chats = chats)
+                }
             }
         }
-
-        updateUnreadMessageCount(chats)
     }
 
     private fun getChats(): Flow<List<Chat>> = flow {
@@ -125,6 +118,9 @@ class MessengerViewModel @Inject constructor(
             chatRepository.getAllChatsByUserId(user.id)
                 .onSuccess { response ->
                     val chats = response.body.orEmpty()
+                    _messengerUiState.update {
+                        it.copy(status = ApiStatus.SUCCESS)
+                    }
                     emit(chats)
                 }
                 .onFailure { error ->

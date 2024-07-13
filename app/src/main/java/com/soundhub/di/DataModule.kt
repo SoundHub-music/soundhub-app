@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
@@ -26,6 +27,11 @@ object DataModule {
     @Singleton
     fun providesUserDataStore(@ApplicationContext context: Context): UserCredsStore =
         UserCredsStore(context)
+
+    @Provides
+    @Singleton
+    fun providesSettingsDataStore(@ApplicationContext context: Context): UserSettingsStore =
+        UserSettingsStore(context)
 
     @Provides
     @Singleton

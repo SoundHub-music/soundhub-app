@@ -16,9 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
+import com.soundhub.ui.components.containers.FetchStatusContainer
 import com.soundhub.ui.messenger.EmptyMessengerScreen
 import com.soundhub.ui.messenger.MessengerUiState
 import com.soundhub.ui.messenger.MessengerViewModel
@@ -44,14 +46,13 @@ internal fun MessengerChatList(
     val searchBarText: String = uiState.searchBarText
     var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
     val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
+    val fetchStatus: ApiStatus = messengerUiState.status
 
-    LaunchedEffect(key1 = true) {
-        messengerViewModel.loadChatsAndUpdateUnreadMessageCount()
-    }
 
     LaunchedEffect(key1 = messageChannel) {
         messageChannel.collect {
-            messengerViewModel.loadChatsAndUpdateUnreadMessageCount()
+            messengerViewModel.loadChats()
+            messengerViewModel.updateUnreadMessageCount(chats)
             filteredChats = chats
         }
     }
@@ -66,23 +67,25 @@ internal fun MessengerChatList(
         )
     }
 
-    if (filteredChats.isEmpty())
-        EmptyMessengerScreen(
-            navController = navController,
-            uiStateDispatcher = uiStateDispatcher
-        )
-    else LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 5.dp, bottom = 5.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        items(items = filteredChats, key = { it.id }) { chat ->
-            ChatCard(
-                chat = chat,
-                uiStateDispatcher = uiStateDispatcher,
-                messengerViewModel = messengerViewModel
+    FetchStatusContainer(status = fetchStatus) {
+        if (filteredChats.isEmpty())
+            EmptyMessengerScreen(
+                navController = navController,
+                uiStateDispatcher = uiStateDispatcher
             )
+        else LazyColumn(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 5.dp, bottom = 5.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            items(items = filteredChats, key = { it.id }) { chat ->
+                ChatCard(
+                    chat = chat,
+                    uiStateDispatcher = uiStateDispatcher,
+                    messengerViewModel = messengerViewModel
+                )
+            }
         }
     }
 }

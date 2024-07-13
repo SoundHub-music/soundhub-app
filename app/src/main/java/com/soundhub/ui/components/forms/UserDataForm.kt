@@ -50,6 +50,7 @@ fun UserDataForm(
     val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
     val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
     val formState: State<IUserDataFormState> = formStateFlow.collectAsState(initial = EmptyFormState())
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(formState.value) {
         Log.d("UserDataForm", formState.value.toString())
@@ -63,7 +64,7 @@ fun UserDataForm(
     Column(
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 20.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         AvatarPicker(

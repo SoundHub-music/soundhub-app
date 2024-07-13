@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.load.model.GlideUrl
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.enums.MediaFolder
 import dagger.hilt.android.lifecycle.HiltViewModel

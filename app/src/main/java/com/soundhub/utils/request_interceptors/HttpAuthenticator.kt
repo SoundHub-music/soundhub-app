@@ -5,7 +5,7 @@ import com.soundhub.Route
 import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.HttpUtils
@@ -44,7 +44,7 @@ class HttpAuthenticator @Inject constructor(
         }
 
         if (response.code == UNAUTHORIZED_USER_ERROR_CODE) {
-            val newCreds: UserPreferences? = runBlocking { refreshTokenIfNeeded(oldCreds) }
+            val newCreds: UserPreferences? = runBlocking { refreshTokenMutex(oldCreds) }
             val bearerToken: String = HttpUtils.getBearerToken(newCreds?.accessToken)
 
             if (!response.request.headers.names().contains(AUTHORIZATION_HEADER))
@@ -57,7 +57,7 @@ class HttpAuthenticator @Inject constructor(
         return null
     }
 
-    private suspend fun refreshTokenIfNeeded(oldCreds: UserPreferences): UserPreferences? {
+    private suspend fun refreshTokenMutex(oldCreds: UserPreferences): UserPreferences? {
         return refreshMutex.withLock {
             if (!isRefreshing) {
                 isRefreshing = true

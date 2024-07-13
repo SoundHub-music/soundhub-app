@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_ENDPOINT
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_ENDPOINT
 import com.soundhub.utils.ApiEndpoints.ChatWebSocket.WS_SEND_MESSAGE_ENDPOINT

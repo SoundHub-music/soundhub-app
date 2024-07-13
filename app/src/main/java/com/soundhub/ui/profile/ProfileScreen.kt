@@ -4,7 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -85,7 +85,7 @@ fun ProfileScreen(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy((-30).dp)
         ) {

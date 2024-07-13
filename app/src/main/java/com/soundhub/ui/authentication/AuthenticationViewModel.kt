@@ -3,7 +3,7 @@ package com.soundhub.ui.authentication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -36,18 +36,17 @@ class AuthenticationViewModel @Inject constructor(
 ) : ViewModel() {
     private val _authFormState = MutableStateFlow(AuthFormState())
     val authFormState = _authFormState.asStateFlow()
+
     private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) { initializeUser() }
-    }
+    init { initializeUser() }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
-    suspend fun initializeUser() {
+    fun initializeUser() = viewModelScope.launch(Dispatchers.IO) {
         getCurrentUser().collect { currentUser ->
             // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
             // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
@@ -55,6 +54,9 @@ class AuthenticationViewModel @Inject constructor(
             currentUser?.let {
                 userDao.saveUser(currentUser)
                 uiStateDispatcher.setAuthorizedUser(currentUser)
+            } ?: run {
+                val cachedUser: User? = userDao.getCurrentUser()
+                uiStateDispatcher.setAuthorizedUser(cachedUser)
             }
         }
     }
@@ -169,7 +171,6 @@ class AuthenticationViewModel @Inject constructor(
     fun setRepeatedPassword(value: String) = _authFormState.update {
         val arePasswordsEqual: Boolean = AuthValidator
             .arePasswordsEqual(authFormState.value.password, value)
-        Log.d("AuthenticationViewModel", "arePasswordsEqual: $arePasswordsEqual")
 
         it.copy(
             repeatedPassword = value,

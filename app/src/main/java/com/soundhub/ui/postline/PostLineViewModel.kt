@@ -62,7 +62,7 @@ class PostLineViewModel @Inject constructor(
                         status = ApiStatus.SUCCESS
                     )
                 }
-        }.onFailureWithContext { error ->
+        }.onFailure { error ->
             val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
             uiStateDispatcher.sendUiEvent(errorEvent)
             _postLineUiState.update { it.copy(status = ApiStatus.ERROR) }

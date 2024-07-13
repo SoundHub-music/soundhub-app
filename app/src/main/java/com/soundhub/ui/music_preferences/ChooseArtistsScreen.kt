@@ -27,12 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
+import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Artist
 import com.soundhub.ui.authentication.registration.components.MusicItemPlate
@@ -131,10 +133,11 @@ fun ChooseArtistsScreen(
             or Configuration.UI_MODE_TYPE_NORMAL
 )
 private fun ChooseArtistsPreview() {
+    val context = LocalContext.current
     ChooseArtistsScreen(
         artistUiState = ArtistUiState(),
         onItemPlateClick = {_, _ ->  },
-        uiStateDispatcher = UiStateDispatcher(),
+        uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context)),
         onNextButtonClick = {},
         onSearchFieldChange = {},
         lazyGridState = rememberLazyGridState()

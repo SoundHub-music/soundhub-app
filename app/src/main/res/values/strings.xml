@@ -135,7 +135,7 @@
 
     <!-- empty post line strings-->
     <string name="empty_postline_screen">Здесь всё ещё пусто :(</string>
-    <string name="error_postline_screen">Произошла ошибка во время загрузки :(</string>
+    <string name="fetch_error_message">Произошла ошибка во время загрузки :(</string>
     <string name="empty_notification_screen">Здесь появятся ваши уведомления</string>
 
     <!-- music section titles-->

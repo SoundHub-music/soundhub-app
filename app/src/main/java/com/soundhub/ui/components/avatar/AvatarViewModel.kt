@@ -3,7 +3,7 @@ package com.soundhub.ui.components.avatar
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.HttpUtils
 import com.soundhub.utils.enums.MediaFolder
 import dagger.hilt.android.lifecycle.HiltViewModel

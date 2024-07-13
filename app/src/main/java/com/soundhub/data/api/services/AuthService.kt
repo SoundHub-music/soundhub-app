@@ -3,7 +3,7 @@ package com.soundhub.data.api.services
 import com.soundhub.data.api.requests.RefreshTokenRequestBody
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.api.responses.LogoutResponse
-import com.soundhub.data.datastore.UserPreferences
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.ApiEndpoints.Authentication.LOGOUT
 import com.soundhub.utils.ApiEndpoints.Authentication.REFRESH_TOKEN
 import com.soundhub.utils.ApiEndpoints.Authentication.SIGN_IN

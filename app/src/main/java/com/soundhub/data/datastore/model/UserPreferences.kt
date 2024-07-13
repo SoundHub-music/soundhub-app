@@ -1,4 +1,4 @@
-package com.soundhub.data.datastore
+package com.soundhub.data.datastore.model
 
 data class UserPreferences(
     var accessToken: String? = null,

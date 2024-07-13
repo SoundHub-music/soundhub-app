@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.constants.Constants.DATASTORE_ACCESS_TOKEN
 import com.soundhub.utils.constants.Constants.DATASTORE_REFRESH_TOKEN
@@ -17,20 +18,20 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = Constants.DATASTORE_USER_CREDS
 )
 
-class UserCredsStore(private val context: Context) {
+class UserCredsStore(private val context: Context): BaseDataStore<UserPreferences>() {
      private object PreferenceKeys {
          val accessToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_ACCESS_TOKEN)
          val refreshToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_REFRESH_TOKEN)
      }
 
-    suspend fun updateCreds(creds: UserPreferences?) {
+    override suspend fun updateCreds(creds: UserPreferences?) {
         context.dataStore.edit { pref ->
             pref[PreferenceKeys.accessToken] = creds?.accessToken ?: ""
             pref[PreferenceKeys.refreshToken] = creds?.refreshToken ?: ""
         }
     }
 
-    fun getCreds(): Flow<UserPreferences> {
+    override fun getCreds(): Flow<UserPreferences> {
         return context.dataStore.data.map {
             pref -> UserPreferences(
                 accessToken = pref[PreferenceKeys.accessToken],
@@ -39,5 +40,7 @@ class UserCredsStore(private val context: Context) {
         }
     }
 
-    suspend fun clear() = context.dataStore.edit { it.clear() }
+    override suspend fun clear() {
+        context.dataStore.edit { it.clear() }
+    }
 }

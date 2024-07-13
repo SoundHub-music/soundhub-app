@@ -57,9 +57,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startOnCreateActivities()
+        onCreateActivityActions()
+
         setContent {
-            SoundHubTheme(dynamicColor = false) {
+            SoundHubTheme(
+                dynamicColor = false,
+                darkTheme = uiStateDispatcher.getBooleanThemeValue()
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surface
@@ -105,7 +109,7 @@ class MainActivity : ComponentActivity() {
         authViewModel.updateUserOnlineStatusDelayed(setOnline = true)
     }
 
-    private fun startOnCreateActivities() {
+    private fun onCreateActivityActions() {
         uiEventState = uiStateDispatcher.uiEvent
         uiState = uiStateDispatcher.uiState
         initSplashScreen()
@@ -115,7 +119,6 @@ class MainActivity : ComponentActivity() {
             uiEventState.collect { event -> handleUiEvent(event, navController) }
         }
     }
-
 
     @Composable
     private fun NavigationListener() {
