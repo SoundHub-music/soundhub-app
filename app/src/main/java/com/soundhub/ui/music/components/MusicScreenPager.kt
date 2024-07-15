@@ -23,7 +23,7 @@ internal fun MusicScreenPager(selectedTabState: PagerState, navController: NavHo
     ) { page ->
         when (page) {
             0 -> MusicMainPage()
-            1 -> MusicLibraryPage(navController = navController)
+            1 -> MusicLibraryPage()
         }
     }
 }

@@ -66,6 +66,7 @@ class AuthenticationViewModel @Inject constructor(
 
         authRepository
             .logout(authorizedUser, userCredsFlow.firstOrNull()?.accessToken)
+            .onSuccessWithContext { uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication)) }
             .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
                     response = error.errorBody,
@@ -101,10 +102,14 @@ class AuthenticationViewModel @Inject constructor(
             .onSuccess { response ->
                 val postLineRoute = Route.PostLine
                 val uiEvent = UiEvent.Navigate(postLineRoute)
-                userCredsStore.updateCreds(response.body).also {
-                    initializeUser()
-                    uiStateDispatcher.sendUiEvent(uiEvent)
+
+                userCredsStore.updateCreds(response.body)
+                initializeUser().invokeOnCompletion {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        uiStateDispatcher.sendUiEvent(uiEvent)
+                    }
                 }
+
             }
             .onFailure { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)

@@ -3,8 +3,11 @@ package com.soundhub.ui.music.components.tab_pages
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,31 +25,37 @@ import com.soundhub.ui.music.components.MusicServiceButton
 fun UnauthorizedLibraryPage(
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.music_auth_service_text),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            lineHeight = 16.sp
+    ElevatedCard(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
         )
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(15.dp)
         ) {
-            MusicServiceButton(
-                painter = painterResource(id = R.drawable.last_fm)
+            Text(
+                text = stringResource(id = R.string.music_auth_service_text),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black,
+                lineHeight = 28.sp,
             )
-            MusicServiceButton(
-                painter = painterResource(id = R.drawable.spotify)
-            )
-            MusicServiceButton(
-                painter = painterResource(id = R.drawable.yandex_music)
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                MusicServiceButton(
+                    painter = painterResource(id = R.drawable.last_fm)
+                )
+                MusicServiceButton(
+                    painter = painterResource(id = R.drawable.spotify)
+                )
+                MusicServiceButton(
+                    painter = painterResource(id = R.drawable.yandex_music)
+                )
+            }
         }
     }
 }

@@ -58,7 +58,7 @@ fun FriendMiniatureSection(profileViewModel: ProfileViewModel) {
                     fontSize = 14.sp,
                 )
             }
-            FriendsMiniaturesRow(friendList = friendList)
+            FriendsMiniaturesRow(profileViewModel)
         }
     }
 }

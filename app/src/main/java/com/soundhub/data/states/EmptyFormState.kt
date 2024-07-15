@@ -1,6 +1,7 @@
-package com.soundhub.ui.components.forms
+package com.soundhub.data.states
 
 import com.soundhub.data.model.Gender
+import com.soundhub.ui.components.forms.IUserDataFormState
 import java.time.LocalDate
 import java.util.UUID
 
@@ -17,5 +18,5 @@ data class EmptyFormState(
     override var languages: MutableList<String> = mutableListOf(),
     override var isFirstNameValid: Boolean = true,
     override var isLastNameValid: Boolean = true,
-    override var isBirthdayValid: Boolean = true
+    override var isBirthdayValid: Boolean = true,
 ): IUserDataFormState

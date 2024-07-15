@@ -69,7 +69,9 @@ class EditUserProfileViewModel @Inject constructor(
 
     private fun updateFormStateFromUser(user: User) = _formState.update {
         val formState: UserFormState = UserMapper.impl.toFormState(user.copy())
-        formState.copy(languages = formState.languages.filter { it.isNotEmpty() }.toMutableList())
+        formState.copy(
+            languages = formState.languages.filter { it.isNotEmpty() }.toMutableList(),
+        )
     }
 
     private fun updateUser() = viewModelScope.launch(Dispatchers.IO) {

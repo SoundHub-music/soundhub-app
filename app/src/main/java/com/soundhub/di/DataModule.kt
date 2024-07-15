@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.soundhub.data.dao.CountryDao
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
@@ -47,6 +48,10 @@ object DataModule {
     @Provides
     @Singleton
     fun providesUserDao(database: AppDatabase): UserDao = database.userDao()
+
+    @Provides
+    @Singleton
+    fun providesCountryDao(database: AppDatabase): CountryDao = database.countryDao()
 
     @Provides
     @Singleton

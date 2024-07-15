@@ -49,6 +49,10 @@ internal fun MessengerChatList(
     val fetchStatus: ApiStatus = messengerUiState.status
 
 
+    LaunchedEffect(key1 = true) {
+        messengerViewModel.loadChats()
+    }
+
     LaunchedEffect(key1 = messageChannel) {
         messageChannel.collect {
             messengerViewModel.loadChats()

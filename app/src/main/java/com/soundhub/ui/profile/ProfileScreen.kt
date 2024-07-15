@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.soundhub.data.model.User
+import com.soundhub.data.states.ProfileUiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.profile.components.UserProfileContainer
 import com.soundhub.ui.profile.components.sections.avatar.UserProfileAvatar
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -40,6 +44,10 @@ fun ProfileScreen(
             initialValue = SheetValue.PartiallyExpanded
         )
     )
+    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val authorizedUser: User? = uiState.authorizedUser
+    val profileOwner: User? = profileUiState.profileOwner
 
     val bottomSheetState = scaffoldState.bottomSheetState
     val partiallyExpandedSheetHeight: Int by remember {
@@ -52,7 +60,7 @@ fun ProfileScreen(
         label = "bottom sheet corner animation"
     )
 
-    LaunchedEffect(userId) {
+    LaunchedEffect(key1 = userId, key2 = authorizedUser) {
         userId?.let { profileViewModel.loadProfileOwner(it) }
     }
 

@@ -53,9 +53,7 @@ class RegistrationViewModel @Inject constructor(
     searchArtistsUseCase
 ) {
     private val uiState = uiStateDispatcher.uiState
-    private val _registerState: MutableStateFlow<RegistrationState> = MutableStateFlow(
-        RegistrationState()
-    )
+    private val _registerState = MutableStateFlow(RegistrationState())
     val registerState: Flow<IUserDataFormState> = _registerState.asStateFlow()
 
     override fun onCleared() {

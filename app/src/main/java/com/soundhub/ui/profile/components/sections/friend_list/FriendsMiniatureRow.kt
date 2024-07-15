@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -15,10 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.soundhub.data.model.User
+import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.components.avatar.CircularAvatar
+import com.soundhub.ui.profile.ProfileViewModel
 
 @Composable
-internal fun FriendsMiniaturesRow(friendList: List<User>) {
+internal fun FriendsMiniaturesRow(profileViewModel: ProfileViewModel) {
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+    val friendList: List<User> = profileOwner?.friends.orEmpty()
     val maxFriendsMiniatureCount = 10
     var friendCount: Int by remember { mutableIntStateOf(friendList.size) }
 

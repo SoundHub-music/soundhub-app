@@ -82,15 +82,18 @@ internal fun UserNameWithDescription(profileViewModel: ProfileViewModel) {
         }
     }
     if (isDescriptionButtonChecked)
-        UserDetailsSection(user = profileOwner)
+        UserDetailsSection(profileViewModel = profileViewModel)
 }
 
 
 @Composable
 private fun UserDetailsSection(
     modifier: Modifier = Modifier,
-    user: User? = null
+    profileViewModel: ProfileViewModel,
 ) {
+    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+    val profileOwner: User? = profileUiState.profileOwner
+
     Column(
         modifier = modifier
             .background(
@@ -100,13 +103,13 @@ private fun UserDetailsSection(
             .fillMaxWidth()
             .padding(12.dp)
     ) {
-        if (user?.description?.isNotEmpty() == true)
-            UserDescriptionBlock(description = user.description)
+        if (profileOwner?.description?.isNotEmpty() == true)
+            UserDescriptionBlock(description = profileOwner.description)
 
-        user?.birthday?.let { UserBirthdayBlock(birthday = it) }
+        profileOwner?.birthday?.let { UserBirthdayBlock(birthday = it) }
 
-        if (user?.languages?.isNotEmpty() == true)
-            UserLanguagesBlock(languages = user.languages)
+        if (profileOwner?.languages?.isNotEmpty() == true)
+            UserLanguagesBlock(languages = profileOwner.languages)
     }
 }
 

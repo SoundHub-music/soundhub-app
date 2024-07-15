@@ -180,22 +180,25 @@ class ProfileViewModel @Inject constructor(
 
     fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.Main) {
         val authorizedUser: User? = userDao.getCurrentUser()
-        val profileOwner: User? = if (authorizedUser?.id == id)
-            authorizedUser
-        else getUserByIdUseCase(id)
+        if (authorizedUser?.id == id)
+            setProfileOwner(authorizedUser)
+        else {
+            val profileOwner: User? = getUserByIdUseCase(id)
+            if (authorizedUser == null || profileOwner == null)
+                return@launch
+            setProfileOwner(profileOwner, authorizedUser)
+        }
+    }
 
-        setProfileOwner(profileOwner, authorizedUser)
+    private fun setProfileOwner(profileOwner: User) = _profileUiState.update {
+        it.copy(profileOwner = profileOwner)
     }
 
     private fun setProfileOwner(
-        profileOwner: User?,
-        authorizedUser: User?
+        profileOwner: User,
+        authorizedUser: User
     ) {
-        if (profileOwner?.id == null || authorizedUser?.id == null)
-            return
-
-        val isFriend: Boolean = authorizedUser
-            .friends.any { it.id == profileOwner.id }
+        val isFriend: Boolean = authorizedUser.friends.any { it.id == profileOwner.id }
 
         _profileUiState.update { state ->
             state.copy(

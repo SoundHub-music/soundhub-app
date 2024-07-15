@@ -14,15 +14,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun MusicServiceButton(
     modifier: Modifier = Modifier,
     painter: Painter,
     contentDescription: String? = null,
     onClick: () -> Unit = {},
-
-    ) {
+) {
     IconButton(
         onClick = onClick,
         modifier = modifier
@@ -35,13 +33,13 @@ fun MusicServiceButton(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(10.dp)
+            .padding(5.dp)
+            .size(70.dp)
     ) {
         Image(
             painter = painter,
             contentDescription = contentDescription,
-            modifier = Modifier
-                .size(72.dp)
+            modifier = Modifier.size(48.dp)
         )
     }
 }

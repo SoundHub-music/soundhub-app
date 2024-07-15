@@ -150,7 +150,7 @@
     <!-- library page items-->
     <string name="music_library_page_playlists">Плейлисты</string>
     <string name="music_library_page_albums">Альбомы</string>
-    <string name="music_library_page_favorites">Любимое</string>
+    <string name="music_library_page_favorites">Жанры</string>
     <string name="music_library_page_artists">Исполнители</string>
 
     <string name="music_auth_service_text">Получить доступ к своей библиотеке</string>

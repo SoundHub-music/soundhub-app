@@ -38,8 +38,6 @@ class MessengerViewModel @Inject constructor(
     private val _messengerUiState = MutableStateFlow(MessengerUiState())
     val messengerUiState = _messengerUiState.asStateFlow()
 
-    init { loadChats() }
-
     override fun onCleared() {
         super.onCleared()
         Log.d("MessengerViewModel", "viewmodel was cleared")

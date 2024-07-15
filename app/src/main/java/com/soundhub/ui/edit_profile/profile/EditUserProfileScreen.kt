@@ -27,7 +27,6 @@ import com.soundhub.R
 import com.soundhub.data.model.User
 import com.soundhub.ui.components.dialogs.DismissChangesDialog
 import com.soundhub.ui.components.forms.UserDataForm
-import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.edit_profile.components.EditProfileTopBarButton
 
 @Composable
@@ -41,8 +40,8 @@ fun EditUserProfileScreen(
     var isLoading by rememberSaveable { mutableStateOf(true) }
 
     /*
-    At the initial moment of time the user state doesn't have time to load.
-    We wait until authorizedUser is loaded
+        At the initial moment of time the user state doesn't have time to load.
+        We wait until authorizedUser is loaded
      */
     LaunchedEffect(authorizedUser) {
         authorizedUser?.let { isLoading = false }
