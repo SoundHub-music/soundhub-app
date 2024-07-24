@@ -22,7 +22,7 @@ import com.soundhub.R
 import com.soundhub.ui.music.components.MusicServiceButton
 
 @Composable
-fun UnauthorizedLibraryPage(
+fun UnauthorizedLibraryActions(
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -42,6 +42,7 @@ fun UnauthorizedLibraryPage(
                 fontWeight = FontWeight.Black,
                 lineHeight = 28.sp,
             )
+
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
@@ -62,6 +63,6 @@ fun UnauthorizedLibraryPage(
 
 @Composable
 @Preview
-private fun UnauthorizedLibraryPagePreview() {
-    UnauthorizedLibraryPage()
+private fun UnauthorizedLibraryItemsPreview() {
+    UnauthorizedLibraryActions()
 }

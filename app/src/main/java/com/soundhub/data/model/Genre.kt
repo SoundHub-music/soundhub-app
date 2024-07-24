@@ -10,7 +10,9 @@ import java.util.UUID
 data class Genre(
     @PrimaryKey
     @SerializedName("id")
-    var id: UUID = UUID.randomUUID(),
-    var name: String? = null,
-    var pictureUrl: String? = null
-): Serializable
+    override var id: UUID = UUID.randomUUID(),
+    override var name: String? = null,
+
+    @SerializedName("pictureUrl")
+    override var cover: String? = null
+): Serializable, MusicEntity<UUID>

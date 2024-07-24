@@ -17,7 +17,7 @@ import java.util.UUID
 
 open class BaseMapperTest {
     private val userAvatar: String = "https://wp-s.ru/wallpapers/9/17/432090200138903/pejzazh-solnechnye-luchi-skvoz-listya-derevev-popadayut-na-ozero.jpg"
-    private val artist = Artist(title = "Rammstein", id = 126841)
+    private val artist = Artist(name = "Rammstein", id = 126841)
 
     protected val user = User(
         email = "user@mail.com",

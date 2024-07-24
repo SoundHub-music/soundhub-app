@@ -162,8 +162,8 @@ class MusicRepositoryImpl @Inject constructor(
             if (artist.title.lowercase() == artistName.lowercase()) {
                 desiredArtist = Artist(
                     id = artist.id,
-                    title = artist.title,
-                    thumb = artist.coverImage
+                    name = artist.title,
+                    cover = artist.coverImage
                 )
 
                 return@forEach
@@ -174,8 +174,8 @@ class MusicRepositoryImpl @Inject constructor(
             val firstArtist: DiscogsEntityResponse = discogsResponseList[0]
             desiredArtist = Artist(
                 id = firstArtist.id,
-                title = firstArtist.title,
-                thumb = firstArtist.thumb
+                name = firstArtist.title,
+                cover = firstArtist.thumb
             )
         }
 
@@ -202,8 +202,8 @@ class MusicRepositoryImpl @Inject constructor(
             body?.let {
                 result = Artist(
                     id = it.id,
-                    title = it.name,
-                    thumb = it.images[0].uri
+                    name = it.name,
+                    cover = it.images[0].uri
                 )
             }
 
@@ -245,10 +245,10 @@ class MusicRepositoryImpl @Inject constructor(
                 ?.map {
                 Artist(
                     id = it.id,
-                    title = it.title,
+                    name = it.title,
                     genre = it.genre.orEmpty(),
                     style = it.style.orEmpty(),
-                    thumb = it.thumb
+                    cover = it.thumb
                 )
             }.orEmpty()
 

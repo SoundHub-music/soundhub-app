@@ -7,22 +7,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.soundhub.data.model.LibraryItemData
-import com.soundhub.ui.music.data.getMenuItems
+import androidx.navigation.NavHostController
+import com.soundhub.ui.music.MusicViewModel
 
 @Composable
-internal fun MusicLibraryPage(modifier: Modifier = Modifier) {
+internal fun MusicLibraryPage(
+    modifier: Modifier = Modifier,
+    musicViewModel: MusicViewModel,
+    navController: NavHostController
+) {
     val authorized = false
-    val menuItems: List<LibraryItemData> = getMenuItems()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(30.dp)
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        AuthorizedLibraryPage(menuItems)
+        MusicLibraryMenu(
+            musicViewModel = musicViewModel,
+            navController = navController,
+            isAuthorized = authorized
+        )
         if (!authorized)
-            UnauthorizedLibraryPage()
+            UnauthorizedLibraryActions()
     }
 }

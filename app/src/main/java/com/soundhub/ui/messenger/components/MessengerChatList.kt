@@ -80,7 +80,7 @@ internal fun MessengerChatList(
         else LazyColumn(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(top = 5.dp, bottom = 5.dp),
+                .padding(vertical = 5.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             items(items = filteredChats, key = { it.id }) { chat ->

@@ -26,6 +26,8 @@
     <string name="screen_title_postline">Главная</string>
     <string name="screen_title_settings">Настройки</string>
     <string name="screen_title_music">Музыка</string>
+    <string name="screen_title_favorite_genres">Любимые жанры</string>
+    <string name="screen_title_favorite_artists">Любимые исполнители</string>
     <string name="screen_title_messenger">Мессенджер</string>
     <string name="screen_title_edit_profile">Изменить профиль</string>
     <string name="screen_title_notifications">Уведомления</string>

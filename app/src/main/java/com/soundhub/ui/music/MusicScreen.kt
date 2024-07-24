@@ -24,24 +24,22 @@ fun MusicScreen(
         stringResource(id = R.string.music_library_page)
     )
 
-    val selectedTabState: PagerState = rememberPagerState(
+    val pagerState: PagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { tabs.size }
     )
 
     Column {
         MusicScreenTabRow(
-            selectedTabState = selectedTabState,
+            pagerState = pagerState,
             tabs = tabs
         )
-        ContentContainer(
-            modifier = Modifier
-        ) {
+        ContentContainer(modifier = Modifier) {
             MusicScreenPager(
-                selectedTabState = selectedTabState,
-                navController = navController
+                pagerState = pagerState,
+                navController = navController,
+                musicViewModel = musicViewModel
             )
-
         }
     }
 }

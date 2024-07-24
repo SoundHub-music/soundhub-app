@@ -29,10 +29,12 @@ internal fun LibraryItem(
     title: String,
     icon: Painter,
     contentDescription: String? = null,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    enabled: Boolean = true
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(10.dp),
+        enabled = enabled,
         onClick = onClick,
         modifier = modifier
             .padding(5.dp)

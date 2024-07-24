@@ -28,6 +28,7 @@ import com.soundhub.ui.home.HomeScreen
 import com.soundhub.ui.messenger.MessengerViewModel
 import com.soundhub.ui.notifications.NotificationViewModel
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.viewmodels.NavigationViewModel
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
     private val uiStateDispatcher: UiStateDispatcher by viewModels()
     private val notificationViewModel: NotificationViewModel by viewModels()
     private val navigationViewModel: NavigationViewModel by viewModels()
+    private val musicViewModel: MusicViewModel by viewModels()
 
     @Inject
     lateinit var userDao: UserDao
@@ -76,7 +78,8 @@ class MainActivity : ComponentActivity() {
                         uiStateDispatcher = uiStateDispatcher,
                         messengerViewModel = messengerViewModel,
                         registrationViewModel = registrationViewModel,
-                        notificationViewModel = notificationViewModel
+                        notificationViewModel = notificationViewModel,
+                        musicViewModel = musicViewModel
                     )
                 }
             }

@@ -64,7 +64,7 @@ fun ChooseGenresScreen(
                         MusicItemPlate(
                             modifier = Modifier.padding(bottom = 20.dp),
                             caption = genre.name ?: "",
-                            thumbnailUrl = genre.pictureUrl,
+                            thumbnailUrl = genre.cover,
                             onClick = { isChosen -> onItemPlateClick(isChosen, genre) },
                             isChosen = genre in genreUiState.chosenGenres,
                             width = 90.dp,

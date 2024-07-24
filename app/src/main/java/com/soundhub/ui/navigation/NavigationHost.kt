@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +50,8 @@ import com.soundhub.ui.profile.ProfileScreen
 import com.soundhub.ui.profile.ProfileViewModel
 import com.soundhub.ui.settings.SettingsScreen
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.music.FavoriteArtistsScreen
+import com.soundhub.ui.music.FavoriteGenresScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import java.util.UUID
@@ -64,8 +65,8 @@ fun NavigationHost(
     uiStateDispatcher: UiStateDispatcher,
     messengerViewModel: MessengerViewModel,
     notificationViewModel: NotificationViewModel,
-    topBarTitle: MutableState<String?>,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    musicViewModel: MusicViewModel
 ) {
     val uiState: UiState by uiStateDispatcher.uiState.collectAsState(UiState())
     val authorizedUser: User? by remember(uiState.authorizedUser) {
@@ -99,7 +100,7 @@ fun NavigationHost(
         startDestination = startDestination
     ) {
         composable(Route.Authentication.route) {
-            topBarTitle.value = null
+            mainViewModel.setTopBarTitle(null)
             AuthenticationScreen(
                 authViewModel = authViewModel,
                 registrationViewModel = registrationViewModel
@@ -132,7 +133,7 @@ fun NavigationHost(
         }
 
         composable(Route.PostLine.route) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_postline)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_postline))
             PostLineScreen(
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
@@ -140,15 +141,25 @@ fun NavigationHost(
         }
 
         composable(Route.Music.route) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_music)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_music))
             MusicScreen(
                 navController = navController,
-                musicViewModel = MusicViewModel()
+                musicViewModel = musicViewModel
             )
         }
 
+        composable(Route.Music.FavoriteGenres.route) {
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_favorite_genres))
+            FavoriteGenresScreen(musicViewModel)
+        }
+
+        composable(Route.Music.FavoriteArtists.route) {
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_favorite_artists))
+            FavoriteArtistsScreen(musicViewModel)
+        }
+
         composable(Route.Messenger.route) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_messenger)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_messenger))
             MessengerScreen(
                 navController = navController,
                 uiStateDispatcher = uiStateDispatcher,
@@ -202,7 +213,7 @@ fun NavigationHost(
                 val userId: UUID? = argument?.let { UUID.fromString(it) }
                 val friendsViewModel: FriendsViewModel = hiltViewModel()
 
-                topBarTitle.value = stringResource(id = R.string.screen_title_friends)
+                mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_friends))
                 FriendsScreen(
                     uiStateDispatcher = uiStateDispatcher,
                     navController = navController,
@@ -213,7 +224,7 @@ fun NavigationHost(
         }
 
         composable(Route.Notifications.route) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_notifications)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_notifications))
             NotificationScreen(
                 navController = navController,
                 notificationViewModel = notificationViewModel
@@ -228,7 +239,7 @@ fun NavigationHost(
         }
 
         composable(Route.Settings.route) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_settings)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_settings))
             SettingsScreen(
                 authViewModel = authViewModel,
                 uiStateDispatcher = uiStateDispatcher
@@ -239,7 +250,7 @@ fun NavigationHost(
             route = "${Route.Gallery.route}/{${Constants.GALLERY_INITIAL_PAGE_NAV_ARG}}",
             arguments = listOf(navArgument(Constants.GALLERY_INITIAL_PAGE_NAV_ARG) { NavType.StringType})
         ) { entry ->
-            topBarTitle.value = null
+            mainViewModel.setTopBarTitle(null)
             val images = uiStateDispatcher.uiState
                 .collectAsState(initial = UiState())
                 .value
@@ -258,7 +269,7 @@ fun NavigationHost(
 
         // post creating route
         composable(route = Route.PostEditor.createPostRoute) {
-            topBarTitle.value = stringResource(id = R.string.screen_title_create_post)
+            mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_create_post))
             PostEditorScreen(profileOwner = authorizedUser)
         }
 
@@ -271,7 +282,7 @@ fun NavigationHost(
                 val postArgument = entry.arguments?.getString(Constants.POST_EDITOR_NAV_ARG)
                 val postId: UUID? = postArgument?.let { UUID.fromString(it) }
 
-                topBarTitle.value = stringResource(id = R.string.screen_title_update_post)
+                mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_update_post))
                 PostEditorScreen(
                     profileOwner = authorizedUser,
                     postId = postId

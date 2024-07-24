@@ -30,6 +30,10 @@ class MainViewModel @Inject constructor(
     private val _startDestination = MutableStateFlow<String>(Route.Authentication.route)
     val startDestination: StateFlow<String> = _startDestination.asStateFlow()
     val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+
+    private val _topBarTitle = MutableStateFlow<String?>(null)
+    val topBarTitle: StateFlow<String?> = _topBarTitle.asStateFlow()
+
     val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
 
     init {
@@ -50,4 +54,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun getGson(): Gson = gson
+
+    fun setTopBarTitle(value: String?) = _topBarTitle.update {
+        value
+    }
+
+    fun getTopBarTitle() = _topBarTitle.value
 }

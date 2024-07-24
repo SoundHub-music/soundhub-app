@@ -35,6 +35,7 @@ import com.soundhub.R
 @Composable
 fun MusicItemPlate(
     modifier: Modifier = Modifier,
+    clickable: Boolean = true,
     caption: String,
     thumbnailUrl: String?,
     onClick: (Boolean) -> Unit = {},
@@ -48,7 +49,7 @@ fun MusicItemPlate(
         .width(width)
         .height(height)
 
-    if (isItemChosen)
+    if (isItemChosen && clickable)
         itemBoxModifier = itemBoxModifier
             .border(
                 width = 8.dp,
@@ -65,8 +66,10 @@ fun MusicItemPlate(
             modifier = itemBoxModifier,
             shape = RoundedCornerShape(16.dp),
             onClick = {
-                isItemChosen = !isItemChosen
-                onClick(isItemChosen)
+                if (clickable) {
+                    isItemChosen = !isItemChosen
+                    onClick(isItemChosen)
+                }
             }
         ) {
             SubcomposeAsyncImage(

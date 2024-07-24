@@ -15,13 +15,17 @@ import java.io.Serializable
 )
 data class Artist(
     @PrimaryKey
-    var id: Int = 0,
-    var title: String? = null,
+    override var id: Int = 0,
+
+    @SerializedName("title")
+    override var name: String? = null,
     var description: String = "",
     var genre: List<String> = emptyList(),
     var style: List<String> = emptyList(),
 
     @SerializedName("albums")
     var albums: List<Album> = emptyList(),
-    var thumb: String? = null
-): Serializable
+
+    @SerializedName("thumb")
+    override var cover: String? = null
+): Serializable, MusicEntity<Int>

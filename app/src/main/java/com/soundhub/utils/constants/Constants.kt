@@ -38,7 +38,7 @@ object Constants {
     val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
         Route.PostLine.route,
         Route.Music.route,
-        Route.Messenger.route
+        Route.Messenger.route,
     )
 
     val ROUTES_WITHOUT_TOP_APP_BAR: List<String> = listOf(
@@ -58,7 +58,9 @@ object Constants {
         Route.Profile.route,
         Route.PostLine.route,
         Route.Music.route,
-        Route.Messenger.route
+        Route.Messenger.route,
+        Route.Music.FavoriteArtists.route,
+        Route.Music.FavoriteGenres.route
     )
 
     val ROUTES_WITH_SEARCH_BAR: List<String> = listOf(
@@ -107,9 +109,12 @@ object Constants {
     const val GALLERY_ROUTE = "gallery"
 
     // music page
-    const val MUSIC_NEW_OF_THE_WEEK = "new-of-the-week"
-    const val MUSIC_NEW_OF_THE_MONTH = "new-of-the-month"
-    const val MUSIC_RECOMMENDATIONS = "recommend-music"
+    const val MUSIC_NEW_OF_THE_WEEK = "music-new-of-the-week"
+    const val MUSIC_NEW_OF_THE_MONTH = "music-new-of-the-month"
+    const val MUSIC_RECOMMENDATIONS = "music-recommend-music"
+    const val MUSIC_FAVORITE_GENRES = "music-favorite-genres"
+    const val MUSIC_FAVORITE_ARTISTS = "music-favorite-artists"
+    const val MUSIC_PLAYLISTS = "music-playlists"
 
     // response error body type
     val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>(){}.type

@@ -17,16 +17,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-internal fun MusicScreenTabRow(selectedTabState: PagerState, tabs: List<String>) {
+internal fun MusicScreenTabRow(
+    pagerState: PagerState,
+    tabs: List<String>
+) {
     val scope = rememberCoroutineScope()
 
     PrimaryTabRow(
-        selectedTabIndex = selectedTabState.currentPage,
+        selectedTabIndex = pagerState.currentPage,
         modifier = Modifier
     ) {
         tabs.forEachIndexed { index, tab ->
             Tab(
-                selected = selectedTabState.currentPage == index,
+                selected = pagerState.currentPage == index,
                 text = {
                     Text(
                         text = tab,
@@ -34,11 +37,12 @@ internal fun MusicScreenTabRow(selectedTabState: PagerState, tabs: List<String>)
                         fontSize = 20.sp,
                         lineHeight = 20.sp,
                         letterSpacing = 2.5.sp,
-                        color = if (index == selectedTabState.currentPage) MaterialTheme.colorScheme.onBackground
+                        color = if (index == pagerState.currentPage)
+                            MaterialTheme.colorScheme.onBackground
                         else Color.Gray
                     )
                 },
-                onClick = { scope.launch { selectedTabState.animateScrollToPage(index) } }
+                onClick = { scope.launch { pagerState.animateScrollToPage(index) }}
             )
         }
     }

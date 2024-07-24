@@ -42,6 +42,7 @@ import com.soundhub.ui.components.buttons.FloatingNextButton
 import com.soundhub.ui.components.containers.ContentContainer
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.components.layouts.music_preferences.components.MusicItemPlate
+import com.soundhub.ui.components.loaders.CircleLoader
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -68,7 +69,9 @@ fun ChooseArtistsScreen(
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
     ) {
-        Column(
+        if (artistUiState.status == ApiStatus.LOADING)
+            CircleLoader()
+        else Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -106,8 +109,8 @@ fun ChooseArtistsScreen(
                 items(items = artists) { artist ->
                     MusicItemPlate(
                         modifier = Modifier.padding(bottom = 20.dp),
-                        caption = artist.title ?: "",
-                        thumbnailUrl = artist.thumb,
+                        caption = artist.name ?: "",
+                        thumbnailUrl = artist.cover,
                         onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
                         isChosen = artist.id in chosenArtistIds,
                         width = 90.dp,

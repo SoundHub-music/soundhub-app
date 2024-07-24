@@ -9,21 +9,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.soundhub.ui.music.MusicViewModel
 import com.soundhub.ui.music.components.tab_pages.MusicLibraryPage
 import com.soundhub.ui.music.components.tab_pages.MusicMainPage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun MusicScreenPager(selectedTabState: PagerState, navController: NavHostController) {
+internal fun MusicScreenPager(
+    pagerState: PagerState,
+    musicViewModel: MusicViewModel,
+    navController: NavHostController
+) {
     HorizontalPager(
-        state = selectedTabState,
+        state = pagerState,
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 10.dp)
     ) { page ->
         when (page) {
             0 -> MusicMainPage()
-            1 -> MusicLibraryPage()
+            1 -> MusicLibraryPage(
+                musicViewModel = musicViewModel,
+                navController = navController
+            )
         }
     }
 }
