@@ -73,8 +73,8 @@ class LoadArtistsUseCase @Inject constructor(
                         artistBody.style = entity.style.orEmpty()
                         val state = artistUiState.value.artists
 
-                        val artistNotInState: Boolean = artistBody.title?.lowercase() !in state.map { it.title?.lowercase() }
-                        val isNotDuplicate: Boolean = artistBody.title?.matches(duplicateEntityRegex) == false
+                        val artistNotInState: Boolean = artistBody.name?.lowercase() !in state.map { it.name?.lowercase() }
+                        val isNotDuplicate: Boolean = artistBody.name?.matches(duplicateEntityRegex) == false
 
                         if (artistNotInState && isNotDuplicate) {
                             artistUiState.update {
@@ -86,6 +86,6 @@ class LoadArtistsUseCase @Inject constructor(
                     }
                 }
         }
-        return result.distinctBy { it.title }
+        return result.distinctBy { it.name }
     }
 }
