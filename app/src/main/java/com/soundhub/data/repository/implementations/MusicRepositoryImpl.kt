@@ -62,6 +62,7 @@ class MusicRepositoryImpl @Inject constructor(
         countPerPage: Int
     ): HttpResult<DiscogsResponse> {
         try {
+// Last.FM api realization
 //            genres.forEach { genre ->
 //                val response: Response<ArtistsByTagResponse> = lastFmService.getArtistsByGenre(genre)
 //

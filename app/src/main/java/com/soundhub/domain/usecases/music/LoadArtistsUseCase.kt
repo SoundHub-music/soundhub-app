@@ -74,9 +74,9 @@ class LoadArtistsUseCase @Inject constructor(
                         val state = artistUiState.value.artists
 
                         val artistNotInState: Boolean = artistBody.name?.lowercase() !in state.map { it.name?.lowercase() }
-                        val isNotDuplicate: Boolean = artistBody.name?.matches(duplicateEntityRegex) == false
+                        val isDuplicate: Boolean = duplicateEntityRegex.matches(artistBody.name ?: "")
 
-                        if (artistNotInState && isNotDuplicate) {
+                        if (artistNotInState && !isDuplicate) {
                             artistUiState.update {
                                 it.copy(artists = (it.artists + artistBody))
                             }

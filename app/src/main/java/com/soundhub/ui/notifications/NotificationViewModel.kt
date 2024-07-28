@@ -3,22 +3,20 @@ package com.soundhub.ui.notifications
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
+import com.soundhub.data.dao.UserDao
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
 import com.soundhub.data.states.NotificationUiState
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -28,33 +26,38 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val inviteRepository: InviteRepository,
     private val uiStateDispatcher: UiStateDispatcher,
+    private val userDao: UserDao,
+    userCredsStore: UserCredsStore
 ): ViewModel() {
-    private val uiState: Flow<UiState> = uiStateDispatcher.uiState
+    private val userCreds = userCredsStore.getCreds()
 
     private val _notificationUiState = MutableStateFlow(NotificationUiState())
     val notificationUiState = _notificationUiState.asStateFlow()
 
-    init { loadInvites() }
+    init { init() }
 
-    fun loadInvites() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
+    private fun init() = viewModelScope.launch {
+        userCreds.collect { creds ->
+            if (creds.accessToken != null) loadInvites()
+        }
+    }
 
-            inviteRepository.getAllInvites()
-                .onSuccessWithContext { response ->
-                    val invites: List<Invite> = response.body.orEmpty()
-                    _notificationUiState.update {
-                        it.copy(
-                            notifications = invites,
-                            status = ApiStatus.SUCCESS
-                        )
-                    }
-                }
-                .onFailureWithContext { error ->
-                    val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                    uiStateDispatcher.sendUiEvent(errorEvent)
-                    _notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
-                }
+    fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
+        _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
+        inviteRepository.getAllInvites()
+        .onSuccessWithContext { response ->
+            val invites: List<Invite> = response.body.orEmpty()
+            _notificationUiState.update {
+                it.copy(
+                    notifications = invites,
+                    status = ApiStatus.SUCCESS
+                )
+            }
+        }
+        .onFailureWithContext { error ->
+            val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+            uiStateDispatcher.sendUiEvent(errorEvent)
+            _notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
         }
     }
 
@@ -65,13 +68,9 @@ class NotificationViewModel @Inject constructor(
         inviteRepository.acceptInvite(invite.id)
             .onSuccessWithContext {
                 deleteNotificationById(invite.id)
-                val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
-                authorizedUser?.let { user ->
-                    with(user) {
-                        friends += invite.sender
-                        uiStateDispatcher.setAuthorizedUser(this)
-                    }
-                }
+                val authorizedUser: User? = userDao.getCurrentUser()
+
+                updateAuthorizedUser(authorizedUser, invite.sender)
             }
             .onFailureWithContext { error ->
                 val errorEvent: UiEvent = UiEvent.Error(
@@ -84,6 +83,13 @@ class NotificationViewModel @Inject constructor(
             .finallyWithContext {
                 uiStateDispatcher.sendUiEvent(uiEvent)
             }
+    }
+
+    private fun updateAuthorizedUser(user: User?, inviteSender: User) = user?.let {
+        with(it) {
+            friends += inviteSender
+            uiStateDispatcher.setAuthorizedUser(this)
+        }
     }
 
     fun rejectInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {

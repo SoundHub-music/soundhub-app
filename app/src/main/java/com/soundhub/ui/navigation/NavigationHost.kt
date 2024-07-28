@@ -87,7 +87,7 @@ fun NavigationHost(
 
     LaunchedEffect(authorizedUser) {
         val gson = mainViewModel.getGson()
-        Log.d("NavigationHost", "authorized_user: ${gson.toJson(authorizedUser)}")
+        Log.d("NavigationHost", "authorized_user: ${gson.toJson(authorizedUser?.favoriteArtists)}")
     }
 
     LaunchedEffect(userCreds) {

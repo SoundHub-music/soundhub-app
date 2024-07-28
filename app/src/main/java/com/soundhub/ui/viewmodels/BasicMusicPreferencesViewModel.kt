@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 open class BaseMusicPreferencesViewModel(
     private val loadGenresUseCase: LoadGenresUseCase,
     private val loadArtistsUseCase: LoadArtistsUseCase,
-    private val searchArtistsUseCase: SearchArtistsUseCase
+    private val searchArtistsUseCase: SearchArtistsUseCase,
+    private val uiStateDispatcher: UiStateDispatcher
 ) : ViewModel() {
     protected val _genreUiState: MutableStateFlow<GenreUiState> = MutableStateFlow(GenreUiState())
     val genreUiState = _genreUiState.asStateFlow()
@@ -99,7 +100,10 @@ open class BaseMusicPreferencesViewModel(
     fun onSearchFieldChange(value: String) = viewModelScope.launch {
         if (value.isEmpty())
             loadArtists()
-        else searchArtists(value)
+        else {
+            uiStateDispatcher.updateSearchBarText(value)
+            searchArtists(value)
+        }
     }
 
     private fun setChosenGenres(genres: List<Genre>) = _genreUiState.update {

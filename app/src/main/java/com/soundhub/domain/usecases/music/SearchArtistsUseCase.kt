@@ -15,7 +15,11 @@ class SearchArtistsUseCase @Inject constructor(
         if (searchString.isNotEmpty()) {
             musicRepository.searchArtists(searchString)
                 .onSuccess { response ->
-                    val artists: List<Artist> = response.body.orEmpty()
+                    val duplicateEntityRegex = Regex("\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)")
+                    val artists: List<Artist> = response.body.orEmpty().filter { artist ->
+                        !duplicateEntityRegex.matches(artist.name ?: "")
+                    }
+
                     searchResult = artists
                 }
                 .onFailure { error ->

@@ -13,6 +13,7 @@ import com.soundhub.data.api.services.MessageService
 import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.services.UserService
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.CountryRepository
@@ -74,11 +75,13 @@ object RepositoryModule {
         context: Context,
         userService: UserService,
         loadAllUserDataUseCase: LoadAllUserDataUseCase,
+        userCredsStore: UserCredsStore,
         gson: Gson
     ): UserRepository = UserRepositoryImpl(
         userService = userService,
         loadAllUserDataUseCase = loadAllUserDataUseCase,
         context = context,
+        userCredsStore = userCredsStore,
         gson = gson
     )
 

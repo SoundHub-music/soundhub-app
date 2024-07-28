@@ -31,11 +31,6 @@ class MusicViewModel @Inject constructor(
     private val _favoriteArtists = MutableStateFlow<List<Artist>>(emptyList())
     val favoriteArtists: StateFlow<List<Artist>> = _favoriteArtists.asStateFlow()
 
-    init {
-        loadUserFavoriteGenres()
-        loadUserFavoriteArtists()
-    }
-
     @Composable
     fun getMenuItems(): List<LibraryItemData> = listOf(
         LibraryItemData(
@@ -55,12 +50,12 @@ class MusicViewModel @Inject constructor(
         )
     )
 
-    private fun loadUserFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadUserFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         _favoriteGenres.update { authorizedUser?.favoriteGenres.orEmpty() }
     }
 
-    private fun loadUserFavoriteArtists() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadUserFavoriteArtists() = viewModelScope.launch(Dispatchers.IO) {
         val authorizedUser: User? = userDao.getCurrentUser()
         _favoriteArtists.update { authorizedUser?.favoriteArtists.orEmpty() }
     }

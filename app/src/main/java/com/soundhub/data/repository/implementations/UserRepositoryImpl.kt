@@ -12,12 +12,14 @@ import com.soundhub.data.api.services.UserService
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.CompatibleUsersResponse
 import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.utils.HttpUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.enums.UriScheme
+import kotlinx.coroutines.flow.firstOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userService: UserService,
     private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
+    private val userCredsStore: UserCredsStore,
     private val context: Context,
     private val gson: Gson
 ): UserRepository {
@@ -67,15 +70,21 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getCurrentUser(): HttpResult<User?> {
         try {
             val currentUserResponse: Response<User?> = userService.getCurrentUser()
+            val userCreds = userCredsStore.getCreds()
 
             Log.d("UserRepository", "getCurrentUser[1]: $currentUserResponse")
 
+
             if (!currentUserResponse.isSuccessful) {
+                if (userCreds.firstOrNull()?.accessToken == null) {
+                    return HttpResult.Success(body = null)
+                }
+
                 val errorBody: ErrorResponse = gson
                     .fromJson(currentUserResponse.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
                     ?: ErrorResponse(
                         status = currentUserResponse.code(),
-                        detail = context.getString(R.string.toast_common_error)
+//                        detail = context.getString(R.string.toast_common_error)
                     )
 
                 Log.e("UserRepository", "getCurrentUser[2]: $errorBody")

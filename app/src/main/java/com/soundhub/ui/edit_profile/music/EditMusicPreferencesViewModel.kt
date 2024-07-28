@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.dao.UserDao
+import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.User
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
@@ -33,16 +34,19 @@ class EditMusicPreferencesViewModel @Inject constructor(
     private val loadGenresUseCase: LoadGenresUseCase,
     private val userDao: UserDao,
     loadArtistsUseCase: LoadArtistsUseCase,
-    searchArtistsUseCase: SearchArtistsUseCase
+    searchArtistsUseCase: SearchArtistsUseCase,
 ) : BaseMusicPreferencesViewModel(
     loadGenresUseCase,
     loadArtistsUseCase,
-    searchArtistsUseCase
+    searchArtistsUseCase,
+    uiStateDispatcher
 ) {
     private val uiState: Flow<UiState> = uiStateDispatcher.uiState
 
     override fun onCleared() {
         super.onCleared()
+        _artistUiState.update { it.copy(artists = emptyList()) }
+
         Log.d("EditMusicPreferencesViewModel", "viewmodel was cleared")
     }
 
@@ -66,6 +70,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
             val user: User? = userDao.getCurrentUser()
             val favoriteArtists = user?.favoriteArtists.orEmpty()
             _artistUiState.update { it.copy(
+                artists = (favoriteArtists + it.artists).distinctBy { a -> a.id },
                 chosenArtists = favoriteArtists
             ) }
         }
@@ -99,13 +104,8 @@ class EditMusicPreferencesViewModel @Inject constructor(
             uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastMessage))
             return@launch
         }
-        val authorizedUser: User? = userDao.getCurrentUser()
 
-        val user: User? = authorizedUser?.copy(
-            favoriteArtists = artistUiState.value.chosenArtists,
-            favoriteGenres = genreUiState.value.chosenGenres,
-            favoriteArtistsIds = artistUiState.value.chosenArtists.map { it.id }
-        )
+        val user: User? = getUpdatedUser()
 
         updateUserUseCase(user).onSuccess {
             withContext(Dispatchers.Main) {
@@ -124,6 +124,26 @@ class EditMusicPreferencesViewModel @Inject constructor(
             toastMessage = UiText.StringResource(R.string.toast_update_music_preferences_failed)
             uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastMessage))
         }
+    }
 
+    private suspend fun getUpdatedUser(): User? {
+        val authorizedUser: User? = userDao.getCurrentUser()
+        val artistUnion: List<Artist> = authorizedUser?.favoriteArtists
+            .orEmpty()
+            .union(artistUiState.value.chosenArtists)
+            .toList()
+
+        val genreUnion: List<Genre> = authorizedUser?.favoriteGenres
+            .orEmpty()
+            .union(genreUiState.value.chosenGenres)
+            .toList()
+
+        val user: User? = authorizedUser?.copy(
+            favoriteArtists = artistUnion,
+            favoriteGenres = genreUnion,
+            favoriteArtistsIds = artistUnion.map { it.id }
+        )
+
+        return user
     }
 }

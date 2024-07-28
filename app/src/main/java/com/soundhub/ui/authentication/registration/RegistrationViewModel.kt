@@ -50,7 +50,8 @@ class RegistrationViewModel @Inject constructor(
 ): BaseMusicPreferencesViewModel(
     loadGenresUseCase,
     loadArtistsUseCase,
-    searchArtistsUseCase
+    searchArtistsUseCase,
+    uiStateDispatcher
 ) {
     private val uiState = uiStateDispatcher.uiState
     private val _registerState = MutableStateFlow(RegistrationState())
