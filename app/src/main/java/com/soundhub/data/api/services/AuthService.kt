@@ -9,7 +9,7 @@ import com.soundhub.utils.constants.ApiEndpoints.Authentication.REFRESH_TOKEN
 import com.soundhub.utils.constants.ApiEndpoints.Authentication.SIGN_IN
 import com.soundhub.utils.constants.ApiEndpoints.Authentication.SIGN_UP
 import com.soundhub.utils.constants.ApiEndpoints.Authentication.USER_DATA_REQUEST_BODY_NAME
-import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response

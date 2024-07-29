@@ -23,35 +23,35 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.model.User
-import com.soundhub.ui.authentication.AuthenticationScreen
-import com.soundhub.ui.authentication.AuthenticationViewModel
-import com.soundhub.ui.authentication.registration.PostRegisterChooseArtistsScreen
-import com.soundhub.ui.authentication.registration.PostRegisterChooseGenresScreen
-import com.soundhub.ui.authentication.registration.FillUserDataScreen
-import com.soundhub.ui.authentication.registration.RegistrationViewModel
-import com.soundhub.ui.edit_profile.music.EditFavoriteArtistsScreen
-import com.soundhub.ui.edit_profile.music.EditFavoriteGenresScreen
-import com.soundhub.ui.edit_profile.music.EditMusicPreferencesViewModel
-import com.soundhub.ui.post_editor.PostEditorScreen
-import com.soundhub.ui.edit_profile.profile.EditUserProfileScreen
-import com.soundhub.ui.friends.FriendsScreen
-import com.soundhub.ui.friends.FriendsViewModel
-import com.soundhub.ui.components.gallery.GalleryScreen
+import com.soundhub.ui.pages.authentication.AuthenticationScreen
+import com.soundhub.ui.pages.authentication.AuthenticationViewModel
+import com.soundhub.ui.pages.authentication.registration.PostRegisterChooseArtistsScreen
+import com.soundhub.ui.pages.authentication.registration.PostRegisterChooseGenresScreen
+import com.soundhub.ui.pages.authentication.registration.FillUserDataScreen
+import com.soundhub.ui.pages.authentication.registration.RegistrationViewModel
+import com.soundhub.ui.pages.edit_profile.music.EditFavoriteArtistsScreen
+import com.soundhub.ui.pages.edit_profile.music.EditFavoriteGenresScreen
+import com.soundhub.ui.pages.edit_profile.music.EditMusicPreferencesViewModel
+import com.soundhub.ui.pages.post_editor.PostEditorScreen
+import com.soundhub.ui.pages.edit_profile.profile.EditUserProfileScreen
+import com.soundhub.ui.pages.friends.FriendsScreen
+import com.soundhub.ui.pages.friends.FriendsViewModel
+import com.soundhub.ui.shared.gallery.GalleryScreen
 import com.soundhub.ui.viewmodels.MainViewModel
-import com.soundhub.ui.messenger.MessengerScreen
-import com.soundhub.ui.messenger.MessengerViewModel
-import com.soundhub.ui.chat.ChatScreen
-import com.soundhub.ui.music.MusicScreen
-import com.soundhub.ui.music.MusicViewModel
-import com.soundhub.ui.notifications.NotificationScreen
-import com.soundhub.ui.notifications.NotificationViewModel
-import com.soundhub.ui.postline.PostLineScreen
-import com.soundhub.ui.profile.ProfileScreen
-import com.soundhub.ui.profile.ProfileViewModel
-import com.soundhub.ui.settings.SettingsScreen
+import com.soundhub.ui.pages.messenger.MessengerScreen
+import com.soundhub.ui.pages.messenger.MessengerViewModel
+import com.soundhub.ui.pages.chat.ChatScreen
+import com.soundhub.ui.pages.music.MusicScreen
+import com.soundhub.ui.pages.music.MusicViewModel
+import com.soundhub.ui.pages.notifications.NotificationScreen
+import com.soundhub.ui.pages.notifications.NotificationViewModel
+import com.soundhub.ui.pages.postline.PostLineScreen
+import com.soundhub.ui.pages.profile.ProfileScreen
+import com.soundhub.ui.pages.profile.ProfileViewModel
+import com.soundhub.ui.pages.settings.SettingsScreen
 import com.soundhub.data.states.UiState
-import com.soundhub.ui.music.FavoriteArtistsScreen
-import com.soundhub.ui.music.FavoriteGenresScreen
+import com.soundhub.ui.pages.music.FavoriteArtistsScreen
+import com.soundhub.ui.pages.music.FavoriteGenresScreen
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import java.util.UUID
@@ -144,7 +144,8 @@ fun NavigationHost(
             mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_music))
             MusicScreen(
                 navController = navController,
-                musicViewModel = musicViewModel
+                musicViewModel = musicViewModel,
+                uiStateDispatcher = uiStateDispatcher
             )
         }
 

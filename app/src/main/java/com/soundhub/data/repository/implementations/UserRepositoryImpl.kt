@@ -13,7 +13,7 @@ import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.CompatibleUsersResponse
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants

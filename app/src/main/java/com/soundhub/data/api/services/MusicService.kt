@@ -8,7 +8,7 @@ import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTISTS
 import com.soundhub.utils.constants.ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTIST_RELEASES
 import com.soundhub.utils.constants.ApiEndpoints.Music.DATABASE_SEARCH
-import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
 import com.soundhub.utils.constants.ApiEndpoints.Music.RELEASE_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.Constants.DISCOGS_AUTHORIZATION
 import retrofit2.Response

@@ -8,8 +8,8 @@ import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.lib.HttpUtils
+import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
 import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow

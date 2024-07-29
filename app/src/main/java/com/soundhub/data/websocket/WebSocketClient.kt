@@ -8,8 +8,8 @@ import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_ENDPOINT
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_ENDPOINT
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_SEND_MESSAGE_ENDPOINT
-import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
-import com.soundhub.utils.HttpUtils.Companion.getBearerToken
+import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.lib.HttpUtils.Companion.getBearerToken
 import com.soundhub.utils.constants.Constants.DELETER_ID_HEADER
 import com.soundhub.utils.constants.Constants.DESTINATION_HEADER
 import com.soundhub.utils.constants.Constants.DYNAMIC_PARAM_REGEX

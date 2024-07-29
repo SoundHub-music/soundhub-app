@@ -65,4 +65,6 @@ data class User(
     @Ignore
     @SerializedName("favoriteArtistsIds")
     var favoriteArtistsIds: List<Int> = emptyList()
-): Serializable
+): Serializable {
+    fun getFullName() = "$firstName $lastName".trim()
+}

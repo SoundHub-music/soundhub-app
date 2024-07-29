@@ -2,8 +2,8 @@ package com.soundhub.utils.interceptors
 
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.utils.HttpUtils
-import com.soundhub.utils.HttpUtils.Companion.AUTHORIZATION_HEADER
+import com.soundhub.utils.lib.HttpUtils
+import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

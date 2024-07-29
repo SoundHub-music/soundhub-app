@@ -4,7 +4,7 @@ import com.soundhub.data.repository.MusicRepository
 import com.soundhub.data.states.GenreUiState
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.UiText
+import com.soundhub.utils.lib.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject

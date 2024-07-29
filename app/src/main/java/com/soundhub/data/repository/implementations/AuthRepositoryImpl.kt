@@ -15,7 +15,7 @@ import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

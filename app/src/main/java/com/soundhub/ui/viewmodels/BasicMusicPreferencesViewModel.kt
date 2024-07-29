@@ -57,9 +57,9 @@ open class BaseMusicPreferencesViewModel(
             searchArtistsUseCase(searchString = value)
                 .onSuccess { response ->
                     _artistUiState.update { it.copy(
-                        status = ApiStatus.SUCCESS,
-                        artists = response
-                    )
+                            status = ApiStatus.SUCCESS,
+                            artists = response
+                        )
                     }
                 }
                 .onFailure { _artistUiState.update { it.copy(status = ApiStatus.ERROR) } }

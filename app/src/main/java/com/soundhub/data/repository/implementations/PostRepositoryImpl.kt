@@ -8,7 +8,7 @@ import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.model.Post
-import com.soundhub.utils.HttpUtils
+import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
