@@ -46,18 +46,14 @@ class AuthenticationViewModel @Inject constructor(
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
-    fun initializeUser() = viewModelScope.launch(Dispatchers.IO) {
+    fun initializeUser(onSaveUser: suspend () -> Unit = {}) = viewModelScope.launch(Dispatchers.IO) {
         getCurrentUser().collect { currentUser ->
             // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
             // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
             //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
-            currentUser?.let {
-                userDao.saveUser(currentUser)
-                uiStateDispatcher.setAuthorizedUser(currentUser)
-            } ?: run {
-                val cachedUser: User? = userDao.getCurrentUser()
-                uiStateDispatcher.setAuthorizedUser(cachedUser)
-            }
+
+            val user: User? = currentUser ?: userDao.getCurrentUser()
+            uiStateDispatcher.setAuthorizedUser(user).also { onSaveUser() }
         }
     }
 
@@ -100,16 +96,12 @@ class AuthenticationViewModel @Inject constructor(
 
         authRepository.signIn(signInRequestBody)
             .onSuccess { response ->
-                val postLineRoute = Route.PostLine
-                val uiEvent = UiEvent.Navigate(postLineRoute)
-
                 userCredsStore.updateCreds(response.body)
-                initializeUser().invokeOnCompletion {
-                    viewModelScope.launch(Dispatchers.Main) {
-                        uiStateDispatcher.sendUiEvent(uiEvent)
-                    }
+                initializeUser {
+                    val postLineRoute = Route.PostLine
+                    val uiEvent = UiEvent.Navigate(postLineRoute)
+                    uiStateDispatcher.sendUiEvent(uiEvent)
                 }
-
             }
             .onFailure { error ->
                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)

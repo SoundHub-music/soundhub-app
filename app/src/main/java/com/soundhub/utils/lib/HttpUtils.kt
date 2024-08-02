@@ -38,7 +38,8 @@ class HttpUtils {
         fun getBearerToken(token: String?): String =
             if (token?.matches(Regex("Bearer\\s\\S+")) == true)
                 token
-            else "Bearer ${token?.trim()}"
+            else
+                "Bearer ${token?.trim()}"
 
         /**
          * creates temporary file and multipart form data

@@ -3,7 +3,6 @@ package com.soundhub.ui.viewmodels
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -14,9 +13,7 @@ import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.model.User
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,11 +49,11 @@ class NavigationViewModel @Inject constructor(
         uiStateDispatcher.setSearchBarActive(false)
     }
 
-    private fun checkAuthAndNavigate(
+    private suspend fun checkAuthAndNavigate(
         route: String?,
         userCreds: UserPreferences?,
         controller: NavController
-    ) = viewModelScope.launch(Dispatchers.Main) {
+    ) {
         val userInstance: User? = userDao.getCurrentUser()
         val isUserAuthorized: Boolean = !userCreds?.accessToken.isNullOrEmpty()
                 && !userCreds?.refreshToken.isNullOrEmpty()
