@@ -3,16 +3,16 @@ package com.soundhub.ui.pages.authentication
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.model.User
-import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.Route
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.api.requests.SignInRequestBody
 import com.soundhub.data.dao.UserDao
+import com.soundhub.data.datastore.UserCredsStore
+import com.soundhub.data.datastore.model.UserPreferences
+import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.UserRepository
+import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.AuthValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,22 +38,32 @@ class AuthenticationViewModel @Inject constructor(
 
     private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    init { initializeUser() }
+    init {
+        viewModelScope.launch {
+            initializeUser()
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()
         Log.d("AuthenticationViewModel", "viewmodel was cleared")
     }
 
-    fun initializeUser(onSaveUser: suspend () -> Unit = {}) = viewModelScope.launch(Dispatchers.IO) {
-        getCurrentUser().collect { currentUser ->
-            // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
-            // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: ""))
-            //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
+    suspend fun initializeUser(onSaveUser: suspend () -> Unit = {}) {
+        var authorizedUser: User? = userRepository
+            .getCurrentUser()
+            .onSuccessReturn()
 
-            val user: User? = currentUser ?: userDao.getCurrentUser()
-            uiStateDispatcher.setAuthorizedUser(user).also { onSaveUser() }
+        with(authorizedUser) {
+            this?.let { userDao.saveUser(this) }
+            ?: run { authorizedUser = userDao.getCurrentUser() }
+
+            uiStateDispatcher.setAuthorizedUser(this)
         }
+
+        onSaveUser()
+        // TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
+        // if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: "")) //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
     }
 
     fun logout() = viewModelScope.launch(Dispatchers.IO) {
@@ -80,18 +89,10 @@ class AuthenticationViewModel @Inject constructor(
         userCredsStore.clear()
     }
 
-    private suspend fun getCurrentUser(): Flow<User?> = flow {
-        val authorizedUser: User? = userRepository
-            .getCurrentUser()
-            .onSuccessReturn()
-
-        emit(authorizedUser)
-    }
-
     fun signIn() = viewModelScope.launch(Dispatchers.Main) {
         _authFormState.update { it.copy(isLoading = true) }
 
-        val ( email: String, password: String ) = authFormState.value
+        val (email: String, password: String) = authFormState.value
         val signInRequestBody = SignInRequestBody(email, password)
 
         authRepository.signIn(signInRequestBody)
