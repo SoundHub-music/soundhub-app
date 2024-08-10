@@ -20,45 +20,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
-import com.soundhub.ui.pages.profile.components.SectionLabel
 import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
 import com.soundhub.ui.pages.profile.ProfileViewModel
+import com.soundhub.ui.pages.profile.components.SectionLabel
 
 @Composable
 fun FriendMiniatureSection(profileViewModel: ProfileViewModel) {
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState
-        .collectAsState()
+	val profileUiState: ProfileUiState by profileViewModel
+		.profileUiState
+		.collectAsState()
 
-    val profileOwner: User? = profileUiState.profileOwner
-    val friendList: List<User> = profileOwner?.friends.orEmpty()
+	val profileOwner: User? = profileUiState.profileOwner
+	val friendList: List<User> = profileOwner?.friends.orEmpty()
 
-    ElevatedCard(
-        onClick = { profileViewModel.onFriendSectionClick() },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SectionLabel(
-                    text = stringResource(id = R.string.profile_screen_friend_section_caption),
-                    labelIcon = painterResource(id = R.drawable.round_groups_24),
-                    iconTint = MaterialTheme.colorScheme.tertiary,
-                )
-                Text(
-                    text = "${friendList.size}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                )
-            }
-            FriendsMiniaturesRow(profileViewModel)
-        }
-    }
+	ElevatedCard(
+		onClick = { profileViewModel.onFriendSectionClick() },
+		modifier = Modifier.fillMaxWidth(),
+		shape = RoundedCornerShape(10.dp),
+	) {
+		Column(
+			modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+			verticalArrangement = Arrangement.spacedBy(5.dp)
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(8.dp)
+			) {
+				SectionLabel(
+					text = stringResource(id = R.string.profile_screen_friend_section_caption),
+					labelIcon = painterResource(id = R.drawable.round_groups_24),
+					iconTint = MaterialTheme.colorScheme.tertiary,
+				)
+				Text(
+					text = "${friendList.size}",
+					fontWeight = FontWeight.Bold,
+					fontSize = 14.sp,
+				)
+			}
+			FriendsMiniaturesRow(profileViewModel)
+		}
+	}
 }

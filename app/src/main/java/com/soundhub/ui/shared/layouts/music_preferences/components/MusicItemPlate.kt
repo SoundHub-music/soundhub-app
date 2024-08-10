@@ -34,61 +34,61 @@ import com.soundhub.R
 
 @Composable
 fun MusicItemPlate(
-    modifier: Modifier = Modifier,
-    clickable: Boolean = true,
-    caption: String,
-    thumbnailUrl: String?,
-    onClick: (Boolean) -> Unit = {},
-    isChosen: Boolean = false,
-    width: Dp = 72.dp,
-    height: Dp = 72.dp
+	modifier: Modifier = Modifier,
+	clickable: Boolean = true,
+	caption: String,
+	thumbnailUrl: String?,
+	onClick: (Boolean) -> Unit = {},
+	isChosen: Boolean = false,
+	width: Dp = 72.dp,
+	height: Dp = 72.dp
 ) {
-    val tertiaryColor = MaterialTheme.colorScheme.tertiary
-    var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
-    var itemBoxModifier: Modifier = Modifier
-        .width(width)
-        .height(height)
+	val tertiaryColor = MaterialTheme.colorScheme.tertiary
+	var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
+	var itemBoxModifier: Modifier = Modifier
+		.width(width)
+		.height(height)
 
-    if (isItemChosen && clickable)
-        itemBoxModifier = itemBoxModifier
-            .border(
-                width = 8.dp,
-                color = tertiaryColor,
-                shape = RoundedCornerShape(16.dp)
-            )
+	if (isItemChosen && clickable)
+		itemBoxModifier = itemBoxModifier
+			.border(
+				width = 8.dp,
+				color = tertiaryColor,
+				shape = RoundedCornerShape(16.dp)
+			)
 
-    Column (
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedCard (
-            modifier = itemBoxModifier,
-            shape = RoundedCornerShape(16.dp),
-            onClick = {
-                if (clickable) {
-                    isItemChosen = !isItemChosen
-                    onClick(isItemChosen)
-                }
-            }
-        ) {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .addHeader("mode", "no-cors")
-                    .data(thumbnailUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = caption,
-                contentScale = ContentScale.Crop,
-            ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Error || state is AsyncImagePainter.State.Loading)
-                    SubcomposeAsyncImageContent(
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        painter = painterResource(id = R.drawable.musical_note)
-                    )
-            }
+	Column(
+		modifier = modifier,
+		verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+		horizontalAlignment = Alignment.CenterHorizontally,
+	) {
+		ElevatedCard(
+			modifier = itemBoxModifier,
+			shape = RoundedCornerShape(16.dp),
+			onClick = {
+				if (clickable) {
+					isItemChosen = !isItemChosen
+					onClick(isItemChosen)
+				}
+			}
+		) {
+			SubcomposeAsyncImage(
+				model = ImageRequest.Builder(LocalContext.current)
+					.addHeader("mode", "no-cors")
+					.data(thumbnailUrl)
+					.crossfade(true)
+					.build(),
+				contentDescription = caption,
+				contentScale = ContentScale.Crop,
+			) {
+				val state = painter.state
+				if (state is AsyncImagePainter.State.Error || state is AsyncImagePainter.State.Loading)
+					SubcomposeAsyncImageContent(
+						modifier = Modifier.fillMaxSize(),
+						contentScale = ContentScale.Crop,
+						painter = painterResource(id = R.drawable.musical_note)
+					)
+			}
 //            GlideImage(
 //                model = HttpUtils.prepareGlideUrlDiscogs(thumbnailUrl) ?: "kkk",
 //                failure = placeholder(painterResource(id = R.drawable.musical_note)),
@@ -96,20 +96,20 @@ fun MusicItemPlate(
 //                contentDescription = thumbnailUrl,
 //                modifier = Modifier.fillMaxSize()
 //            )
-        }
-        Text(
-            text = caption,
-            style = TextStyle(
-                fontSize = 15.sp,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
-        )
-    }
+		}
+		Text(
+			text = caption,
+			style = TextStyle(
+				fontSize = 15.sp,
+				textAlign = TextAlign.Center,
+				color = MaterialTheme.colorScheme.onSecondaryContainer,
+			)
+		)
+	}
 }
 
 @Preview
 @Composable
 private fun ItemPlatePreview() {
-    MusicItemPlate(caption = "Rap", thumbnailUrl = "")
+	MusicItemPlate(caption = "Rap", thumbnailUrl = "")
 }

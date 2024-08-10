@@ -16,40 +16,42 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultTopAppBar(
-    topBarTitle: String?,
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher,
-    notificationViewModel: NotificationViewModel
+	topBarTitle: String?,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher,
+	notificationViewModel: NotificationViewModel
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val isSearchBarActive = uiState.isSearchBarActive
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val isSearchBarActive = uiState.isSearchBarActive
 
-    TopAppBar(
-        title = {
-            if (!isSearchBarActive)
-                Text(text = topBarTitle ?: "")
-        },
-        navigationIcon = {
-            if (!isSearchBarActive)
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = stringResource(id = R.string.btn_description_back),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-        },
-        actions = { TopBarActions(
-            navController = navController,
-            uiStateDispatcher = uiStateDispatcher,
-            notificationViewModel = notificationViewModel
-        ) }
-    )
+	TopAppBar(
+		title = {
+			if (!isSearchBarActive)
+				Text(text = topBarTitle ?: "")
+		},
+		navigationIcon = {
+			if (!isSearchBarActive)
+				IconButton(onClick = { navController.popBackStack() }) {
+					Icon(
+						imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+						contentDescription = stringResource(id = R.string.btn_description_back),
+						modifier = Modifier.size(24.dp)
+					)
+				}
+		},
+		actions = {
+			TopBarActions(
+				navController = navController,
+				uiStateDispatcher = uiStateDispatcher,
+				notificationViewModel = notificationViewModel
+			)
+		}
+	)
 }

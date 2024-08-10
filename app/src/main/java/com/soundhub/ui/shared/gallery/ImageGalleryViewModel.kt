@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.load.model.GlideUrl
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.lib.HttpUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,24 +18,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImageGalleryViewModel @Inject constructor(
-    userCredsStore: UserCredsStore
-): ViewModel() {
-    private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
-    private val userCredsInstance = MutableStateFlow<UserPreferences?>(null)
+	userCredsStore: UserCredsStore
+) : ViewModel() {
+	private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
+	private val userCredsInstance = MutableStateFlow<UserPreferences?>(null)
 
-    init {
-        viewModelScope.launch(Dispatchers.Main) {
-            userCredsInstance.update { userCredsFlow.firstOrNull() }
-        }
-    }
+	init {
+		viewModelScope.launch(Dispatchers.Main) {
+			userCredsInstance.update { userCredsFlow.firstOrNull() }
+		}
+	}
 
-    fun getGlideUrlOrImageUri(
-        image: String,
-        mediaFolder: MediaFolder
-    ): GlideUrl? = HttpUtils
-        .prepareGlideUrWithAccessToken(
-            userCredsInstance.value,
-            image,
-            mediaFolder
-        )
+	fun getGlideUrlOrImageUri(
+		image: String,
+		mediaFolder: MediaFolder
+	): GlideUrl? = HttpUtils
+		.prepareGlideUrWithAccessToken(
+			userCredsInstance.value,
+			image,
+			mediaFolder
+		)
 }

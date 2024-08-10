@@ -15,28 +15,28 @@ import com.soundhub.data.model.Notification
 
 @Composable
 fun NotificationItem(
-    modifier: Modifier = Modifier,
-    notification: Notification,
-    onClick: () -> Unit = {},
-    content: @Composable () -> Unit
+	modifier: Modifier = Modifier,
+	notification: Notification,
+	onClick: () -> Unit = {},
+	content: @Composable () -> Unit
 ) {
-    ElevatedCard(
-        shape = RoundedCornerShape(10.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 5.dp,
-                ambientColor = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(10.dp)
-            ),
-        onClick = { onClick() }
-    ) {
-        Box(modifier = Modifier.padding(20.dp)) {
-            content()
-        }
-    }
+	ElevatedCard(
+		shape = RoundedCornerShape(10.dp),
+		modifier = modifier
+			.fillMaxWidth()
+			.shadow(
+				elevation = 5.dp,
+				ambientColor = MaterialTheme.colorScheme.onSurface,
+				shape = RoundedCornerShape(10.dp)
+			)
+			.background(
+				color = MaterialTheme.colorScheme.secondaryContainer,
+				shape = RoundedCornerShape(10.dp)
+			),
+		onClick = { onClick() }
+	) {
+		Box(modifier = Modifier.padding(20.dp)) {
+			content()
+		}
+	}
 }

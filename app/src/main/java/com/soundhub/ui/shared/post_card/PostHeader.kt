@@ -32,69 +32,69 @@ import java.util.UUID
 
 @Composable
 internal fun PostHeader(
-    modifier: Modifier = Modifier,
-    currentUser: User?,
-    navController: NavHostController,
-    post: Post,
-    onDeletePost: (UUID) -> Unit
+	modifier: Modifier = Modifier,
+	currentUser: User?,
+	navController: NavHostController,
+	post: Post,
+	onDeletePost: (UUID) -> Unit
 ) {
-    val isPostMenuExpandedState: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
-    val userFullName: String = post.author?.getFullName() ?: ""
-    val isAuthorizedUserAuthor: Boolean = currentUser?.id == post.author?.id
+	val isPostMenuExpandedState: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+	val userFullName: String = post.author?.getFullName() ?: ""
+	val isAuthorizedUserAuthor: Boolean = currentUser?.id == post.author?.id
 
-    Box(contentAlignment = Alignment.TopEnd) {
-        Row(
-            modifier = modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CircularAvatar(
-                    imageUri = post.author?.avatarUrl?.toUri(),
-                    contentDescription = userFullName,
-                    modifier = Modifier,
-                    onClick = {
-                        val stringAuthorId = post.author?.id.toString()
-                        val route: String = Route.Profile.getStringRouteWithNavArg(stringAuthorId)
-                        navController.navigate(route)
-                    }
-                )
+	Box(contentAlignment = Alignment.TopEnd) {
+		Row(
+			modifier = modifier
+				.padding(horizontal = 16.dp, vertical = 12.dp)
+				.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween,
+		) {
+			Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+				CircularAvatar(
+					imageUri = post.author?.avatarUrl?.toUri(),
+					contentDescription = userFullName,
+					modifier = Modifier,
+					onClick = {
+						val stringAuthorId = post.author?.id.toString()
+						val route: String = Route.Profile.getStringRouteWithNavArg(stringAuthorId)
+						navController.navigate(route)
+					}
+				)
 
-                Column {
-                    Text(
-                        text = userFullName,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.15.sp
-                    )
+				Column {
+					Text(
+						text = userFullName,
+						fontSize = 16.sp,
+						lineHeight = 24.sp,
+						fontWeight = FontWeight.Bold,
+						letterSpacing = 0.15.sp
+					)
 
-                    Text(
-                        text = DateFormatter.getRelativeDate(post.publishDate),
-                        fontSize = 16.sp,
-                        lineHeight = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.25.sp
-                    )
-                }
-            }
-            if (isAuthorizedUserAuthor) {
-                IconButton(
-                    onClick = { isPostMenuExpandedState.value = !isPostMenuExpandedState.value }
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreVert,
-                        contentDescription = "post parameters"
-                    )
-                    PostDropdownMenu(
-                        isMenuExpandedState = isPostMenuExpandedState,
-                        post = post,
-                        onDeletePost = onDeletePost,
-                        navController = navController
-                    ) { isPostMenuExpandedState.value = false }
-                }
-            }
-        }
-    }
+					Text(
+						text = DateFormatter.getRelativeDate(post.publishDate),
+						fontSize = 16.sp,
+						lineHeight = 20.sp,
+						fontWeight = FontWeight.Medium,
+						letterSpacing = 0.25.sp
+					)
+				}
+			}
+			if (isAuthorizedUserAuthor) {
+				IconButton(
+					onClick = { isPostMenuExpandedState.value = !isPostMenuExpandedState.value }
+				) {
+					Icon(
+						imageVector = Icons.Rounded.MoreVert,
+						contentDescription = "post parameters"
+					)
+					PostDropdownMenu(
+						isMenuExpandedState = isPostMenuExpandedState,
+						post = post,
+						onDeletePost = onDeletePost,
+						navController = navController
+					) { isPostMenuExpandedState.value = false }
+				}
+			}
+		}
+	}
 }

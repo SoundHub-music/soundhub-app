@@ -18,36 +18,36 @@ import com.soundhub.ui.pages.chat.ChatViewModel
 
 @Composable
 fun MessageInputBox(
-    modifier: Modifier = Modifier,
-    lazyListState: LazyListState,
-    chatViewModel: ChatViewModel,
+	modifier: Modifier = Modifier,
+	lazyListState: LazyListState,
+	chatViewModel: ChatViewModel,
 ) {
-    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val messageCount: Int = chatUiState.chat?.messages?.size ?: 0
+	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+	val messageCount: Int = chatUiState.chat?.messages?.size ?: 0
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(16.dp)
-            ),
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AttachFileButton()
-        MessageTextField(
-            chatViewModel = chatViewModel,
-            modifier = Modifier.weight(1f)
-        )
+	Row(
+		modifier = modifier
+			.fillMaxWidth()
+			.background(
+				color = MaterialTheme.colorScheme.surfaceContainer,
+				shape = RoundedCornerShape(16.dp)
+			),
+		horizontalArrangement = Arrangement.spacedBy(5.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		AttachFileButton()
+		MessageTextField(
+			chatViewModel = chatViewModel,
+			modifier = Modifier.weight(1f)
+		)
 
-        Row {
-            EmojiButton()
-            SendMessageButton(
-                messageCount = messageCount,
-                lazyListState = lazyListState,
-                chatViewModel = chatViewModel
-            )
-        }
-    }
+		Row {
+			EmojiButton()
+			SendMessageButton(
+				messageCount = messageCount,
+				lazyListState = lazyListState,
+				chatViewModel = chatViewModel
+			)
+		}
+	}
 }

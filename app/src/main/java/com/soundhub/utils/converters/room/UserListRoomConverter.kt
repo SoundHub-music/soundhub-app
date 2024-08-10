@@ -12,22 +12,22 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class UserListRoomConverter {
-    private val gson: Gson
-        get() = GsonBuilder()
-            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-            .create()
+	private val gson: Gson
+		get() = GsonBuilder()
+			.registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+			.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+			.create()
 
-    private val userListType: Type
-        get() = object : TypeToken<List<User>>(){}.type
+	private val userListType: Type
+		get() = object : TypeToken<List<User>>() {}.type
 
-    @TypeConverter
-    fun toStringUserList(userList: List<User>): String {
-        return gson.toJson(userList)
-    }
+	@TypeConverter
+	fun toStringUserList(userList: List<User>): String {
+		return gson.toJson(userList)
+	}
 
-    @TypeConverter
-    fun fromStringUserList(userJson: String): List<User> {
-        return gson.fromJson(userJson, userListType)
-    }
+	@TypeConverter
+	fun fromStringUserList(userJson: String): List<User> {
+		return gson.fromJson(userJson, userListType)
+	}
 }

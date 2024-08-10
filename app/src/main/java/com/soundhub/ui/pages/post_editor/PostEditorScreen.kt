@@ -39,86 +39,86 @@ import java.util.UUID
 
 @Composable
 fun PostEditorScreen(
-    postEditorViewModel: PostEditorViewModel = hiltViewModel(),
-    profileOwner: User?,
-    postId: UUID? = null
+	postEditorViewModel: PostEditorViewModel = hiltViewModel(),
+	profileOwner: User?,
+	postId: UUID? = null
 ) {
-    val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+	val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
+	val coroutineScope = rememberCoroutineScope()
 
-    val activityResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { postEditorViewModel.setImages(it.map { uri -> uri.toString() }) }
+	val activityResultLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.GetMultipleContents()
+	) { postEditorViewModel.setImages(it.map { uri -> uri.toString() }) }
 
-    LaunchedEffect(key1 = postId) {
-        Log.d("PostEditorScreen", "post id: $postId")
-        postId?.let { id -> postEditorViewModel.loadPost(id) }
-    }
+	LaunchedEffect(key1 = postId) {
+		Log.d("PostEditorScreen", "post id: $postId")
+		postId?.let { id -> postEditorViewModel.loadPost(id) }
+	}
 
-    LaunchedEffect(key1 = postEditorState) {
-        Log.d("PostEditorScreen", "post editor state: $postEditorState")
-    }
+	LaunchedEffect(key1 = postEditorState) {
+		Log.d("PostEditorScreen", "post editor state: $postEditorState")
+	}
 
-    Box(contentAlignment = Alignment.BottomEnd) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxSize(),
-            value = postEditorState.content,
-            onValueChange = { postEditorViewModel.setContent(it) },
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.create_post_field_placeholder),
-                    fontSize = 20.sp
-                )
-            }
-        )
+	Box(contentAlignment = Alignment.BottomEnd) {
+		OutlinedTextField(
+			modifier = Modifier.fillMaxSize(),
+			value = postEditorState.content,
+			onValueChange = { postEditorViewModel.setContent(it) },
+			placeholder = {
+				Text(
+					text = stringResource(id = R.string.create_post_field_placeholder),
+					fontSize = 20.sp
+				)
+			}
+		)
 
-        Column {
-            ImagePreviewRow(postEditorViewModel)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                FloatingActionButton(
-                    onClick = { activityResultLauncher.launch(ContentTypes.IMAGE_ALL.type) },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_photo_camera_24),
-                        contentDescription = "add photo"
-                    )
-                }
+		Column {
+			ImagePreviewRow(postEditorViewModel)
+			Row(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = 10.dp),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.SpaceBetween
+			) {
+				FloatingActionButton(
+					onClick = { activityResultLauncher.launch(ContentTypes.IMAGE_ALL.type) },
+					containerColor = MaterialTheme.colorScheme.secondaryContainer
+				) {
+					Icon(
+						painter = painterResource(id = R.drawable.baseline_photo_camera_24),
+						contentDescription = "add photo"
+					)
+				}
 
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier.padding(10.dp),
-                    onClick = {
-                        coroutineScope.launch {
-                            if (postId == null)
-                                onCreatePostButtonClick(
-                                    postEditorViewModel = postEditorViewModel,
-                                    user = profileOwner
-                                )
-                            else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.Send,
-                        contentDescription = "send post"
-                    )
-                }
-            }
-        }
-    }
+				FloatingActionButton(
+					containerColor = MaterialTheme.colorScheme.secondaryContainer,
+					modifier = Modifier.padding(10.dp),
+					onClick = {
+						coroutineScope.launch {
+							if (postId == null)
+								onCreatePostButtonClick(
+									postEditorViewModel = postEditorViewModel,
+									user = profileOwner
+								)
+							else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
+						}
+					}
+				) {
+					Icon(
+						imageVector = Icons.AutoMirrored.Rounded.Send,
+						contentDescription = "send post"
+					)
+				}
+			}
+		}
+	}
 }
 
 private suspend fun onUpdatePostButtonClick(postEditorViewModel: PostEditorViewModel) =
-    postEditorViewModel.updatePost()
+	postEditorViewModel.updatePost()
 
 private suspend fun onCreatePostButtonClick(
-    postEditorViewModel: PostEditorViewModel,
-    user: User?
+	postEditorViewModel: PostEditorViewModel,
+	user: User?
 ) = postEditorViewModel.createPost(author = user)

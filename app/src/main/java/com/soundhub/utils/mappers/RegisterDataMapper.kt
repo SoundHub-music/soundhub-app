@@ -10,22 +10,22 @@ import org.mapstruct.factory.Mappers
 
 @Mapper
 interface RegisterDataMapper {
-    @Mapping(
-        target = "favoriteArtistsIds",
-        source = "favoriteArtists",
-        qualifiedByName = ["mapArtistsToIds"]
-    )
-    @Mapping(target = "online", ignore = true)
-    @Mapping(target = "lastOnline", ignore = true)
-    fun registerStateToRegisterRequestBody(
-        registrationState: RegistrationState?
-    ): RegisterRequestBody
+	@Mapping(
+		target = "favoriteArtistsIds",
+		source = "favoriteArtists",
+		qualifiedByName = ["mapArtistsToIds"]
+	)
+	@Mapping(target = "online", ignore = true)
+	@Mapping(target = "lastOnline", ignore = true)
+	fun registerStateToRegisterRequestBody(
+		registrationState: RegistrationState?
+	): RegisterRequestBody
 
-    companion object {
-        val impl: RegisterDataMapper = Mappers.getMapper(RegisterDataMapper::class.java)
+	companion object {
+		val impl: RegisterDataMapper = Mappers.getMapper(RegisterDataMapper::class.java)
 
-        @JvmStatic
-        @Named("mapArtistsToIds")
-        fun mapArtistsToIds(list: List<Artist>): List<Int> = list.map { it.id }
-    }
+		@JvmStatic
+		@Named("mapArtistsToIds")
+		fun mapArtistsToIds(list: List<Artist>): List<Int> = list.map { it.id }
+	}
 }

@@ -18,32 +18,32 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun MusicScreenTabRow(
-    pagerState: PagerState,
-    tabs: List<String>
+	pagerState: PagerState,
+	tabs: List<String>
 ) {
-    val scope = rememberCoroutineScope()
+	val scope = rememberCoroutineScope()
 
-    PrimaryTabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = Modifier
-    ) {
-        tabs.forEachIndexed { index, tab ->
-            Tab(
-                selected = pagerState.currentPage == index,
-                text = {
-                    Text(
-                        text = tab,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 20.sp,
-                        lineHeight = 20.sp,
-                        letterSpacing = 2.5.sp,
-                        color = if (index == pagerState.currentPage)
-                            MaterialTheme.colorScheme.onBackground
-                        else Color.Gray
-                    )
-                },
-                onClick = { scope.launch { pagerState.animateScrollToPage(index) }}
-            )
-        }
-    }
+	PrimaryTabRow(
+		selectedTabIndex = pagerState.currentPage,
+		modifier = Modifier
+	) {
+		tabs.forEachIndexed { index, tab ->
+			Tab(
+				selected = pagerState.currentPage == index,
+				text = {
+					Text(
+						text = tab,
+						fontWeight = FontWeight.ExtraBold,
+						fontSize = 20.sp,
+						lineHeight = 20.sp,
+						letterSpacing = 2.5.sp,
+						color = if (index == pagerState.currentPage)
+							MaterialTheme.colorScheme.onBackground
+						else Color.Gray
+					)
+				},
+				onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+			)
+		}
+	}
 }

@@ -19,33 +19,31 @@ import com.soundhub.ui.pages.friends.enums.FriendListPage
 
 @Composable
 internal fun SearchUserPage(
-    friendsViewModel: FriendsViewModel,
-    navController: NavHostController
+	friendsViewModel: FriendsViewModel,
+	navController: NavHostController
 ) {
-    val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-    val foundUsers: List<User> = friendsUiState.foundUsers
-    val searchStatus: ApiStatus = friendsUiState.status
+	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+	val foundUsers: List<User> = friendsUiState.foundUsers
+	val searchStatus: ApiStatus = friendsUiState.status
 
-    if (foundUsers.isEmpty()) {
-        Text(
-            text = stringResource(id = R.string.friends_search_users_empty_screen),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-    else if (searchStatus == ApiStatus.ERROR) {
-        Text(
-            text = stringResource(id = R.string.friends_search_users_not_found),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-    else UserFriendsContainer(
-        friendList = foundUsers,
-        navController = navController,
-        chosenPage = FriendListPage.SEARCH,
-        friendsViewModel = friendsViewModel
-    )
+	if (foundUsers.isEmpty()) {
+		Text(
+			text = stringResource(id = R.string.friends_search_users_empty_screen),
+			textAlign = TextAlign.Center,
+			fontSize = 20.sp,
+			fontWeight = FontWeight.Bold
+		)
+	} else if (searchStatus == ApiStatus.ERROR) {
+		Text(
+			text = stringResource(id = R.string.friends_search_users_not_found),
+			textAlign = TextAlign.Center,
+			fontSize = 20.sp,
+			fontWeight = FontWeight.Bold
+		)
+	} else UserFriendsContainer(
+		friendList = foundUsers,
+		navController = navController,
+		chosenPage = FriendListPage.SEARCH,
+		friendsViewModel = friendsViewModel
+	)
 }

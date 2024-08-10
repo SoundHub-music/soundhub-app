@@ -22,57 +22,61 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
-import com.soundhub.ui.shared.loaders.CircleLoader
 import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.friends.components.UserFriendsContainer
 import com.soundhub.ui.pages.friends.enums.FriendListPage
+import com.soundhub.ui.shared.loaders.CircleLoader
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun UserRecommendationsPage(
-    friendsViewModel: FriendsViewModel,
-    uiStateDispatcher: UiStateDispatcher,
-    navController: NavHostController,
-    tabs: List<FriendListPage>,
-    page: Int
+	friendsViewModel: FriendsViewModel,
+	uiStateDispatcher: UiStateDispatcher,
+	navController: NavHostController,
+	tabs: List<FriendListPage>,
+	page: Int
 ) {
-    val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-    val recommendedUsers: List<User> = friendsUiState.recommendedFriends
-    var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
-    val searchBarText: String = uiStateDispatcher.getSearchBarText()
+	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+	val recommendedUsers: List<User> = friendsUiState.recommendedFriends
+	var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
+	val searchBarText: String = uiStateDispatcher.getSearchBarText()
 
-    LaunchedEffect(key1 = searchBarText) {
-        filteredUserList = friendsViewModel.filterFriendsList(
-            occurrenceString = searchBarText,
-            users = recommendedUsers
-        )
-    }
+	LaunchedEffect(key1 = searchBarText) {
+		filteredUserList = friendsViewModel.filterFriendsList(
+			occurrenceString = searchBarText,
+			users = recommendedUsers
+		)
+	}
 
-    LaunchedEffect(key1 = recommendedUsers) {
-        friendsViewModel.loadUsersCompatibility(recommendedUsers.map { it.id })
-    }
+	LaunchedEffect(key1 = recommendedUsers) {
+		friendsViewModel.loadUsersCompatibility(recommendedUsers.map { it.id })
+	}
 
-    when (friendsUiState.status) {
-        ApiStatus.LOADING -> Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) { CircleLoader(modifier = Modifier.size(64.dp)) }
-        ApiStatus.ERROR -> {
-            Text(
-                text = stringResource(id = R.string.friends_recommended_friends_error_message),
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        ApiStatus.SUCCESS -> {
-            UserFriendsContainer(
-                friendList = recommendedUsers,
-                navController = navController,
-                chosenPage = tabs[page],
-                friendsViewModel = friendsViewModel
-            )
-        }
-    }
+	when (friendsUiState.status) {
+		ApiStatus.LOADING -> Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.Center
+		) { CircleLoader(modifier = Modifier.size(64.dp)) }
+
+		ApiStatus.ERROR -> {
+			Text(
+				text = stringResource(id = R.string.friends_recommended_friends_error_message),
+				textAlign = TextAlign.Center,
+				fontSize = 20.sp,
+				fontWeight = FontWeight.Bold
+			)
+		}
+
+		ApiStatus.SUCCESS -> {
+			UserFriendsContainer(
+				friendList = recommendedUsers,
+				navController = navController,
+				chosenPage = tabs[page],
+				friendsViewModel = friendsViewModel
+			)
+		}
+
+		else -> {}
+	}
 }

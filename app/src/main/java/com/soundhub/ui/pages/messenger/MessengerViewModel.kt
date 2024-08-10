@@ -18,7 +18,13 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -27,109 +33,109 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MessengerViewModel @Inject constructor(
-    private val chatRepository: ChatRepository,
-    private val uiStateDispatcher: UiStateDispatcher,
-    private val userDao: UserDao,
-    userCredsStore: UserCredsStore,
-): ViewModel() {
-    private val uiState = uiStateDispatcher.uiState
-    val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+	private val chatRepository: ChatRepository,
+	private val uiStateDispatcher: UiStateDispatcher,
+	private val userDao: UserDao,
+	userCredsStore: UserCredsStore,
+) : ViewModel() {
+	private val uiState = uiStateDispatcher.uiState
+	val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    private val _messengerUiState = MutableStateFlow(MessengerUiState())
-    val messengerUiState = _messengerUiState.asStateFlow()
+	private val _messengerUiState = MutableStateFlow(MessengerUiState())
+	val messengerUiState = _messengerUiState.asStateFlow()
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("MessengerViewModel", "viewmodel was cleared")
-        _messengerUiState.update { MessengerUiState() }
-    }
+	override fun onCleared() {
+		super.onCleared()
+		Log.d("MessengerViewModel", "viewmodel was cleared")
+		_messengerUiState.update { MessengerUiState() }
+	}
 
-    suspend fun updateUnreadMessageCount(
-        cachedChatList: List<Chat> = emptyList()
-    ) = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = userDao.getCurrentUser()
-        val chats = cachedChatList.ifEmpty { getChats().firstOrNull().orEmpty() }
-        val unreadMessageCount = chats.count {
-            chat -> chat.messages.any {
-                m -> !m.isRead && m.sender?.id != authorizedUser?.id
-            }
-        }
+	suspend fun updateUnreadMessageCount(
+		cachedChatList: List<Chat> = emptyList()
+	) = viewModelScope.launch(Dispatchers.IO) {
+		val authorizedUser: User? = userDao.getCurrentUser()
+		val chats = cachedChatList.ifEmpty { getChats().firstOrNull().orEmpty() }
+		val unreadMessageCount = chats.count { chat ->
+			chat.messages.any { m ->
+				!m.isRead && m.sender?.id != authorizedUser?.id
+			}
+		}
 
-        withContext(Dispatchers.Main) {
-            _messengerUiState.update {
-                it.copy(unreadMessagesCount = unreadMessageCount)
-            }
-        }
-    }
+		withContext(Dispatchers.Main) {
+			_messengerUiState.update {
+				it.copy(unreadMessagesCount = unreadMessageCount)
+			}
+		}
+	}
 
-    fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
-        val route = Route.Messenger.Chat.getRouteWithNavArg(chat.id.toString())
-        uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
-    }
+	fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
+		val route = Route.Messenger.Chat.getRouteWithNavArg(chat.id.toString())
+		uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
+	}
 
-    fun getUnreadMessageCountByChatId(chatId: UUID?): UInt {
-        val authorizedUser: User? = runBlocking { userDao.getCurrentUser() }
-        val ( chats: List<Chat> ) = _messengerUiState.value
+	fun getUnreadMessageCountByChatId(chatId: UUID?): UInt {
+		val authorizedUser: User? = runBlocking { userDao.getCurrentUser() }
+		val (chats: List<Chat>) = _messengerUiState.value
 
-        return chats.find { chat -> chat.id == chatId}
-            ?.messages
-            ?.count { message ->
-                !message.isRead && message.sender?.id != authorizedUser?.id
-            }?.toUInt() ?: 0u
-    }
+		return chats.find { chat -> chat.id == chatId }
+			?.messages
+			?.count { message ->
+				!message.isRead && message.sender?.id != authorizedUser?.id
+			}?.toUInt() ?: 0u
+	}
 
-    fun filterChats(chats: List<Chat>, searchBarText: String, authorizedUser: User?): List<Chat> {
-        return if (searchBarText.isNotEmpty()) {
-            chats.filter { chat ->
-                val otherUser = chat.participants.firstOrNull { it.id != authorizedUser?.id }
-                otherUser != null && SearchUtils.compareWithUsername(otherUser, searchBarText)
-            }
-        } else chats
-    }
+	fun filterChats(chats: List<Chat>, searchBarText: String, authorizedUser: User?): List<Chat> {
+		return if (searchBarText.isNotEmpty()) {
+			chats.filter { chat ->
+				val otherUser = chat.participants.firstOrNull { it.id != authorizedUser?.id }
+				otherUser != null && SearchUtils.compareWithUsername(otherUser, searchBarText)
+			}
+		} else chats
+	}
 
-    suspend fun prepareMessagePreview(prefix: String, lastMessage: Message): String {
-        val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
-        var lastMessageContent = lastMessage.content
+	suspend fun prepareMessagePreview(prefix: String, lastMessage: Message): String {
+		val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
+		var lastMessageContent = lastMessage.content
 
-        if (lastMessageContent.length > 20) {
-            lastMessageContent = "${lastMessageContent.substring(0, 20)}..."
-        }
+		if (lastMessageContent.length > 20) {
+			lastMessageContent = "${lastMessageContent.substring(0, 20)}..."
+		}
 
-        lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {
-            "$prefix $lastMessageContent"
-        } else "${lastMessage.sender?.firstName}: $lastMessageContent".trim()
+		lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {
+			"$prefix $lastMessageContent"
+		} else "${lastMessage.sender?.firstName}: $lastMessageContent".trim()
 
-        return lastMessageContent
-    }
+		return lastMessageContent
+	}
 
-    fun loadChats() = viewModelScope.launch(Dispatchers.IO) {
-        getChats().collect { chats ->
-            withContext(Dispatchers.Main) {
-                _messengerUiState.update {
-                    it.copy(chats = chats)
-                }
-            }
-        }
-    }
+	fun loadChats() = viewModelScope.launch(Dispatchers.IO) {
+		getChats().collect { chats ->
+			withContext(Dispatchers.Main) {
+				_messengerUiState.update {
+					it.copy(chats = chats)
+				}
+			}
+		}
+	}
 
-    private fun getChats(): Flow<List<Chat>> = flow {
-        userDao.getCurrentUser()?.let { user ->
-            chatRepository.getAllChatsByUserId(user.id)
-                .onSuccess { response ->
-                    val chats = response.body.orEmpty()
-                    _messengerUiState.update {
-                        it.copy(status = ApiStatus.SUCCESS)
-                    }
-                    emit(chats)
-                }
-                .onFailure { error ->
-                    emit(emptyList())
-                    val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                    uiStateDispatcher.sendUiEvent(errorEvent)
-                    _messengerUiState.update {
-                        it.copy(status = ApiStatus.ERROR)
-                    }
-                }
-        }
-    }
+	private fun getChats(): Flow<List<Chat>> = flow {
+		userDao.getCurrentUser()?.let { user ->
+			chatRepository.getAllChatsByUserId(user.id)
+				.onSuccess { response ->
+					val chats = response.body.orEmpty()
+					_messengerUiState.update {
+						it.copy(status = ApiStatus.SUCCESS)
+					}
+					emit(chats)
+				}
+				.onFailure { error ->
+					emit(emptyList())
+					val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+					uiStateDispatcher.sendUiEvent(errorEvent)
+					_messengerUiState.update {
+						it.copy(status = ApiStatus.ERROR)
+					}
+				}
+		}
+	}
 }

@@ -35,64 +35,64 @@ import com.soundhub.ui.pages.post_editor.PostEditorViewModel
 
 @Composable
 internal fun ImagePreviewRow(
-    postEditorViewModel: PostEditorViewModel
+	postEditorViewModel: PostEditorViewModel
 ) {
-    val postEditorState: PostEditorState by postEditorViewModel
-        .postEditorState.collectAsState()
+	val postEditorState: PostEditorState by postEditorViewModel
+		.postEditorState.collectAsState()
 
-    val currentImages: List<String> = postEditorState.images
-    val newImages: List<String> = postEditorState.newImages
-    val allImages: List<String> = currentImages + newImages
+	val currentImages: List<String> = postEditorState.images
+	val newImages: List<String> = postEditorState.newImages
+	val allImages: List<String> = currentImages + newImages
 
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(items = allImages) { uri ->
-            ImageItem(imageUrl = uri, postEditorViewModel = postEditorViewModel)
-        }
-    }
+	LazyRow(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(10.dp),
+		horizontalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		items(items = allImages) { uri ->
+			ImageItem(imageUrl = uri, postEditorViewModel = postEditorViewModel)
+		}
+	}
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun ImageItem(
-    modifier: Modifier = Modifier,
-    postEditorViewModel: PostEditorViewModel,
-    imageUrl: String
+	modifier: Modifier = Modifier,
+	postEditorViewModel: PostEditorViewModel,
+	imageUrl: String
 ) {
-    var glideUrl: Any? by remember { mutableStateOf(null) }
+	var glideUrl: Any? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(imageUrl) {
-        glideUrl = postEditorViewModel.getGlideUrl(imageUrl.toUri())
-    }
+	LaunchedEffect(imageUrl) {
+		glideUrl = postEditorViewModel.getGlideUrl(imageUrl.toUri())
+	}
 
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.TopEnd
-    ) {
-        IconButton(
-            onClick = { postEditorViewModel.deleteImage(imageUrl) },
-            modifier = Modifier.zIndex(1f)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = "delete photo",
-                modifier = Modifier
-                    .size(20.dp)
-                    .padding(0.dp)
-            )
-        }
-        GlideImage(
-            model = glideUrl,
-            contentDescription = imageUrl,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .width(100.dp)
-                .height(100.dp)
-        )
-    }
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.TopEnd
+	) {
+		IconButton(
+			onClick = { postEditorViewModel.deleteImage(imageUrl) },
+			modifier = Modifier.zIndex(1f)
+		) {
+			Icon(
+				imageVector = Icons.Rounded.Close,
+				contentDescription = "delete photo",
+				modifier = Modifier
+					.size(20.dp)
+					.padding(0.dp)
+			)
+		}
+		GlideImage(
+			model = glideUrl,
+			contentDescription = imageUrl,
+			contentScale = ContentScale.Crop,
+			modifier = Modifier
+				.clip(RoundedCornerShape(12.dp))
+				.width(100.dp)
+				.height(100.dp)
+		)
+	}
 }

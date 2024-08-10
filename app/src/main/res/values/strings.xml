@@ -194,4 +194,12 @@
     <string name="edit_profile_alert_dialog_content">Есть несохраненные изменения вашего профиля. Вы действительно хотите отменить их?</string>
     <string name="edit_profile_alert_dialog_dismiss_btn">Продолжить редактирование</string>
     <string name="edit_profile_alert_dialog_confirm_btn">Отмена</string>
+
+    <!-- last fm login window -->
+    <string name="music_service_login_form_success">Вы вошли</string>
+    <string name="music_service_login_form_error">Произошла ошибка</string>
+
+    <string name="music_service_login_signin_button">Войти в %s</string>
+    <string name="music_service_login_username_placeholder">Логин %s</string>
+    <string name="music_service_login_password_placeholder">Пароль %s</string>
 </resources>

@@ -14,14 +14,14 @@ import com.soundhub.Route
 
 @Composable
 internal fun WritePostButton(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+	modifier: Modifier = Modifier,
+	navController: NavHostController
 ) {
-    FilledTonalIconButton(
-        onClick = { navController.navigate(Route.PostEditor.createPostRoute) },
-        shape = RoundedCornerShape(10.dp),
-        modifier = modifier.size(48.dp)
-    ) {
-        Icon(imageVector = Icons.Rounded.Create, contentDescription = "create_post_btn")
-    }
+	FilledTonalIconButton(
+		onClick = { navController.navigate(Route.PostEditor.createPostRoute) },
+		shape = RoundedCornerShape(10.dp),
+		modifier = modifier.size(48.dp)
+	) {
+		Icon(imageVector = Icons.Rounded.Create, contentDescription = "create_post_btn")
+	}
 }

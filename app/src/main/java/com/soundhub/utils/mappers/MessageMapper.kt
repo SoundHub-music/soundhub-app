@@ -10,22 +10,22 @@ import java.util.UUID
 
 @Mapper
 interface MessageMapper {
-    @Mapping(target = "chat.id", ignore = true)
-    @Mapping(target = "chat.messages", ignore = true)
-    @Mapping(target = "chat.participants", ignore = true)
-    @Mapping(target = "chat.isGroup", ignore = true)
-    @Mapping(target = "chat.chatName", ignore = true)
-    @Mapping(target = "chat.createdBy", ignore = true)
-    @Mapping(target = "userId", source = "userId")
-    @Mapping(target = "chatId", source = "chat", qualifiedByName = ["mapChatToId"])
-    @Mapping(target = "content", source = "content")
-    fun toSendMessageRequest(chat: Chat?, userId: UUID?, content: String): SendMessageRequest?
+	@Mapping(target = "chat.id", ignore = true)
+	@Mapping(target = "chat.messages", ignore = true)
+	@Mapping(target = "chat.participants", ignore = true)
+	@Mapping(target = "chat.isGroup", ignore = true)
+	@Mapping(target = "chat.chatName", ignore = true)
+	@Mapping(target = "chat.createdBy", ignore = true)
+	@Mapping(target = "userId", source = "userId")
+	@Mapping(target = "chatId", source = "chat", qualifiedByName = ["mapChatToId"])
+	@Mapping(target = "content", source = "content")
+	fun toSendMessageRequest(chat: Chat?, userId: UUID?, content: String): SendMessageRequest?
 
-    companion object {
-        val impl: MessageMapper = Mappers.getMapper(MessageMapper::class.java)
+	companion object {
+		val impl: MessageMapper = Mappers.getMapper(MessageMapper::class.java)
 
-        @JvmStatic
-        @Named("mapChatToId")
-        fun mapChatToId(chat: Chat?): UUID? = chat?.id
-    }
+		@JvmStatic
+		@Named("mapChatToId")
+		fun mapChatToId(chat: Chat?): UUID? = chat?.id
+	}
 }

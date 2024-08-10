@@ -7,14 +7,14 @@ import com.soundhub.data.model.CountryTranslationBody
 import java.lang.reflect.Type
 
 class CountryTranslationBodyRoomConverter {
-    private val ctbJsonType: Type
-        get() = object : TypeToken<CountryTranslationBody>(){}.type
+	private val ctbJsonType: Type
+		get() = object : TypeToken<CountryTranslationBody>() {}.type
 
-    @TypeConverter
-    fun toCtbJson(ctb: CountryTranslationBody): String =
-        Gson().toJson(ctb)
+	@TypeConverter
+	fun toCtbJson(ctb: CountryTranslationBody): String =
+		Gson().toJson(ctb)
 
-    @TypeConverter
-    fun fromCtbJson(json: String): CountryTranslationBody =
-        Gson().fromJson(json, ctbJsonType)
+	@TypeConverter
+	fun fromCtbJson(json: String): CountryTranslationBody =
+		Gson().fromJson(json, ctbJsonType)
 }

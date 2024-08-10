@@ -10,35 +10,35 @@ import java.lang.reflect.Type
 import java.time.LocalDate
 
 class AlbumRoomConverter {
-    private val gson: Gson
-        get() = GsonBuilder()
-            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter::class.java)
-            .create()
+	private val gson: Gson
+		get() = GsonBuilder()
+			.registerTypeAdapter(LocalDate::class.java, LocalDateAdapter::class.java)
+			.create()
 
-    private val albumListType: Type
-        get() = object : TypeToken<List<Album>>(){}.type
+	private val albumListType: Type
+		get() = object : TypeToken<List<Album>>() {}.type
 
-    private val albumType: Type
-        get() = object : TypeToken<Album>(){}.type
+	private val albumType: Type
+		get() = object : TypeToken<Album>() {}.type
 
-    @TypeConverter
-    fun toStringAlbum(albumList: Album): String {
-        return gson.toJson(albumList)
-    }
+	@TypeConverter
+	fun toStringAlbum(albumList: Album): String {
+		return gson.toJson(albumList)
+	}
 
-    @TypeConverter
-    fun fromStringAlbum(albumJson: String): Album {
-        return gson.fromJson(albumJson, albumType)
-    }
+	@TypeConverter
+	fun fromStringAlbum(albumJson: String): Album {
+		return gson.fromJson(albumJson, albumType)
+	}
 
-    @TypeConverter
-    fun toStringAlbumList(albumList: List<Album>): String {
-        return gson.toJson(albumList)
-    }
+	@TypeConverter
+	fun toStringAlbumList(albumList: List<Album>): String {
+		return gson.toJson(albumList)
+	}
 
-    @TypeConverter
-    fun fromStringAlbumList(albumJson: String): List<Album> {
-        return gson.fromJson(albumJson, albumListType)
-    }
+	@TypeConverter
+	fun fromStringAlbumList(albumJson: String): List<Album> {
+		return gson.fromJson(albumJson, albumListType)
+	}
 
 }

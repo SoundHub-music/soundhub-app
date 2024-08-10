@@ -18,24 +18,24 @@ import java.time.LocalDate
 
 @Composable
 internal fun MessageDateChip(date: LocalDate) {
-    Box(
-        modifier = Modifier
-            .padding(top = 5.dp)
-            .fillMaxWidth()
-            .zIndex(1F),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        Row(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                    shape = RoundedCornerShape(5.dp)
-                ),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                text = DateFormatter.getStringDate(date),
-            )
-        }
-    }
+	Box(
+		modifier = Modifier
+			.padding(top = 5.dp)
+			.fillMaxWidth()
+			.zIndex(1F),
+		contentAlignment = Alignment.TopCenter
+	) {
+		Row(
+			modifier = Modifier
+				.background(
+					color = MaterialTheme.colorScheme.tertiaryContainer,
+					shape = RoundedCornerShape(5.dp)
+				),
+		) {
+			Text(
+				modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+				text = DateFormatter.getStringDate(date),
+			)
+		}
+	}
 }

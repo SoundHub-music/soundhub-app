@@ -14,19 +14,19 @@ import com.soundhub.data.model.Message
 
 @Composable
 internal fun MessageReadMarker(isOwnMessage: Boolean, message: Message) {
-    if (isOwnMessage) {
-        if (message.isRead)
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_done_all_24),
-                contentDescription = "message is read",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
-            )
-        else Icon(
-            imageVector = Icons.Rounded.Done,
-            contentDescription = "message is sent",
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp)
-        )
-    }
+	if (isOwnMessage) {
+		if (message.isRead)
+			Icon(
+				painter = painterResource(id = R.drawable.baseline_done_all_24),
+				contentDescription = "message is read",
+				tint = MaterialTheme.colorScheme.primary,
+				modifier = Modifier.size(18.dp)
+			)
+		else Icon(
+			imageVector = Icons.Rounded.Done,
+			contentDescription = "message is sent",
+			tint = MaterialTheme.colorScheme.primary,
+			modifier = Modifier.size(18.dp)
+		)
+	}
 }

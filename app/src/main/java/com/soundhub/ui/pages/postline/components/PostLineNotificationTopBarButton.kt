@@ -21,25 +21,25 @@ import com.soundhub.ui.pages.notifications.NotificationViewModel
 
 @Composable
 fun PostLineNotificationTopBarButton(
-    navController: NavHostController,
-    notificationViewModel: NotificationViewModel
+	navController: NavHostController,
+	notificationViewModel: NotificationViewModel
 ) {
-    val notificationUiState: NotificationUiState by notificationViewModel
-        .notificationUiState.collectAsState()
+	val notificationUiState: NotificationUiState by notificationViewModel
+		.notificationUiState.collectAsState()
 
-    val notifications: List<Notification> = notificationUiState.notifications
+	val notifications: List<Notification> = notificationUiState.notifications
 
-    IconButton(onClick = { navController.navigate(Route.Notifications.route) }) {
-        BadgedBox(badge = {
-            if (notifications.isNotEmpty())
-                Badge(
-                    modifier = Modifier.offset(x = (-20).dp)
-                ) {
-                    Text(text = notifications.size.toString())
-                }
-        }) {
-            Icon(Icons.Rounded.Notifications, contentDescription = "notification_button")
-        }
+	IconButton(onClick = { navController.navigate(Route.Notifications.route) }) {
+		BadgedBox(badge = {
+			if (notifications.isNotEmpty())
+				Badge(
+					modifier = Modifier.offset(x = (-20).dp)
+				) {
+					Text(text = notifications.size.toString())
+				}
+		}) {
+			Icon(Icons.Rounded.Notifications, contentDescription = "notification_button")
+		}
 
-    }
+	}
 }

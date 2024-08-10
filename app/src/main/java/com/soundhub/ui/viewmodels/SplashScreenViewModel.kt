@@ -7,18 +7,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SplashScreenViewModel: ViewModel() {
-    val isLoading = MutableStateFlow(true)
+class SplashScreenViewModel : ViewModel() {
+	val isLoading = MutableStateFlow(true)
 
-    override fun onCleared() {
-        super.onCleared()
-        isLoading.update { true }
-    }
+	override fun onCleared() {
+		super.onCleared()
+		isLoading.update { true }
+	}
 
-    init {
-        viewModelScope.launch {
-            delay(2000)
-            isLoading.update { false }
-        }
-    }
+	init {
+		viewModelScope.launch {
+			delay(2000)
+			isLoading.update { false }
+		}
+	}
 }

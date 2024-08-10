@@ -22,46 +22,47 @@ import com.soundhub.ui.shared.forms.IUserDataFormState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenderDropdownField(
-    formState: State<IUserDataFormState>,
-    onGenderChange: (String) -> Unit = {}
+	formState: State<IUserDataFormState>,
+	onGenderChange: (String) -> Unit = {}
 ) {
-    var isGenderDropdownExpanded by rememberSaveable { mutableStateOf(false) }
-    val genders: Map<String, String> = mapOf(
-        Gender.MALE.name to stringResource(id = R.string.gender_item_male),
-        Gender.FEMALE.name to stringResource(id = R.string.gender_item_female),
-        Gender.UNKNOWN.name to stringResource(id = R.string.gender_item_unknown)
-    )
+	var isGenderDropdownExpanded by rememberSaveable { mutableStateOf(false) }
+	val genders: Map<String, String> = mapOf(
+		Gender.MALE.name to stringResource(id = R.string.gender_item_male),
+		Gender.FEMALE.name to stringResource(id = R.string.gender_item_female),
+		Gender.UNKNOWN.name to stringResource(id = R.string.gender_item_unknown)
+	)
 
-    ExposedDropdownMenuBox(
-        expanded = isGenderDropdownExpanded,
-        onExpandedChange = { isGenderDropdownExpanded = !isGenderDropdownExpanded },
-    ) {
-        OutlinedTextField(
-            value = genders[formState.value.gender.name] ?: stringResource(id = R.string.gender_item_unknown) ,
-            onValueChange = onGenderChange,
-            label = { Text(text = stringResource(R.string.dropdown_label_gender)) },
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
-            },
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
+	ExposedDropdownMenuBox(
+		expanded = isGenderDropdownExpanded,
+		onExpandedChange = { isGenderDropdownExpanded = !isGenderDropdownExpanded },
+	) {
+		OutlinedTextField(
+			value = genders[formState.value.gender.name]
+				?: stringResource(id = R.string.gender_item_unknown),
+			onValueChange = onGenderChange,
+			label = { Text(text = stringResource(R.string.dropdown_label_gender)) },
+			readOnly = true,
+			trailingIcon = {
+				ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
+			},
+			modifier = Modifier
+				.menuAnchor()
+				.fillMaxWidth()
+		)
 
-        ExposedDropdownMenu(
-            expanded = isGenderDropdownExpanded,
-            onDismissRequest = { isGenderDropdownExpanded = false }
-        ) {
-            genders.forEach { (k, v) ->
-                DropdownMenuItem(
-                    text = { Text(text = v) },
-                    onClick = {
-                        onGenderChange(k)
-                        isGenderDropdownExpanded = false
-                    }
-                )
-            }
-        }
-    }
+		ExposedDropdownMenu(
+			expanded = isGenderDropdownExpanded,
+			onDismissRequest = { isGenderDropdownExpanded = false }
+		) {
+			genders.forEach { (k, v) ->
+				DropdownMenuItem(
+					text = { Text(text = v) },
+					onClick = {
+						onGenderChange(k)
+						isGenderDropdownExpanded = false
+					}
+				)
+			}
+		}
+	}
 }

@@ -13,12 +13,12 @@ import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 
 @Composable
 internal fun LogoutButton(authViewModel: AuthenticationViewModel) {
-    IconButton(onClick = { authViewModel.logout() }, modifier = Modifier.size(48.dp)) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
-            contentDescription = "logout button",
-            tint = MaterialTheme.colorScheme.error,
-            modifier = Modifier.size(28.dp)
-        )
-    }
+	IconButton(onClick = { authViewModel.logout() }, modifier = Modifier.size(48.dp)) {
+		Icon(
+			imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
+			contentDescription = "logout button",
+			tint = MaterialTheme.colorScheme.error,
+			modifier = Modifier.size(28.dp)
+		)
+	}
 }

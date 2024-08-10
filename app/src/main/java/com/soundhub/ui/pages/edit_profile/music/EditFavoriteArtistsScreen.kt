@@ -12,34 +12,34 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun EditFavoriteArtistsScreen(
-    editMusicPrefViewModel: EditMusicPreferencesViewModel,
-    uiStateDispatcher: UiStateDispatcher
+	editMusicPrefViewModel: EditMusicPreferencesViewModel,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val artistUiState: ArtistUiState by editMusicPrefViewModel
-        .artistUiState.collectAsState()
-    val lazyGridState = rememberLazyGridState()
+	val artistUiState: ArtistUiState by editMusicPrefViewModel
+		.artistUiState.collectAsState()
+	val lazyGridState = rememberLazyGridState()
 
-    LaunchedEffect(key1 = artistUiState) {
+	LaunchedEffect(key1 = artistUiState) {
 //        Log.d("EditFavoriteArtistsScreen", "artist state: $artistUiState")
-        Log.d("EditFavoriteArtistsScreen", "chosen artists: ${artistUiState.chosenArtists}")
-    }
+		Log.d("EditFavoriteArtistsScreen", "chosen artists: ${artistUiState.chosenArtists}")
+	}
 
-    LaunchedEffect(key1 = lazyGridState.canScrollForward) {
-        if (!lazyGridState.canScrollForward) {
-            editMusicPrefViewModel.loadArtists(artistUiState.pagination?.urls?.next)
-        }
-    }
+	LaunchedEffect(key1 = lazyGridState.canScrollForward) {
+		if (!lazyGridState.canScrollForward) {
+			editMusicPrefViewModel.loadArtists(artistUiState.pagination?.urls?.next)
+		}
+	}
 
-    LaunchedEffect(key1 = true) {
-        editMusicPrefViewModel.loadArtists()
-    }
+	LaunchedEffect(key1 = true) {
+		editMusicPrefViewModel.loadArtists()
+	}
 
-    ChooseArtistsScreen(
-        artistUiState = artistUiState,
-        onItemPlateClick = editMusicPrefViewModel::onArtistItemClick,
-        onNextButtonClick = editMusicPrefViewModel::onNextButtonClick,
-        onSearchFieldChange = editMusicPrefViewModel::onSearchFieldChange,
-        uiStateDispatcher = uiStateDispatcher,
-        lazyGridState = lazyGridState
-    )
+	ChooseArtistsScreen(
+		artistUiState = artistUiState,
+		onItemPlateClick = editMusicPrefViewModel::onArtistItemClick,
+		onNextButtonClick = editMusicPrefViewModel::onNextButtonClick,
+		onSearchFieldChange = editMusicPrefViewModel::onSearchFieldChange,
+		uiStateDispatcher = uiStateDispatcher,
+		lazyGridState = lazyGridState
+	)
 }

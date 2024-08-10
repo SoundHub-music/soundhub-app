@@ -27,42 +27,42 @@ import com.soundhub.ui.shared.forms.IUserDataFormState
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserLanguagesField(
-    onLanguagesChange: (List<String>) -> Unit = {},
-    formState: State<IUserDataFormState>
+	onLanguagesChange: (List<String>) -> Unit = {},
+	formState: State<IUserDataFormState>
 ) {
-    // TODO: make language field more intuitive
-    var languageText by rememberSaveable { mutableStateOf("") }
-    val languages: List<String> = remember(formState.value) { formState.value.languages }
+	// TODO: make language field more intuitive
+	var languageText by rememberSaveable { mutableStateOf("") }
+	val languages: List<String> = remember(formState.value) { formState.value.languages }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = stringResource(id = R.string.text_field_languages)) },
-            singleLine = true,
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    if (languageText.isNotBlank()) {
-                        onLanguagesChange(languages + languageText)
-                        languageText = ""
-                    }
-                }
-            ),
-            value = languageText,
-            onValueChange = { languageText = it },
-        )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            languages.forEach { lang ->
-                SuggestionChip(
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                    ),
-                    onClick = { onLanguagesChange(formState.value.languages.filter { it != lang }) },
-                    label = { Text(text = lang) }
-                )
-            }
-        }
-    }
+	Column(
+		verticalArrangement = Arrangement.spacedBy(5.dp),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		OutlinedTextField(
+			modifier = Modifier.fillMaxWidth(),
+			label = { Text(text = stringResource(id = R.string.text_field_languages)) },
+			singleLine = true,
+			keyboardActions = KeyboardActions(
+				onDone = {
+					if (languageText.isNotBlank()) {
+						onLanguagesChange(languages + languageText)
+						languageText = ""
+					}
+				}
+			),
+			value = languageText,
+			onValueChange = { languageText = it },
+		)
+		FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+			languages.forEach { lang ->
+				SuggestionChip(
+					colors = SuggestionChipDefaults.suggestionChipColors(
+						containerColor = MaterialTheme.colorScheme.tertiaryContainer
+					),
+					onClick = { onLanguagesChange(formState.value.languages.filter { it != lang }) },
+					label = { Text(text = lang) }
+				)
+			}
+		}
+	}
 }

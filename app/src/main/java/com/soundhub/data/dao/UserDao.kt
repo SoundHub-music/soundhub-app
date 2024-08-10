@@ -11,16 +11,17 @@ import com.soundhub.utils.constants.Queries
 
 @Dao
 interface UserDao {
-    @Query(Queries.GET_USER)
-    suspend fun getCurrentUser(): User?
+	@Query(Queries.GET_USER)
+	suspend fun getCurrentUser(): User?
 
-    @Transaction
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveUser(user: User)
+	@Transaction
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun saveUser(user: User)
 
-    @Delete
-    suspend fun deleteUser(user: User)
+	@Transaction
+	@Delete
+	suspend fun deleteUser(user: User)
 
-    @Query(Queries.TRUNCATE_USER)
-    suspend fun truncateUser()
+	@Query(Queries.TRUNCATE_USER)
+	suspend fun truncateUser()
 }

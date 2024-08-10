@@ -19,47 +19,47 @@ import com.soundhub.ui.shared.forms.UserDataForm
 
 @Composable
 fun FillUserDataScreen(
-    modifier: Modifier = Modifier,
-    registrationViewModel: RegistrationViewModel
+	modifier: Modifier = Modifier,
+	registrationViewModel: RegistrationViewModel
 ) {
-    val registerState = registrationViewModel.registerState
+	val registerState = registrationViewModel.registerState
 
-    Box(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-       Column(
-           modifier = Modifier
-               .padding(vertical = 20.dp, horizontal = 16.dp)
-       ) {
-           Text(
-               text = stringResource(id = R.string.screen_title_fill_user_data),
-               fontWeight = FontWeight.Black,
-               fontSize = 32.sp,
-               lineHeight = 42.sp
-           )
+	Box(
+		modifier = modifier
+			.background(MaterialTheme.colorScheme.background)
+	) {
+		Column(
+			modifier = Modifier
+				.padding(vertical = 20.dp, horizontal = 16.dp)
+		) {
+			Text(
+				text = stringResource(id = R.string.screen_title_fill_user_data),
+				fontWeight = FontWeight.Black,
+				fontSize = 32.sp,
+				lineHeight = 42.sp
+			)
 
-            UserDataForm(
-                formStateFlow = registerState,
-                onFirstNameChange = registrationViewModel::setFirstName,
-                onLastNameChange = registrationViewModel::setLastName,
-                onBirthdayChange = registrationViewModel::setBirthday,
-                onGenderChange = registrationViewModel::setGender,
-                onDescriptionChange = registrationViewModel::setDescription,
-                onCountryChange = registrationViewModel::setCountry,
-                onCityChange = registrationViewModel::setCity,
-                onLanguagesChange = registrationViewModel::setLanguages,
-                onAvatarChange = registrationViewModel::setAvatar
-            )
-        }
+			UserDataForm(
+				formStateFlow = registerState,
+				onFirstNameChange = registrationViewModel::setFirstName,
+				onLastNameChange = registrationViewModel::setLastName,
+				onBirthdayChange = registrationViewModel::setBirthday,
+				onGenderChange = registrationViewModel::setGender,
+				onDescriptionChange = registrationViewModel::setDescription,
+				onCountryChange = registrationViewModel::setCountry,
+				onCityChange = registrationViewModel::setCity,
+				onLanguagesChange = registrationViewModel::setLanguages,
+				onAvatarChange = registrationViewModel::setAvatar
+			)
+		}
 
-        FloatingNextButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            registrationViewModel
-            .onNextButtonClick()
-        }
-    }
+		FloatingNextButton(
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(16.dp)
+		) {
+			registrationViewModel
+				.onNextButtonClick()
+		}
+	}
 }

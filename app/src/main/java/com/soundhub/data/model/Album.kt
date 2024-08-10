@@ -12,17 +12,17 @@ import java.util.UUID
 
 @Entity
 @TypeConverters(
-    LocalDateRoomConverter::class,
-    GenreRoomConverter::class
+	LocalDateRoomConverter::class,
+	GenreRoomConverter::class
 )
 data class Album(
-    @PrimaryKey
-    var id: UUID = UUID.randomUUID(),
-    var title: String = "",
+	@PrimaryKey
+	var id: UUID = UUID.randomUUID(),
+	var title: String = "",
 
-    @SerializedName("releaseDate")
-    var releaseDate: LocalDate? = null,
+	@SerializedName("releaseDate")
+	var releaseDate: LocalDate? = null,
 
-    @SerializedName("genre")
-    var genre: Genre? = null
-): Serializable
+	@SerializedName("genre")
+	var genre: Genre? = null
+) : Serializable

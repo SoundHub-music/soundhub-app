@@ -25,61 +25,61 @@ import com.soundhub.R
 
 @Composable
 internal fun LibraryItem(
-    modifier: Modifier = Modifier,
-    title: String,
-    icon: Painter,
-    contentDescription: String? = null,
-    onClick: () -> Unit = {},
-    enabled: Boolean = true
+	modifier: Modifier = Modifier,
+	title: String,
+	icon: Painter,
+	contentDescription: String? = null,
+	onClick: () -> Unit = {},
+	enabled: Boolean = true
 ) {
-    ElevatedCard(
-        shape = RoundedCornerShape(10.dp),
-        enabled = enabled,
-        onClick = onClick,
-        modifier = modifier
-            .padding(5.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(vertical = 15.dp, horizontal = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(5.dp)
-            ) {
-                Icon(
-                    painter = icon,
-                    contentDescription = contentDescription,
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.padding(5.dp)
-                )
-            }
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
+	ElevatedCard(
+		shape = RoundedCornerShape(10.dp),
+		enabled = enabled,
+		onClick = onClick,
+		modifier = modifier
+			.padding(5.dp)
+			.fillMaxWidth(),
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.primaryContainer
+		)
+	) {
+		Row(
+			modifier = Modifier
+				.padding(vertical = 15.dp, horizontal = 10.dp),
+			horizontalArrangement = Arrangement.spacedBy(15.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Box(
+				modifier = Modifier
+					.background(
+						color = MaterialTheme.colorScheme.secondaryContainer,
+						shape = RoundedCornerShape(10.dp)
+					)
+					.padding(5.dp)
+			) {
+				Icon(
+					painter = icon,
+					contentDescription = contentDescription,
+					tint = MaterialTheme.colorScheme.tertiary,
+					modifier = Modifier.padding(5.dp)
+				)
+			}
+			Text(
+				text = title,
+				fontSize = 18.sp,
+				fontWeight = FontWeight.Medium
+			)
+		}
+	}
 }
 
 @Composable
 @Preview(showBackground = true)
 private fun LibraryItemPreview() {
-    Box(modifier = Modifier.padding(10.dp)) {
-        LibraryItem(
-            title = "Плейлисты",
-            icon = painterResource(id = R.drawable.baseline_album_24),
-        )
-    }
+	Box(modifier = Modifier.padding(10.dp)) {
+		LibraryItem(
+			title = "Плейлисты",
+			icon = painterResource(id = R.drawable.baseline_album_24),
+		)
+	}
 }

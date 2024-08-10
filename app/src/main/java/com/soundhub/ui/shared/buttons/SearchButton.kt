@@ -12,11 +12,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchButton(uiStateDispatcher: UiStateDispatcher) {
-    val coroutineScope = rememberCoroutineScope()
-    IconButton(onClick = {
-        coroutineScope.launch {
-            uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
-        }
-    }
-    ) { Icon(Icons.Rounded.Search, contentDescription = "search button") }
+	val coroutineScope = rememberCoroutineScope()
+	IconButton(onClick = {
+		coroutineScope.launch {
+			uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick)
+		}
+	}
+	) { Icon(Icons.Rounded.Search, contentDescription = "search button") }
 }

@@ -34,68 +34,68 @@ import com.soundhub.utils.lib.UserUtils
 
 @Composable
 internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        UserNameWithDescription(profileViewModel)
-        OnlineStatusBlock(profileViewModel)
-        UserLocationText(profileViewModel)
-    }
+	Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+		UserNameWithDescription(profileViewModel)
+		OnlineStatusBlock(profileViewModel)
+		UserLocationText(profileViewModel)
+	}
 }
 
 @Composable
 private fun OnlineStatusBlock(profileViewModel: ProfileViewModel) {
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState
-        .collectAsState()
+	val profileUiState: ProfileUiState by profileViewModel
+		.profileUiState
+		.collectAsState()
 
-    val profileOwner: User? = profileUiState.profileOwner
-    val context: Context = LocalContext.current
+	val profileOwner: User? = profileUiState.profileOwner
+	val context: Context = LocalContext.current
 
-    var indicatorColorState: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
-    var onlineIndicatorTextState: String by rememberSaveable {
-        mutableStateOf(context.getString(R.string.online_indicator_user_offline))
-    }
+	var indicatorColorState: Int by rememberSaveable { mutableIntStateOf(R.color.offline_status) }
+	var onlineIndicatorTextState: String by rememberSaveable {
+		mutableStateOf(context.getString(R.string.online_indicator_user_offline))
+	}
 
-    LaunchedEffect(key1 = profileOwner?.isOnline) {
-        UserUtils.updateOnlineStatusIndicator(
-            context = context,
-            user = profileOwner
-        ) { _, indicatorColor , onlineIndicatorText ->
-            indicatorColorState = indicatorColor
-            onlineIndicatorTextState = onlineIndicatorText
-        }
-    }
+	LaunchedEffect(key1 = profileOwner?.isOnline) {
+		UserUtils.updateOnlineStatusIndicator(
+			context = context,
+			user = profileOwner
+		) { _, indicatorColor, onlineIndicatorText ->
+			indicatorColorState = indicatorColor
+			onlineIndicatorTextState = onlineIndicatorText
+		}
+	}
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(colorResource(id = indicatorColorState))
-        )
-        Text(
-            text = onlineIndicatorTextState,
-            fontWeight = FontWeight.Light
-        )
-    }
+	Row(
+		horizontalArrangement = Arrangement.spacedBy(5.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Box(
+			modifier = Modifier
+				.size(8.dp)
+				.clip(CircleShape)
+				.background(colorResource(id = indicatorColorState))
+		)
+		Text(
+			text = onlineIndicatorTextState,
+			fontWeight = FontWeight.Light
+		)
+	}
 }
 
 @Composable
 private fun UserLocationText(profileViewModel: ProfileViewModel) {
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState
-        .collectAsState()
+	val profileUiState: ProfileUiState by profileViewModel
+		.profileUiState
+		.collectAsState()
 
-    val profileOwner: User? = profileUiState.profileOwner
-    val userLocation: String = rememberSaveable(profileOwner) {
-        UserUtils.getUserLocation(profileOwner?.city, profileOwner?.country)
-    }
+	val profileOwner: User? = profileUiState.profileOwner
+	val userLocation: String = rememberSaveable(profileOwner) {
+		UserUtils.getUserLocation(profileOwner?.city, profileOwner?.country)
+	}
 
-    Text(
-        text = userLocation,
-        fontWeight = FontWeight.Light,
-        fontSize = 14.sp,
-    )
+	Text(
+		text = userLocation,
+		fontWeight = FontWeight.Light,
+		fontSize = 14.sp,
+	)
 }

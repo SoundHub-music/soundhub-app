@@ -18,27 +18,27 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun FriendsScreenTabs(selectedTabState: PagerState, tabs: List<FriendListPage>) {
-    val scope = rememberCoroutineScope()
+	val scope = rememberCoroutineScope()
 
-    PrimaryTabRow(
-        selectedTabIndex = selectedTabState.currentPage,
-    ) {
-        tabs.forEachIndexed { index, tab ->
-            Tab(
-                selected = index == selectedTabState.currentPage,
-                onClick = {
-                    scope.launch { selectedTabState.animateScrollToPage(index) }
-                },
-                text = {
-                    Text(
-                        text = stringResource(id = tab.titleId),
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily.SansSerif
-                    )
-                }
-            )
-        }
-    }
+	PrimaryTabRow(
+		selectedTabIndex = selectedTabState.currentPage,
+	) {
+		tabs.forEachIndexed { index, tab ->
+			Tab(
+				selected = index == selectedTabState.currentPage,
+				onClick = {
+					scope.launch { selectedTabState.animateScrollToPage(index) }
+				},
+				text = {
+					Text(
+						text = stringResource(id = tab.titleId),
+						fontWeight = FontWeight.Medium,
+						fontSize = 14.sp,
+						lineHeight = 20.sp,
+						fontFamily = FontFamily.SansSerif
+					)
+				}
+			)
+		}
+	}
 }

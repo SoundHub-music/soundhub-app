@@ -39,99 +39,99 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
+import com.soundhub.data.states.ProfileUiState
+import com.soundhub.data.states.UiState
+import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.shared.avatar.AvatarViewModel
 import com.soundhub.ui.shared.menu.AvatarDropdownMenu
-import com.soundhub.data.states.ProfileUiState
-import com.soundhub.ui.pages.profile.ProfileViewModel
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun UserProfileAvatar(
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher,
-    profileViewModel: ProfileViewModel,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher,
+	profileViewModel: ProfileViewModel,
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
+	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+	val profileOwner: User? = profileUiState.profileOwner
 
-    var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
+	var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val authorizedUser: User? = uiState.authorizedUser
 
-    val isAuthorizedUser: Boolean = authorizedUser?.id == profileOwner?.id
-    val isAvatarMenuExpandedState = rememberSaveable { mutableStateOf(false) }
+	val isAuthorizedUser: Boolean = authorizedUser?.id == profileOwner?.id
+	val isAvatarMenuExpandedState = rememberSaveable { mutableStateOf(false) }
 
-    val changeAvatarLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { selectedImageUri = it } }
+	val changeAvatarLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.GetContent()
+	) { uri -> uri?.let { selectedImageUri = it } }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.45f)
-    ) {
-        Avatar(
-            isAvatarMenuExpandedState = isAvatarMenuExpandedState,
-            profileViewModel = profileViewModel
-        )
-        AvatarDropdownMenu(
-            modifier = Modifier.align(Alignment.Center),
-            isAvatarMenuExpandedState = isAvatarMenuExpandedState,
-            onDismissRequest = { isAvatarMenuExpandedState.value = false },
-            activityResultLauncher = changeAvatarLauncher
-        )
-        UserSettingsButton(
-            isAuthorizedUser = isAuthorizedUser,
-            navController = navController
-        )
-    }
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.fillMaxHeight(0.45f)
+	) {
+		Avatar(
+			isAvatarMenuExpandedState = isAvatarMenuExpandedState,
+			profileViewModel = profileViewModel
+		)
+		AvatarDropdownMenu(
+			modifier = Modifier.align(Alignment.Center),
+			isAvatarMenuExpandedState = isAvatarMenuExpandedState,
+			onDismissRequest = { isAvatarMenuExpandedState.value = false },
+			activityResultLauncher = changeAvatarLauncher
+		)
+		UserSettingsButton(
+			isAuthorizedUser = isAuthorizedUser,
+			navController = navController
+		)
+	}
 }
 
 @Composable
 private fun UserSettingsButton(
-    isAuthorizedUser: Boolean,
-    navController: NavHostController
+	isAuthorizedUser: Boolean,
+	navController: NavHostController
 ) {
-    if (isAuthorizedUser) Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp, start = 16.dp, end = 16.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
-            Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
-        }
-    }
+	if (isAuthorizedUser) Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(top = 20.dp, start = 16.dp, end = 16.dp),
+		horizontalArrangement = Arrangement.End
+	) {
+		IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
+			Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
+		}
+	}
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun Avatar(
-    isAvatarMenuExpandedState: MutableState<Boolean>,
-    avatarViewModel: AvatarViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel
+	isAvatarMenuExpandedState: MutableState<Boolean>,
+	avatarViewModel: AvatarViewModel = hiltViewModel(),
+	profileViewModel: ProfileViewModel
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
+	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+	val profileOwner: User? = profileUiState.profileOwner
 
-    val userFullName: String = profileOwner?.getFullName() ?: ""
-    var glideUrl: Any? by remember { mutableStateOf(null) }
-    val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
+	val userFullName: String = profileOwner?.getFullName() ?: ""
+	var glideUrl: Any? by remember { mutableStateOf(null) }
+	val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
-    LaunchedEffect(key1 = profileOwner) {
-        glideUrl = avatarViewModel.getGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
-    }
+	LaunchedEffect(key1 = profileOwner) {
+		glideUrl = avatarViewModel.getGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
+	}
 
-    GlideImage(
-        model = glideUrl,
-        contentScale = ContentScale.Crop,
-        failure = placeholder(defaultAvatar),
-        contentDescription = userFullName,
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {
-                isAvatarMenuExpandedState.value = true
-            },
-    )
+	GlideImage(
+		model = glideUrl,
+		contentScale = ContentScale.Crop,
+		failure = placeholder(defaultAvatar),
+		contentDescription = userFullName,
+		modifier = Modifier
+			.fillMaxSize()
+			.clickable {
+				isAvatarMenuExpandedState.value = true
+			},
+	)
 }

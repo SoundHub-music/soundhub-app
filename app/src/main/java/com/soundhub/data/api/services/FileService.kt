@@ -8,11 +8,11 @@ import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 interface FileService {
-    @Streaming
-    @GET
-    suspend fun getFile(
-        @Url fileName: String?,
-        @Query("folderName")
-        folderName: String? = null
-    ): Response<ResponseBody>
+	@Streaming
+	@GET
+	suspend fun getFile(
+		@Url fileName: String?,
+		@Query("folderName")
+		folderName: String? = null
+	): Response<ResponseBody>
 }

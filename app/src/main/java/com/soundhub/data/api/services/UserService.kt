@@ -31,57 +31,57 @@ import retrofit2.http.Query
 import java.util.UUID
 
 interface UserService {
-    @GET(CURRENT_USER)
-    suspend fun getCurrentUser(): Response<User?>
+	@GET(CURRENT_USER)
+	suspend fun getCurrentUser(): Response<User?>
 
-    @GET(GET_USER_BY_ID)
-    suspend fun getUserById(
-        @Path(USER_ID_DYNAMIC_PARAM)
-        id: UUID?,
-    ): Response<User?>
+	@GET(GET_USER_BY_ID)
+	suspend fun getUserById(
+		@Path(USER_ID_DYNAMIC_PARAM)
+		id: UUID?,
+	): Response<User?>
 
-    @PUT(UPDATE_USER)
-    @Multipart
-    suspend fun updateUserById(
-        @Path(USER_ID_DYNAMIC_PARAM)
-        id: UUID?,
-        @Part(USER_REQUEST_BODY_NAME) user: RequestBody,
-        @Part userAvatar: MultipartBody.Part?
-    ): Response<User>
+	@PUT(UPDATE_USER)
+	@Multipart
+	suspend fun updateUserById(
+		@Path(USER_ID_DYNAMIC_PARAM)
+		id: UUID?,
+		@Part(USER_REQUEST_BODY_NAME) user: RequestBody,
+		@Part userAvatar: MultipartBody.Part?
+	): Response<User>
 
-    @PUT(ADD_FRIEND)
-    suspend fun addFriend(
-        @Path(FRIEND_ID_DYNAMIC_PARAM)
-        friendId: UUID
-    ): Response<User>
+	@PUT(ADD_FRIEND)
+	suspend fun addFriend(
+		@Path(FRIEND_ID_DYNAMIC_PARAM)
+		friendId: UUID
+	): Response<User>
 
-    @PUT(DELETE_FRIEND)
-    suspend fun deleteFriend(
-        @Path(FRIEND_ID_DYNAMIC_PARAM)
-        friendId: UUID
-    ): Response<User>
+	@PUT(DELETE_FRIEND)
+	suspend fun deleteFriend(
+		@Path(FRIEND_ID_DYNAMIC_PARAM)
+		friendId: UUID
+	): Response<User>
 
-    @GET(GET_RECOMMENDED_FRIENDS)
-    suspend fun getRecommendedFriends(): Response<List<User>>
+	@GET(GET_RECOMMENDED_FRIENDS)
+	suspend fun getRecommendedFriends(): Response<List<User>>
 
-    @POST(COMPATIBLE_USERS)
-    suspend fun getUsersCompatibilityPercentage(
-        @Body
-        listUsersCompareWith: CompatibleUsersRequestBody
-    ): Response<CompatibleUsersResponse>
+	@POST(COMPATIBLE_USERS)
+	suspend fun getUsersCompatibilityPercentage(
+		@Body
+		listUsersCompareWith: CompatibleUsersRequestBody
+	): Response<CompatibleUsersResponse>
 
-    @GET(GET_FRIENDS)
-    suspend fun getFriendsByUserId(
-        @Path(USER_ID_DYNAMIC_PARAM)
-        userId: UUID
-    ): Response<List<User>>
+	@GET(GET_FRIENDS)
+	suspend fun getFriendsByUserId(
+		@Path(USER_ID_DYNAMIC_PARAM)
+		userId: UUID
+	): Response<List<User>>
 
-    @GET(SEARCH_USER)
-    suspend fun searchUserByFullName(
-        @Query(SEARCH_PARAM_NAME)
-        name: String
-    ): Response<List<User>>
+	@GET(SEARCH_USER)
+	suspend fun searchUserByFullName(
+		@Query(SEARCH_PARAM_NAME)
+		name: String
+	): Response<List<User>>
 
-    @PUT(TOGGLE_ONLINE)
-    suspend fun toggleUserOnline(): Response<User?>
+	@PUT(TOGGLE_ONLINE)
+	suspend fun toggleUserOnline(): Response<User?>
 }

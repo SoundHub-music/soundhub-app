@@ -17,41 +17,41 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun WriteMessageButton(
-    modifier: Modifier = Modifier,
-    profileViewModel: ProfileViewModel,
-    navController: NavHostController,
-    user: User?
+	modifier: Modifier = Modifier,
+	profileViewModel: ProfileViewModel,
+	navController: NavHostController,
+	user: User?
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val buttonContent = stringResource(id = R.string.profile_screen_write_message_btn_content)
-    val buttonIcon: ImageVector = Icons.Rounded.MailOutline
+	val coroutineScope = rememberCoroutineScope()
+	val buttonContent = stringResource(id = R.string.profile_screen_write_message_btn_content)
+	val buttonIcon: ImageVector = Icons.Rounded.MailOutline
 
-    ProfileActionLongButton(
-        content = buttonContent,
-        buttonIcon = buttonIcon,
-        modifier = modifier
-    ) {
-        coroutineScope.launch {
-            onButtonClick(
-                profileViewModel = profileViewModel,
-                navController = navController,
-                user = user
-            )
-        }
-    }
+	ProfileActionLongButton(
+		content = buttonContent,
+		buttonIcon = buttonIcon,
+		modifier = modifier
+	) {
+		coroutineScope.launch {
+			onButtonClick(
+				profileViewModel = profileViewModel,
+				navController = navController,
+				user = user
+			)
+		}
+	}
 }
 
 private suspend fun onButtonClick(
-    profileViewModel: ProfileViewModel,
-    navController: NavHostController,
-    user: User?
+	profileViewModel: ProfileViewModel,
+	navController: NavHostController,
+	user: User?
 ) {
-    profileViewModel
-        .getOrCreateChatByUser(user)
-        .firstOrNull()?.let {
-        navController.navigate(
-            Route.Messenger.Chat
-                .getStringRouteWithNavArg(it.id.toString())
-        )
-    }
+	profileViewModel
+		.getOrCreateChatByUser(user)
+		.firstOrNull()?.let {
+			navController.navigate(
+				Route.Messenger.Chat
+					.getStringRouteWithNavArg(it.id.toString())
+			)
+		}
 }

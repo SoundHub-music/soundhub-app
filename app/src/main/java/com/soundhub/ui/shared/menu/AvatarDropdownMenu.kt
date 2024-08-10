@@ -19,46 +19,56 @@ import com.soundhub.utils.enums.ContentTypes
 
 @Composable
 internal fun AvatarDropdownMenu(
-    modifier: Modifier = Modifier,
-    isAvatarMenuExpandedState: MutableState<Boolean>,
-    activityResultLauncher: ManagedActivityResultLauncher<String, Uri?>,
-    onDismissRequest: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	isAvatarMenuExpandedState: MutableState<Boolean>,
+	activityResultLauncher: ManagedActivityResultLauncher<String, Uri?>,
+	onDismissRequest: () -> Unit = {}
 ) {
-    Box(
-        modifier = modifier
-    ) {
-        DropdownMenu(
-            expanded = isAvatarMenuExpandedState.value,
-            onDismissRequest = onDismissRequest,
-            modifier = Modifier
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.menu_action_open_avatar)) },
-                leadingIcon = { Icon(imageVector = Icons.Rounded.Face, contentDescription = "open_avatar") },
-                onClick = {
-                    onOpenAvatarMenuClick()
-                    isAvatarMenuExpandedState.value = false
-                }
-            )
+	Box(
+		modifier = modifier
+	) {
+		DropdownMenu(
+			expanded = isAvatarMenuExpandedState.value,
+			onDismissRequest = onDismissRequest,
+			modifier = Modifier
+		) {
+			DropdownMenuItem(
+				text = { Text(stringResource(id = R.string.menu_action_open_avatar)) },
+				leadingIcon = {
+					Icon(
+						imageVector = Icons.Rounded.Face,
+						contentDescription = "open_avatar"
+					)
+				},
+				onClick = {
+					onOpenAvatarMenuClick()
+					isAvatarMenuExpandedState.value = false
+				}
+			)
 
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.menu_action_change_avatar)) },
-                leadingIcon = { Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "change_avatar") },
-                onClick = {
-                    onChangeAvatarMenuClick(activityResultLauncher)
-                    isAvatarMenuExpandedState.value = false
-                }
-            )
-        }
-    }
+			DropdownMenuItem(
+				text = { Text(stringResource(id = R.string.menu_action_change_avatar)) },
+				leadingIcon = {
+					Icon(
+						imageVector = Icons.Rounded.Refresh,
+						contentDescription = "change_avatar"
+					)
+				},
+				onClick = {
+					onChangeAvatarMenuClick(activityResultLauncher)
+					isAvatarMenuExpandedState.value = false
+				}
+			)
+		}
+	}
 }
 
 private fun onOpenAvatarMenuClick() {
-    /* TODO: implement open avatar logic */
+	/* TODO: implement open avatar logic */
 }
 
 private fun onChangeAvatarMenuClick(
-    changeAvatarLauncher: ManagedActivityResultLauncher<String, Uri?>
+	changeAvatarLauncher: ManagedActivityResultLauncher<String, Uri?>
 ) {
-    changeAvatarLauncher.launch(ContentTypes.IMAGE_ALL.type)
+	changeAvatarLauncher.launch(ContentTypes.IMAGE_ALL.type)
 }

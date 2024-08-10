@@ -12,32 +12,32 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun PostRegisterChooseArtistsScreen(
-    registrationViewModel: RegistrationViewModel,
-    uiStateDispatcher: UiStateDispatcher
+	registrationViewModel: RegistrationViewModel,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val artistUiState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
-    val lazyGridState = rememberLazyGridState()
+	val artistUiState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
+	val lazyGridState = rememberLazyGridState()
 
-    LaunchedEffect(key1 = lazyGridState.canScrollForward) {
-        if (!lazyGridState.canScrollForward) {
-            registrationViewModel.loadArtists(artistUiState.pagination?.urls?.next)
-        }
-    }
+	LaunchedEffect(key1 = lazyGridState.canScrollForward) {
+		if (!lazyGridState.canScrollForward) {
+			registrationViewModel.loadArtists(artistUiState.pagination?.urls?.next)
+		}
+	}
 
-    LaunchedEffect(key1 = true) {
-        registrationViewModel.loadArtists()
-    }
+	LaunchedEffect(key1 = true) {
+		registrationViewModel.loadArtists()
+	}
 
-    LaunchedEffect(key1 = artistUiState) {
-        Log.d("PostRegisterChooseArtistsScreen", "ui state: $artistUiState")
-    }
+	LaunchedEffect(key1 = artistUiState) {
+		Log.d("PostRegisterChooseArtistsScreen", "ui state: $artistUiState")
+	}
 
-    ChooseArtistsScreen(
-        artistUiState = artistUiState,
-        onItemPlateClick = registrationViewModel::onArtistItemClick,
-        onNextButtonClick = registrationViewModel::onNextButtonClick,
-        onSearchFieldChange = registrationViewModel::onSearchFieldChange,
-        uiStateDispatcher = uiStateDispatcher,
-        lazyGridState = lazyGridState
-    )
+	ChooseArtistsScreen(
+		artistUiState = artistUiState,
+		onItemPlateClick = registrationViewModel::onArtistItemClick,
+		onNextButtonClick = registrationViewModel::onNextButtonClick,
+		onSearchFieldChange = registrationViewModel::onSearchFieldChange,
+		uiStateDispatcher = uiStateDispatcher,
+		lazyGridState = lazyGridState
+	)
 }

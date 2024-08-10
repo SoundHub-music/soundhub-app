@@ -22,42 +22,42 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userDao: UserDao,
-    private val gson: Gson,
-    userSettingsStore: UserSettingsStore,
-    userCredsStore: UserCredsStore,
-): ViewModel() {
-    private val _startDestination = MutableStateFlow<String>(Route.Authentication.route)
-    val startDestination: StateFlow<String> = _startDestination.asStateFlow()
-    val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+	private val userDao: UserDao,
+	private val gson: Gson,
+	userSettingsStore: UserSettingsStore,
+	userCredsStore: UserCredsStore,
+) : ViewModel() {
+	private val _startDestination = MutableStateFlow<String>(Route.Authentication.route)
+	val startDestination: StateFlow<String> = _startDestination.asStateFlow()
+	val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
-    private val _topBarTitle = MutableStateFlow<String?>(null)
-    val topBarTitle: StateFlow<String?> = _topBarTitle.asStateFlow()
+	private val _topBarTitle = MutableStateFlow<String?>(null)
+	val topBarTitle: StateFlow<String?> = _topBarTitle.asStateFlow()
 
-    val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
+	val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
 
-    init {
-        viewModelScope.launch(Dispatchers.Main) {
-            userCreds.collect { creds -> defineStartDestination(creds) }
-        }
-    }
+	init {
+		viewModelScope.launch(Dispatchers.Main) {
+			userCreds.collect { creds -> defineStartDestination(creds) }
+		}
+	}
 
-    private suspend fun defineStartDestination(creds: UserPreferences) {
-        val authorizedUser: User? = userDao.getCurrentUser()
-        if (
-            !creds.refreshToken.isNullOrEmpty() &&
-            !creds.accessToken.isNullOrEmpty() &&
-            authorizedUser != null
-        )
-            _startDestination.update { Route.PostLine.route }
-        else _startDestination.update { Route.Authentication.route }
-    }
+	private suspend fun defineStartDestination(creds: UserPreferences) {
+		val authorizedUser: User? = userDao.getCurrentUser()
+		if (
+			!creds.refreshToken.isNullOrEmpty() &&
+			!creds.accessToken.isNullOrEmpty() &&
+			authorizedUser != null
+		)
+			_startDestination.update { Route.PostLine.route }
+		else _startDestination.update { Route.Authentication.route }
+	}
 
-    fun getGson(): Gson = gson
+	fun getGson(): Gson = gson
 
-    fun setTopBarTitle(value: String?) = _topBarTitle.update {
-        value
-    }
+	fun setTopBarTitle(value: String?) = _topBarTitle.update {
+		value
+	}
 
-    fun getTopBarTitle() = _topBarTitle.value
+	fun getTopBarTitle() = _topBarTitle.value
 }

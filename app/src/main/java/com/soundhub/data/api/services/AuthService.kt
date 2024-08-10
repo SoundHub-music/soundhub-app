@@ -20,26 +20,26 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface AuthService {
-    @POST(SIGN_UP)
-    @Multipart
-    suspend fun signUp(
-        @Part(USER_DATA_REQUEST_BODY_NAME) userData: RequestBody,
-        @Part file: MultipartBody.Part?
-    ): Response<UserPreferences>
+	@POST(SIGN_UP)
+	@Multipart
+	suspend fun signUp(
+		@Part(USER_DATA_REQUEST_BODY_NAME) userData: RequestBody,
+		@Part file: MultipartBody.Part?
+	): Response<UserPreferences>
 
-    @POST(SIGN_IN)
-    suspend fun signIn(
-        @Body userData: SignInRequestBody
-    ): Response<UserPreferences>
+	@POST(SIGN_IN)
+	suspend fun signIn(
+		@Body userData: SignInRequestBody
+	): Response<UserPreferences>
 
-    @POST(LOGOUT)
-    suspend fun logout(
-        @Header(AUTHORIZATION_HEADER)
-        accessToken: String?
-    ): Response<LogoutResponse>
+	@POST(LOGOUT)
+	suspend fun logout(
+		@Header(AUTHORIZATION_HEADER)
+		accessToken: String?
+	): Response<LogoutResponse>
 
-    @POST(REFRESH_TOKEN)
-    suspend fun refreshToken(
-        @Body refreshToken: RefreshTokenRequestBody
-    ): Response<UserPreferences>
+	@POST(REFRESH_TOKEN)
+	suspend fun refreshToken(
+		@Body refreshToken: RefreshTokenRequestBody
+	): Response<UserPreferences>
 }

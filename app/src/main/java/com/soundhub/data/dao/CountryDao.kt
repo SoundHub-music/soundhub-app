@@ -9,10 +9,10 @@ import com.soundhub.utils.constants.Queries
 
 @Dao
 interface CountryDao {
-    @Query(Queries.GET_COUNTRIES)
-    suspend fun getCountries(): List<Country>
+	@Query(Queries.GET_COUNTRIES)
+	suspend fun getCountries(): List<Country>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveCountries(countries: List<Country>)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	suspend fun saveCountries(countries: List<Country>)
 
 }

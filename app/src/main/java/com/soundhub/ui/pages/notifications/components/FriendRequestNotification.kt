@@ -29,83 +29,86 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
-import com.soundhub.ui.shared.avatar.CircularAvatar
 import com.soundhub.ui.pages.notifications.NotificationViewModel
+import com.soundhub.ui.shared.avatar.CircularAvatar
 
 @Composable
 internal fun FriendRequestNotification(
-    invite: Invite,
-    notificationViewModel: NotificationViewModel,
-    navController: NavHostController
+	invite: Invite,
+	notificationViewModel: NotificationViewModel,
+	navController: NavHostController
 ) {
-    val sender: User = invite.sender
-    val senderFullName: String = sender.getFullName()
+	val sender: User = invite.sender
+	val senderFullName: String = sender.getFullName()
 
-    LaunchedEffect(key1 = invite) {
-        Log.d("FriendRequestNotificationItem", invite.toString())
-    }
+	LaunchedEffect(key1 = invite) {
+		Log.d("FriendRequestNotificationItem", invite.toString())
+	}
 
-    NotificationItem(
-        notification = invite,
-        onClick = { onNotificationClick(invite, navController) }
-    ) {
-        Column {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                CircularAvatar(
-                    imageUri = invite.sender.avatarUrl?.toUri(),
-                    modifier = Modifier.size(48.dp)
-                )
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(senderFullName)
-                        }
-                        append(" ")
-                        append(stringResource(R.string.notification_screen_friend_request_content))
-                    },
-                    softWrap = true,
-                    fontSize = 18.sp,
-                )
-            }
+	NotificationItem(
+		notification = invite,
+		onClick = { onNotificationClick(invite, navController) }
+	) {
+		Column {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(20.dp)
+			) {
+				CircularAvatar(
+					imageUri = invite.sender.avatarUrl?.toUri(),
+					modifier = Modifier.size(48.dp)
+				)
+				Text(
+					text = buildAnnotatedString {
+						withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+							append(senderFullName)
+						}
+						append(" ")
+						append(stringResource(R.string.notification_screen_friend_request_content))
+					},
+					softWrap = true,
+					fontSize = 18.sp,
+				)
+			}
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(space = 5.dp, alignment = Alignment.CenterHorizontally),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-            ) {
-                Button(
-                    onClick = { notificationViewModel.acceptInvite(invite) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    Text(text = stringResource(id = R.string.notification_screen_accept_invite_text))
-                }
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(
+					space = 5.dp,
+					alignment = Alignment.CenterHorizontally
+				),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 10.dp)
+			) {
+				Button(
+					onClick = { notificationViewModel.acceptInvite(invite) },
+					shape = RoundedCornerShape(10.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+				) {
+					Text(text = stringResource(id = R.string.notification_screen_accept_invite_text))
+				}
 
-                Button(
-                    onClick = { notificationViewModel.rejectInvite(invite) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(text = stringResource(id = R.string.notification_screen_reject_invite_text))
-                }
-            }
-        }
-    }
+				Button(
+					onClick = { notificationViewModel.rejectInvite(invite) },
+					shape = RoundedCornerShape(10.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f),
+					colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+				) {
+					Text(text = stringResource(id = R.string.notification_screen_reject_invite_text))
+				}
+			}
+		}
+	}
 }
 
 private fun onNotificationClick(
-    invite: Invite,
-    navController: NavHostController
+	invite: Invite,
+	navController: NavHostController
 ) {
-    val route: String = Route.Profile.getStringRouteWithNavArg(invite.sender.id.toString())
-    navController.navigate(route)
+	val route: String = Route.Profile.getStringRouteWithNavArg(invite.sender.id.toString())
+	navController.navigate(route)
 }

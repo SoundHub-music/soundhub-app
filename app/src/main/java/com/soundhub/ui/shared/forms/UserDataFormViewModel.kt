@@ -13,23 +13,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserDataFormViewModel @Inject constructor(
-    private val countryRepository: CountryRepository,
-    private val countryDao: CountryDao
-): ViewModel() {
-    val countryList = MutableStateFlow<List<Country>>(emptyList())
-    val isLoading = MutableStateFlow(false)
+	private val countryRepository: CountryRepository,
+	private val countryDao: CountryDao
+) : ViewModel() {
+	val countryList = MutableStateFlow<List<Country>>(emptyList())
+	val isLoading = MutableStateFlow(false)
 
-    init { loadCountries() }
+	init {
+		loadCountries()
+	}
 
-    private fun loadCountries() = viewModelScope.launch {
-        isLoading.value = true
-        var countries: List<Country> = countryDao.getCountries()
+	private fun loadCountries() = viewModelScope.launch {
+		isLoading.value = true
+		var countries: List<Country> = countryDao.getCountries()
 
-        if (countries.isEmpty()) {
-            countryRepository.getAllCountryNames()
-                .onSuccess { response -> countries = response.body.orEmpty() }
-        }
-        countryList.update { countries.sortedBy { it.translations.rus.common } }
-        isLoading.value = false
-    }
+		if (countries.isEmpty()) {
+			countryRepository.getAllCountryNames()
+				.onSuccess { response -> countries = response.body.orEmpty() }
+		}
+		countryList.update { countries.sortedBy { it.translations.rus.common } }
+		isLoading.value = false
+	}
 }

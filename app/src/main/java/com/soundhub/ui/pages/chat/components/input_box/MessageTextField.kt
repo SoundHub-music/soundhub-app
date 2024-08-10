@@ -22,37 +22,37 @@ import com.soundhub.ui.pages.chat.ChatViewModel
 
 @Composable
 fun MessageTextField(
-    modifier: Modifier = Modifier,
-    chatViewModel: ChatViewModel
+	modifier: Modifier = Modifier,
+	chatViewModel: ChatViewModel
 ) {
-    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val messageContent: String = chatUiState.messageContent
+	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+	val messageContent: String = chatUiState.messageContent
 
-    OutlinedTextField(
-        modifier = modifier
-            .height(72.dp)
-            .fillMaxWidth(),
-        singleLine = true,
-        value = messageContent,
-        onValueChange = { chatViewModel.setMessageContent(it) },
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-            focusedTextColor = MaterialTheme.colorScheme.onSurface
-        ),
-        placeholder = {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.message_input_placeholder),
-                    modifier = Modifier
-                )
-            }
-        }
-    )
+	OutlinedTextField(
+		modifier = modifier
+			.height(72.dp)
+			.fillMaxWidth(),
+		singleLine = true,
+		value = messageContent,
+		onValueChange = { chatViewModel.setMessageContent(it) },
+		colors = TextFieldDefaults.colors(
+			focusedIndicatorColor = Color.Transparent,
+			unfocusedIndicatorColor = Color.Transparent,
+			focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+			unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+			unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+			focusedTextColor = MaterialTheme.colorScheme.onSurface
+		),
+		placeholder = {
+			Column(
+				modifier = Modifier.fillMaxSize(),
+				verticalArrangement = Arrangement.Center
+			) {
+				Text(
+					text = stringResource(id = R.string.message_input_placeholder),
+					modifier = Modifier
+				)
+			}
+		}
+	)
 }

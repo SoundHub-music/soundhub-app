@@ -24,95 +24,97 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    private val inviteRepository: InviteRepository,
-    private val uiStateDispatcher: UiStateDispatcher,
-    private val userDao: UserDao,
-    userCredsStore: UserCredsStore
-): ViewModel() {
-    private val userCreds = userCredsStore.getCreds()
+	private val inviteRepository: InviteRepository,
+	private val uiStateDispatcher: UiStateDispatcher,
+	private val userDao: UserDao,
+	userCredsStore: UserCredsStore
+) : ViewModel() {
+	private val userCreds = userCredsStore.getCreds()
 
-    private val _notificationUiState = MutableStateFlow(NotificationUiState())
-    val notificationUiState = _notificationUiState.asStateFlow()
+	private val _notificationUiState = MutableStateFlow(NotificationUiState())
+	val notificationUiState = _notificationUiState.asStateFlow()
 
-    init { init() }
+	init {
+		init()
+	}
 
-    private fun init() = viewModelScope.launch {
-        userCreds.collect { creds ->
-            if (creds.accessToken != null) loadInvites()
-        }
-    }
+	private fun init() = viewModelScope.launch {
+		userCreds.collect { creds ->
+			if (creds.accessToken != null) loadInvites()
+		}
+	}
 
-    fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
-        _notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
-        inviteRepository.getAllInvites()
-        .onSuccessWithContext { response ->
-            val invites: List<Invite> = response.body.orEmpty()
-            _notificationUiState.update {
-                it.copy(
-                    notifications = invites,
-                    status = ApiStatus.SUCCESS
-                )
-            }
-        }
-        .onFailureWithContext { error ->
-            val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-            uiStateDispatcher.sendUiEvent(errorEvent)
-            _notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
-        }
-    }
+	fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {
+		_notificationUiState.update { it.copy(status = ApiStatus.LOADING) }
+		inviteRepository.getAllInvites()
+			.onSuccessWithContext { response ->
+				val invites: List<Invite> = response.body.orEmpty()
+				_notificationUiState.update {
+					it.copy(
+						notifications = invites,
+						status = ApiStatus.SUCCESS
+					)
+				}
+			}
+			.onFailureWithContext { error ->
+				val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+				uiStateDispatcher.sendUiEvent(errorEvent)
+				_notificationUiState.update { it.copy(status = ApiStatus.ERROR) }
+			}
+	}
 
-    fun acceptInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
-        val toastText = UiText.StringResource(R.string.toast_invite_accepted_successfully)
-        val uiEvent = UiEvent.ShowToast(toastText)
+	fun acceptInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
+		val toastText = UiText.StringResource(R.string.toast_invite_accepted_successfully)
+		val uiEvent = UiEvent.ShowToast(toastText)
 
-        inviteRepository.acceptInvite(invite.id)
-            .onSuccessWithContext {
-                deleteNotificationById(invite.id)
-                val authorizedUser: User? = userDao.getCurrentUser()
+		inviteRepository.acceptInvite(invite.id)
+			.onSuccessWithContext {
+				deleteNotificationById(invite.id)
+				val authorizedUser: User? = userDao.getCurrentUser()
 
-                updateAuthorizedUser(authorizedUser, invite.sender)
-            }
-            .onFailureWithContext { error ->
-                val errorEvent: UiEvent = UiEvent.Error(
-                    error.errorBody,
-                    error.throwable,
-                    R.string.toast_accept_invite_error
-                )
-                uiStateDispatcher.sendUiEvent(errorEvent)
-            }
-            .finallyWithContext {
-                uiStateDispatcher.sendUiEvent(uiEvent)
-            }
-    }
+				updateAuthorizedUser(authorizedUser, invite.sender)
+			}
+			.onFailureWithContext { error ->
+				val errorEvent: UiEvent = UiEvent.Error(
+					error.errorBody,
+					error.throwable,
+					R.string.toast_accept_invite_error
+				)
+				uiStateDispatcher.sendUiEvent(errorEvent)
+			}
+			.finallyWithContext {
+				uiStateDispatcher.sendUiEvent(uiEvent)
+			}
+	}
 
-    private fun updateAuthorizedUser(user: User?, inviteSender: User) = user?.let {
-        with(it) {
-            friends += inviteSender
-            uiStateDispatcher.setAuthorizedUser(this)
-        }
-    }
+	private fun updateAuthorizedUser(user: User?, inviteSender: User) = user?.let {
+		with(it) {
+			friends += inviteSender
+			uiStateDispatcher.setAuthorizedUser(this)
+		}
+	}
 
-    fun rejectInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
-        val toastText = UiText.StringResource(R.string.toast_invite_rejected_successfully)
-        val uiEvent = UiEvent.ShowToast(toastText)
+	fun rejectInvite(invite: Invite) = viewModelScope.launch(Dispatchers.IO) {
+		val toastText = UiText.StringResource(R.string.toast_invite_rejected_successfully)
+		val uiEvent = UiEvent.ShowToast(toastText)
 
-        inviteRepository.rejectInvite(invite.id)
-            .onSuccessWithContext {
-                deleteNotificationById(invite.id)
-            }
-            .onFailureWithContext { error ->
-                val errorEvent: UiEvent = UiEvent.Error(
-                    error.errorBody,
-                    error.throwable,
-                    R.string.toast_reject_invite_error
-                )
-                uiStateDispatcher.sendUiEvent(errorEvent)
-            }
-            .finallyWithContext { uiStateDispatcher.sendUiEvent(uiEvent) }
-    }
+		inviteRepository.rejectInvite(invite.id)
+			.onSuccessWithContext {
+				deleteNotificationById(invite.id)
+			}
+			.onFailureWithContext { error ->
+				val errorEvent: UiEvent = UiEvent.Error(
+					error.errorBody,
+					error.throwable,
+					R.string.toast_reject_invite_error
+				)
+				uiStateDispatcher.sendUiEvent(errorEvent)
+			}
+			.finallyWithContext { uiStateDispatcher.sendUiEvent(uiEvent) }
+	}
 
-    private fun deleteNotificationById(notificationId: UUID) = _notificationUiState.update {
-        val notifications = it.notifications.filter { n -> n.id != notificationId }
-        it.copy(notifications = notifications)
-    }
+	private fun deleteNotificationById(notificationId: UUID) = _notificationUiState.update {
+		val notifications = it.notifications.filter { n -> n.id != notificationId }
+		it.copy(notifications = notifications)
+	}
 }

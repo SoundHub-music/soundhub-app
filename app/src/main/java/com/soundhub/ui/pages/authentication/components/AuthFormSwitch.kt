@@ -13,17 +13,17 @@ import com.soundhub.R
 
 @Composable
 fun AuthFormSwitch(isRegisterForm: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Switch(
-            checked = isRegisterForm,
-            onCheckedChange = onCheckedChange
-        )
-        Text(
-            text = stringResource(R.string.get_account_switch_label),
-            fontWeight = FontWeight.Bold
-        )
-    }
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(10.dp)
+	) {
+		Switch(
+			checked = isRegisterForm,
+			onCheckedChange = onCheckedChange
+		)
+		Text(
+			text = stringResource(R.string.get_account_switch_label),
+			fontWeight = FontWeight.Bold
+		)
+	}
 }

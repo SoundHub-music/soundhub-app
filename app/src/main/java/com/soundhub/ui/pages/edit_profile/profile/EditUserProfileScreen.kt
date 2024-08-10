@@ -25,78 +25,78 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.User
+import com.soundhub.ui.pages.edit_profile.components.EditProfileTopBarButton
 import com.soundhub.ui.shared.dialogs.DismissChangesDialog
 import com.soundhub.ui.shared.forms.UserDataForm
-import com.soundhub.ui.pages.edit_profile.components.EditProfileTopBarButton
 
 @Composable
 fun EditUserProfileScreen(
-    authorizedUser: User?,
-    editUserProfileViewModel: EditUserProfileViewModel = hiltViewModel(),
-    navController: NavHostController,
+	authorizedUser: User?,
+	editUserProfileViewModel: EditUserProfileViewModel = hiltViewModel(),
+	navController: NavHostController,
 ) {
-    val formState = editUserProfileViewModel.formState
-    val isDialogOpened by editUserProfileViewModel.isDialogOpened.collectAsState(initial = false)
-    var isLoading by rememberSaveable { mutableStateOf(true) }
+	val formState = editUserProfileViewModel.formState
+	val isDialogOpened by editUserProfileViewModel.isDialogOpened.collectAsState(initial = false)
+	var isLoading by rememberSaveable { mutableStateOf(true) }
 
-    /*
-        At the initial moment of time the user state doesn't have time to load.
-        We wait until authorizedUser is loaded
-     */
-    LaunchedEffect(authorizedUser) {
-        authorizedUser?.let { isLoading = false }
-    }
+	/*
+		At the initial moment of time the user state doesn't have time to load.
+		We wait until authorizedUser is loaded
+	 */
+	LaunchedEffect(authorizedUser) {
+		authorizedUser?.let { isLoading = false }
+	}
 
-    EditUserProfileScaffold(editUserProfileViewModel) {
-        if (!isLoading)
-            UserDataForm(
-                modifier = Modifier.padding(it),
-                formStateFlow = formState,
-                onFirstNameChange = editUserProfileViewModel::setFirstName,
-                onLastNameChange = editUserProfileViewModel::setLastName,
-                onBirthdayChange = editUserProfileViewModel::setBirthday,
-                onDescriptionChange = editUserProfileViewModel::setDescription,
-                onGenderChange = editUserProfileViewModel::setGender,
-                onCountryChange = editUserProfileViewModel::setCountry,
-                onCityChange = editUserProfileViewModel::setCity,
-                onAvatarChange = editUserProfileViewModel::setAvatar,
-                onLanguagesChange = editUserProfileViewModel::setLanguages,
-            )
+	EditUserProfileScaffold(editUserProfileViewModel) {
+		if (!isLoading)
+			UserDataForm(
+				modifier = Modifier.padding(it),
+				formStateFlow = formState,
+				onFirstNameChange = editUserProfileViewModel::setFirstName,
+				onLastNameChange = editUserProfileViewModel::setLastName,
+				onBirthdayChange = editUserProfileViewModel::setBirthday,
+				onDescriptionChange = editUserProfileViewModel::setDescription,
+				onGenderChange = editUserProfileViewModel::setGender,
+				onCountryChange = editUserProfileViewModel::setCountry,
+				onCityChange = editUserProfileViewModel::setCity,
+				onAvatarChange = editUserProfileViewModel::setAvatar,
+				onLanguagesChange = editUserProfileViewModel::setLanguages,
+			)
 
-        if (isDialogOpened)
-            DismissChangesDialog(
-                navController = navController,
-                updateDialogStateCallback = { state ->
-                    editUserProfileViewModel.setDialogVisibility(state)
-                }
-            )
-    }
+		if (isDialogOpened)
+			DismissChangesDialog(
+				navController = navController,
+				updateDialogStateCallback = { state ->
+					editUserProfileViewModel.setDialogVisibility(state)
+				}
+			)
+	}
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditUserProfileScaffold(
-    editUserProfileViewModel: EditUserProfileViewModel,
-    content: @Composable (PaddingValues) -> Unit
+	editUserProfileViewModel: EditUserProfileViewModel,
+	content: @Composable (PaddingValues) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.screen_title_edit_profile)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        editUserProfileViewModel.onTopNavigationButtonClick()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(id = R.string.btn_description_back),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                },
-                actions = { EditProfileTopBarButton(editUserProfileViewModel) }
-            )
-        }
-    ) { content(it) }
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = { Text(text = stringResource(id = R.string.screen_title_edit_profile)) },
+				navigationIcon = {
+					IconButton(onClick = {
+						editUserProfileViewModel.onTopNavigationButtonClick()
+					}) {
+						Icon(
+							imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+							contentDescription = stringResource(id = R.string.btn_description_back),
+							modifier = Modifier.size(24.dp)
+						)
+					}
+				},
+				actions = { EditProfileTopBarButton(editUserProfileViewModel) }
+			)
+		}
+	) { content(it) }
 }

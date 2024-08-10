@@ -20,39 +20,38 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun ProfileButtonsSection(
-    navController: NavHostController,
-    profileViewModel: ProfileViewModel,
-    uiStateDispatcher: UiStateDispatcher,
-    isOriginProfile: Boolean,
+	navController: NavHostController,
+	profileViewModel: ProfileViewModel,
+	uiStateDispatcher: UiStateDispatcher,
+	isOriginProfile: Boolean,
 ) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
+	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+	val profileOwner: User? = profileUiState.profileOwner
 
-    val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
+	val isUserAFriendToAuthorizedUser: Boolean = profileUiState.isUserAFriendToAuthorizedUser
 
-    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-        if (isOriginProfile) {
-            EditProfileButton(
-                modifier = Modifier.weight(1f),
-                navController = navController,
-            )
-            WritePostButton(navController = navController)
-        }
-        else {
-            WriteMessageButton(
-                modifier = Modifier.weight(1f),
-                profileViewModel = profileViewModel,
-                navController = navController,
-                user = profileOwner,
-            )
+	Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+		if (isOriginProfile) {
+			EditProfileButton(
+				modifier = Modifier.weight(1f),
+				navController = navController,
+			)
+			WritePostButton(navController = navController)
+		} else {
+			WriteMessageButton(
+				modifier = Modifier.weight(1f),
+				profileViewModel = profileViewModel,
+				navController = navController,
+				user = profileOwner,
+			)
 
-            if (isUserAFriendToAuthorizedUser)
-                DeleteFriendButton(profileViewModel)
-            else SendFriendRequestButton(
-                profileViewModel = profileViewModel,
-                uiStateDispatcher = uiStateDispatcher,
-                profileOwner = profileOwner
-            )
-        }
-    }
+			if (isUserAFriendToAuthorizedUser)
+				DeleteFriendButton(profileViewModel)
+			else SendFriendRequestButton(
+				profileViewModel = profileViewModel,
+				uiStateDispatcher = uiStateDispatcher,
+				profileOwner = profileOwner
+			)
+		}
+	}
 }

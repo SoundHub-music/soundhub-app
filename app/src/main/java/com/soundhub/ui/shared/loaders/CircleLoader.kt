@@ -10,19 +10,19 @@ import androidx.compose.ui.unit.Dp
 
 @Composable
 fun CircleLoader(
-    modifier: Modifier = Modifier,
-    strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth
+	modifier: Modifier = Modifier,
+	strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth
 ) {
-    CircularProgressIndicator(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.secondary,
-        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        strokeWidth = strokeWidth
-    )
+	CircularProgressIndicator(
+		modifier = modifier,
+		color = MaterialTheme.colorScheme.secondary,
+		trackColor = MaterialTheme.colorScheme.surfaceVariant,
+		strokeWidth = strokeWidth
+	)
 }
 
 @Composable
 @Preview
 private fun CircleLoaderPreview() {
-    CircleLoader()
+	CircleLoader()
 }

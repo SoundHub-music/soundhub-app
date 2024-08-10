@@ -28,108 +28,113 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.model.User
-import com.soundhub.ui.shared.avatar.CircularAvatar
 import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.friends.enums.FriendListPage
+import com.soundhub.ui.shared.avatar.CircularAvatar
 import com.soundhub.utils.lib.UserUtils
 
 @Composable
 fun FriendCard(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    friendsViewModel: FriendsViewModel,
-    chosenPage: FriendListPage,
-    user: User,
+	modifier: Modifier = Modifier,
+	navController: NavHostController,
+	friendsViewModel: FriendsViewModel,
+	chosenPage: FriendListPage,
+	user: User,
 ) {
-    ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground,
-            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
-        ),
-        onClick = { navController
-            .navigate(Route.Profile
-                .getStringRouteWithNavArg(user.id.toString()))
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularAvatar(
-                    imageUri = user.avatarUrl?.toUri(),
-                    modifier = Modifier.size(64.dp)
-                )
+	ElevatedCard(
+		modifier = modifier.fillMaxWidth(),
+		shape = RoundedCornerShape(12.dp),
+		colors = CardColors(
+			containerColor = MaterialTheme.colorScheme.background,
+			contentColor = MaterialTheme.colorScheme.onBackground,
+			disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+			disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
+		),
+		onClick = {
+			navController
+				.navigate(
+					Route.Profile
+						.getStringRouteWithNavArg(user.id.toString())
+				)
+		}
+	) {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(16.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Row(
+				modifier = Modifier,
+				horizontalArrangement = Arrangement.spacedBy(16.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				CircularAvatar(
+					imageUri = user.avatarUrl?.toUri(),
+					modifier = Modifier.size(64.dp)
+				)
 
-                UserDescriptionColumn(
-                    user = user,
-                    chosenPage = chosenPage,
-                    friendsViewModel = friendsViewModel
-                )
-            }
+				UserDescriptionColumn(
+					user = user,
+					chosenPage = chosenPage,
+					friendsViewModel = friendsViewModel
+				)
+			}
 
-            NavigateToChatButton(
-                user = user,
-                friendsViewModel = friendsViewModel
-            )
-        }
-    }
+			NavigateToChatButton(
+				user = user,
+				friendsViewModel = friendsViewModel
+			)
+		}
+	}
 }
 
 @Composable
 private fun UserDescriptionColumn(
-    user: User,
-    chosenPage: FriendListPage,
-    friendsViewModel: FriendsViewModel
+	user: User,
+	chosenPage: FriendListPage,
+	friendsViewModel: FriendsViewModel
 ) {
-    val userFullName = remember(user) { "${user.firstName} ${user.lastName}".trim() }
-    val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+	val userFullName = remember(user) { "${user.firstName} ${user.lastName}".trim() }
+	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
 
-    val userCompatibilities = friendsUiState.userCompatibilityPercentage
-    val userCompatibility = remember(userCompatibilities) {
-        userCompatibilities?.userCompatibilities.orEmpty()
-            .filter { it.user.id == user.id }
-            .firstNotNullOfOrNull { it }
-    }
+	val userCompatibilities = friendsUiState.userCompatibilityPercentage
+	val userCompatibility = remember(userCompatibilities) {
+		userCompatibilities?.userCompatibilities.orEmpty()
+			.filter { it.user.id == user.id }
+			.firstNotNullOfOrNull { it }
+	}
 
-    val additionalText: String = when(chosenPage) {
-        in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
-            UserUtils.getUserLocation(city = user.city, country = user.country)
-        FriendListPage.RECOMMENDATIONS ->
-            stringResource(
-                R.string.friends_recommendation_page_card_caption,
-                userCompatibility?.compatibility ?: 0.0f
-            )
-        else -> ""
-    }
+	val additionalText: String = when (chosenPage) {
+		in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
+			UserUtils.getUserLocation(city = user.city, country = user.country)
 
-    Column(modifier = Modifier.fillMaxWidth(0.8f)) {
-        Text(
-            text = userFullName,
-            fontWeight = FontWeight.Medium,
-            fontSize = 20.sp,
-            overflow = TextOverflow.Ellipsis
-        )
+		FriendListPage.RECOMMENDATIONS ->
+			stringResource(
+				R.string.friends_recommendation_page_card_caption,
+				userCompatibility?.compatibility ?: 0.0f
+			)
 
-        if (additionalText.isNotEmpty())
-            Text(
-                text = additionalText,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraLight,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Left,
-            )
-    }
+		else -> ""
+	}
+
+	Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+		Text(
+			text = userFullName,
+			fontWeight = FontWeight.Medium,
+			fontSize = 20.sp,
+			overflow = TextOverflow.Ellipsis
+		)
+
+		if (additionalText.isNotEmpty())
+			Text(
+				text = additionalText,
+				fontSize = 12.sp,
+				fontWeight = FontWeight.ExtraLight,
+				color = MaterialTheme.colorScheme.onBackground,
+				textAlign = TextAlign.Left,
+			)
+	}
 }

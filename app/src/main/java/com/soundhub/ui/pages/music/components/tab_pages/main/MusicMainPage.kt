@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music.components.tab_pages
+package com.soundhub.ui.pages.music.components.tab_pages.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,19 +13,18 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun MusicMainPage(
-    modifier: Modifier = Modifier,
-    musicViewModel: MusicViewModel,
-    uiStateDispatcher: UiStateDispatcher
+	modifier: Modifier = Modifier,
+	musicViewModel: MusicViewModel,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        RecommendationSection()
-        FriendMusicSection(
-            musicViewModel = musicViewModel,
-            uiStateDispatcher = uiStateDispatcher
-        )
-    }
+	Column(
+		modifier = modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.spacedBy(10.dp)
+	) {
+		RecommendationSection(musicViewModel)
+		FriendMusicSection(
+			musicViewModel = musicViewModel,
+			uiStateDispatcher = uiStateDispatcher
+		)
+	}
 }

@@ -1,6 +1,8 @@
 package com.soundhub.ui.pages.music
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
@@ -23,40 +25,53 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicViewModel @Inject constructor(
-    private val userDao: UserDao
-): ViewModel() {
-    private val _favoriteGenres = MutableStateFlow<List<Genre>>(emptyList())
-    val favoriteGenres: StateFlow<List<Genre>> = _favoriteGenres.asStateFlow()
+	private val userDao: UserDao
+) : ViewModel() {
+	private val _favoriteGenres = MutableStateFlow<List<Genre>>(emptyList())
+	val favoriteGenres: StateFlow<List<Genre>> = _favoriteGenres.asStateFlow()
 
-    private val _favoriteArtists = MutableStateFlow<List<Artist>>(emptyList())
-    val favoriteArtists: StateFlow<List<Artist>> = _favoriteArtists.asStateFlow()
+	private val _favoriteArtists = MutableStateFlow<List<Artist>>(emptyList())
+	val favoriteArtists: StateFlow<List<Artist>> = _favoriteArtists.asStateFlow()
 
-    @Composable
-    fun getMenuItems(): List<LibraryItemData> = listOf(
-        LibraryItemData(
-            title = stringResource(id = R.string.music_library_page_playlists),
-            icon = painterResource(id = R.drawable.round_queue_music_24),
-            route = Route.Music.Playlists.route
-        ),
-        LibraryItemData(
-            title = stringResource(id = R.string.music_library_page_favorites),
-            icon = painterResource(id = R.drawable.rounded_genres_24),
-            route = Route.Music.FavoriteGenres.route
-        ),
-        LibraryItemData(
-            title = stringResource(id = R.string.music_library_page_artists),
-            icon = painterResource(id = R.drawable.rounded_artist_24),
-            route = Route.Music.FavoriteArtists.route
-        )
-    )
+	private val _pagerLockState = MutableStateFlow(false)
+	val pagerLockState = _pagerLockState.asStateFlow()
 
-    fun loadUserFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = userDao.getCurrentUser()
-        _favoriteGenres.update { authorizedUser?.favoriteGenres.orEmpty() }
-    }
+	@Composable
+	fun getMenuItems(): List<LibraryItemData> = listOf(
+		LibraryItemData(
+			title = stringResource(id = R.string.music_library_page_playlists),
+			icon = painterResource(id = R.drawable.round_queue_music_24),
+			route = Route.Music.Playlists.route
+		),
+		LibraryItemData(
+			title = stringResource(id = R.string.music_library_page_favorites),
+			icon = painterResource(id = R.drawable.rounded_genres_24),
+			route = Route.Music.FavoriteGenres.route
+		),
+		LibraryItemData(
+			title = stringResource(id = R.string.music_library_page_artists),
+			icon = painterResource(id = R.drawable.rounded_artist_24),
+			route = Route.Music.FavoriteArtists.route
+		)
+	)
 
-    fun loadUserFavoriteArtists() = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = userDao.getCurrentUser()
-        _favoriteArtists.update { authorizedUser?.favoriteArtists.orEmpty() }
-    }
+	fun setPagerLock(value: Boolean) = _pagerLockState.update { value }
+
+	fun horizontalDragHandler(pointerInputScope: PointerInputScope) = viewModelScope.launch {
+		pointerInputScope.detectHorizontalDragGestures(
+			onDragStart = { setPagerLock(true) },
+			onDragEnd = { setPagerLock(false) },
+			onDragCancel = { setPagerLock(false) }
+		) { change, _ -> change.consume() }
+	}
+
+	fun loadUserFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
+		val authorizedUser: User? = userDao.getCurrentUser()
+		_favoriteGenres.update { authorizedUser?.favoriteGenres.orEmpty() }
+	}
+
+	fun loadUserFavoriteArtists() = viewModelScope.launch(Dispatchers.IO) {
+		val authorizedUser: User? = userDao.getCurrentUser()
+		_favoriteArtists.update { authorizedUser?.favoriteArtists.orEmpty() }
+	}
 }

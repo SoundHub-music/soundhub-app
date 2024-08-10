@@ -4,9 +4,9 @@ import androidx.room.TypeConverter
 import com.soundhub.data.model.CountryName
 
 class CountryNameRoomConverter {
-    @TypeConverter
-    fun toStringName(countryName: CountryName): String = countryName.common
+	@TypeConverter
+	fun toStringName(countryName: CountryName): String = countryName.common
 
-    @TypeConverter
-    fun fromStringName(stringName: String): CountryName = CountryName(stringName)
+	@TypeConverter
+	fun fromStringName(stringName: String): CountryName = CountryName(stringName)
 }

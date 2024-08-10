@@ -11,8 +11,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object WebSocketModule {
-    @Provides
-    @Singleton
-    fun providesWebSocketClient(userCredsStore: UserCredsStore): WebSocketClient =
-        WebSocketClient(userCredsStore)
+	@Provides
+	@Singleton
+	fun providesWebSocketClient(userCredsStore: UserCredsStore): WebSocketClient =
+		WebSocketClient(userCredsStore)
 }

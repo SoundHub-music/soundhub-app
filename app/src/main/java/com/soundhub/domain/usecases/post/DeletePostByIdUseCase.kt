@@ -1,23 +1,22 @@
 package com.soundhub.domain.usecases.post
 
 import com.soundhub.data.repository.PostRepository
-import java.lang.Exception
 import java.util.UUID
 import javax.inject.Inject
 
 class DeletePostByIdUseCase @Inject constructor(
-    private val postRepository: PostRepository,
+	private val postRepository: PostRepository,
 ) {
-    suspend operator fun invoke(postId: UUID): Result<UUID?> = runCatching {
+	suspend operator fun invoke(postId: UUID): Result<UUID?> = runCatching {
 
-        var errorResponse: Throwable? = null
-        var deletedPostId: UUID? = null
+		var errorResponse: Throwable? = null
+		var deletedPostId: UUID? = null
 
-        postRepository.deletePost(postId)
-            .onSuccess { response -> deletedPostId = response.body }
-            .onFailure { error -> errorResponse = error.throwable }
+		postRepository.deletePost(postId)
+			.onSuccess { response -> deletedPostId = response.body }
+			.onFailure { error -> errorResponse = error.throwable }
 
-        errorResponse?.let { throw Exception(errorResponse) }
-        return@runCatching deletedPostId
-    }
+		errorResponse?.let { throw Exception(errorResponse) }
+		return@runCatching deletedPostId
+	}
 }

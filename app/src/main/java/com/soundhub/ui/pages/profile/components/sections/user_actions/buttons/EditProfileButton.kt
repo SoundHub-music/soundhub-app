@@ -12,16 +12,16 @@ import com.soundhub.Route
 
 @Composable
 internal fun EditProfileButton(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+	modifier: Modifier = Modifier,
+	navController: NavHostController
 ) {
-    val buttonContent = stringResource(id = R.string.profile_screen_edit_profile_btn_content)
-    val buttonIcon: ImageVector = Icons.Rounded.Person
+	val buttonContent = stringResource(id = R.string.profile_screen_edit_profile_btn_content)
+	val buttonIcon: ImageVector = Icons.Rounded.Person
 
-    ProfileActionLongButton(
-        modifier = modifier,
-        content = buttonContent,
-        buttonIcon = buttonIcon,
-        onClick = { navController.navigate(Route.EditUserData.route) }
-    )
+	ProfileActionLongButton(
+		modifier = modifier,
+		content = buttonContent,
+		buttonIcon = buttonIcon,
+		onClick = { navController.navigate(Route.EditUserData.route) }
+	)
 }

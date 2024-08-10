@@ -40,144 +40,157 @@ import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MessengerAndroidService: Service() {
-    private val CHANNEL_ID = "message_channel"
+class MessengerAndroidService : Service() {
+	private val CHANNEL_ID = "message_channel"
 
-    @Inject
-    lateinit var webSocketClient: WebSocketClient
-    @Inject
-    lateinit var userDao: UserDao
-    @Inject
-    lateinit var chatRepository: ChatRepository
-    @Inject
-    lateinit var messageRepository: MessageRepository
-    @Inject
-    lateinit var uiStateDispatcher: UiStateDispatcher
-    @Inject
-    lateinit var userCredsStore: UserCredsStore
+	@Inject
+	lateinit var webSocketClient: WebSocketClient
 
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
-        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-        .create()
+	@Inject
+	lateinit var userDao: UserDao
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
+	@Inject
+	lateinit var chatRepository: ChatRepository
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.i("WebSocketService", "Service created")
-    }
+	@Inject
+	lateinit var messageRepository: MessageRepository
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        coroutineScope.launch {
-            webSocketClient.connect(Constants.SOUNDHUB_WEBSOCKET)
-            subscribeToAllChats()
-        }
-        return START_STICKY
-    }
+	@Inject
+	lateinit var uiStateDispatcher: UiStateDispatcher
 
-    override fun onDestroy() {
-        super.onDestroy()
-        webSocketClient.disconnect()
-        Log.i("WebSocketService", "Service destroyed")
-    }
+	@Inject
+	lateinit var userCredsStore: UserCredsStore
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
+	private val gson: Gson = GsonBuilder()
+		.registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
+		.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+		.create()
 
-    private suspend fun subscribeToAllChats() = coroutineScope.launch {
-        userDao.getCurrentUser()?.let { user ->
-            val chats: List<Chat> = chatRepository.getAllChatsByUserId(
-                userId = user.id
-            ).getOrNull().orEmpty()
+	private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
-            with(webSocketClient) {
-                val subscriptions: MutableList<Disposable?> = mutableListOf()
+	override fun onCreate() {
+		super.onCreate()
+		Log.i("WebSocketService", "Service created")
+	}
 
-                chats.map { it.id }.forEach { id ->
-                    val subscription = subscribe(
-                        topic = "$WS_GET_MESSAGES_TOPIC/$id",
-                        messageListener = ::onReceiveMessageListener,
-                        errorListener = ::onSubscribeErrorListener
-                    )
-                    subscriptions.add(subscription)
-                }
+	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+		coroutineScope.launch {
+			webSocketClient.connect(Constants.SOUNDHUB_WEBSOCKET)
+			subscribeToAllChats()
+		}
+		return START_STICKY
+	}
 
-                subscribe(
-                    topic = WS_READ_MESSAGE_TOPIC,
-                    messageListener = ::onReadMessageListener,
-                    errorListener = ::onSubscribeErrorListener
-                )
+	override fun onDestroy() {
+		super.onDestroy()
+		webSocketClient.disconnect()
+		Log.i("WebSocketService", "Service destroyed")
+	}
 
-                subscribe(
-                    topic = WS_DELETE_MESSAGE_TOPIC,
-                    messageListener = ::onDeleteMessageListener,
-                    errorListener = ::onSubscribeErrorListener
-                )
-            }
-        }
-    }
+	override fun onBind(intent: Intent?): IBinder? {
+		return null
+	}
 
-    private fun onDeleteMessageListener(message: StompMessage) {
-        Log.i("MessengerAndroidService", "onDeleteMessageListener[1]: $message")
-        coroutineScope.launch {
-            runCatching { gson.fromJson(message.payload, UUID::class.java) }
-                .onFailure { Log.e("MessengerAndroidService", "onDeleteMessageListener[2]: ${it.stackTraceToString()}") }
-                .onSuccess{ uiStateDispatcher.sendDeletedMessage(it) }
-        }
-    }
+	private suspend fun subscribeToAllChats() = coroutineScope.launch {
+		userDao.getCurrentUser()?.let { user ->
+			val chats: List<Chat> = chatRepository.getAllChatsByUserId(
+				userId = user.id
+			).getOrNull().orEmpty()
 
-    private fun onSubscribeErrorListener(throwable: Throwable) {
-        Log.e("MessengerAndroidService", "onSubscribeErrorListener: ${throwable.stackTraceToString()}")
-    }
+			with(webSocketClient) {
+				val subscriptions: MutableList<Disposable?> = mutableListOf()
 
-    private fun onReadMessageListener(message: StompMessage) {
-        Log.i("MessengerAndroidService", "onReadMessageListener: $message")
-        coroutineScope.launch {
-            val readMessage: Message = gson.fromJson(message.payload, Message::class.java)
-            uiStateDispatcher.sendReadMessage(readMessage)
-        }
-    }
+				chats.map { it.id }.forEach { id ->
+					val subscription = subscribe(
+						topic = "$WS_GET_MESSAGES_TOPIC/$id",
+						messageListener = ::onReceiveMessageListener,
+						errorListener = ::onSubscribeErrorListener
+					)
+					subscriptions.add(subscription)
+				}
 
-    private fun onReceiveMessageListener(message: StompMessage) {
-        Log.i("MessengerAndroidService", "onReceiveMessageListener: $message")
+				subscribe(
+					topic = WS_READ_MESSAGE_TOPIC,
+					messageListener = ::onReadMessageListener,
+					errorListener = ::onSubscribeErrorListener
+				)
 
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Напоминание")
-            .setContentText("Пора покормить кота")
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+				subscribe(
+					topic = WS_DELETE_MESSAGE_TOPIC,
+					messageListener = ::onDeleteMessageListener,
+					errorListener = ::onSubscribeErrorListener
+				)
+			}
+		}
+	}
 
-        val notificationManager = NotificationManagerCompat.from(this)
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        notificationManager.notify(1, builder.build())
+	private fun onDeleteMessageListener(message: StompMessage) {
+		Log.i("MessengerAndroidService", "onDeleteMessageListener[1]: $message")
+		coroutineScope.launch {
+			runCatching { gson.fromJson(message.payload, UUID::class.java) }
+				.onFailure {
+					Log.e(
+						"MessengerAndroidService",
+						"onDeleteMessageListener[2]: ${it.stackTraceToString()}"
+					)
+				}
+				.onSuccess { uiStateDispatcher.sendDeletedMessage(it) }
+		}
+	}
 
-        coroutineScope.launch {
-            val receivedMessageResponse: ReceivedMessageResponse = gson
-                .fromJson(message.payload, ReceivedMessageResponse::class.java)
+	private fun onSubscribeErrorListener(throwable: Throwable) {
+		Log.e(
+			"MessengerAndroidService",
+			"onSubscribeErrorListener: ${throwable.stackTraceToString()}"
+		)
+	}
 
-            val receivedMessage: Message? = messageRepository.getMessageById(
-                messageId = receivedMessageResponse.id
-            ).getOrNull()
+	private fun onReadMessageListener(message: StompMessage) {
+		Log.i("MessengerAndroidService", "onReadMessageListener: $message")
+		coroutineScope.launch {
+			val readMessage: Message = gson.fromJson(message.payload, Message::class.java)
+			uiStateDispatcher.sendReadMessage(readMessage)
+		}
+	}
 
-            receivedMessage?.let {
-                uiStateDispatcher.sendReceivedMessage(it)
-            }
-        }
-    }
+	private fun onReceiveMessageListener(message: StompMessage) {
+		Log.i("MessengerAndroidService", "onReceiveMessageListener: $message")
+
+		val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+			.setSmallIcon(R.drawable.ic_launcher_foreground)
+			.setContentTitle("Напоминание")
+			.setContentText("Пора покормить кота")
+			.setAutoCancel(true)
+			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+		val notificationManager = NotificationManagerCompat.from(this)
+		if (ActivityCompat.checkSelfPermission(
+				this,
+				Manifest.permission.POST_NOTIFICATIONS
+			) != PackageManager.PERMISSION_GRANTED
+		) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return
+		}
+		notificationManager.notify(1, builder.build())
+
+		coroutineScope.launch {
+			val receivedMessageResponse: ReceivedMessageResponse = gson
+				.fromJson(message.payload, ReceivedMessageResponse::class.java)
+
+			val receivedMessage: Message? = messageRepository.getMessageById(
+				messageId = receivedMessageResponse.id
+			).getOrNull()
+
+			receivedMessage?.let {
+				uiStateDispatcher.sendReceivedMessage(it)
+			}
+		}
+	}
 }

@@ -10,22 +10,22 @@ import java.io.Serializable
 
 @Entity
 @TypeConverters(
-    StringListRoomConverter::class,
-    AlbumRoomConverter::class
+	StringListRoomConverter::class,
+	AlbumRoomConverter::class
 )
 data class Artist(
-    @PrimaryKey
-    override var id: Int = 0,
+	@PrimaryKey
+	override var id: Int = 0,
 
-    @SerializedName("title")
-    override var name: String? = null,
-    var description: String = "",
-    var genre: List<String> = emptyList(),
-    var style: List<String> = emptyList(),
+	@SerializedName("title")
+	override var name: String? = null,
+	var description: String = "",
+	var genre: List<String> = emptyList(),
+	var style: List<String> = emptyList(),
 
-    @SerializedName("albums")
-    var albums: List<Album> = emptyList(),
+	@SerializedName("albums")
+	var albums: List<Album> = emptyList(),
 
-    @SerializedName("thumb")
-    override var cover: String? = null
-): Serializable, MusicEntity<Int>
+	@SerializedName("thumb")
+	override var cover: String? = null
+) : Serializable, MusicEntity<Int>

@@ -8,11 +8,11 @@ import java.util.UUID
 
 @Entity
 data class Genre(
-    @PrimaryKey
-    @SerializedName("id")
-    override var id: UUID = UUID.randomUUID(),
-    override var name: String? = null,
+	@PrimaryKey
+	@SerializedName("id")
+	override var id: UUID = UUID.randomUUID(),
+	override var name: String? = null,
 
-    @SerializedName("pictureUrl")
-    override var cover: String? = null
-): Serializable, MusicEntity<UUID>
+	@SerializedName("pictureUrl")
+	override var cover: String? = null
+) : Serializable, MusicEntity<UUID>

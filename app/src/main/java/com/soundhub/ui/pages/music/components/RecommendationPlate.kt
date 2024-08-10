@@ -24,39 +24,39 @@ import com.soundhub.R
 
 @Composable
 internal fun RecommendationPlate(
-    modifier: Modifier = Modifier,
-    gradientColor: Brush,
-    text: String,
-    onClick: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	gradientColor: Brush,
+	text: String,
+	onClick: () -> Unit = {}
 ) {
-    Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = modifier
-            .size(130.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .background(
-                brush = gradientColor,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(bottom = 20.dp)
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center,
-            fontFamily = FontFamily(Font(R.font.nunito_bold))
-        )
-    }
+	Box(
+		contentAlignment = Alignment.BottomCenter,
+		modifier = modifier
+			.size(130.dp)
+			.clip(RoundedCornerShape(16.dp))
+			.clickable { onClick() }
+			.background(
+				brush = gradientColor,
+				shape = RoundedCornerShape(16.dp)
+			)
+			.padding(bottom = 20.dp)
+	) {
+		Text(
+			text = text,
+			color = Color.White,
+			fontWeight = FontWeight.Bold,
+			fontSize = 18.sp,
+			textAlign = TextAlign.Center,
+			fontFamily = FontFamily(Font(R.font.nunito_bold))
+		)
+	}
 }
 
 @Composable
 @Preview
 private fun RecommendationPlatePreview() {
-    RecommendationPlate(
-        gradientColor = Brush.linearGradient(listOf(Color(0xFFd18787), Color(0xFFFF0000))),
-        text = "Новинки недели"
-    )
+	RecommendationPlate(
+		gradientColor = Brush.linearGradient(listOf(Color(0xFFd18787), Color(0xFFFF0000))),
+		text = "Новинки недели"
+	)
 }

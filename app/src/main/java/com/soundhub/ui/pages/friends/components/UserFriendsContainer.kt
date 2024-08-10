@@ -15,22 +15,22 @@ import com.soundhub.ui.pages.friends.enums.FriendListPage
 
 @Composable
 fun UserFriendsContainer(
-    friendList: List<User>,
-    navController: NavHostController,
-    chosenPage: FriendListPage,
-    friendsViewModel: FriendsViewModel
+	friendList: List<User>,
+	navController: NavHostController,
+	chosenPage: FriendListPage,
+	friendsViewModel: FriendsViewModel
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        items(items = friendList, key = { it.id }) { user ->
-            FriendCard(
-                user = user,
-                navController = navController,
-                chosenPage = chosenPage,
-                friendsViewModel = friendsViewModel
-            )
-        }
-    }
+	LazyColumn(
+		modifier = Modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.spacedBy(5.dp)
+	) {
+		items(items = friendList, key = { it.id }) { user ->
+			FriendCard(
+				user = user,
+				navController = navController,
+				chosenPage = chosenPage,
+				friendsViewModel = friendsViewModel
+			)
+		}
+	}
 }

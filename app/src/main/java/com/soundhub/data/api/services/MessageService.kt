@@ -11,16 +11,16 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface MessageService {
-    @GET(GET_CHAT_MESSAGES)
-    suspend fun getAllMessagesByChatId(
-        @Path(CHAT_ID_DYNAMIC_PARAM)
-        chatId: UUID
-    ): Response<List<Message>>
+	@GET(GET_CHAT_MESSAGES)
+	suspend fun getAllMessagesByChatId(
+		@Path(CHAT_ID_DYNAMIC_PARAM)
+		chatId: UUID
+	): Response<List<Message>>
 
-    @GET(GET_MESSAGE_BY_ID)
-    suspend fun getMessageById(
-        @Path(MESSAGE_ID_DYNAMIC_PARAM)
-        messageId: UUID
-    ): Response<Message?>
+	@GET(GET_MESSAGE_BY_ID)
+	suspend fun getMessageById(
+		@Path(MESSAGE_ID_DYNAMIC_PARAM)
+		messageId: UUID
+	): Response<Message?>
 
 }

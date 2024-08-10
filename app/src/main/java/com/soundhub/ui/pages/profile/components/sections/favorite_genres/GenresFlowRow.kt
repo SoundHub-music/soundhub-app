@@ -28,51 +28,51 @@ import kotlin.random.Random
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun GenresFlowRow(
-    profileViewModel: ProfileViewModel,
-    isOriginProfile: Boolean,
-    navController: NavHostController
+	profileViewModel: ProfileViewModel,
+	isOriginProfile: Boolean,
+	navController: NavHostController
 ) {
-    val maxItemsPerRow = 3
-    val profileUiState: ProfileUiState by profileViewModel
-        .profileUiState.collectAsState()
+	val maxItemsPerRow = 3
+	val profileUiState: ProfileUiState by profileViewModel
+		.profileUiState.collectAsState()
 
-    val genreList: List<Genre> = profileUiState.profileOwner?.favoriteGenres.orEmpty()
-    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-    val colors = remember(genreList) {
-        List(genreList.size) { generateContrastColor(onPrimaryColor) }
-    }
+	val genreList: List<Genre> = profileUiState.profileOwner?.favoriteGenres.orEmpty()
+	val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+	val colors = remember(genreList) {
+		List(genreList.size) { generateContrastColor(onPrimaryColor) }
+	}
 
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        maxItemsInEachRow = maxItemsPerRow,
+	FlowRow(
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(5.dp),
+		verticalArrangement = Arrangement.spacedBy(10.dp),
+		maxItemsInEachRow = maxItemsPerRow,
 
-        ) {
-        genreList.forEachIndexed { index, genre ->
-            genre.name?.let {
-                FavoriteGenreItem(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .weight(1f),
-                    genreName = it,
-                    genreColor = colors[index]
-                )
-            }
-        }
+		) {
+		genreList.forEachIndexed { index, genre ->
+			genre.name?.let {
+				FavoriteGenreItem(
+					modifier = Modifier
+						.wrapContentWidth()
+						.weight(1f),
+					genreName = it,
+					genreColor = colors[index]
+				)
+			}
+		}
 
-        if (isOriginProfile) IconButton(
-            onClick = { navController.navigate(Route.EditFavoriteGenres.route) },
-            modifier = Modifier.size(40.dp)
-        ) { Icon(Icons.Rounded.Add, contentDescription = "add genre button") }
-    }
+		if (isOriginProfile) IconButton(
+			onClick = { navController.navigate(Route.EditFavoriteGenres.route) },
+			modifier = Modifier.size(40.dp)
+		) { Icon(Icons.Rounded.Add, contentDescription = "add genre button") }
+	}
 }
 
 private fun generateContrastColor(baseColor: Color): Color {
-    val contrastFactor = 1f
-    val r = (baseColor.red + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
-    val g = (baseColor.green + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
-    val b = (baseColor.blue + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
+	val contrastFactor = 1f
+	val r = (baseColor.red + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
+	val g = (baseColor.green + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
+	val b = (baseColor.blue + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
 
-    return Color(r, g, b)
+	return Color(r, g, b)
 }

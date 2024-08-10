@@ -28,78 +28,78 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DomainModule {
-    @Provides
-    @Singleton
-    fun providesUpdateUserUseCase(
-        userRepository: UserRepository
-    ): UpdateUserUseCase = UpdateUserUseCase(userRepository)
+	@Provides
+	@Singleton
+	fun providesUpdateUserUseCase(
+		userRepository: UserRepository
+	): UpdateUserUseCase = UpdateUserUseCase(userRepository)
 
-    @Provides
-    @Singleton
-    fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase =
-        GetImageUseCase(fileRepository)
+	@Provides
+	@Singleton
+	fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase =
+		GetImageUseCase(fileRepository)
 
-    @Provides
-    @Singleton
-    fun providesLoadGenresUseCase(
-        musicRepository: MusicRepository,
-        uiStateDispatcher: UiStateDispatcher
-    ): LoadGenresUseCase = LoadGenresUseCase(musicRepository, uiStateDispatcher)
+	@Provides
+	@Singleton
+	fun providesLoadGenresUseCase(
+		musicRepository: MusicRepository,
+		uiStateDispatcher: UiStateDispatcher
+	): LoadGenresUseCase = LoadGenresUseCase(musicRepository, uiStateDispatcher)
 
-    @Provides
-    @Singleton
-    fun providesLoadArtistsUseCase(musicRepository: MusicRepository): LoadArtistsUseCase =
-        LoadArtistsUseCase(musicRepository)
+	@Provides
+	@Singleton
+	fun providesLoadArtistsUseCase(musicRepository: MusicRepository): LoadArtistsUseCase =
+		LoadArtistsUseCase(musicRepository)
 
-    @Provides
-    @Singleton
-    fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase =
-        GetAllChatsByUserUseCase(chatRepository)
+	@Provides
+	@Singleton
+	fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase =
+		GetAllChatsByUserUseCase(chatRepository)
 
-    @Provides
-    @Singleton
-    fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase =
-        GetOrCreateChatByUserUseCase(chatRepository)
+	@Provides
+	@Singleton
+	fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase =
+		GetOrCreateChatByUserUseCase(chatRepository)
 
-    @Provides
-    @Singleton
-    fun providesSearchArtistsUseCase(musicRepository: MusicRepository): SearchArtistsUseCase =
-        SearchArtistsUseCase(musicRepository)
+	@Provides
+	@Singleton
+	fun providesSearchArtistsUseCase(musicRepository: MusicRepository): SearchArtistsUseCase =
+		SearchArtistsUseCase(musicRepository)
 
-    @Provides
-    @Singleton
-    fun providesGetUserByIdUseCase(
-        userRepository: UserRepository,
-    ): GetUserByIdUseCase = GetUserByIdUseCase(userRepository)
+	@Provides
+	@Singleton
+	fun providesGetUserByIdUseCase(
+		userRepository: UserRepository,
+	): GetUserByIdUseCase = GetUserByIdUseCase(userRepository)
 
-    @Provides
-    @Singleton
-    fun providesLoadAllUserDataUseCase(
-        fileRepository: FileRepository,
-        musicRepository: MusicRepository,
-        userService: UserService,
-    ): LoadAllUserDataUseCase = LoadAllUserDataUseCase(
-        fileRepository = fileRepository,
-        musicRepository = musicRepository,
-        userService = userService
-    )
+	@Provides
+	@Singleton
+	fun providesLoadAllUserDataUseCase(
+		fileRepository: FileRepository,
+		musicRepository: MusicRepository,
+		userService: UserService,
+	): LoadAllUserDataUseCase = LoadAllUserDataUseCase(
+		fileRepository = fileRepository,
+		musicRepository = musicRepository,
+		userService = userService
+	)
 
-    @Provides
-    @Singleton
-    fun providesGetPostsByUserUseCase(
-        postRepository: PostRepository,
-    ): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository)
+	@Provides
+	@Singleton
+	fun providesGetPostsByUserUseCase(
+		postRepository: PostRepository,
+	): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository)
 
-    @Provides
-    @Singleton
-    fun providesDeletePostByIdUseCase(
-        postRepository: PostRepository,
-    ): DeletePostByIdUseCase = DeletePostByIdUseCase(postRepository)
+	@Provides
+	@Singleton
+	fun providesDeletePostByIdUseCase(
+		postRepository: PostRepository,
+	): DeletePostByIdUseCase = DeletePostByIdUseCase(postRepository)
 
-    @Provides
-    @Singleton
-    fun providesTogglePostLikeAndUpdateListUseCase(
-        postRepository: PostRepository
-    ): TogglePostLikeAndUpdateListUseCase =
-        TogglePostLikeAndUpdateListUseCase(postRepository)
+	@Provides
+	@Singleton
+	fun providesTogglePostLikeAndUpdateListUseCase(
+		postRepository: PostRepository
+	): TogglePostLikeAndUpdateListUseCase =
+		TogglePostLikeAndUpdateListUseCase(postRepository)
 }

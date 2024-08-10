@@ -31,134 +31,138 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FriendsViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val uiStateDispatcher: UiStateDispatcher,
-    private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
-    private val getUserByIdUseCase: GetUserByIdUseCase,
-    private val userDao: UserDao,
-): ViewModel() {
-    private var searchUsersJob: Job? = null
-    private val authorizedUser = MutableStateFlow<User?>(null)
+	private val userRepository: UserRepository,
+	private val uiStateDispatcher: UiStateDispatcher,
+	private val getOrCreateChatByUserUseCase: GetOrCreateChatByUserUseCase,
+	private val getUserByIdUseCase: GetUserByIdUseCase,
+	private val userDao: UserDao,
+) : ViewModel() {
+	private var searchUsersJob: Job? = null
+	private val authorizedUser = MutableStateFlow<User?>(null)
 
-    private val _friendsUiState = MutableStateFlow(FriendsUiState())
-    val friendsUiState: StateFlow<FriendsUiState> = _friendsUiState.asStateFlow()
-    val tabs: List<FriendListPage> = listOf(
-        FriendListPage.MAIN,
-        FriendListPage.RECOMMENDATIONS,
-        FriendListPage.SEARCH
-    )
+	private val _friendsUiState = MutableStateFlow(FriendsUiState())
+	val friendsUiState: StateFlow<FriendsUiState> = _friendsUiState.asStateFlow()
+	val tabs: List<FriendListPage> = listOf(
+		FriendListPage.MAIN,
+		FriendListPage.RECOMMENDATIONS,
+		FriendListPage.SEARCH
+	)
 
-    init { viewModelScope.launch { initializeFriendsUiState() } }
+	init {
+		viewModelScope.launch { initializeFriendsUiState() }
+	}
 
-    private suspend fun initializeFriendsUiState() = authorizedUser.update {
-        userDao.getCurrentUser()
-    }
+	private suspend fun initializeFriendsUiState() = authorizedUser.update {
+		userDao.getCurrentUser()
+	}
 
-    fun onNavigateToChatBtnClick(user: User) = viewModelScope.launch(Dispatchers.Main) {
-        getOrCreateChat(user)
-            .firstOrNull()
-            ?.let {
-                val route: Route = Route.Messenger.Chat
-                    .getRouteWithNavArg(it.id.toString())
+	fun onNavigateToChatBtnClick(user: User) = viewModelScope.launch(Dispatchers.Main) {
+		getOrCreateChat(user)
+			.firstOrNull()
+			?.let {
+				val route: Route = Route.Messenger.Chat
+					.getRouteWithNavArg(it.id.toString())
 
-                uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
-            }
-    }
+				uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
+			}
+	}
 
-    fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
-        _friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
-        userRepository.getRecommendedFriends()
-            .onSuccess { response ->
-                _friendsUiState.update {
-                    it.copy(
-                        recommendedFriends = response.body.orEmpty(),
-                        status = ApiStatus.SUCCESS
-                    )
-                }
-        }.onFailure { error ->
-            val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-            uiStateDispatcher.sendUiEvent(errorEvent)
-            _friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
-        }
-    }
+	fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
+		_friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
+		userRepository.getRecommendedFriends()
+			.onSuccess { response ->
+				_friendsUiState.update {
+					it.copy(
+						recommendedFriends = response.body.orEmpty(),
+						status = ApiStatus.SUCCESS
+					)
+				}
+			}.onFailure { error ->
+				val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+				uiStateDispatcher.sendUiEvent(errorEvent)
+				_friendsUiState.update { it.copy(status = ApiStatus.ERROR) }
+			}
+	}
 
-    private fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
-        authorizedUser.value?.let { user ->
-            val chat: Chat? = getOrCreateChatByUserUseCase(
-                interlocutor = interlocutor,
-                userId = user.id
-            )
-            emit(chat)
+	private fun getOrCreateChat(interlocutor: User): Flow<Chat?> = flow {
+		authorizedUser.value?.let { user ->
+			val chat: Chat? = getOrCreateChatByUserUseCase(
+				interlocutor = interlocutor,
+				userId = user.id
+			)
+			emit(chat)
 
-        } ?: emit(null)
-    }
+		} ?: emit(null)
+	}
 
-    fun filterFriendsList(occurrenceString: String, users: List<User>): List<User> {
-        return if (occurrenceString.isNotEmpty() && occurrenceString.isNotBlank())
-            users.filter { SearchUtils.compareWithUsername(it, occurrenceString) }
-        else users
-    }
+	fun filterFriendsList(occurrenceString: String, users: List<User>): List<User> {
+		return if (occurrenceString.isNotEmpty() && occurrenceString.isNotBlank())
+			users.filter { SearchUtils.compareWithUsername(it, occurrenceString) }
+		else users
+	}
 
-    fun searchUsers(username: String) {
-        searchUsersJob?.cancel()
+	fun searchUsers(username: String) {
+		searchUsersJob?.cancel()
 
-        if (username.isEmpty() || username.isBlank()) {
-            _friendsUiState.update { it.copy(foundUsers = emptyList()) }
-            return
-        }
+		if (username.isEmpty() || username.isBlank()) {
+			_friendsUiState.update { it.copy(foundUsers = emptyList()) }
+			return
+		}
 
-        searchUsersJob = viewModelScope.launch(Dispatchers.IO) {
-             userRepository.searchUserByFullName(username)
-                 .onSuccess { response ->
-                 val otherUsers: List<User> = response.body
-                     ?.filter { user -> user.id != authorizedUser.firstOrNull()?.id }
-                     .orEmpty()
+		searchUsersJob = viewModelScope.launch(Dispatchers.IO) {
+			userRepository.searchUserByFullName(username)
+				.onSuccess { response ->
+					val otherUsers: List<User> = response.body
+						?.filter { user -> user.id != authorizedUser.firstOrNull()?.id }
+						.orEmpty()
 
-                 _friendsUiState.update {
-                     it.copy(
-                         foundUsers = otherUsers,
-                         status = ApiStatus.SUCCESS
-                     )
-                 }
-             }
-             .onFailure { error ->
-                 val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                 uiStateDispatcher.sendUiEvent(errorEvent)
-                 _friendsUiState.update { it.copy(
-                     status = ApiStatus.ERROR,
-                     foundUsers = emptyList()
-                 ) }
-             }
-        }
-    }
+					_friendsUiState.update {
+						it.copy(
+							foundUsers = otherUsers,
+							status = ApiStatus.SUCCESS
+						)
+					}
+				}
+				.onFailure { error ->
+					val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+					uiStateDispatcher.sendUiEvent(errorEvent)
+					_friendsUiState.update {
+						it.copy(
+							status = ApiStatus.ERROR,
+							foundUsers = emptyList()
+						)
+					}
+				}
+		}
+	}
 
-    private fun setProfileOwner(user: User?) = viewModelScope.launch(Dispatchers.IO) {
-        _friendsUiState.update {
-            it.copy(profileOwner = user)
-        }
-    }
+	private fun setProfileOwner(user: User?) = viewModelScope.launch(Dispatchers.IO) {
+		_friendsUiState.update {
+			it.copy(profileOwner = user)
+		}
+	}
 
-    fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
-        val authorizedUser: User? = authorizedUser.firstOrNull()
-        val profileOwner: User? = if (authorizedUser?.id == id)
-            authorizedUser
-        else getUserByIdUseCase(id)
+	fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
+		val authorizedUser: User? = authorizedUser.firstOrNull()
+		val profileOwner: User? = if (authorizedUser?.id == id)
+			authorizedUser
+		else getUserByIdUseCase(id)
 
-        setProfileOwner(profileOwner)
-    }
+		setProfileOwner(profileOwner)
+	}
 
-    fun loadUsersCompatibility(userIds: List<UUID>) = viewModelScope.launch(Dispatchers.IO) {
-        userRepository.getUsersCompatibilityPercentage(userIds)
-            .onSuccess { response ->
-                _friendsUiState.update {
-                    it.copy(
-                        userCompatibilityPercentage = response.body
-                    )
-                }
-            }
-            .onFailure { error ->
-                val uiEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-                 uiStateDispatcher.sendUiEvent(uiEvent)
-            }
-    }
+	fun loadUsersCompatibility(userIds: List<UUID>) = viewModelScope.launch(Dispatchers.IO) {
+		userRepository.getUsersCompatibilityPercentage(userIds)
+			.onSuccess { response ->
+				_friendsUiState.update {
+					it.copy(
+						userCompatibilityPercentage = response.body
+					)
+				}
+			}
+			.onFailure { error ->
+				val uiEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+				uiStateDispatcher.sendUiEvent(uiEvent)
+			}
+	}
 }

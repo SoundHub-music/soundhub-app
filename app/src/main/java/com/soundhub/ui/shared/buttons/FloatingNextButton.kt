@@ -15,26 +15,26 @@ import com.soundhub.ui.shared.loaders.CircleLoader
 
 @Composable
 fun FloatingNextButton(
-    modifier: Modifier = Modifier,
-    isLoading: Boolean = false,
-    onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+	isLoading: Boolean = false,
+	onClick: () -> Unit,
 ) {
-    FloatingActionButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        containerColor = MaterialTheme.colorScheme.primary,
-        modifier = modifier
-    ) {
-        if (isLoading) CircleLoader(modifier = Modifier.size(20.dp))
-        else Icon(
-            imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-            contentDescription = "arrow_forward"
-        )
-    }
+	FloatingActionButton(
+		onClick = onClick,
+		shape = RoundedCornerShape(16.dp),
+		containerColor = MaterialTheme.colorScheme.primary,
+		modifier = modifier
+	) {
+		if (isLoading) CircleLoader(modifier = Modifier.size(20.dp))
+		else Icon(
+			imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+			contentDescription = "arrow_forward"
+		)
+	}
 }
 
 @Preview
 @Composable
 private fun NextButtonPreview() {
-    FloatingNextButton {}
+	FloatingNextButton {}
 }

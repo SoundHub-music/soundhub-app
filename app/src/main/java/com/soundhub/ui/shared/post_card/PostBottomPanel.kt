@@ -21,53 +21,53 @@ import androidx.compose.ui.unit.dp
 import com.soundhub.R
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
-import com.soundhub.ui.shared.buttons.LikeButton
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.shared.buttons.LikeButton
 import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 
 @Composable
 internal fun PostBottomPanel(
-    post: Post,
-    postViewModel: PostViewModel,
-    uiStateDispatcher: UiStateDispatcher,
-    onLikePost: (UUID) -> Unit
+	post: Post,
+	postViewModel: PostViewModel,
+	uiStateDispatcher: UiStateDispatcher,
+	onLikePost: (UUID) -> Unit
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
-    var isFavorite: Boolean by rememberSaveable {
-        mutableStateOf(false)
-    }
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val authorizedUser: User? = uiState.authorizedUser
+	var isFavorite: Boolean by rememberSaveable {
+		mutableStateOf(false)
+	}
 
-    LaunchedEffect(key1 = post, key2 = authorizedUser) {
-        isFavorite = postViewModel.isPostLiked(authorizedUser, post)
-    }
+	LaunchedEffect(key1 = post, key2 = authorizedUser) {
+		isFavorite = postViewModel.isPostLiked(authorizedUser, post)
+	}
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (post.likes.isNotEmpty())
-            Text(
-                text = post.likes.size.toString(),
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.nunito_bold_italic))
-            )
-        LikeButton(isFavorite = isFavorite) {
-            isFavorite = !isFavorite
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(8.dp),
+		horizontalArrangement = Arrangement.End,
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		if (post.likes.isNotEmpty())
+			Text(
+				text = post.likes.size.toString(),
+				fontWeight = FontWeight.Bold,
+				fontFamily = FontFamily(Font(R.font.nunito_bold_italic))
+			)
+		LikeButton(isFavorite = isFavorite) {
+			isFavorite = !isFavorite
 
-            authorizedUser?.let {
-                if (isFavorite)
-                    post.likes += authorizedUser
-                else post.likes = post.likes
-                    .filter { it.id != authorizedUser.id }
-                    .toSet()
-            }
-            onLikePost(post.id)
-        }
-    }
+			authorizedUser?.let {
+				if (isFavorite)
+					post.likes += authorizedUser
+				else post.likes = post.likes
+					.filter { it.id != authorizedUser.id }
+					.toSet()
+			}
+			onLikePost(post.id)
+		}
+	}
 }

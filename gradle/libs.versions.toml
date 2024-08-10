@@ -1,14 +1,16 @@
 [versions]
+accompanistDrawablepainter = "0.32.0"
 androidxCore = "1.13.1"
 gradle = "8.5.1"
-lifecycle = "2.8.2"
-activity = "1.9.0"
+haze = "0.7.3"
+lifecycle = "2.8.4"
+activity = "1.9.1"
 composeBom = "2024.06.00"
 compose = "1.6.8"
 material3 = "1.2.1"
 appcompat = "1.7.0"
 material = "1.12.0"
-annotation = "1.8.0"
+annotation = "1.8.1"
 constraintlayout = "2.1.4"
 navigation = "2.7.7"
 hilt = "2.51"
@@ -30,8 +32,10 @@ stomp = "1.6.6"
 rxandroid = "2.1.1"
 
 [libraries]
+accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
 androidCoreKtx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 lifecycleRuntimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }

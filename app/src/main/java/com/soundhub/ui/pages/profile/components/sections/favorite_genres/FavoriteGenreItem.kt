@@ -18,24 +18,24 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun FavoriteGenreItem(genreName: String, genreColor: Color, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.wrapContentSize(),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = genreColor
-        )
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            text = genreName,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 20.sp,
-            fontSize = 14.sp,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+	Card(
+		modifier = modifier.wrapContentSize(),
+		shape = RoundedCornerShape(8.dp),
+		colors = CardDefaults.cardColors(
+			containerColor = genreColor
+		)
+	) {
+		Text(
+			modifier = Modifier
+				.padding(8.dp)
+				.fillMaxWidth(),
+			text = genreName,
+			fontWeight = FontWeight.Bold,
+			lineHeight = 20.sp,
+			fontSize = 14.sp,
+			maxLines = 1,
+			textAlign = TextAlign.Center,
+			overflow = TextOverflow.Ellipsis
+		)
+	}
 }

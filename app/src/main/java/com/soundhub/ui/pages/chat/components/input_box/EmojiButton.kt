@@ -9,11 +9,11 @@ import com.soundhub.R
 
 @Composable
 internal fun EmojiButton() {
-    IconButton(onClick = { /*TODO: implement emoji panel */ }) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_emoji_emotions_24),
-            contentDescription = "emoji",
-            tint = colorResource(id = R.color.emoji_btn_dark)
-        )
-    }
+	IconButton(onClick = { /*TODO: implement emoji panel */ }) {
+		Icon(
+			painter = painterResource(id = R.drawable.baseline_emoji_emotions_24),
+			contentDescription = "emoji",
+			tint = colorResource(id = R.color.emoji_btn_dark)
+		)
+	}
 }

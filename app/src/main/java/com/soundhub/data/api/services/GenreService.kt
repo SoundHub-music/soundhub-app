@@ -6,6 +6,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface GenreService {
-    @GET(GET_GENRES)
-    suspend fun getAllGenres(): Response<List<Genre>>
+	@GET(GET_GENRES)
+	suspend fun getAllGenres(): Response<List<Genre>>
 }

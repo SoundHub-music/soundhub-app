@@ -17,21 +17,21 @@ import com.soundhub.utils.lib.DateFormatter
 
 @Composable
 internal fun MessageTimeAndMarkerRow(
-    message: Message,
-    contentColor: Color,
-    isOwnMessage: Boolean
+	message: Message,
+	contentColor: Color,
+	isOwnMessage: Boolean
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        Text(
-            modifier = Modifier.height(IntrinsicSize.Min),
-            text = DateFormatter.getHourAndMinuteWithSeparator(message.timestamp),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Light,
-            color = contentColor,
-        )
-        MessageReadMarker(isOwnMessage = isOwnMessage, message = message)
-    }
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(2.dp),
+	) {
+		Text(
+			modifier = Modifier.height(IntrinsicSize.Min),
+			text = DateFormatter.getHourAndMinuteWithSeparator(message.timestamp),
+			fontSize = 12.sp,
+			fontWeight = FontWeight.Light,
+			color = contentColor,
+		)
+		MessageReadMarker(isOwnMessage = isOwnMessage, message = message)
+	}
 }

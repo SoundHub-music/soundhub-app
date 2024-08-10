@@ -20,48 +20,48 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.Invite
 import com.soundhub.data.states.NotificationUiState
-import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.pages.notifications.components.FriendRequestNotification
+import com.soundhub.ui.shared.containers.ContentContainer
 
 @Composable
 fun NotificationScreen(
-    navController: NavHostController,
-    notificationViewModel: NotificationViewModel
+	navController: NavHostController,
+	notificationViewModel: NotificationViewModel
 ) {
-    val notificationUiState: NotificationUiState by notificationViewModel
-        .notificationUiState
-        .collectAsState()
+	val notificationUiState: NotificationUiState by notificationViewModel
+		.notificationUiState
+		.collectAsState()
 
-    LaunchedEffect(key1 = true) {
-        notificationViewModel.loadInvites()
-    }
+	LaunchedEffect(key1 = true) {
+		notificationViewModel.loadInvites()
+	}
 
 
-    ContentContainer(
-        modifier = Modifier.padding(top = 10.dp),
-        contentAlignment = if (notificationUiState.notifications.isEmpty()) Alignment.Center
-        else Alignment.TopStart
-    ) {
-        if (notificationUiState.notifications.isEmpty()) Text(
-            text = stringResource(id = R.string.empty_notification_screen),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+	ContentContainer(
+		modifier = Modifier.padding(top = 10.dp),
+		contentAlignment = if (notificationUiState.notifications.isEmpty()) Alignment.Center
+		else Alignment.TopStart
+	) {
+		if (notificationUiState.notifications.isEmpty()) Text(
+			text = stringResource(id = R.string.empty_notification_screen),
+			textAlign = TextAlign.Center,
+			fontSize = 20.sp,
+			fontWeight = FontWeight.Bold
+		)
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(items = notificationUiState.notifications, key = { it.id }) { item ->
-                when (item) {
-                    is Invite ->
-                        FriendRequestNotification(
-                            invite = item,
-                            notificationViewModel = notificationViewModel,
-                            navController = navController
-                        )
-                }
-            }
-        }
-    }
+		LazyColumn(
+			modifier = Modifier.fillMaxSize()
+		) {
+			items(items = notificationUiState.notifications, key = { it.id }) { item ->
+				when (item) {
+					is Invite ->
+						FriendRequestNotification(
+							invite = item,
+							notificationViewModel = notificationViewModel,
+							navController = navController
+						)
+				}
+			}
+		}
+	}
 }

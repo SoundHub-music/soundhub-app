@@ -18,30 +18,30 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 internal fun SectionLabel(
-    modifier: Modifier = Modifier,
-    labelIcon: Painter? = null,
-    iconTint: Color? = null,
-    contentDescription: String? = null,
-    text: String,
+	modifier: Modifier = Modifier,
+	labelIcon: Painter? = null,
+	iconTint: Color? = null,
+	contentDescription: String? = null,
+	text: String,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        if (labelIcon != null && iconTint != null)
-            Icon(
-                painter = labelIcon,
-                contentDescription = contentDescription,
-                modifier = Modifier.size(32.dp),
-                tint = iconTint
-            )
-        Text(
-            modifier = modifier,
-            text = text,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
-    }
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(space = 8.dp),
+		modifier = Modifier.padding(horizontal = 8.dp)
+	) {
+		if (labelIcon != null && iconTint != null)
+			Icon(
+				painter = labelIcon,
+				contentDescription = contentDescription,
+				modifier = Modifier.size(32.dp),
+				tint = iconTint
+			)
+		Text(
+			modifier = modifier,
+			text = text,
+			color = MaterialTheme.colorScheme.onPrimaryContainer,
+			fontWeight = FontWeight.Bold,
+			fontSize = 16.sp
+		)
+	}
 }

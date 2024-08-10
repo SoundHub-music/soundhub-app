@@ -26,67 +26,67 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.containers.FetchStatusContainer
 import com.soundhub.ui.shared.post_card.PostCard
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.PostViewModel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun PostLineScreen(
-    modifier: Modifier = Modifier,
-    postLineViewModel: PostLineViewModel = hiltViewModel(),
-    postViewModel: PostViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher,
-    navController: NavHostController,
+	modifier: Modifier = Modifier,
+	postLineViewModel: PostLineViewModel = hiltViewModel(),
+	postViewModel: PostViewModel = hiltViewModel(),
+	uiStateDispatcher: UiStateDispatcher,
+	navController: NavHostController,
 ) {
-    val context: Context = LocalContext.current
-    val postLineUiState by postLineViewModel.postLineUiState.collectAsState(initial = PostLineUiState())
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
+	val context: Context = LocalContext.current
+	val postLineUiState by postLineViewModel.postLineUiState.collectAsState(initial = PostLineUiState())
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val authorizedUser: User? = uiState.authorizedUser
 
-    val posts = postLineUiState.posts
-    val fetchStatus: ApiStatus = postLineUiState.status
+	val posts = postLineUiState.posts
+	val fetchStatus: ApiStatus = postLineUiState.status
 
-    var messageScreenText: String by rememberSaveable { mutableStateOf("") }
+	var messageScreenText: String by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(key1 = authorizedUser) {
-        postLineViewModel.loadPosts()
-    }
+	LaunchedEffect(key1 = authorizedUser) {
+		postLineViewModel.loadPosts()
+	}
 
-    LaunchedEffect(key1 = posts) {
-        if (posts.isEmpty())
-            messageScreenText = context.getString(R.string.empty_postline_screen)
-    }
+	LaunchedEffect(key1 = posts) {
+		if (posts.isEmpty())
+			messageScreenText = context.getString(R.string.empty_postline_screen)
+	}
 
-    ContentContainer(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.padding(top = 10.dp)
-    ) {
-        FetchStatusContainer(status = fetchStatus) {
-            if (posts.isEmpty())
-                Text(
-                    text = messageScreenText,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            else LazyColumn(
-                    modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    items(items = posts, key = { it.id }) { post ->
-                        PostCard(
-                            navController = navController,
-                            post = post,
-                            uiStateDispatcher = uiStateDispatcher,
-                            postViewModel = postViewModel,
-                            onDeletePost = { id -> postLineViewModel.deletePostById(id) },
-                            onLikePost = { id -> postLineViewModel.togglePostLikeAndUpdatePostList(id) }
-                        )
-                    }
-            }
-        }
-    }
+	ContentContainer(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier.padding(top = 10.dp)
+	) {
+		FetchStatusContainer(status = fetchStatus) {
+			if (posts.isEmpty())
+				Text(
+					text = messageScreenText,
+					fontSize = 20.sp,
+					fontWeight = FontWeight.Bold,
+					textAlign = TextAlign.Center
+				)
+			else LazyColumn(
+				modifier.fillMaxSize(),
+				verticalArrangement = Arrangement.spacedBy(20.dp)
+			) {
+				items(items = posts, key = { it.id }) { post ->
+					PostCard(
+						navController = navController,
+						post = post,
+						uiStateDispatcher = uiStateDispatcher,
+						postViewModel = postViewModel,
+						onDeletePost = { id -> postLineViewModel.deletePostById(id) },
+						onLikePost = { id -> postLineViewModel.togglePostLikeAndUpdatePostList(id) }
+					)
+				}
+			}
+		}
+	}
 }

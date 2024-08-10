@@ -11,8 +11,8 @@ import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.datastore.model.UserSettings
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.events.UiEvent
 import com.soundhub.utils.enums.AppTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -28,87 +28,87 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UiStateDispatcher @Inject constructor(
-    private val userSettingsStore: UserSettingsStore
+	private val userSettingsStore: UserSettingsStore
 ) : ViewModel() {
-    private val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
+	private val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
 
-    private val _uiEvent = Channel<UiEvent>()
-    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
+	private val _uiEvent = Channel<UiEvent>()
+	val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: Flow<UiState> = _uiState.asStateFlow()
+	private val _uiState = MutableStateFlow(UiState())
+	val uiState: Flow<UiState> = _uiState.asStateFlow()
 
-    private val _receivedMessages = Channel<Message>(Channel.BUFFERED)
-    val receivedMessages: Flow<Message> = _receivedMessages.receiveAsFlow()
+	private val _receivedMessages = Channel<Message>(Channel.BUFFERED)
+	val receivedMessages: Flow<Message> = _receivedMessages.receiveAsFlow()
 
-    private val _readMessages = Channel<Message>(Channel.BUFFERED)
-    val readMessages: Flow<Message> = _readMessages.receiveAsFlow()
+	private val _readMessages = Channel<Message>(Channel.BUFFERED)
+	val readMessages: Flow<Message> = _readMessages.receiveAsFlow()
 
-    private val _deletedMessages = Channel<UUID>(Channel.BUFFERED)
-    val deletedMessages: Flow<UUID> = _deletedMessages.receiveAsFlow()
+	private val _deletedMessages = Channel<UUID>(Channel.BUFFERED)
+	val deletedMessages: Flow<UUID> = _deletedMessages.receiveAsFlow()
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("UiStateDispatcher", "onCleared: viewmodel was cleared")
-    }
+	override fun onCleared() {
+		super.onCleared()
+		Log.d("UiStateDispatcher", "onCleared: viewmodel was cleared")
+	}
 
-    fun clearState() = _uiState.update { UiState() }
+	fun clearState() = _uiState.update { UiState() }
 
-    suspend fun sendReceivedMessage(message: Message) {
-        if (!message.isRead)
-            _receivedMessages.send(message)
-    }
+	suspend fun sendReceivedMessage(message: Message) {
+		if (!message.isRead)
+			_receivedMessages.send(message)
+	}
 
-    suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.send(messageId)
+	suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.send(messageId)
 
-    suspend fun sendReadMessage(message: Message) = _readMessages.send(message)
+	suspend fun sendReadMessage(message: Message) = _readMessages.send(message)
 
-    fun setCurrentRoute(route: String?) = _uiState.update {
-        it.copy(currentRoute = route)
-    }
+	fun setCurrentRoute(route: String?) = _uiState.update {
+		it.copy(currentRoute = route)
+	}
 
-    fun setAuthorizedUser(user: User?) = _uiState.update {
-        it.copy(authorizedUser = user)
-    }
+	fun setAuthorizedUser(user: User?) = _uiState.update {
+		it.copy(authorizedUser = user)
+	}
 
-    // search bar visibility
-    fun toggleSearchBarActive() = _uiState.update {
-        it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")
-    }
+	// search bar visibility
+	fun toggleSearchBarActive() = _uiState.update {
+		it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")
+	}
 
-    fun setSearchBarActive(value: Boolean) = _uiState.update {
-        it.copy(isSearchBarActive = value, searchBarText = "")
-    }
+	fun setSearchBarActive(value: Boolean) = _uiState.update {
+		it.copy(isSearchBarActive = value, searchBarText = "")
+	}
 
-    // search bar content
-    fun updateSearchBarText(value: String) = _uiState.update {
-        it.copy(searchBarText = value)
-    }
+	// search bar content
+	fun updateSearchBarText(value: String) = _uiState.update {
+		it.copy(searchBarText = value)
+	}
 
-    fun getSearchBarText(): String = _uiState.value.searchBarText
+	fun getSearchBarText(): String = _uiState.value.searchBarText
 
-    fun setGalleryUrls(value: List<String>) = _uiState.update {
-        it.copy(galleryImageUrls = value)
-    }
+	fun setGalleryUrls(value: List<String>) = _uiState.update {
+		it.copy(galleryImageUrls = value)
+	}
 
-    suspend fun sendUiEvent(event: UiEvent) = _uiEvent.send(event)
+	suspend fun sendUiEvent(event: UiEvent) = _uiEvent.send(event)
 
-    fun setTheme(theme: AppTheme) = viewModelScope.launch {
-        var settings = userSettings.firstOrNull()
+	fun setTheme(theme: AppTheme) = viewModelScope.launch {
+		var settings = userSettings.firstOrNull()
 
-        if (settings?.appTheme != theme) {
-            settings = settings?.copy(appTheme = theme)
-            userSettingsStore.updateCreds(settings)
-        }
-    }
+		if (settings?.appTheme != theme) {
+			settings = settings?.copy(appTheme = theme)
+			userSettingsStore.updateCreds(settings)
+		}
+	}
 
-    @Composable
-    fun getBooleanThemeValue(): Boolean {
-        val settings by userSettings.collectAsState(initial = UserSettings())
-        return when(settings.appTheme) {
-            AppTheme.DARK -> true
-            AppTheme.LIGHT -> false
-            AppTheme.AUTO -> isSystemInDarkTheme()
-        }
-    }
+	@Composable
+	fun getBooleanThemeValue(): Boolean {
+		val settings by userSettings.collectAsState(initial = UserSettings())
+		return when (settings.appTheme) {
+			AppTheme.DARK -> true
+			AppTheme.LIGHT -> false
+			AppTheme.AUTO -> isSystemInDarkTheme()
+		}
+	}
 }

@@ -10,24 +10,23 @@ import com.soundhub.R
 
 @Composable
 fun DismissChangesDialog(
-    navController: NavHostController,
-    updateDialogStateCallback: (Boolean) -> Unit
+	navController: NavHostController,
+	updateDialogStateCallback: (Boolean) -> Unit
 ) {
-
-    AlertDialog(
-        onDismissRequest = { updateDialogStateCallback(false) },
-        dismissButton = {
-            TextButton(onClick = { updateDialogStateCallback(false) }) {
-                Text(text = stringResource(id = R.string.edit_profile_alert_dialog_dismiss_btn))
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                updateDialogStateCallback(false)
-                navController.popBackStack()
-            }) { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_confirm_btn)) }
-        },
-        title = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_title)) },
-        text = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_content)) }
-    )
+	AlertDialog(
+		onDismissRequest = { updateDialogStateCallback(false) },
+		dismissButton = {
+			TextButton(onClick = { updateDialogStateCallback(false) }) {
+				Text(text = stringResource(id = R.string.edit_profile_alert_dialog_dismiss_btn))
+			}
+		},
+		confirmButton = {
+			TextButton(onClick = {
+				updateDialogStateCallback(false)
+				navController.popBackStack()
+			}) { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_confirm_btn)) }
+		},
+		title = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_title)) },
+		text = { Text(text = stringResource(id = R.string.edit_profile_alert_dialog_content)) }
+	)
 }

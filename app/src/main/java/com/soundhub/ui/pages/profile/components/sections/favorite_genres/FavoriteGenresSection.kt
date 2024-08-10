@@ -17,26 +17,26 @@ import com.soundhub.ui.pages.profile.components.SectionLabel
 
 @Composable
 fun FavoriteGenresSection(
-    profileViewModel: ProfileViewModel,
-    isOriginProfile: Boolean,
-    navController: NavHostController
+	profileViewModel: ProfileViewModel,
+	isOriginProfile: Boolean,
+	navController: NavHostController
 ) {
-    ElevatedCard {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(5.dp)
-        ) {
-            SectionLabel(
-                text = stringResource(id = R.string.profile_screen_favorite_genres_section_caption),
-                labelIcon = painterResource(id = R.drawable.round_music_note_24),
-                iconTint = Color(0xFFE75555)
-            )
+	ElevatedCard {
+		Column(
+			verticalArrangement = Arrangement.spacedBy(10.dp),
+			modifier = Modifier.padding(5.dp)
+		) {
+			SectionLabel(
+				text = stringResource(id = R.string.profile_screen_favorite_genres_section_caption),
+				labelIcon = painterResource(id = R.drawable.round_music_note_24),
+				iconTint = Color(0xFFE75555)
+			)
 
-            GenresFlowRow(
-                profileViewModel = profileViewModel,
-                isOriginProfile = isOriginProfile,
-                navController = navController
-            )
-        }
-    }
+			GenresFlowRow(
+				profileViewModel = profileViewModel,
+				isOriginProfile = isOriginProfile,
+				navController = navController
+			)
+		}
+	}
 }

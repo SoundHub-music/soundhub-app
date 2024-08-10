@@ -11,14 +11,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ContentContainer(
-    modifier: Modifier = Modifier,
-    contentAlignment: Alignment = Alignment.TopStart,
-    content: @Composable (BoxScope.() -> Unit)
+	modifier: Modifier = Modifier,
+	contentAlignment: Alignment = Alignment.TopStart,
+	content: @Composable (BoxScope.() -> Unit)
 ) {
-    Box(
-        contentAlignment = contentAlignment,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) { content() }
+	Box(
+		contentAlignment = contentAlignment,
+		modifier = modifier
+			.fillMaxSize()
+			.padding(horizontal = 16.dp)
+	) { content() }
 }

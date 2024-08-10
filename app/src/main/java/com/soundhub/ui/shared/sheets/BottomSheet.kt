@@ -23,45 +23,45 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
-    modifier: Modifier = Modifier,
-    sheetContent: @Composable () -> Unit,
-    content: @Composable () -> Unit = {},
-    scaffoldState: BottomSheetScaffoldState
+	modifier: Modifier = Modifier,
+	sheetContent: @Composable () -> Unit,
+	content: @Composable () -> Unit = {},
+	scaffoldState: BottomSheetScaffoldState
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+	val keyboardController = LocalSoftwareKeyboardController.current
 
-    if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded)
-        keyboardController?.hide()
+	if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded)
+		keyboardController?.hide()
 
-    BottomSheetScaffold(
-        modifier = modifier,
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = { sheetContent() },
-    ) { content() }
+	BottomSheetScaffold(
+		modifier = modifier,
+		scaffoldState = scaffoldState,
+		sheetPeekHeight = 0.dp,
+		sheetContent = { sheetContent() },
+	) { content() }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 private fun BottomSheetPreview() {
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        SheetState(
-            skipPartiallyExpanded = false,
-            density = LocalDensity.current,
-            initialValue = SheetValue.Expanded
-        )
-    )
+	val coroutineScope = rememberCoroutineScope()
+	val scaffoldState = rememberBottomSheetScaffoldState(
+		SheetState(
+			skipPartiallyExpanded = false,
+			density = LocalDensity.current,
+			initialValue = SheetValue.Expanded
+		)
+	)
 
-    BottomSheet(sheetContent = {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                onClick = { coroutineScope.launch { scaffoldState.bottomSheetState.expand() } }
-            ) { Text("Click me") }
-        }
-   }, scaffoldState = scaffoldState)
+	BottomSheet(sheetContent = {
+		Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.Center
+		) {
+			Button(
+				onClick = { coroutineScope.launch { scaffoldState.bottomSheetState.expand() } }
+			) { Text("Click me") }
+		}
+	}, scaffoldState = scaffoldState)
 }

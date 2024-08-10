@@ -29,58 +29,58 @@ import com.soundhub.ui.shared.loaders.CircleLoader
 
 @Composable
 fun ChooseGenresScreen(
-    genreUiState: GenreUiState,
-    onItemPlateClick: (isChosen: Boolean, genre: Genre) -> Unit,
-    onNextButtonClick: () -> Unit
+	genreUiState: GenreUiState,
+	onItemPlateClick: (isChosen: Boolean, genre: Genre) -> Unit,
+	onNextButtonClick: () -> Unit
 ) {
-    val isLoading: Boolean = genreUiState.status == ApiStatus.LOADING
+	val isLoading: Boolean = genreUiState.status == ApiStatus.LOADING
 
-    Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
-                text = stringResource(id = R.string.screen_title_choose_genres),
-                fontSize = 32.sp,
-                lineHeight = 42.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                fontWeight = FontWeight.ExtraBold
-            )
+	Box(
+		modifier = Modifier
+			.background(MaterialTheme.colorScheme.background)
+			.fillMaxSize(),
+	) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier.fillMaxSize()
+		) {
+			Text(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
+				text = stringResource(id = R.string.screen_title_choose_genres),
+				fontSize = 32.sp,
+				lineHeight = 42.sp,
+				color = MaterialTheme.colorScheme.onSecondaryContainer,
+				fontWeight = FontWeight.ExtraBold
+			)
 
-            if (isLoading) CircleLoader()
-            else LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 100.dp),
-                contentPadding = PaddingValues(all = 10.dp),
-                content = {
-                    items(items = genreUiState.genres, key = { it.id }) { genre ->
-                        MusicItemPlate(
-                            modifier = Modifier.padding(bottom = 20.dp),
-                            caption = genre.name ?: "",
-                            thumbnailUrl = genre.cover,
-                            onClick = { isChosen -> onItemPlateClick(isChosen, genre) },
-                            isChosen = genre in genreUiState.chosenGenres,
-                            width = 90.dp,
-                            height = 90.dp
-                        )
-                    }
-                }
-            )
-        }
+			if (isLoading) CircleLoader()
+			else LazyVerticalGrid(
+				columns = GridCells.Adaptive(minSize = 100.dp),
+				contentPadding = PaddingValues(all = 10.dp),
+				content = {
+					items(items = genreUiState.genres, key = { it.id }) { genre ->
+						MusicItemPlate(
+							modifier = Modifier.padding(bottom = 20.dp),
+							caption = genre.name ?: "",
+							thumbnailUrl = genre.cover,
+							onClick = { isChosen -> onItemPlateClick(isChosen, genre) },
+							isChosen = genre in genreUiState.chosenGenres,
+							width = 90.dp,
+							height = 90.dp
+						)
+					}
+				}
+			)
+		}
 
-        FloatingNextButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = onNextButtonClick,
-            isLoading = isLoading
-        )
-    }
+		FloatingNextButton(
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(16.dp),
+			onClick = onNextButtonClick,
+			isLoading = isLoading
+		)
+	}
 }

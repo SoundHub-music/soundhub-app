@@ -24,97 +24,97 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.shared.fields.TransparentSearchTextField
-import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.pages.notifications.NotificationViewModel
+import com.soundhub.ui.shared.fields.TransparentSearchTextField
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun CustomTopAppBar(
-    topBarTitle: String?,
-    uiStateDispatcher: UiStateDispatcher,
-    navController: NavHostController,
-    notificationViewModel: NotificationViewModel
+	topBarTitle: String?,
+	uiStateDispatcher: UiStateDispatcher,
+	navController: NavHostController,
+	notificationViewModel: NotificationViewModel
 ) {
-    topBarTitle?.let {
-        AppHeader(
-            modifier = Modifier.padding(0.dp),
-            pageName = topBarTitle,
-            uiStateDispatcher = uiStateDispatcher,
-            actionButton = {
-                TopBarActions(
-                    navController = navController,
-                    uiStateDispatcher = uiStateDispatcher,
-                    notificationViewModel = notificationViewModel
-                )
-            }
-        )
-    }
+	topBarTitle?.let {
+		AppHeader(
+			modifier = Modifier.padding(0.dp),
+			pageName = topBarTitle,
+			uiStateDispatcher = uiStateDispatcher,
+			actionButton = {
+				TopBarActions(
+					navController = navController,
+					uiStateDispatcher = uiStateDispatcher,
+					notificationViewModel = notificationViewModel
+				)
+			}
+		)
+	}
 }
 
 @Composable
 private fun AppHeader(
-    pageName: String?,
-    modifier: Modifier = Modifier,
-    actionButton: @Composable () -> Unit,
-    uiStateDispatcher: UiStateDispatcher 
+	pageName: String?,
+	modifier: Modifier = Modifier,
+	actionButton: @Composable () -> Unit,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val isSearchBarActive: Boolean = uiState.isSearchBarActive
-    val inputValue: String = uiState.searchBarText
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val isSearchBarActive: Boolean = uiState.isSearchBarActive
+	val inputValue: String = uiState.searchBarText
 
-    Row(
-        modifier = modifier
-            .height(60.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
-            )
-            .shadow(
-                elevation = 4.dp,
-                spotColor = Color(0x40000000),
-                ambientColor = Color(0x40000000)
-            )
-            .padding(5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        if (isSearchBarActive)
-            TransparentSearchTextField(
-                value = inputValue,
-                onValueChange = uiStateDispatcher::updateSearchBarText,
-                modifier = Modifier.padding(horizontal = 10.dp),
-                uiStateDispatcher = uiStateDispatcher
-            )
-        else Row(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            AppLogoWithPageName(pageName)
-            actionButton()
-        }
-    }
+	Row(
+		modifier = modifier
+			.height(60.dp)
+			.fillMaxWidth()
+			.background(
+				color = MaterialTheme.colorScheme.secondaryContainer,
+				shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+			)
+			.shadow(
+				elevation = 4.dp,
+				spotColor = Color(0x40000000),
+				ambientColor = Color(0x40000000)
+			)
+			.padding(5.dp),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.SpaceBetween
+	) {
+		if (isSearchBarActive)
+			TransparentSearchTextField(
+				value = inputValue,
+				onValueChange = uiStateDispatcher::updateSearchBarText,
+				modifier = Modifier.padding(horizontal = 10.dp),
+				uiStateDispatcher = uiStateDispatcher
+			)
+		else Row(
+			modifier = Modifier
+				.padding(10.dp)
+				.fillMaxWidth(),
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.SpaceBetween
+		) {
+			AppLogoWithPageName(pageName)
+			actionButton()
+		}
+	}
 }
 
 @Composable
 private fun AppLogoWithPageName(pageName: String?) {
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        Image(
-            modifier = Modifier
-                .width(40.dp)
-                .height(40.dp),
-            painter = painterResource(id = R.drawable.soundhub_logo),
-            contentDescription = "app logo"
-        )
-        if (pageName != null)
-            Text(
-                text = pageName,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-            )
-    }
+	Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+		Image(
+			modifier = Modifier
+				.width(40.dp)
+				.height(40.dp),
+			painter = painterResource(id = R.drawable.soundhub_logo),
+			contentDescription = "app logo"
+		)
+		if (pageName != null)
+			Text(
+				text = pageName,
+				fontWeight = FontWeight.Bold,
+				fontSize = 24.sp,
+			)
+	}
 }

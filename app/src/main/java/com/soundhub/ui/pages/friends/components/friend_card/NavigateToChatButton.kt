@@ -13,17 +13,17 @@ import com.soundhub.ui.pages.friends.FriendsViewModel
 
 @Composable
 internal fun NavigateToChatButton(
-    user: User,
-    friendsViewModel: FriendsViewModel
+	user: User,
+	friendsViewModel: FriendsViewModel
 ) {
-    FilledTonalIconButton(
-        onClick = { friendsViewModel.onNavigateToChatBtnClick(user) },
-        shape = RoundedCornerShape(5.dp),
-        modifier = Modifier,
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
-            contentDescription = "send message"
-        )
-    }
+	FilledTonalIconButton(
+		onClick = { friendsViewModel.onNavigateToChatBtnClick(user) },
+		shape = RoundedCornerShape(5.dp),
+		modifier = Modifier,
+	) {
+		Icon(
+			painter = painterResource(id = R.drawable.baseline_forward_to_inbox_24),
+			contentDescription = "send message"
+		)
+	}
 }

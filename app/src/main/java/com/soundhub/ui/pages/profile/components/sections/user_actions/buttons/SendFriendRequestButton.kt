@@ -19,58 +19,58 @@ import androidx.compose.ui.unit.dp
 import com.soundhub.R
 import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
-import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun SendFriendRequestButton(
-    modifier: Modifier = Modifier,
-    profileViewModel: ProfileViewModel,
-    uiStateDispatcher: UiStateDispatcher,
-    profileOwner: User?
+	modifier: Modifier = Modifier,
+	profileViewModel: ProfileViewModel,
+	uiStateDispatcher: UiStateDispatcher,
+	profileOwner: User?
 ) {
-    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val isRequestSent: Boolean = profileUiState.isRequestSent
+	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+	val isRequestSent: Boolean = profileUiState.isRequestSent
 
-    val coroutineScope = rememberCoroutineScope()
-    var buttonIconRes by rememberSaveable { mutableIntStateOf(R.drawable.baseline_person_add) }
+	val coroutineScope = rememberCoroutineScope()
+	var buttonIconRes by rememberSaveable { mutableIntStateOf(R.drawable.baseline_person_add) }
 
-    LaunchedEffect(key1 = profileUiState) {
-        if (profileOwner?.id != uiState.authorizedUser?.id)
-            profileViewModel.checkInvite()
-    }
+	LaunchedEffect(key1 = profileUiState) {
+		if (profileOwner?.id != uiState.authorizedUser?.id)
+			profileViewModel.checkInvite()
+	}
 
-    LaunchedEffect(key1 = isRequestSent) {
-        Log.d("SendFriendRequestButton", "was request sent: $isRequestSent")
-        buttonIconRes = getSendRequestBtnIconRes(isRequestSent)
-    }
+	LaunchedEffect(key1 = isRequestSent) {
+		Log.d("SendFriendRequestButton", "was request sent: $isRequestSent")
+		buttonIconRes = getSendRequestBtnIconRes(isRequestSent)
+	}
 
-    FilledTonalIconToggleButton(
-        modifier = modifier.size(48.dp),
-        shape = RoundedCornerShape(10.dp),
-        checked = isRequestSent,
-        onCheckedChange = {
-            coroutineScope.launch {
-                profileViewModel.onSendRequestButtonClick(
-                    isRequestSent = isRequestSent,
-                    user = profileOwner
-                )
-            }
-        },
-    ) {
-        Icon(
-            painter = painterResource(id = buttonIconRes),
-            contentDescription = "add friend button"
-        )
-    }
+	FilledTonalIconToggleButton(
+		modifier = modifier.size(48.dp),
+		shape = RoundedCornerShape(10.dp),
+		checked = isRequestSent,
+		onCheckedChange = {
+			coroutineScope.launch {
+				profileViewModel.onSendRequestButtonClick(
+					isRequestSent = isRequestSent,
+					user = profileOwner
+				)
+			}
+		},
+	) {
+		Icon(
+			painter = painterResource(id = buttonIconRes),
+			contentDescription = "add friend button"
+		)
+	}
 }
 
 
 private fun getSendRequestBtnIconRes(isRequestSent: Boolean): Int =
-    if (isRequestSent)
-        R.drawable.baseline_how_to_reg_24
-    else
-        R.drawable.baseline_person_add
+	if (isRequestSent)
+		R.drawable.baseline_how_to_reg_24
+	else
+		R.drawable.baseline_person_add

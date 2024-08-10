@@ -9,28 +9,28 @@ import java.util.UUID
 import javax.inject.Inject
 
 class GetOrCreateChatByUserUseCase @Inject constructor(
-    private val chatRepository: ChatRepository
+	private val chatRepository: ChatRepository
 ) {
-    suspend operator fun invoke(
-        interlocutor: User?,
-        userId: UUID
-    ): Chat? {
-        if (interlocutor == null)
-            return null
+	suspend operator fun invoke(
+		interlocutor: User?,
+		userId: UUID
+	): Chat? {
+		if (interlocutor == null)
+			return null
 
-        val allChats: List<Chat> = chatRepository
-            .getAllChatsByUserId(userId)
-            .onFailure { Log.e("GetOrCreateChatUseCase", "get all chats error: $it") }
-            .getOrNull()
-            .orEmpty()
+		val allChats: List<Chat> = chatRepository
+			.getAllChatsByUserId(userId)
+			.onFailure { Log.e("GetOrCreateChatUseCase", "get all chats error: $it") }
+			.getOrNull()
+			.orEmpty()
 
-        val isChatExists: Boolean = allChats.any { chat -> interlocutor in chat.participants }
+		val isChatExists: Boolean = allChats.any { chat -> interlocutor in chat.participants }
 
-        return if (!isChatExists)
-            chatRepository.createChat(
-                body = CreateChatRequestBody(interlocutor.id)
-            ).onFailure { Log.e("GetOrCreateChatUseCase", "create chat error: $it") }
-            .getOrNull()
-        else allChats.first { interlocutor in it.participants }
-    }
+		return if (!isChatExists)
+			chatRepository.createChat(
+				body = CreateChatRequestBody(interlocutor.id)
+			).onFailure { Log.e("GetOrCreateChatUseCase", "create chat error: $it") }
+				.getOrNull()
+		else allChats.first { interlocutor in it.participants }
+	}
 }

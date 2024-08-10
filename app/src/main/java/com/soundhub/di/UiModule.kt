@@ -11,8 +11,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object UiModule {
-    @Provides
-    @Singleton
-    fun providesUiEventDispatcher(userSettingsStore: UserSettingsStore): UiStateDispatcher =
-        UiStateDispatcher(userSettingsStore)
+	@Provides
+	@Singleton
+	fun providesUiEventDispatcher(userSettingsStore: UserSettingsStore): UiStateDispatcher =
+		UiStateDispatcher(userSettingsStore)
 }

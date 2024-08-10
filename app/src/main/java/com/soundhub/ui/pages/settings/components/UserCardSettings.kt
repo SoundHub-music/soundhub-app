@@ -17,46 +17,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.soundhub.data.model.User
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 import com.soundhub.ui.shared.avatar.CircularAvatar
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun UserCardSettings(
-    authViewModel: AuthenticationViewModel,
-    uiStateDispatcher: UiStateDispatcher
+	authViewModel: AuthenticationViewModel,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
-    val userFullName: String = authorizedUser?.getFullName() ?: ""
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val authorizedUser: User? = uiState.authorizedUser
+	val userFullName: String = authorizedUser?.getFullName() ?: ""
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 15.dp)
-    ) {
-       Row(
-           horizontalArrangement = Arrangement.SpaceBetween,
-           verticalAlignment = Alignment.CenterVertically,
-           modifier = Modifier.fillMaxWidth()
-       ) {
-           Row(
-               verticalAlignment = Alignment.CenterVertically,
-               horizontalArrangement = Arrangement.spacedBy(10.dp)
-           ) {
-               CircularAvatar(
-                   modifier = Modifier.size(64.dp),
-                   imageUri = authorizedUser?.avatarUrl?.toUri()
-               )
-               Text(
-                   text = userFullName,
-                   fontWeight = FontWeight.Bold,
-                   fontSize = 18.sp,
-                   lineHeight = 32.sp
-               )
-           }
-            LogoutButton(authViewModel)
-       }
-    }
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(bottom = 15.dp)
+	) {
+		Row(
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				CircularAvatar(
+					modifier = Modifier.size(64.dp),
+					imageUri = authorizedUser?.avatarUrl?.toUri()
+				)
+				Text(
+					text = userFullName,
+					fontWeight = FontWeight.Bold,
+					fontSize = 18.sp,
+					lineHeight = 32.sp
+				)
+			}
+			LogoutButton(authViewModel)
+		}
+	}
 }

@@ -20,34 +20,34 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 internal fun ProfileActionLongButton(
-    modifier: Modifier = Modifier,
-    content: String,
-    buttonIcon: ImageVector,
-    onClick: () -> Unit
+	modifier: Modifier = Modifier,
+	content: String,
+	buttonIcon: ImageVector,
+	onClick: () -> Unit
 ) {
-    Button(
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier.height(30.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = buttonIcon,
-                contentDescription = "profile action_button"
-            )
-            Text(
-                text = content,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-    }
+	Button(
+		colors = ButtonDefaults.buttonColors(
+			containerColor = MaterialTheme.colorScheme.primary
+		),
+		modifier = modifier.fillMaxWidth(),
+		shape = RoundedCornerShape(10.dp),
+		onClick = onClick
+	) {
+		Row(
+			modifier = Modifier.height(30.dp),
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Icon(
+				imageVector = buttonIcon,
+				contentDescription = "profile action_button"
+			)
+			Text(
+				text = content,
+				fontWeight = FontWeight.Bold,
+				fontSize = 14.sp,
+				color = MaterialTheme.colorScheme.onPrimary
+			)
+		}
+	}
 }

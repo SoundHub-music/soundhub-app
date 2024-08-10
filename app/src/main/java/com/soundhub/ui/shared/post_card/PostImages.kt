@@ -11,32 +11,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.ui.shared.pagination.PagerPaginationDots
 import com.soundhub.ui.shared.gallery.ImageHorizontalPager
+import com.soundhub.ui.shared.pagination.PagerPaginationDots
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PostImages(
-    modifier: Modifier = Modifier,
-    images: List<String>,
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher
+	modifier: Modifier = Modifier,
+	images: List<String>,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val sliderState = rememberPagerState(initialPage = 0, pageCount = { images.size })
+	val sliderState = rememberPagerState(initialPage = 0, pageCount = { images.size })
 
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            ImageHorizontalPager(
-                navController = navController,
-                pagerState = sliderState,
-                images = images,
-                uiStateDispatcher = uiStateDispatcher
-            )
-            PagerPaginationDots(sliderState = sliderState)
-        }
-    }
+	Box(
+		modifier = modifier.fillMaxWidth(),
+		contentAlignment = Alignment.Center
+	) {
+		Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+			ImageHorizontalPager(
+				navController = navController,
+				pagerState = sliderState,
+				images = images,
+				uiStateDispatcher = uiStateDispatcher
+			)
+			PagerPaginationDots(sliderState = sliderState)
+		}
+	}
 }

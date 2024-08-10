@@ -27,81 +27,81 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.soundhub.data.datastore.UserSettingsStore
-import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.data.states.UiState
+import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 
 @Composable
 fun TransparentSearchTextField(
-    modifier: Modifier = Modifier,
-    value: String = "",
-    onValueChange: (String) -> Unit = {},
-    uiStateDispatcher: UiStateDispatcher 
+	modifier: Modifier = Modifier,
+	value: String = "",
+	onValueChange: (String) -> Unit = {},
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val isSearchBarActive = uiState.isSearchBarActive
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val isSearchBarActive = uiState.isSearchBarActive
 
-    val focusRequester = remember { FocusRequester() }
+	val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(key1 = isSearchBarActive) {
-        if (isSearchBarActive) focusRequester.requestFocus()
-    }
+	LaunchedEffect(key1 = isSearchBarActive) {
+		if (isSearchBarActive) focusRequester.requestFocus()
+	}
 
-    TextField(
-        modifier = modifier
-            .focusRequester(focusRequester)
-            .fillMaxWidth(),
-        value = value,
-        onValueChange = onValueChange,
-        shape = CircleShape,
-        textStyle = TextStyle(
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
-        ),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = "search icon"
-            )
-        },
-        trailingIcon = {
-            CloseSearchBarButton(uiStateDispatcher)
-       },
-        singleLine = true,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-        ),
-    )
+	TextField(
+		modifier = modifier
+			.focusRequester(focusRequester)
+			.fillMaxWidth(),
+		value = value,
+		onValueChange = onValueChange,
+		shape = CircleShape,
+		textStyle = TextStyle(
+			color = MaterialTheme.colorScheme.onBackground,
+			fontSize = 16.sp
+		),
+		leadingIcon = {
+			Icon(
+				imageVector = Icons.Rounded.Search,
+				contentDescription = "search icon"
+			)
+		},
+		trailingIcon = {
+			CloseSearchBarButton(uiStateDispatcher)
+		},
+		singleLine = true,
+		colors = TextFieldDefaults.colors(
+			focusedContainerColor = Color.Transparent,
+			unfocusedContainerColor = Color.Transparent,
+			focusedIndicatorColor = Color.Transparent,
+			unfocusedIndicatorColor = Color.Transparent,
+			disabledContainerColor = Color.Transparent,
+		),
+	)
 }
 
 @Composable
 private fun CloseSearchBarButton(uiStateDispatcher: UiStateDispatcher) {
-    val coroutineScope = rememberCoroutineScope()
+	val coroutineScope = rememberCoroutineScope()
 
-    IconButton(onClick = {
-        coroutineScope.launch { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }
-    }) {
-        Icon(
-            imageVector = Icons.Rounded.Close,
-            contentDescription = "close search bar button"
-        )
-    }
+	IconButton(onClick = {
+		coroutineScope.launch { uiStateDispatcher.sendUiEvent(UiEvent.SearchButtonClick) }
+	}) {
+		Icon(
+			imageVector = Icons.Rounded.Close,
+			contentDescription = "close search bar button"
+		)
+	}
 }
 
 @Composable
 @Preview(name = "SearchTextField", showBackground = true)
 private fun SearchTextFieldPreview() {
-    var text by remember { mutableStateOf("") }
-    val context = LocalContext.current
+	var text by remember { mutableStateOf("") }
+	val context = LocalContext.current
 
-    TransparentSearchTextField(
-        onValueChange = { text = it },
-        value = text,
-        uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context))
-    )
+	TransparentSearchTextField(
+		onValueChange = { text = it },
+		value = text,
+		uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context))
+	)
 }

@@ -30,44 +30,44 @@ import com.soundhub.R
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CircularAvatar(
-    modifier: Modifier = Modifier,
-    avatarViewModel: AvatarViewModel = hiltViewModel(),
-    imageUri: Uri?,
-    shape: Shape = CircleShape,
-    contentDescription: String? = null,
-    onClick: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	avatarViewModel: AvatarViewModel = hiltViewModel(),
+	imageUri: Uri?,
+	shape: Shape = CircleShape,
+	contentDescription: String? = null,
+	onClick: () -> Unit = {}
 ) {
-    var glideUrl: Any? by remember { mutableStateOf(null) }
+	var glideUrl: Any? by remember { mutableStateOf(null) }
 
-    LaunchedEffect(imageUri) {
-        imageUri?.let {
-            glideUrl = avatarViewModel.getGlideUrlOrImageUri(imageUri)
-        }
-    }
+	LaunchedEffect(imageUri) {
+		imageUri?.let {
+			glideUrl = avatarViewModel.getGlideUrlOrImageUri(imageUri)
+		}
+	}
 
-    Box(
-        modifier = modifier
-            .clip(shape)
-            .size(40.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        GlideImage(
-            model = glideUrl,
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .clip(shape)
-                .fillMaxSize()
-                .clickable { onClick() },
-            contentScale = ContentScale.Crop,
-            failure = placeholder(R.drawable.circular_user),
-            transition = CrossFade
-        )
-    }
+	Box(
+		modifier = modifier
+			.clip(shape)
+			.size(40.dp),
+		contentAlignment = Alignment.Center
+	) {
+		GlideImage(
+			model = glideUrl,
+			contentDescription = contentDescription,
+			modifier = Modifier
+				.clip(shape)
+				.fillMaxSize()
+				.clickable { onClick() },
+			contentScale = ContentScale.Crop,
+			failure = placeholder(R.drawable.circular_user),
+			transition = CrossFade
+		)
+	}
 }
 
 @Composable
 @Preview
 private fun CircularAvatarPreview() {
-    val imageState: MutableState<Uri?> = remember { mutableStateOf(null) }
-    CircularAvatar(imageUri = imageState.value)
+	val imageState: MutableState<Uri?> = remember { mutableStateOf(null) }
+	CircularAvatar(imageUri = imageState.value)
 }

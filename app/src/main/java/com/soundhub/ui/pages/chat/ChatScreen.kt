@@ -28,96 +28,96 @@ import com.soundhub.R
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.data.states.UiState
+import com.soundhub.ui.pages.chat.components.input_box.MessageInputBox
+import com.soundhub.ui.pages.chat.components.message_box_list.MessageBoxList
 import com.soundhub.ui.shared.bars.top.ChatTopAppBar
 import com.soundhub.ui.shared.containers.ContentContainer
-import com.soundhub.ui.pages.chat.components.message_box_list.MessageBoxList
-import com.soundhub.ui.pages.chat.components.input_box.MessageInputBox
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 
 @Composable
 fun ChatScreen(
-    chatId: UUID,
-    chatViewModel: ChatViewModel = hiltViewModel(),
-    uiStateDispatcher: UiStateDispatcher,
-    navController: NavHostController
+	chatId: UUID,
+	chatViewModel: ChatViewModel = hiltViewModel(),
+	uiStateDispatcher: UiStateDispatcher,
+	navController: NavHostController
 ) {
-    val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
-    val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val isCheckMessageModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
+	val backgroundImage: Painter = painterResource(id = R.drawable.chat_background)
+	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val isCheckMessageModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
 
-    val authorizedUser: User? = uiState.authorizedUser
-    val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
+	val authorizedUser: User? = uiState.authorizedUser
+	val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
 
-    val lazyListState: LazyListState = rememberLazyListState()
-    val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
+	val lazyListState: LazyListState = rememberLazyListState()
+	val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
 
-    BackHandler {
-        if (isCheckMessageModeEnabled)
-            chatViewModel.unsetCheckMessagesMode()
-        else navController.popBackStack()
-    }
+	BackHandler {
+		if (isCheckMessageModeEnabled)
+			chatViewModel.unsetCheckMessagesMode()
+		else navController.popBackStack()
+	}
 
-    LaunchedEffect(firstVisibleMessageIndex, messages, authorizedUser) {
-        var index = firstVisibleMessageIndex
-        if (firstVisibleMessageIndex > 0)
-            index -= 1
+	LaunchedEffect(firstVisibleMessageIndex, messages, authorizedUser) {
+		var index = firstVisibleMessageIndex
+		if (firstVisibleMessageIndex > 0)
+			index -= 1
 
-        chatViewModel.readVisibleMessagesFromIndex(index)
-    }
+		chatViewModel.readVisibleMessagesFromIndex(index)
+	}
 
-    LaunchedEffect(key1 = chatId) {
-        chatViewModel.loadChatById(chatId)
-    }
+	LaunchedEffect(key1 = chatId) {
+		chatViewModel.loadChatById(chatId)
+	}
 
-    ChatScreenScaffold(
-        chatViewModel = chatViewModel,
-        navController = navController,
-        uiStateDispatcher = uiStateDispatcher
-    ) {
-        ContentContainer(
-            modifier = Modifier
-                .paint(painter = backgroundImage, contentScale = ContentScale.Crop)
-                .background(Color.Transparent)
-                .padding(it)
-                .padding(top = 10.dp),
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(bottom = 10.dp)
-            ) {
-                MessageBoxList(
-                    lazyListState = lazyListState,
-                    chatViewModel = chatViewModel,
-                    modifier = Modifier.weight(1f),
-                    uiStateDispatcher = uiStateDispatcher
-                )
-                MessageInputBox(
-                    lazyListState = lazyListState,
-                    modifier = Modifier,
-                    chatViewModel = chatViewModel,
-                )
-            }
-        }
-    }
+	ChatScreenScaffold(
+		chatViewModel = chatViewModel,
+		navController = navController,
+		uiStateDispatcher = uiStateDispatcher
+	) {
+		ContentContainer(
+			modifier = Modifier
+				.paint(painter = backgroundImage, contentScale = ContentScale.Crop)
+				.background(Color.Transparent)
+				.padding(it)
+				.padding(top = 10.dp),
+		) {
+			Column(
+				verticalArrangement = Arrangement.SpaceBetween,
+				modifier = Modifier.padding(bottom = 10.dp)
+			) {
+				MessageBoxList(
+					lazyListState = lazyListState,
+					chatViewModel = chatViewModel,
+					modifier = Modifier.weight(1f),
+					uiStateDispatcher = uiStateDispatcher
+				)
+				MessageInputBox(
+					lazyListState = lazyListState,
+					modifier = Modifier,
+					chatViewModel = chatViewModel,
+				)
+			}
+		}
+	}
 }
 
 @Composable
 private fun ChatScreenScaffold(
-    chatViewModel: ChatViewModel,
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher,
-    content: @Composable (PaddingValues) -> Unit
+	chatViewModel: ChatViewModel,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher,
+	content: @Composable (PaddingValues) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            ChatTopAppBar(
-                navController = navController,
-                chatViewModel = chatViewModel,
-                uiStateDispatcher = uiStateDispatcher
-            )
-        }
-    ) { content(it) }
+	Scaffold(
+		topBar = {
+			ChatTopAppBar(
+				navController = navController,
+				chatViewModel = chatViewModel,
+				uiStateDispatcher = uiStateDispatcher
+			)
+		}
+	) { content(it) }
 }

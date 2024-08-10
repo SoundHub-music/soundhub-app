@@ -12,23 +12,23 @@ import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.layouts.music_preferences.components.MusicItemPlate
 
 @Composable
-internal fun <T, U: MusicEntity<T>> MusicGridLayout(items: List<U>) {
-    ContentContainer {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 100.dp),
-            contentPadding = PaddingValues(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(items = items, key = { it.id.toString() }) { genre ->
-                MusicItemPlate(
-                    caption = genre.name ?: "",
-                    clickable = false,
-                    thumbnailUrl = genre.cover,
-                    width = 92.dp,
-                    height = 92.dp
-                )
-            }
-        }
-    }
+internal fun <T, U : MusicEntity<T>> MusicGridLayout(items: List<U>) {
+	ContentContainer {
+		LazyVerticalGrid(
+			columns = GridCells.Adaptive(minSize = 100.dp),
+			contentPadding = PaddingValues(20.dp),
+			verticalArrangement = Arrangement.spacedBy(20.dp),
+			horizontalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			items(items = items, key = { it.id.toString() }) { genre ->
+				MusicItemPlate(
+					caption = genre.name ?: "",
+					clickable = false,
+					thumbnailUrl = genre.cover,
+					width = 92.dp,
+					height = 92.dp
+				)
+			}
+		}
+	}
 }

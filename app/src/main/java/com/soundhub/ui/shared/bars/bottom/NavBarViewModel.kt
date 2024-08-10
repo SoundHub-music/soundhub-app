@@ -18,52 +18,52 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class NavBarViewModel @Inject constructor(): ViewModel() {
-    private val _selectedItem = MutableStateFlow<String?>(null)
-    val selectedItem = _selectedItem.asStateFlow()
+class NavBarViewModel @Inject constructor() : ViewModel() {
+	private val _selectedItem = MutableStateFlow<String?>(null)
+	val selectedItem = _selectedItem.asStateFlow()
 
-    fun getNavBarItems(userId: UUID?): List<NavBarItem> {
-        val navBarButtons = mutableListOf(
-            NavBarItem(
-                route = Route.PostLine.route,
-                icon = Icons.Rounded.Home,
-            ),
-            NavBarItem(
-                route = Route.Music.route,
-                icon = Icons.Rounded.QueueMusic,
-            ),
-            NavBarItem(
-                route = Route.Messenger.route,
-                icon = Icons.Rounded.Email
-            ),
-            NavBarItem(
-                route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
-                icon = Icons.Rounded.AccountCircle
-            )
-        )
+	fun getNavBarItems(userId: UUID?): List<NavBarItem> {
+		val navBarButtons = mutableListOf(
+			NavBarItem(
+				route = Route.PostLine.route,
+				icon = Icons.Rounded.Home,
+			),
+			NavBarItem(
+				route = Route.Music.route,
+				icon = Icons.Rounded.QueueMusic,
+			),
+			NavBarItem(
+				route = Route.Messenger.route,
+				icon = Icons.Rounded.Email
+			),
+			NavBarItem(
+				route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
+				icon = Icons.Rounded.AccountCircle
+			)
+		)
 
 
-        return navBarButtons
-    }
+		return navBarButtons
+	}
 
-    fun onMenuItemClick(
-        menuItem: NavBarItem,
-        navController: NavController
-    ) {
-        _selectedItem.update { menuItem.route }
-        Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
+	fun onMenuItemClick(
+		menuItem: NavBarItem,
+		navController: NavController
+	) {
+		_selectedItem.update { menuItem.route }
+		Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
 
-        if (!menuItem.route.contains("null"))
-            navController.navigate(menuItem.route) {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                    inclusive = true
-                }
+		if (!menuItem.route.contains("null"))
+			navController.navigate(menuItem.route) {
+				popUpTo(navController.graph.findStartDestination().id) {
+					saveState = true
+					inclusive = true
+				}
 
-                launchSingleTop = true
-                restoreState = true
-            }
-    }
+				launchSingleTop = true
+				restoreState = true
+			}
+	}
 
-    fun setSelectedItem(value: String?) = _selectedItem.update { value }
+	fun setSelectedItem(value: String?) = _selectedItem.update { value }
 }

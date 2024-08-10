@@ -26,59 +26,59 @@ import java.time.LocalDate
 
 @Composable
 fun DatePicker(
-    modifier: Modifier = Modifier,
-    label: String = "",
-    value: LocalDate?,
-    onValueChange: (String) -> Unit = {},
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isError: Boolean = false,
-    supportingText: @Composable () -> Unit = {}
+	modifier: Modifier = Modifier,
+	label: String = "",
+	value: LocalDate?,
+	onValueChange: (String) -> Unit = {},
+	keyboardActions: KeyboardActions = KeyboardActions.Default,
+	keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+	isError: Boolean = false,
+	supportingText: @Composable () -> Unit = {}
 ) {
-    var stringDate: String by rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
-    val invalidBirthdayMessage: String = stringResource(id = R.string.user_form_invalid_birthday_error_message)
-    val defaultDate: LocalDate = LocalDate.now().minusYears(14).minusMonths(1)
+	var stringDate: String by rememberSaveable { mutableStateOf("") }
+	val context = LocalContext.current
+	val invalidBirthdayMessage: String =
+		stringResource(id = R.string.user_form_invalid_birthday_error_message)
+	val defaultDate: LocalDate = LocalDate.now().minusYears(14).minusMonths(1)
 
-    val focusManager: FocusManager = LocalFocusManager.current
-    val focusRequester: FocusRequester = remember { FocusRequester() }
+	val focusManager: FocusManager = LocalFocusManager.current
+	val focusRequester: FocusRequester = remember { FocusRequester() }
 
-    val dialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            focusManager.clearFocus()
-            val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-            if (selectedDate.plusYears(14) <= LocalDate.now()) {
-                onValueChange(selectedDate.toString())
-                stringDate = selectedDate.toString()
-            }
-            else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
-        },
-        value?.year ?: defaultDate.year,
-        value?.monthValue?.minus(1) ?: defaultDate.monthValue,
-        value?.dayOfMonth ?: defaultDate.dayOfMonth,
-    )
+	val dialog = DatePickerDialog(
+		context,
+		{ _, year, month, dayOfMonth ->
+			focusManager.clearFocus()
+			val selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+			if (selectedDate.plusYears(14) <= LocalDate.now()) {
+				onValueChange(selectedDate.toString())
+				stringDate = selectedDate.toString()
+			} else Toast.makeText(context, invalidBirthdayMessage, Toast.LENGTH_SHORT).show()
+		},
+		value?.year ?: defaultDate.year,
+		value?.monthValue?.minus(1) ?: defaultDate.monthValue,
+		value?.dayOfMonth ?: defaultDate.dayOfMonth,
+	)
 
-    dialog.setOnCancelListener { focusManager.clearFocus() }
+	dialog.setOnCancelListener { focusManager.clearFocus() }
 
-    OutlinedTextField(
-        label = { Text(text = label) },
-        onValueChange = onValueChange,
-        value = value?.toString() ?: "",
-        readOnly = true,
-        modifier = modifier
-            .focusRequester(focusRequester)
-            .onFocusChanged { if (it.isFocused) dialog.show() },
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        supportingText = supportingText,
-        isError = isError
-    )
+	OutlinedTextField(
+		label = { Text(text = label) },
+		onValueChange = onValueChange,
+		value = value?.toString() ?: "",
+		readOnly = true,
+		modifier = modifier
+			.focusRequester(focusRequester)
+			.onFocusChanged { if (it.isFocused) dialog.show() },
+		keyboardOptions = keyboardOptions,
+		keyboardActions = keyboardActions,
+		supportingText = supportingText,
+		isError = isError
+	)
 }
 
 @Composable
 @Preview
 private fun DatePickerPreview() {
-    var value by remember { mutableStateOf("") }
-    DatePicker(value = LocalDate.now(), onValueChange = { value = it })
+	var value by remember { mutableStateOf("") }
+	DatePicker(value = LocalDate.now(), onValueChange = { value = it })
 }

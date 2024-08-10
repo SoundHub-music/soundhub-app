@@ -10,18 +10,20 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response as HttpResponse
 
-class AuthInterceptor(private val userCredsStore: UserCredsStore): Interceptor {
-    override fun intercept(chain: Interceptor.Chain): HttpResponse {
-        val tokens: UserPreferences? = runBlocking { userCredsStore.getCreds().firstOrNull() }
-        val bearerToken: String = HttpUtils.getBearerToken(tokens?.accessToken)
-        val request: Request = chain.request()
+class AuthInterceptor(private val userCredsStore: UserCredsStore) : Interceptor {
+	override fun intercept(chain: Interceptor.Chain): HttpResponse {
+		val tokens: UserPreferences? = runBlocking { userCredsStore.getCreds().firstOrNull() }
+		val bearerToken: String = HttpUtils.getBearerToken(tokens?.accessToken)
+		val request: Request = chain.request()
 
-        if (!request.headers.names().contains(AUTHORIZATION_HEADER))
-            return chain.proceed(chain.request()
-                .newBuilder()
-                .addHeader(AUTHORIZATION_HEADER, bearerToken)
-                .build())
+		if (!request.headers.names().contains(AUTHORIZATION_HEADER))
+			return chain.proceed(
+				chain.request()
+					.newBuilder()
+					.addHeader(AUTHORIZATION_HEADER, bearerToken)
+					.build()
+			)
 
-        return chain.proceed(request)
-    }
+		return chain.proceed(request)
+	}
 }

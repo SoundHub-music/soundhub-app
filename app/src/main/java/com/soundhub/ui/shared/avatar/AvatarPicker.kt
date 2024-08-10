@@ -21,38 +21,38 @@ import com.soundhub.utils.enums.ContentTypes
 
 @Composable
 fun AvatarPicker(
-    modifier: Modifier = Modifier,
-    imageUriState: MutableState<Uri?>,
-    onImagePick: (Uri?) -> Unit
+	modifier: Modifier = Modifier,
+	imageUriState: MutableState<Uri?>,
+	onImagePick: (Uri?) -> Unit
 ) {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri -> onImagePick(uri) }
+	val launcher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.GetContent()
+	) { uri -> onImagePick(uri) }
 
-    LaunchedEffect(key1 = imageUriState.value) {
-        Log.d("AvatarPicker", imageUriState.value?.scheme.toString())
-    }
+	LaunchedEffect(key1 = imageUriState.value) {
+		Log.d("AvatarPicker", imageUriState.value?.scheme.toString())
+	}
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularAvatar(
-            modifier = Modifier.size(150.dp),
-            imageUri = imageUriState.value,
-            onClick = { launcher.launch(ContentTypes.IMAGE_ALL.type) }
-        )
-    }
+	Column(
+		modifier = modifier
+			.fillMaxWidth()
+			.padding(16.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		CircularAvatar(
+			modifier = Modifier.size(150.dp),
+			imageUri = imageUriState.value,
+			onClick = { launcher.launch(ContentTypes.IMAGE_ALL.type) }
+		)
+	}
 }
 
 @Composable
 @Preview
 private fun AvatarPickerPreview() {
-    val imageUri: MutableState<Uri?> = remember { mutableStateOf(null) }
-    AvatarPicker(
-        imageUriState = imageUri,
-        onImagePick = { imageUri.value = it }
-    )
+	val imageUri: MutableState<Uri?> = remember { mutableStateOf(null) }
+	AvatarPicker(
+		imageUriState = imageUri,
+		onImagePick = { imageUri.value = it }
+	)
 }

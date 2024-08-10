@@ -8,17 +8,17 @@ import org.mapstruct.factory.Mappers
 
 @Mapper
 interface PostMapper {
-    @Mapping(target = "id", source = "postId")
-    fun fromPostEditorStateToPost(state: PostEditorState): Post
+	@Mapping(target = "id", source = "postId")
+	fun fromPostEditorStateToPost(state: PostEditorState): Post
 
-    @Mapping(target = "postId", source = "id")
-    @Mapping(target = "newImages", ignore = true)
-    @Mapping(target = "imagesToBeDeleted", ignore = true)
-    @Mapping(target = "doesPostExist", ignore = true)
-    @Mapping(target = "oldPostState", ignore = true)
-    fun fromPostToPostEditorState(post: Post): PostEditorState
+	@Mapping(target = "postId", source = "id")
+	@Mapping(target = "newImages", ignore = true)
+	@Mapping(target = "imagesToBeDeleted", ignore = true)
+	@Mapping(target = "doesPostExist", ignore = true)
+	@Mapping(target = "oldPostState", ignore = true)
+	fun fromPostToPostEditorState(post: Post): PostEditorState
 
-    companion object {
-        val impl: PostMapper = Mappers.getMapper(PostMapper::class.java)
-    }
+	companion object {
+		val impl: PostMapper = Mappers.getMapper(PostMapper::class.java)
+	}
 }

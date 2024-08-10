@@ -38,108 +38,109 @@ import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Artist
 import com.soundhub.data.states.ArtistUiState
+import com.soundhub.data.states.UiState
 import com.soundhub.ui.shared.buttons.FloatingNextButton
 import com.soundhub.ui.shared.containers.ContentContainer
-import com.soundhub.data.states.UiState
 import com.soundhub.ui.shared.layouts.music_preferences.components.MusicItemPlate
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun ChooseArtistsScreen(
-    artistUiState: ArtistUiState,
-    onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
-    uiStateDispatcher: UiStateDispatcher,
-    onNextButtonClick: () -> Unit,
-    onSearchFieldChange: (value: String) -> Unit,
-    lazyGridState: LazyGridState
+	artistUiState: ArtistUiState,
+	onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
+	uiStateDispatcher: UiStateDispatcher,
+	onNextButtonClick: () -> Unit,
+	onSearchFieldChange: (value: String) -> Unit,
+	lazyGridState: LazyGridState
 ) {
-    val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val artists = remember(artistUiState.artists) { artistUiState.artists }
-    val chosenArtistIds = remember(artistUiState.chosenArtists) {
-        artistUiState.chosenArtists.map { it.id }
-    }
+	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val artists = remember(artistUiState.artists) { artistUiState.artists }
+	val chosenArtistIds = remember(artistUiState.chosenArtists) {
+		artistUiState.chosenArtists.map { it.id }
+	}
 
-    LaunchedEffect(key1 = artistUiState) {
-        Log.d("ChooseArtistsScreen", "ui state: $artistUiState")
-    }
+	LaunchedEffect(key1 = artistUiState) {
+		Log.d("ChooseArtistsScreen", "ui state: $artistUiState")
+	}
 
-    ContentContainer(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize(),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
-                text = stringResource(id = R.string.screen_title_choose_artists),
-                fontSize = 32.sp,
-                lineHeight = 42.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                fontWeight = FontWeight.ExtraBold
-            )
+	ContentContainer(
+		modifier = Modifier
+			.background(MaterialTheme.colorScheme.background)
+			.fillMaxSize(),
+	) {
+		Column(
+			modifier = Modifier.fillMaxSize(),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			Text(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
+				text = stringResource(id = R.string.screen_title_choose_artists),
+				fontSize = 32.sp,
+				lineHeight = 42.sp,
+				color = MaterialTheme.colorScheme.onSecondaryContainer,
+				fontWeight = FontWeight.ExtraBold
+			)
 
-            OutlinedTextField(
-                value = uiState.searchBarText,
-                onValueChange = onSearchFieldChange,
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                singleLine = true,
-                trailingIcon = {
-                    Icon(imageVector = Icons.Rounded.Search, contentDescription = "search bar")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-            )
+			OutlinedTextField(
+				value = uiState.searchBarText,
+				onValueChange = onSearchFieldChange,
+				colors = TextFieldDefaults.colors(
+					unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+				),
+				singleLine = true,
+				trailingIcon = {
+					Icon(imageVector = Icons.Rounded.Search, contentDescription = "search bar")
+				},
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(bottom = 5.dp),
+			)
 
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 100.dp),
-                contentPadding = PaddingValues(all = 10.dp),
-                state = lazyGridState
-            ) {
-                items(items = artists) { artist ->
-                    MusicItemPlate(
-                        modifier = Modifier.padding(bottom = 20.dp),
-                        caption = artist.name ?: "",
-                        thumbnailUrl = artist.cover,
-                        onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
-                        isChosen = artist.id in chosenArtistIds,
-                        width = 90.dp,
-                        height = 90.dp
-                    )
-                }
-            }
-        }
+			LazyVerticalGrid(
+				columns = GridCells.Adaptive(minSize = 100.dp),
+				contentPadding = PaddingValues(all = 10.dp),
+				state = lazyGridState
+			) {
+				items(items = artists) { artist ->
+					MusicItemPlate(
+						modifier = Modifier.padding(bottom = 20.dp),
+						caption = artist.name ?: "",
+						thumbnailUrl = artist.cover,
+						onClick = { isChosen -> onItemPlateClick(isChosen, artist) },
+						isChosen = artist.id in chosenArtistIds,
+						width = 90.dp,
+						height = 90.dp
+					)
+				}
+			}
+		}
 
-        FloatingNextButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = onNextButtonClick,
-            isLoading = artistUiState.status != ApiStatus.SUCCESS
-        )
-    }
+		FloatingNextButton(
+			modifier = Modifier
+				.align(Alignment.BottomEnd)
+				.padding(16.dp),
+			onClick = onNextButtonClick,
+			isLoading = artistUiState.status != ApiStatus.SUCCESS
+		)
+	}
 }
 
 @Composable
-@Preview(showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-            or Configuration.UI_MODE_TYPE_NORMAL
+@Preview(
+	showSystemUi = true,
+	uiMode = Configuration.UI_MODE_NIGHT_YES
+			or Configuration.UI_MODE_TYPE_NORMAL
 )
 private fun ChooseArtistsPreview() {
-    val context = LocalContext.current
-    ChooseArtistsScreen(
-        artistUiState = ArtistUiState(),
-        onItemPlateClick = {_, _ ->  },
-        uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context)),
-        onNextButtonClick = {},
-        onSearchFieldChange = {},
-        lazyGridState = rememberLazyGridState()
-    )
+	val context = LocalContext.current
+	ChooseArtistsScreen(
+		artistUiState = ArtistUiState(),
+		onItemPlateClick = { _, _ -> },
+		uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context)),
+		onNextButtonClick = {},
+		onSearchFieldChange = {},
+		lazyGridState = rememberLazyGridState()
+	)
 }

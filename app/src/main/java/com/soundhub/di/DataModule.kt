@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.soundhub.data.dao.CountryDao
+import com.soundhub.data.dao.LastFmDao
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
@@ -24,40 +25,44 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-    @Provides
-    @Singleton
-    fun providesUserDataStore(@ApplicationContext context: Context): UserCredsStore =
-        UserCredsStore(context)
+	@Provides
+	@Singleton
+	fun providesUserDataStore(@ApplicationContext context: Context): UserCredsStore =
+		UserCredsStore(context)
 
-    @Provides
-    @Singleton
-    fun providesSettingsDataStore(@ApplicationContext context: Context): UserSettingsStore =
-        UserSettingsStore(context)
+	@Provides
+	@Singleton
+	fun providesSettingsDataStore(@ApplicationContext context: Context): UserSettingsStore =
+		UserSettingsStore(context)
 
-    @Provides
-    @Singleton
-    fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(
-            context = context,
-            klass = AppDatabase::class.java,
-            name = Constants.ROOM_DB_NAME
-        )
-            .fallbackToDestructiveMigration()
-            .build()
+	@Provides
+	@Singleton
+	fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase =
+		Room.databaseBuilder(
+			context = context,
+			klass = AppDatabase::class.java,
+			name = Constants.ROOM_DB_NAME
+		)
+			.fallbackToDestructiveMigration()
+			.build()
 
-    @Provides
-    @Singleton
-    fun providesUserDao(database: AppDatabase): UserDao = database.userDao()
+	@Provides
+	@Singleton
+	fun providesUserDao(database: AppDatabase): UserDao = database.userDao()
 
-    @Provides
-    @Singleton
-    fun providesCountryDao(database: AppDatabase): CountryDao = database.countryDao()
+	@Provides
+	@Singleton
+	fun providesCountryDao(database: AppDatabase): CountryDao = database.countryDao()
 
-    @Provides
-    @Singleton
-    fun providesGsonWithDateConverters(): Gson = GsonBuilder()
-        .setPrettyPrinting()
-        .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-        .create()
+	@Provides
+	@Singleton
+	fun providesLastFmDao(database: AppDatabase): LastFmDao = database.lastFmDao()
+
+	@Provides
+	@Singleton
+	fun providesGsonWithDateConverters(): Gson = GsonBuilder()
+		.setPrettyPrinting()
+		.registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
+		.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
+		.create()
 }

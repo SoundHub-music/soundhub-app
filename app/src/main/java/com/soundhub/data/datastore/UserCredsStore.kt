@@ -15,32 +15,32 @@ import kotlinx.coroutines.flow.map
 
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-    name = Constants.DATASTORE_USER_CREDS
+	name = Constants.DATASTORE_USER_CREDS
 )
 
-class UserCredsStore(private val context: Context): BaseDataStore<UserPreferences>() {
-     private object PreferenceKeys {
-         val accessToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_ACCESS_TOKEN)
-         val refreshToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_REFRESH_TOKEN)
-     }
+class UserCredsStore(private val context: Context) : BaseDataStore<UserPreferences>() {
+	private object PreferenceKeys {
+		val accessToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_ACCESS_TOKEN)
+		val refreshToken: Preferences.Key<String> = stringPreferencesKey(DATASTORE_REFRESH_TOKEN)
+	}
 
-    override suspend fun updateCreds(creds: UserPreferences?) {
-        context.dataStore.edit { pref ->
-            pref[PreferenceKeys.accessToken] = creds?.accessToken ?: ""
-            pref[PreferenceKeys.refreshToken] = creds?.refreshToken ?: ""
-        }
-    }
+	override suspend fun updateCreds(creds: UserPreferences?) {
+		context.dataStore.edit { pref ->
+			pref[PreferenceKeys.accessToken] = creds?.accessToken ?: ""
+			pref[PreferenceKeys.refreshToken] = creds?.refreshToken ?: ""
+		}
+	}
 
-    override fun getCreds(): Flow<UserPreferences> {
-        return context.dataStore.data.map {
-            pref -> UserPreferences(
-                accessToken = pref[PreferenceKeys.accessToken],
-                refreshToken = pref[PreferenceKeys.refreshToken]
-            )
-        }
-    }
+	override fun getCreds(): Flow<UserPreferences> {
+		return context.dataStore.data.map { pref ->
+			UserPreferences(
+				accessToken = pref[PreferenceKeys.accessToken],
+				refreshToken = pref[PreferenceKeys.refreshToken]
+			)
+		}
+	}
 
-    override suspend fun clear() {
-        context.dataStore.edit { it.clear() }
-    }
+	override suspend fun clear() {
+		context.dataStore.edit { it.clear() }
+	}
 }

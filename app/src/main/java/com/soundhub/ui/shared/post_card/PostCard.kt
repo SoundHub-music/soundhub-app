@@ -24,50 +24,50 @@ import java.util.UUID
 
 @Composable
 fun PostCard(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher,
-    postViewModel: PostViewModel = hiltViewModel(),
-    post: Post,
-    onLikePost: (UUID) -> Unit = {},
-    onDeletePost: (UUID) -> Unit = {}
+	modifier: Modifier = Modifier,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher,
+	postViewModel: PostViewModel = hiltViewModel(),
+	post: Post,
+	onLikePost: (UUID) -> Unit = {},
+	onDeletePost: (UUID) -> Unit = {}
 ) {
-    val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-    val authorizedUser: User? = uiState.authorizedUser
+	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
+	val authorizedUser: User? = uiState.authorizedUser
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 6.dp,
-                spotColor = Color(0x40000000),
-                ambientColor = Color(0x40000000)
-            ),
-        border = BorderStroke(1.dp, borderColor)
-    ) {
-        PostHeader(
-            navController = navController,
-            currentUser = authorizedUser,
-            onDeletePost = onDeletePost,
-            post = post
-        )
-        PostContent(textContent = post.content)
-        PostImages(
-            images = post.images,
-            navController = navController,
-            uiStateDispatcher = uiStateDispatcher
-        )
-        authorizedUser?.let {
-            PostBottomPanel(
-                post = post,
-                postViewModel = postViewModel,
-                uiStateDispatcher = uiStateDispatcher,
-                onLikePost = onLikePost
-            )
-        }
-    }
+	Card(
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.surface,
+			contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+		),
+		modifier = modifier
+			.fillMaxWidth()
+			.shadow(
+				elevation = 6.dp,
+				spotColor = Color(0x40000000),
+				ambientColor = Color(0x40000000)
+			),
+		border = BorderStroke(1.dp, borderColor)
+	) {
+		PostHeader(
+			navController = navController,
+			currentUser = authorizedUser,
+			onDeletePost = onDeletePost,
+			post = post
+		)
+		PostContent(textContent = post.content)
+		PostImages(
+			images = post.images,
+			navController = navController,
+			uiStateDispatcher = uiStateDispatcher
+		)
+		authorizedUser?.let {
+			PostBottomPanel(
+				post = post,
+				postViewModel = postViewModel,
+				uiStateDispatcher = uiStateDispatcher,
+				onLikePost = onLikePost
+			)
+		}
+	}
 }

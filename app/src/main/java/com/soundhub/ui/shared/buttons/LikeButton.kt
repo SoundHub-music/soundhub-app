@@ -10,19 +10,19 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun LikeButton(isFavorite: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    IconToggleButton(
-        onCheckedChange = onCheckedChange,
-        checked = isFavorite
-    ) {
-        if (isFavorite)
-            Icon(
-                Icons.Rounded.Favorite,
-                contentDescription = "like",
-                tint = Color.Red
-            )
-        else Icon(
-            Icons.Rounded.FavoriteBorder,
-            contentDescription = "not like",
-        )
-    }
+	IconToggleButton(
+		onCheckedChange = onCheckedChange,
+		checked = isFavorite
+	) {
+		if (isFavorite)
+			Icon(
+				Icons.Rounded.Favorite,
+				contentDescription = "like",
+				tint = Color.Red
+			)
+		else Icon(
+			Icons.Rounded.FavoriteBorder,
+			contentDescription = "not like",
+		)
+	}
 }

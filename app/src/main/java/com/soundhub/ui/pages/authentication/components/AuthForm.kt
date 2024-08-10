@@ -40,157 +40,157 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
+import com.soundhub.ui.pages.authentication.AuthFormState
 import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 import com.soundhub.ui.pages.authentication.registration.RegistrationViewModel
-import com.soundhub.ui.pages.authentication.AuthFormState
 import com.soundhub.ui.shared.loaders.CircleLoader
 import com.soundhub.utils.lib.AuthValidator
 
 @Composable
 fun AuthForm(
-    isBottomSheetHidden: Boolean,
-    authViewModel: AuthenticationViewModel,
-    registrationViewModel: RegistrationViewModel
+	isBottomSheetHidden: Boolean,
+	authViewModel: AuthenticationViewModel,
+	registrationViewModel: RegistrationViewModel
 ) {
-    val density: Density = LocalDensity.current
-    val context: Context = LocalContext.current
+	val density: Density = LocalDensity.current
+	val context: Context = LocalContext.current
 
-    val authFormState by authViewModel.authFormState.collectAsState()
-    var buttonFormText: String = getButtonFormText(authFormState.isRegisterForm, context)
+	val authFormState by authViewModel.authFormState.collectAsState()
+	var buttonFormText: String = getButtonFormText(authFormState.isRegisterForm, context)
 
-    if (isBottomSheetHidden) authViewModel.resetAuthFormState()
-    if (!authFormState.isRegisterForm) authViewModel.resetRepeatedPassword()
+	if (isBottomSheetHidden) authViewModel.resetAuthFormState()
+	if (!authFormState.isRegisterForm) authViewModel.resetRepeatedPassword()
 
-    LaunchedEffect(key1 = authFormState.isRegisterForm) {
-        buttonFormText = getButtonFormText(authFormState.isRegisterForm, context)
-    }
+	LaunchedEffect(key1 = authFormState.isRegisterForm) {
+		buttonFormText = getButtonFormText(authFormState.isRegisterForm, context)
+	}
 
-    LaunchedEffect(key1 = authFormState) {
-        Log.d("AuthForm", "state: $authFormState")
-    }
+	LaunchedEffect(key1 = authFormState) {
+		Log.d("AuthForm", "state: $authFormState")
+	}
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 30.dp, end = 30.dp, bottom = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(start = 30.dp, end = 30.dp, bottom = 20.dp),
+		verticalArrangement = Arrangement.spacedBy(5.dp)
+	) {
 
-        // email field
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = authFormState.email,
-            singleLine = true,
-            onValueChange = authViewModel::setEmail,
-            label = { Text(stringResource(id = R.string.email_label)) },
-            isError = !authFormState.isEmailValid,
-            supportingText = {
-                if (!authFormState.isEmailValid)
-                    Text(
-                        text = stringResource(id = R.string.invalid_email),
-                        color = MaterialTheme.colorScheme.error
-                    )
-            },
-            placeholder = { Text(stringResource(R.string.email_placeholder)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
+		// email field
+		OutlinedTextField(
+			modifier = Modifier.fillMaxWidth(),
+			value = authFormState.email,
+			singleLine = true,
+			onValueChange = authViewModel::setEmail,
+			label = { Text(stringResource(id = R.string.email_label)) },
+			isError = !authFormState.isEmailValid,
+			supportingText = {
+				if (!authFormState.isEmailValid)
+					Text(
+						text = stringResource(id = R.string.invalid_email),
+						color = MaterialTheme.colorScheme.error
+					)
+			},
+			placeholder = { Text(stringResource(R.string.email_placeholder)) },
+			keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+		)
 
-        // password field
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = authFormState.password,
-            singleLine = true,
-            onValueChange = authViewModel::setPassword,
-            label = { Text(stringResource(id = R.string.password_label)) },
-            isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
-            visualTransformation = PasswordVisualTransformation(),
-            placeholder = { Text(stringResource(R.string.password_placeholder)) },
-            supportingText = { ErrorPasswordFieldMessage(authFormState) }
-        )
+		// password field
+		OutlinedTextField(
+			modifier = Modifier.fillMaxWidth(),
+			value = authFormState.password,
+			singleLine = true,
+			onValueChange = authViewModel::setPassword,
+			label = { Text(stringResource(id = R.string.password_label)) },
+			isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
+			visualTransformation = PasswordVisualTransformation(),
+			placeholder = { Text(stringResource(R.string.password_placeholder)) },
+			supportingText = { ErrorPasswordFieldMessage(authFormState) }
+		)
 
-        // repeated password field
-        AnimatedVisibility(
-            visible = authFormState.isRegisterForm,
-            enter = slideInVertically(initialOffsetY = { with(density) { -40.dp.roundToPx() } }) +
-                    expandVertically(expandFrom = Alignment.Top) +
-                    fadeIn(initialAlpha = 0.3f),
-            exit = slideOutVertically(targetOffsetY = { with(density) { -40.dp.roundToPx() } }) +
-                    shrinkVertically(shrinkTowards = Alignment.Top) +
-                    fadeOut()
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = authFormState.repeatedPassword,
-                singleLine = true,
-                onValueChange = authViewModel::setRepeatedPassword,
-                label = { Text(stringResource(id = R.string.repeat_password_label)) },
-                isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
-                visualTransformation = PasswordVisualTransformation(),
-                placeholder = { Text(stringResource(R.string.password_placeholder)) },
-                supportingText = { ErrorPasswordFieldMessage(authFormState) }
-            )
-        }
+		// repeated password field
+		AnimatedVisibility(
+			visible = authFormState.isRegisterForm,
+			enter = slideInVertically(initialOffsetY = { with(density) { -40.dp.roundToPx() } }) +
+					expandVertically(expandFrom = Alignment.Top) +
+					fadeIn(initialAlpha = 0.3f),
+			exit = slideOutVertically(targetOffsetY = { with(density) { -40.dp.roundToPx() } }) +
+					shrinkVertically(shrinkTowards = Alignment.Top) +
+					fadeOut()
+		) {
+			OutlinedTextField(
+				modifier = Modifier.fillMaxWidth(),
+				value = authFormState.repeatedPassword,
+				singleLine = true,
+				onValueChange = authViewModel::setRepeatedPassword,
+				label = { Text(stringResource(id = R.string.repeat_password_label)) },
+				isError = !authFormState.isPasswordValid || !authFormState.arePasswordsEqual,
+				visualTransformation = PasswordVisualTransformation(),
+				placeholder = { Text(stringResource(R.string.password_placeholder)) },
+				supportingText = { ErrorPasswordFieldMessage(authFormState) }
+			)
+		}
 
-        AuthFormSwitch(
-            isRegisterForm = authFormState.isRegisterForm,
-            onCheckedChange = authViewModel::setAuthFormType
-        )
+		AuthFormSwitch(
+			isRegisterForm = authFormState.isRegisterForm,
+			onCheckedChange = authViewModel::setAuthFormType
+		)
 
-        FilledTonalButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(5.dp),
-            colors = ButtonDefaults.buttonColors(),
-            onClick = {
-                onSubmitButtonClick(
-                    authFormState = authFormState,
-                    registrationViewModel = registrationViewModel,
-                    authViewModel = authViewModel
-                )
-            },
-            enabled = AuthValidator.validateAuthForm(authFormState)
-        ) {
-            if (authFormState.isLoading)
-                CircleLoader(modifier = Modifier.size(24.dp))
-            else Text(
-                text = buttonFormText,
-                fontFamily = FontFamily(Font(R.font.nunito_bold)),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+		FilledTonalButton(
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(50.dp),
+			shape = RoundedCornerShape(5.dp),
+			colors = ButtonDefaults.buttonColors(),
+			onClick = {
+				onSubmitButtonClick(
+					authFormState = authFormState,
+					registrationViewModel = registrationViewModel,
+					authViewModel = authViewModel
+				)
+			},
+			enabled = AuthValidator.validateAuthForm(authFormState)
+		) {
+			if (authFormState.isLoading)
+				CircleLoader(modifier = Modifier.size(24.dp))
+			else Text(
+				text = buttonFormText,
+				fontFamily = FontFamily(Font(R.font.nunito_bold)),
+				fontSize = 14.sp,
+				fontWeight = FontWeight.Bold
+			)
+		}
+	}
 }
 
 private fun onSubmitButtonClick(
-    authFormState: AuthFormState,
-    registrationViewModel: RegistrationViewModel,
-    authViewModel: AuthenticationViewModel
+	authFormState: AuthFormState,
+	registrationViewModel: RegistrationViewModel,
+	authViewModel: AuthenticationViewModel
 ) {
-    if (authFormState.isRegisterForm)
-        registrationViewModel.onSignUpButtonClick(authFormState)
-    else authViewModel.signIn()
+	if (authFormState.isRegisterForm)
+		registrationViewModel.onSignUpButtonClick(authFormState)
+	else authViewModel.signIn()
 }
 
 @Composable
 private fun ErrorPasswordFieldMessage(authFormState: AuthFormState) {
-    Column {
-        if (!authFormState.isPasswordValid)
-            Text(
-                text = stringResource(id = R.string.invalid_password),
-                color = MaterialTheme.colorScheme.error
-            )
-        if (!authFormState.arePasswordsEqual && authFormState.isRegisterForm)
-            Text(
-                text = stringResource(id = R.string.passwords_mismatch),
-                color = MaterialTheme.colorScheme.error
-            )
-    }
+	Column {
+		if (!authFormState.isPasswordValid)
+			Text(
+				text = stringResource(id = R.string.invalid_password),
+				color = MaterialTheme.colorScheme.error
+			)
+		if (!authFormState.arePasswordsEqual && authFormState.isRegisterForm)
+			Text(
+				text = stringResource(id = R.string.passwords_mismatch),
+				color = MaterialTheme.colorScheme.error
+			)
+	}
 }
 
 private fun getButtonFormText(isRegisterForm: Boolean, context: Context): String {
-    return if (isRegisterForm)
-        context.getString(R.string.auth_button_register_name)
-    else context.getString(R.string.auth_button_login_name)
+	return if (isRegisterForm)
+		context.getString(R.string.auth_button_register_name)
+	else context.getString(R.string.auth_button_login_name)
 }

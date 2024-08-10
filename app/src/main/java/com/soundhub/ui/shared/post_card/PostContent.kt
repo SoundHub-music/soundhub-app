@@ -9,7 +9,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun PostContent(modifier: Modifier = Modifier, textContent: String) {
-    Row(modifier = modifier.padding(
-        horizontal = 16.dp, vertical = 12.dp
-    )) { Text(text = textContent) }
+	Row(
+		modifier = modifier.padding(
+			horizontal = 16.dp, vertical = 12.dp
+		)
+	) { Text(text = textContent) }
 }

@@ -22,23 +22,23 @@ import com.soundhub.R
 @Preview(name = "App name with logo")
 @Composable
 fun LoginScreenLogo(modifier: Modifier = Modifier) {
-    val appLogo: Painter = painterResource(R.drawable.soundhub_logo)
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 30.dp, bottom = 30.dp),
-        horizontalArrangement = Arrangement.spacedBy(
-            space = 10.dp,
-            alignment = Alignment.CenterHorizontally
-        ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(painter = appLogo, contentDescription = "SoundHub App logo")
-        Text(
-            text = stringResource(R.string.app_name),
-            color = Color.White,
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 50.sp
-        )
-    }
+	val appLogo: Painter = painterResource(R.drawable.soundhub_logo)
+	Row(
+		modifier = modifier
+			.fillMaxWidth()
+			.padding(start = 16.dp, end = 16.dp, top = 30.dp, bottom = 30.dp),
+		horizontalArrangement = Arrangement.spacedBy(
+			space = 10.dp,
+			alignment = Alignment.CenterHorizontally
+		),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Image(painter = appLogo, contentDescription = "SoundHub App logo")
+		Text(
+			text = stringResource(R.string.app_name),
+			color = Color.White,
+			fontWeight = FontWeight.ExtraBold,
+			fontSize = 50.sp
+		)
+	}
 }

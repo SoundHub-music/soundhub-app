@@ -21,50 +21,50 @@ import java.util.UUID
 
 @Entity
 @TypeConverters(
-    StringListRoomConverter::class,
-    StringMutableListRoomConverter::class,
-    IntListRoomConverter::class,
-    LocalDateRoomConverter::class,
-    LocalDateTimeRoomConverter::class,
-    UserListRoomConverter::class,
-    ArtistRoomConverter::class,
-    GenreRoomConverter::class,
-    FileRoomConverter::class
+	StringListRoomConverter::class,
+	StringMutableListRoomConverter::class,
+	IntListRoomConverter::class,
+	LocalDateRoomConverter::class,
+	LocalDateTimeRoomConverter::class,
+	UserListRoomConverter::class,
+	ArtistRoomConverter::class,
+	GenreRoomConverter::class,
+	FileRoomConverter::class
 )
 data class User(
-    @PrimaryKey
-    var id: UUID = UUID.randomUUID(),
-    var gender: Gender = Gender.UNKNOWN,
-    var avatarUrl: String? = null,
-    var email: String = "",
-    var firstName: String = "",
-    var lastName: String = "",
-    var country: String? = "",
+	@PrimaryKey
+	var id: UUID = UUID.randomUUID(),
+	var gender: Gender = Gender.UNKNOWN,
+	var avatarUrl: String? = null,
+	var email: String = "",
+	var firstName: String = "",
+	var lastName: String = "",
+	var country: String? = "",
 
-    @SerializedName("isOnline")
-    var isOnline: Boolean = false,
+	@SerializedName("isOnline")
+	var isOnline: Boolean = false,
 
-    @SerializedName("lastOnline")
-    var lastOnline: LocalDateTime? = null,
+	@SerializedName("lastOnline")
+	var lastOnline: LocalDateTime? = null,
 
-    @SerializedName("birthday")
-    var birthday: LocalDate? = null,
-    var city: String? = "",
-    var description: String? = "",
-    var languages: MutableList<String> = mutableListOf(),
+	@SerializedName("birthday")
+	var birthday: LocalDate? = null,
+	var city: String? = "",
+	var description: String? = "",
+	var languages: MutableList<String> = mutableListOf(),
 
-    @SerializedName("friends")
-    var friends: List<User> = emptyList(),
+	@SerializedName("friends")
+	var friends: List<User> = emptyList(),
 
-    @SerializedName("favoriteGenres")
-    var favoriteGenres: List<Genre> = emptyList(),
+	@SerializedName("favoriteGenres")
+	var favoriteGenres: List<Genre> = emptyList(),
 
-    @SerializedName("favoriteArtists")
-    var favoriteArtists: List<Artist> = emptyList(),
+	@SerializedName("favoriteArtists")
+	var favoriteArtists: List<Artist> = emptyList(),
 
-    @Ignore
-    @SerializedName("favoriteArtistsIds")
-    var favoriteArtistsIds: List<Int> = emptyList()
-): Serializable {
-    fun getFullName() = "$firstName $lastName".trim()
+	@Ignore
+	@SerializedName("favoriteArtistsIds")
+	var favoriteArtistsIds: List<Int> = emptyList()
+) : Serializable {
+	fun getFullName() = "$firstName $lastName".trim()
 }

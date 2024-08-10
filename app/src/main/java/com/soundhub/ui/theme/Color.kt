@@ -1,5 +1,6 @@
 package com.soundhub.ui.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 
 
@@ -68,4 +69,24 @@ val md_theme_dark_scrim = Color(0xFF000000)
 var borderColor: Color = Color(0xFFCAC4D0)
 
 val seed = Color(0xFF6750A4)
+val dark_acceptColor = Color(0xFF729C62)
+val onDark_acceptColor = Color(0xFFFFFFFF)
+
+val onLight_acceptColor = Color(0xFF000000)
+val light_acceptColor = Color(0xFF577F49)
+
+private var ColorSchemeAcceptColorMap = mutableMapOf<ColorScheme, Color>()
+private var ColorSchemeOnAcceptColorMap = mutableMapOf<ColorScheme, Color>()
+
+var ColorScheme.acceptColor: Color
+	get() = ColorSchemeAcceptColorMap[this] ?: Color.Unspecified
+	set(value) {
+		ColorSchemeAcceptColorMap[this] = value
+	}
+
+var ColorScheme.onAcceptColor: Color
+	get() = ColorSchemeOnAcceptColorMap[this] ?: Color.Unspecified
+	set(value) {
+		ColorSchemeOnAcceptColorMap[this] = value
+	}
 

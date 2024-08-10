@@ -23,31 +23,31 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun EmptyFriendsScreen(selectedTabState: PagerState, tabs: List<FriendListPage>) {
-    val scope = rememberCoroutineScope()
+	val scope = rememberCoroutineScope()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(id = R.string.friends_empty_list_message),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(10.dp),
+		modifier = Modifier.fillMaxWidth()
+	) {
+		Text(
+			text = stringResource(id = R.string.friends_empty_list_message),
+			fontSize = 20.sp,
+			textAlign = TextAlign.Center,
+			fontWeight = FontWeight.Bold,
+			modifier = Modifier
+				.fillMaxWidth()
+		)
 
-        Button(onClick = {
-            scope.launch {
-                selectedTabState
-                    .animateScrollToPage(tabs.indexOf(FriendListPage.RECOMMENDATIONS))
-            }
-        }) {
-            Text(
-                text = stringResource(id = R.string.friends_empty_list_button_text)
-            )
-        }
-    }
+		Button(onClick = {
+			scope.launch {
+				selectedTabState
+					.animateScrollToPage(tabs.indexOf(FriendListPage.RECOMMENDATIONS))
+			}
+		}) {
+			Text(
+				text = stringResource(id = R.string.friends_empty_list_button_text)
+			)
+		}
+	}
 }

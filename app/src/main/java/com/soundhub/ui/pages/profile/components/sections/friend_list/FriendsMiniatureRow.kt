@@ -17,37 +17,37 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
-import com.soundhub.ui.shared.avatar.CircularAvatar
 import com.soundhub.ui.pages.profile.ProfileViewModel
+import com.soundhub.ui.shared.avatar.CircularAvatar
 
 @Composable
 internal fun FriendsMiniaturesRow(profileViewModel: ProfileViewModel) {
-    val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-    val profileOwner: User? = profileUiState.profileOwner
-    val friendList: List<User> = profileOwner?.friends.orEmpty()
-    val maxFriendsMiniatureCount = 10
-    var friendCount: Int by remember { mutableIntStateOf(friendList.size) }
+	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
+	val profileOwner: User? = profileUiState.profileOwner
+	val friendList: List<User> = profileOwner?.friends.orEmpty()
+	val maxFriendsMiniatureCount = 10
+	var friendCount: Int by remember { mutableIntStateOf(friendList.size) }
 
-    LaunchedEffect(key1 = friendList) {
-        friendCount = if (friendList.size > maxFriendsMiniatureCount)
-            (maxFriendsMiniatureCount - 1)
-        else friendList.size
-    }
+	LaunchedEffect(key1 = friendList) {
+		friendCount = if (friendList.size > maxFriendsMiniatureCount)
+			(maxFriendsMiniatureCount - 1)
+		else friendList.size
+	}
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy((-15).dp)
-    ) {
-        if (friendList.isNotEmpty()) {
-            friendList.subList(0, friendCount)
-                .forEach { friend ->
-                    CircularAvatar(
-                        imageUri = friend.avatarUrl?.toUri(),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-        }
-    }
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(start = 10.dp),
+		horizontalArrangement = Arrangement.spacedBy((-15).dp)
+	) {
+		if (friendList.isNotEmpty()) {
+			friendList.subList(0, friendCount)
+				.forEach { friend ->
+					CircularAvatar(
+						imageUri = friend.avatarUrl?.toUri(),
+						modifier = Modifier.size(24.dp)
+					)
+				}
+		}
+	}
 }

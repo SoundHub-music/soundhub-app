@@ -19,23 +19,23 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagerPaginationDots(modifier: Modifier = Modifier, sliderState: PagerState) {
-    if (sliderState.pageCount > 1) Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        repeat(sliderState.pageCount) { index ->
-            Box(
-                modifier = modifier
-                    .width(10.dp)
-                    .height(10.dp)
-                    .padding(2.dp)
-                    .background(
-                        color = if (sliderState.currentPage == index)
-                            MaterialTheme.colorScheme.secondaryContainer
-                        else MaterialTheme.colorScheme.onBackground,
-                        shape = CircleShape
-                    ),
-            )
-        }
-    }
+	if (sliderState.pageCount > 1) Row(
+		horizontalArrangement = Arrangement.Center,
+		modifier = Modifier.fillMaxWidth()
+	) {
+		repeat(sliderState.pageCount) { index ->
+			Box(
+				modifier = modifier
+					.width(10.dp)
+					.height(10.dp)
+					.padding(2.dp)
+					.background(
+						color = if (sliderState.currentPage == index)
+							MaterialTheme.colorScheme.secondaryContainer
+						else MaterialTheme.colorScheme.onBackground,
+						shape = CircleShape
+					),
+			)
+		}
+	}
 }

@@ -6,28 +6,28 @@ import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class SearchArtistsUseCase @Inject constructor(
-    private val musicRepository: MusicRepository
+	private val musicRepository: MusicRepository
 ) {
-    suspend operator fun invoke(searchString: String): Result<List<Artist>> = runCatching {
-        var searchResult: List<Artist> = emptyList()
-        delay(500)
+	suspend operator fun invoke(searchString: String): Result<List<Artist>> = runCatching {
+		var searchResult: List<Artist> = emptyList()
+		delay(500)
 
-        if (searchString.isNotEmpty()) {
-            musicRepository.searchArtists(searchString)
-                .onSuccess { response ->
-                    val duplicateEntityRegex = Regex("\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)")
-                    val artists: List<Artist> = response.body.orEmpty().filter { artist ->
-                        !duplicateEntityRegex.matches(artist.name ?: "")
-                    }
+		if (searchString.isNotEmpty()) {
+			musicRepository.searchArtists(searchString)
+				.onSuccess { response ->
+					val duplicateEntityRegex = Regex("\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)")
+					val artists: List<Artist> = response.body.orEmpty().filter { artist ->
+						!duplicateEntityRegex.matches(artist.name ?: "")
+					}
 
-                    searchResult = artists
-                }
-                .onFailure { error ->
-                    error.throwable?.let { throw error.throwable } ?:
-                    throw Exception(error.errorBody.detail)
-                }
-        }
+					searchResult = artists
+				}
+				.onFailure { error ->
+					error.throwable?.let { throw error.throwable }
+						?: throw Exception(error.errorBody.detail)
+				}
+		}
 
-        return@runCatching searchResult
-    }
+		return@runCatching searchResult
+	}
 }

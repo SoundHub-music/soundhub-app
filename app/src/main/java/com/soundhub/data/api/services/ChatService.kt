@@ -25,52 +25,52 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface ChatService {
-    @GET(GET_CHATS_BY_CURRENT_USER)
-    suspend fun getAllChatsByUserId(
-        @Path(USER_ID_DYNAMIC_PARAM) userId: UUID
-    ): Response<List<Chat>>
+	@GET(GET_CHATS_BY_CURRENT_USER)
+	suspend fun getAllChatsByUserId(
+		@Path(USER_ID_DYNAMIC_PARAM) userId: UUID
+	): Response<List<Chat>>
 
-    @GET(GET_CHAT_BY_ID)
-    suspend fun getChatById(
-        @Path(CHAT_ID_DYNAMIC_PARAM) chatId: UUID
-    ): Response<Chat?>
+	@GET(GET_CHAT_BY_ID)
+	suspend fun getChatById(
+		@Path(CHAT_ID_DYNAMIC_PARAM) chatId: UUID
+	): Response<Chat?>
 
-    @DELETE(DELETE_CHAT)
-    suspend fun deleteChatById(
-        @Path(CHAT_ID_DYNAMIC_PARAM) chatId: UUID
-    ): Response<ApiStateResponse>
+	@DELETE(DELETE_CHAT)
+	suspend fun deleteChatById(
+		@Path(CHAT_ID_DYNAMIC_PARAM) chatId: UUID
+	): Response<ApiStateResponse>
 
-    @POST(CREATE_CHAT)
-    suspend fun createChat(
-        @Body body: CreateChatRequestBody
-    ): Response<Chat>
+	@POST(CREATE_CHAT)
+	suspend fun createChat(
+		@Body body: CreateChatRequestBody
+	): Response<Chat>
 
-    @POST(CREATE_GROUP_CHAT)
-    suspend fun createGroupChat(
-        @Body body: CreateGroupChatRequestBody
-    ): Response<Chat>
+	@POST(CREATE_GROUP_CHAT)
+	suspend fun createGroupChat(
+		@Body body: CreateGroupChatRequestBody
+	): Response<Chat>
 
-    @PUT(ADD_USER_TO_GROUP)
-    suspend fun addUserToGroup(
-        @Path(CHAT_ID_DYNAMIC_PARAM)
-        chatId: UUID,
-        @Path(USER_ID_DYNAMIC_PARAM)
-        userId: UUID
-    ): Response<Chat>
+	@PUT(ADD_USER_TO_GROUP)
+	suspend fun addUserToGroup(
+		@Path(CHAT_ID_DYNAMIC_PARAM)
+		chatId: UUID,
+		@Path(USER_ID_DYNAMIC_PARAM)
+		userId: UUID
+	): Response<Chat>
 
-    @PUT(DELETE_USER_FROM_GROUP)
-    suspend fun deleteUserFromGroupChat(
-        @Path(CHAT_ID_DYNAMIC_PARAM)
-        chatId: UUID,
-        @Path(USER_ID_DYNAMIC_PARAM)
-        userId: UUID
-    ): Response<Chat>
+	@PUT(DELETE_USER_FROM_GROUP)
+	suspend fun deleteUserFromGroupChat(
+		@Path(CHAT_ID_DYNAMIC_PARAM)
+		chatId: UUID,
+		@Path(USER_ID_DYNAMIC_PARAM)
+		userId: UUID
+	): Response<Chat>
 
-    @PUT(RENAME_GROUP_CHAT)
-    suspend fun renameGroupChat(
-        @Path(CHAT_ID_DYNAMIC_PARAM)
-        chatId: UUID,
-        @Path(CHAT_NAME_DYNAMIC_PARAM)
-        newChatName: String
-    ): Response<Chat>
+	@PUT(RENAME_GROUP_CHAT)
+	suspend fun renameGroupChat(
+		@Path(CHAT_ID_DYNAMIC_PARAM)
+		chatId: UUID,
+		@Path(CHAT_NAME_DYNAMIC_PARAM)
+		newChatName: String
+	): Response<Chat>
 }

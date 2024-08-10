@@ -28,54 +28,54 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
-import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.ui.pages.profile.components.SectionLabel
 import com.soundhub.Route
+import com.soundhub.ui.pages.profile.components.SectionLabel
+import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.enums.ContentTypes
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun UserPhotoCarousel(
-    images: List<String>,
-    navController: NavHostController,
-    uiStateDispatcher: UiStateDispatcher 
+	images: List<String>,
+	navController: NavHostController,
+	uiStateDispatcher: UiStateDispatcher
 ) {
-    val listState = rememberLazyListState()
-    var newPhotos by remember { mutableStateOf<List<Uri>>(emptyList()) }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { newPhotos = it }
+	val listState = rememberLazyListState()
+	var newPhotos by remember { mutableStateOf<List<Uri>>(emptyList()) }
+	val launcher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.GetMultipleContents()
+	) { newPhotos = it }
 
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            SectionLabel(text = stringResource(id = R.string.profile_screen_photo_section_caption))
-            FilledTonalIconButton(onClick = {
-                launcher.launch(ContentTypes.IMAGE_ALL.type)
-            }) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "add_photo"
-                )
-            }
-        }
-        LazyRow(state = listState) {
-            items(images.size) { index ->
-                GlideImage(
-                    modifier = Modifier
-                        .fillMaxSize(0.25f)
-                        .clickable {
-                            uiStateDispatcher.setGalleryUrls(images)
-                            navController.navigate("${Route.Gallery.route}/$index")
-                        },
-                    model = images[index],
-                    failure = placeholder(R.drawable.circular_user),
-                    contentDescription = null
-                )
-            }
-        }
-    }
+	Column {
+		Row(
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.fillMaxWidth()
+		) {
+			SectionLabel(text = stringResource(id = R.string.profile_screen_photo_section_caption))
+			FilledTonalIconButton(onClick = {
+				launcher.launch(ContentTypes.IMAGE_ALL.type)
+			}) {
+				Icon(
+					imageVector = Icons.Rounded.Add,
+					contentDescription = "add_photo"
+				)
+			}
+		}
+		LazyRow(state = listState) {
+			items(images.size) { index ->
+				GlideImage(
+					modifier = Modifier
+						.fillMaxSize(0.25f)
+						.clickable {
+							uiStateDispatcher.setGalleryUrls(images)
+							navController.navigate("${Route.Gallery.route}/$index")
+						},
+					model = images[index],
+					failure = placeholder(R.drawable.circular_user),
+					contentDescription = null
+				)
+			}
+		}
+	}
 }

@@ -18,38 +18,38 @@ import retrofit2.http.Path
 import java.util.UUID
 
 interface InviteService {
-    @POST(CREATE_INVITE)
-    suspend fun createInvite(
-        @Path(RECIPIENT_ID_DYNAMIC_PARAM)
-        recipientId: UUID?
-    ): Response<Invite>
+	@POST(CREATE_INVITE)
+	suspend fun createInvite(
+		@Path(RECIPIENT_ID_DYNAMIC_PARAM)
+		recipientId: UUID?
+	): Response<Invite>
 
-    @POST(ACCEPT_INVITE)
-    suspend fun acceptInvite(
-        @Path(INVITE_ID_DYNAMIC_PARAM)
-        inviteId: UUID
-    ): Response<Invite>
+	@POST(ACCEPT_INVITE)
+	suspend fun acceptInvite(
+		@Path(INVITE_ID_DYNAMIC_PARAM)
+		inviteId: UUID
+	): Response<Invite>
 
-    @POST(REJECT_INVITE)
-    suspend fun rejectInvite(
-        @Path(INVITE_ID_DYNAMIC_PARAM)
-        inviteId: UUID
-    ): Response<Invite>
+	@POST(REJECT_INVITE)
+	suspend fun rejectInvite(
+		@Path(INVITE_ID_DYNAMIC_PARAM)
+		inviteId: UUID
+	): Response<Invite>
 
-    @GET(INVITES_ENDPOINT)
-    suspend fun getAllInvites(): Response<List<Invite>>
+	@GET(INVITES_ENDPOINT)
+	suspend fun getAllInvites(): Response<List<Invite>>
 
-    @GET(GET_INVITE_BY_SENDER_AND_RECIPIENT)
-    suspend fun getInviteBySenderAndRecipientId(
-        @Path(SENDER_ID_DYNAMIC_PARAM)
-        senderId: UUID?,
-        @Path(RECIPIENT_ID_DYNAMIC_PARAM)
-        recipientId: UUID?
-    ): Response<Invite?>
+	@GET(GET_INVITE_BY_SENDER_AND_RECIPIENT)
+	suspend fun getInviteBySenderAndRecipientId(
+		@Path(SENDER_ID_DYNAMIC_PARAM)
+		senderId: UUID?,
+		@Path(RECIPIENT_ID_DYNAMIC_PARAM)
+		recipientId: UUID?
+	): Response<Invite?>
 
-    @DELETE(DELETE_INVITE)
-    suspend fun deleteInvite(
-        @Path(INVITE_ID_DYNAMIC_PARAM)
-        inviteId: UUID
-    ): Response<Invite>
+	@DELETE(DELETE_INVITE)
+	suspend fun deleteInvite(
+		@Path(INVITE_ID_DYNAMIC_PARAM)
+		inviteId: UUID
+	): Response<Invite>
 }
