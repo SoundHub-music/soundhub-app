@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music.components
+package com.soundhub.ui.pages.music.components.tab_pages.main.sections.recommendations.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

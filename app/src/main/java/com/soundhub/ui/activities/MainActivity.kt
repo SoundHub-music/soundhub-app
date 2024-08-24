@@ -23,7 +23,7 @@ import com.soundhub.data.dao.UserDao
 import com.soundhub.data.states.UiState
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.layout.HomeScreen
+import com.soundhub.ui.layout.RootLayout
 import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 import com.soundhub.ui.pages.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.pages.messenger.MessengerViewModel
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 					color = MaterialTheme.colorScheme.surface
 				) {
 					NavigationListener()
-					HomeScreen(
+					RootLayout(
 						navController = navController,
 						authViewModel = authViewModel,
 						uiStateDispatcher = uiStateDispatcher,

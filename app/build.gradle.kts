@@ -58,16 +58,8 @@ android {
 		buildConfigField("String", "DISCOGS_KEY", properties.getProperty("DISCOGS_KEY"))
 		buildConfigField("String", "DISCOGS_SECRET", properties.getProperty("DISCOGS_SECRET"))
 		buildConfigField("String", "LAST_FM_API_KEY", properties.getProperty("LAST_FM_API_KEY"))
-		buildConfigField(
-			"String",
-			"LAST_FM_SHARED_SECRET",
-			properties.getProperty("LAST_FM_SHARED_SECRET")
-		)
-		buildConfigField(
-			"String",
-			"SOUNDHUB_API_HOSTNAME",
-			properties.getProperty("SOUNDHUB_API_HOSTNAME")
-		)
+		buildConfigField("String", "LAST_FM_SHARED_SECRET", properties.getProperty("LAST_FM_SHARED_SECRET"))
+		buildConfigField("String", "SOUNDHUB_API_HOSTNAME", properties.getProperty("SOUNDHUB_API_HOSTNAME"))
 	}
 
 	compileOptions {

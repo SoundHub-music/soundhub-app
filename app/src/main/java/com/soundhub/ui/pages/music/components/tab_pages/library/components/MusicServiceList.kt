@@ -23,7 +23,6 @@ import com.soundhub.R
 import com.soundhub.ui.pages.music.LastFmViewModel
 import com.soundhub.ui.pages.music.SpotifyViewModel
 import com.soundhub.ui.pages.music.VKViewModel
-import com.soundhub.ui.pages.music.components.MusicServiceButton
 
 @Composable
 fun MusicServiceList(
@@ -63,7 +62,7 @@ fun MusicServiceList(
 					musicServiceDialogViewModel = spotifyViewModel,
 				)
 				MusicServiceButton(
-					painter = painterResource(id = R.drawable.yandex_music),
+					painter = painterResource(id = R.drawable.vk_logo),
 					musicServiceDialogViewModel = vkViewModel,
 				)
 			}

@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music.components.sections.recommendations
+package com.soundhub.ui.pages.music.components.tab_pages.main.sections.recommendations
 
 import android.util.Log
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.ui.pages.music.MusicViewModel
-import com.soundhub.ui.pages.music.components.RecommendationPlate
+import com.soundhub.ui.pages.music.components.tab_pages.main.sections.recommendations.components.RecommendationPlate
 
 @Composable
 fun RecommendationSection(musicViewModel: MusicViewModel) {
@@ -73,7 +73,7 @@ fun RecommendationSection(musicViewModel: MusicViewModel) {
 			state = lazyListState,
 			modifier = Modifier
 				.padding(10.dp)
-				.pointerInput(Unit) {
+				.pointerInput(isRowDragged) {
 					musicViewModel.horizontalDragHandler(this@pointerInput)
 				}
 		) {

@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.soundhub.ui.pages.music.MusicViewModel
-import com.soundhub.ui.pages.music.components.sections.friend_music.FriendMusicSection
-import com.soundhub.ui.pages.music.components.sections.recommendations.RecommendationSection
+import com.soundhub.ui.pages.music.components.tab_pages.main.sections.friend_music.FriendMusicSection
+import com.soundhub.ui.pages.music.components.tab_pages.main.sections.recommendations.RecommendationSection
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable

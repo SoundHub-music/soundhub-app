@@ -2,6 +2,7 @@ package com.soundhub.ui.pages.music
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.soundhub.R
 import com.soundhub.data.api.responses.lastfm.LastFmFullUser
 import com.soundhub.data.dao.LastFmDao
 import com.soundhub.data.enums.ApiStatus
@@ -26,7 +27,7 @@ class LastFmViewModel @Inject constructor(
 	private val _lastFmUser = MutableStateFlow<LastFmUser?>(null)
 	val lastFmUser = _lastFmUser.asStateFlow()
 
-	val _userInfo = MutableStateFlow<LastFmFullUser?>(null)
+	private val _userInfo = MutableStateFlow<LastFmFullUser?>(null)
 	val userInfo = _userInfo.asStateFlow()
 
 	override val chosenMusicService: ChosenMusicService
@@ -34,7 +35,10 @@ class LastFmViewModel @Inject constructor(
 
 	init {
 		initLastFmUser()
+		initHeaderIcon()
 	}
+
+	override fun initHeaderIcon() = mutableHeaderFormColor.update { R.color.last_fm_color }
 
 	private fun initLastFmUser() = viewModelScope.launch {
 		val user: LastFmUser? = lastFmDao.getLastFmSessionUser()
@@ -43,7 +47,7 @@ class LastFmViewModel @Inject constructor(
 		getUserInfo()
 	}
 
-	fun getUserInfo() = viewModelScope.launch {
+	private fun getUserInfo() = viewModelScope.launch {
 		val lastFmUser = _lastFmUser.value
 		lastFmRepository.getUserInfo(lastFmUser?.name ?: "")
 			.onSuccess { response ->
@@ -56,8 +60,8 @@ class LastFmViewModel @Inject constructor(
 	}
 
 	override fun login() = viewModelScope.launch(Dispatchers.IO) {
-		val (userName, password) = _loginState.value
-		status.update { ApiStatus.LOADING }
+		val (userName, password) = mutableLoginState.value
+		mutableStatus.update { ApiStatus.LOADING }
 
 		lastFmRepository.getMobileSession(userName, password)
 			.onSuccess { response ->
@@ -65,13 +69,13 @@ class LastFmViewModel @Inject constructor(
 					.impl.lastFmSessionBodyToLastFmUser(response.body?.session)
 
 				user?.let { lastFmDao.saveLastFmSessionUser(user) }
-				status.update { ApiStatus.SUCCESS }
+				mutableStatus.update { ApiStatus.SUCCESS }
 			}
-			.onFailure { status.update { ApiStatus.ERROR } }
+			.onFailure { mutableStatus.update { ApiStatus.ERROR } }
 	}
 
 	override fun checkAuthority(user: LastFmUser?) = viewModelScope.launch {
 		Log.d("LastFmViewModel", "Last fm user $user")
-		_isAuthorized.update { user?.sessionKey != null }
+		mutableIsAuthorized.update { user?.sessionKey != null }
 	}
 }

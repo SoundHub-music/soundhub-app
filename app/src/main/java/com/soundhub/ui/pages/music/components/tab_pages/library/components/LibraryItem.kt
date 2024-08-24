@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music.components
+package com.soundhub.ui.pages.music.components.tab_pages.library.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

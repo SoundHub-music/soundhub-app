@@ -12,4 +12,6 @@
     <color name="emoji_btn_light">#FFFF7E62</color>
     <color name="online_status">#6dfb95</color>
     <color name="offline_status">#f46b58</color>
+    <color name="link_color">#4E8BFF</color>
+    <color name="last_fm_color">#FFE62730</color>
 </resources>

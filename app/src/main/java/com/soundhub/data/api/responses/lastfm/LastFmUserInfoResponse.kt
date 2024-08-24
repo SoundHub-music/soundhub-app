@@ -3,53 +3,58 @@ package com.soundhub.data.api.responses.lastfm
 import com.google.gson.annotations.SerializedName
 
 data class LastFmUserInfoResponse(
+	@SerializedName("user")
 	val user: LastFmFullUser
 )
 
 data class LastFmFullUser(
 	val name: String,
-	val age: Int,
-	val subscriber: Int,
+	val age: String,
+	val subscriber: String,
 
 	@SerializedName("realname")
 	val realName: String,
 
 	@SerializedName("playcount")
-	val playCount: Int,
+	val playCount: String,
 
 	@SerializedName("playlists")
-	val playlistCount: Int,
+	val playlistCount: String,
 
 	@SerializedName("artist_count")
-	val artistCount: Int,
+	val artistCount: String,
 
 	@SerializedName("track_count")
-	val trackCount: Int,
+	val trackCount: String,
 
 	@SerializedName("album_count")
-	val albumCount: Int,
+	val albumCount: String,
 
 	@SerializedName("image")
-	val images: List<LastFmUserImage> = emptyList(),
+	val images: List<LastFmUserImage>,
 
 	val registered: LastFmUserRegisterTime,
 
 	val country: String,
-
 	val gender: String,
 
 	@SerializedName("url")
-	val userLink: String
+	val userLink: String,
+
+	val type: String
 )
 
 data class LastFmUserImage(
 	val size: String,
 
 	@SerializedName("#text")
-	val text: String
+	val url: String
 )
 
 data class LastFmUserRegisterTime(
 	@SerializedName("unixtime")
-	val unixTime: String
+	val unixTime: String,
+
+	@SerializedName("#text")
+	val text: String
 )

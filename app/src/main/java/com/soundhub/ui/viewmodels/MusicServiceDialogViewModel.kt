@@ -14,23 +14,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 open class MusicServiceDialogViewModel @Inject constructor() : ViewModel() {
-	protected val _loginState = MutableStateFlow(MusicServiceLoginState())
-	val loginState = _loginState.asStateFlow()
+	protected val mutableLoginState = MutableStateFlow(MusicServiceLoginState())
+	val loginState = mutableLoginState.asStateFlow()
 
-	protected val _isAuthorized = MutableStateFlow(false)
-	val isAuthorized = _isAuthorized.asStateFlow()
+	protected val mutableIsAuthorized = MutableStateFlow(false)
+	val isAuthorizedState = mutableIsAuthorized.asStateFlow()
 
-	protected val status = MutableStateFlow(ApiStatus.NOT_LAUNCHED)
-	val statusState = status.asStateFlow()
+	protected val mutableStatus = MutableStateFlow(ApiStatus.NOT_LAUNCHED)
+	val statusState = mutableStatus.asStateFlow()
+
+	protected val mutableHeaderFormColor = MutableStateFlow<Int?>(null)
+	val headerFormColorState = mutableHeaderFormColor.asStateFlow()
 
 	open val chosenMusicService: ChosenMusicService
 		get() = throw NotImplementedError(Constants.PROPERTY_NOT_IMPLEMENTED_ERROR)
 
-	fun setUserName(value: String) = _loginState.update {
+	fun setUserName(value: String) = mutableLoginState.update {
 		it.copy(userName = value)
 	}
 
-	fun setPassword(value: String) = _loginState.update {
+	fun setPassword(value: String) = mutableLoginState.update {
 		it.copy(password = value)
 	}
 
@@ -41,6 +44,8 @@ open class MusicServiceDialogViewModel @Inject constructor() : ViewModel() {
 	open fun login(): Job {
 		throw NotImplementedError(Constants.METHOD_NOT_IMPLEMENTED_ERROR)
 	}
+
+	protected open fun initHeaderIcon() {}
 }
 
 data class MusicServiceLoginState(

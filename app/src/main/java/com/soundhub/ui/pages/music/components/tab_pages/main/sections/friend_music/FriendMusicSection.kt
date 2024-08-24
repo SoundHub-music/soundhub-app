@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music.components.sections.friend_music
+package com.soundhub.ui.pages.music.components.tab_pages.main.sections.friend_music
 
 import android.util.Log
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -15,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,7 +23,7 @@ import com.soundhub.R
 import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.music.MusicViewModel
-import com.soundhub.ui.pages.music.components.sections.friend_music.components.FriendMusicCard
+import com.soundhub.ui.pages.music.components.tab_pages.main.sections.friend_music.components.FriendMusicCard
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
@@ -58,10 +57,10 @@ fun FriendMusicSection(
 		LazyRow(
 			state = lazyListState,
 			modifier = Modifier
-				.padding(top = 20.dp)
-				.pointerInput(Unit) {
-					musicViewModel.horizontalDragHandler(this@pointerInput)
-				},
+				.padding(top = 20.dp),
+//				.pointerInput(isRowDragged) {
+//					musicViewModel.horizontalDragHandler(this@pointerInput)
+//				},
 			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
 			items(items = friends, key = { it.id }) { friend ->

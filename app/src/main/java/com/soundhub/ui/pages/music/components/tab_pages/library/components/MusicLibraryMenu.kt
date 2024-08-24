@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import com.soundhub.Route
 import com.soundhub.data.model.LibraryItemData
 import com.soundhub.ui.pages.music.MusicViewModel
-import com.soundhub.ui.pages.music.components.LibraryItem
 
 @Composable
 fun MusicLibraryMenu(

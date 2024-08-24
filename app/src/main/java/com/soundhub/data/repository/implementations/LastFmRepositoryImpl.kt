@@ -33,7 +33,7 @@ class LastFmRepositoryImpl @Inject constructor(
 	override suspend fun getUserInfo(username: String): HttpResult<LastFmUserInfoResponse> {
 		try {
 			val response = lastFmService.getUserInfo(username)
-			Log.e("LastFmRepository", "getUserInfo[1]: $response")
+			Log.d("LastFmRepository", "getUserInfo[1]: $response")
 
 			if (!response.isSuccessful) {
 				val errorBody: ErrorResponse = Gson()

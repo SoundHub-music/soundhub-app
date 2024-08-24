@@ -25,7 +25,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 
 @Composable
-fun HomeScreen(
+fun RootLayout(
 	modifier: Modifier = Modifier,
 	navController: NavHostController,
 	authViewModel: AuthenticationViewModel,
