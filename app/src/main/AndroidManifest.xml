@@ -21,10 +21,8 @@
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
 
-        <service
-                android:name=".services.NotificationAndroidService"
-                android:enabled="true"
-                android:exported="false" />
+        <receiver android:name=".receivers.MessageReceiver"/>
+
         <service
                 android:name=".services.MessengerAndroidService"
                 android:enabled="true"

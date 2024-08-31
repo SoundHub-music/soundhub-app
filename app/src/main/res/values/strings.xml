@@ -206,4 +206,11 @@
     <string name="last_fm_follow_profile">Перейти к профилю</string>
     <string name="last_fm_scrobble_artist_count">Артисты</string>
     <string name="last_fm_scrobble_track_count">Скробблы</string>
+
+    <string name="notification_channel_messenger_name">Мессенджер</string>
+
+    <!-- Messenger notification actions-->
+    <string name="notification_messenger_action_reply_label">Ваше сообщение…</string>
+    <string name="notification_messenger_action_read_message_title">Пометить как прочитанное</string>
+    <string name="notification_messenger_action_reply_title">Ответить</string>
 </resources>

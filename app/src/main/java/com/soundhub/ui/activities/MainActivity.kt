@@ -1,7 +1,15 @@
 package com.soundhub.ui.activities
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +29,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.states.UiState
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.layout.RootLayout
@@ -34,10 +42,9 @@ import com.soundhub.ui.viewmodels.NavigationViewModel
 import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.extensions.context_wrapper.registerReceiverExtended
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,12 +62,28 @@ class MainActivity : ComponentActivity() {
 	@Inject
 	lateinit var userDao: UserDao
 	private lateinit var navController: NavHostController
-	private lateinit var uiEventState: Flow<UiEvent>
-	private lateinit var uiState: Flow<UiState>
+
+	private lateinit var messengerAndroidService: MessengerAndroidService
+	private var isMessengerConnected = false
+
+	private val messengerConnection = object : ServiceConnection {
+		override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+			val serviceBinder = service as MessengerAndroidService.LocalBinder
+			messengerAndroidService = serviceBinder.getService()
+			isMessengerConnected = true
+		}
+
+		override fun onServiceDisconnected(name: ComponentName?) {
+			isMessengerConnected = false
+		}
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		onCreateActivityActions()
+
+		val chatId = intent?.getStringExtra(Constants.CHAT_NAV_ARG)
+		Log.d("MainActivity", chatId.toString())
+		runActionsOnCreateActivity()
 
 		setContent {
 			SoundHubTheme(
@@ -90,19 +113,23 @@ class MainActivity : ComponentActivity() {
 		super.onDestroy()
 		Log.d("MainActivity", "onDestroy: user has closed the app")
 
+		uiStateDispatcher.clearState()
 		stopAndroidService(MessengerAndroidService::class.java)
 		authViewModel.updateUserOnlineStatusDelayed(
-			setOnline = false,
+			online = false,
 			delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY
 		)
-		uiStateDispatcher.clearState()
+		if (isMessengerConnected) {
+			messengerAndroidService.unbindService(messengerConnection)
+			isMessengerConnected = false
+		}
 	}
 
 	override fun onStop() {
 		super.onStop()
 		Log.d("MainActivity", "onStop: user has minimized the app")
 		authViewModel.updateUserOnlineStatusDelayed(
-			setOnline = false,
+			online = false,
 			delayTime = Constants.SET_OFFLINE_DELAY_ON_STOP
 		)
 	}
@@ -110,17 +137,33 @@ class MainActivity : ComponentActivity() {
 	override fun onResume() {
 		super.onResume()
 		Log.d("MainActivity", "onResume: user has opened the app")
-		authViewModel.updateUserOnlineStatusDelayed(setOnline = true)
+		authViewModel.updateUserOnlineStatusDelayed(online = true)
 	}
 
-	private fun onCreateActivityActions() {
-		uiEventState = uiStateDispatcher.uiEvent
-		uiState = uiStateDispatcher.uiState
+	override fun onStart() {
+		super.onStart()
+		Intent(this, MessengerAndroidService::class.java).also { intent ->
+			if (isMessengerConnected)
+				messengerAndroidService.bindService(
+					intent,
+					messengerConnection,
+					Context.BIND_AUTO_CREATE
+				)
+		}
+	}
+
+	private suspend fun observeUiEvents() {
+		uiStateDispatcher.uiEvent.collect { event -> handleUiEvent(event, navController) }
+	}
+
+	private fun runActionsOnCreateActivity() {
+		registerReceivers()
 		initSplashScreen()
 		startAndroidService(MessengerAndroidService::class.java)
+		requestPermissions()
 
-		lifecycleScope.launch(Dispatchers.Main) {
-			uiEventState.collect { event -> handleUiEvent(event, navController) }
+		lifecycleScope.launch {
+			launch { observeUiEvents() }
 		}
 	}
 
@@ -139,6 +182,24 @@ class MainActivity : ComponentActivity() {
 		}
 	}
 
+	private fun registerReceivers() {
+		registerReceiverExtended(
+			messengerViewModel.getMessageReceiver(),
+			IntentFilter(MessengerAndroidService.MESSAGE_RECEIVER),
+
+		)
+
+		registerReceiverExtended(
+			messengerViewModel.getReadMessageReceiver(),
+			IntentFilter(MessengerAndroidService.READ_MESSAGE_RECEIVER)
+		)
+
+		registerReceiverExtended(
+			messengerViewModel.getDeletedMessageReceiver(),
+			IntentFilter(MessengerAndroidService.DELETE_MESSAGE_RECEIVER)
+		)
+	}
+
 	private fun initSplashScreen() {
 		val splashScreen: SplashScreen = installSplashScreen()
 		splashScreen.setKeepOnScreenCondition { splashScreenViewModel.isLoading.value }
@@ -152,6 +213,19 @@ class MainActivity : ComponentActivity() {
 	private fun <K> stopAndroidService(clazz: Class<K>) {
 		val intent = Intent(this, clazz)
 		stopService(intent)
+	}
+
+	private fun requestPermissions() {
+		if (ActivityCompat.checkSelfPermission(
+				this,
+				Manifest.permission.POST_NOTIFICATIONS
+			) != PackageManager.PERMISSION_GRANTED
+		) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+				val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+				ActivityCompat.requestPermissions(this, permissions,101)
+			}
+		}
 	}
 
 	private fun handleUiEvent(event: UiEvent, navController: NavHostController) {

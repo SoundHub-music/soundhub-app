@@ -1,47 +1,85 @@
 package com.soundhub.services
 
-import android.Manifest
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.os.Binder
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.RemoteInput
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.soundhub.R
+import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.api.responses.ReceivedMessageResponse
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
+import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.websocket.WebSocketClient
+import com.soundhub.ui.activities.MainActivity
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.utils.NotificationHelper
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.converters.json.LocalDateTimeAdapter
-import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
+import com.soundhub.utils.extensions.intent.getSerializableExtraExtended
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.StompMessage
-import java.time.LocalDate
-import java.time.LocalDateTime
+import java.io.Serializable
 import java.util.UUID
 import javax.inject.Inject
+import com.soundhub.Route.Messenger.Chat as ChatRoute
 
 @AndroidEntryPoint
 class MessengerAndroidService : Service() {
-	private val CHANNEL_ID = "message_channel"
+	companion object {
+		private val LOG_CLASSNAME = MessengerAndroidService::class.simpleName
+
+		private const val CHANNEL_ID = "com.soundhub.messenger"
+		private const val NOTIFICATION_GROUP_ID = "com.soundhub.services.MessengerAndroidService"
+
+		const val BROADCAST_MESSAGE_KEY = "message"
+		const val MESSAGE_RECEIVER = "message.receiver.get"
+		const val READ_MESSAGE_RECEIVER = "message.receiver.read"
+		const val DELETE_MESSAGE_RECEIVER = "message.receiver.delete"
+
+		const val READ_MESSAGE_ACTION = "action.read_message"
+		const val MESSAGE_ID_KEY = "message.id"
+
+		const val REPLY_ACTION = "action.reply"
+		const val REPLY_INPUT_KEY = "reply_input"
+		const val CHAT_ID = "chat.id"
+		const val NOTIFICATION_ID = "notification.id"
+
+		const val REPLY_MESSAGE_REQUEST_CODE = 100
+		const val READ_MESSAGE_REQUEST_CODE = 101
+		const val FOLLOW_CHAT_REQUEST_CODE = 102
+
+		const val MESSAGE_REPLAY_COUNT = 32
+	}
+
+	inner class LocalBinder: Binder() {
+		fun getService(): MessengerAndroidService = context
+	}
+
+	private val receivedMessagesCache = MutableSharedFlow<Message>(
+		replay = MESSAGE_REPLAY_COUNT,
+		onBufferOverflow = BufferOverflow.DROP_OLDEST
+	)
 
 	@Inject
 	lateinit var webSocketClient: WebSocketClient
@@ -56,57 +94,156 @@ class MessengerAndroidService : Service() {
 	lateinit var messageRepository: MessageRepository
 
 	@Inject
-	lateinit var uiStateDispatcher: UiStateDispatcher
-
-	@Inject
 	lateinit var userCredsStore: UserCredsStore
 
-	private val gson: Gson = GsonBuilder()
-		.registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
-		.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-		.create()
+	@Inject
+	lateinit var gson: Gson
+
+	@Inject
+	lateinit var uiStateDispatcher: UiStateDispatcher
+
+	private lateinit var notificationHelper: NotificationHelper
+
+	private val binder = LocalBinder()
+
+	private val context = this
 
 	private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
 	override fun onCreate() {
 		super.onCreate()
-		Log.i("WebSocketService", "Service created")
+		Log.i(LOG_CLASSNAME, "Service created")
 	}
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+		Log.i(LOG_CLASSNAME, "Service started with flag: $flags, startId: $startId")
+		startWithAction(intent)
+
 		coroutineScope.launch {
+			notificationHelper = NotificationHelper(
+				context = context,
+				userCredsStore = userCredsStore
+			)
+
 			webSocketClient.connect(Constants.SOUNDHUB_WEBSOCKET)
 			subscribeToAllChats()
 		}
+
 		return START_STICKY
 	}
+
 
 	override fun onDestroy() {
 		super.onDestroy()
 		webSocketClient.disconnect()
-		Log.i("WebSocketService", "Service destroyed")
+		Log.i(LOG_CLASSNAME, "Service destroyed")
 	}
 
-	override fun onBind(intent: Intent?): IBinder? {
-		return null
+	override fun onBind(intent: Intent): IBinder = binder
+
+	private fun startWithAction(intent: Intent?) {
+		intent?.let {
+			Log.d(LOG_CLASSNAME, "startWithAction[1]: received action ${intent.action}")
+			when (intent.action) {
+				REPLY_ACTION -> processReplyMessage(intent)
+				READ_MESSAGE_ACTION -> processReadMessage(intent)
+				else -> return
+			}
+		}
+	}
+
+	private fun processReadMessage(intent: Intent) {
+		val notificationId = intent.getIntExtra(NOTIFICATION_ID, 0)
+		intent.getSerializableExtraExtended(MESSAGE_ID_KEY, UUID::class.java)?.let {
+			Log.d(LOG_CLASSNAME, "processReadMessage[1]: request for reading message with id $it")
+			readMessage(
+				messageId = it,
+				onReadMessage = {
+					Log.i(
+						LOG_CLASSNAME,
+						"readMessage[1]: message with id $it marked as read successfully"
+					)
+					notificationHelper.cancelNotification(notificationId)
+				},
+				onErrorReadMessage = { error ->
+					Log.e(LOG_CLASSNAME, "readMessage[2]: ${error.stackTraceToString()}")
+				}
+			)
+		}
+
+	}
+
+	private fun processReplyMessage(intent: Intent) {
+		val replyBundle: Bundle? = RemoteInput.getResultsFromIntent(intent)
+		val message = replyBundle?.getCharSequence(REPLY_INPUT_KEY)?.toString()
+		val chatId: UUID? = intent.getSerializableExtraExtended(CHAT_ID, UUID::class.java)
+		val notificationId = intent.getIntExtra(NOTIFICATION_ID, 0)
+
+		Log.d(LOG_CLASSNAME, "processReplyMessage[1] -> Chat id: $chatId")
+		Log.d(LOG_CLASSNAME, "processReplyMessage[2] -> Notification id: $notificationId")
+		Log.d(LOG_CLASSNAME, "processReplyMessage[3] -> message: $message")
+
+		if (chatId != null && message != null)
+			sendMessage(
+				chatId = chatId,
+				message = message,
+				onSendMessage = {
+					Log.i("$LOG_CLASSNAME", "processReplyMessage[4]: Message was sent successfully")
+					notificationHelper.cancelNotification(notificationId)
+				},
+				onErrorSendMessage = { error ->
+					Log.e(LOG_CLASSNAME, "processReplyMessage[5]: ${error.stackTraceToString()}")
+				}
+			)
+	}
+
+	private fun sendMessage(
+		chatId: UUID,
+		message: String,
+		onSendMessage: () -> Unit = {},
+		onErrorSendMessage: (Throwable) -> Unit = {}
+	) = coroutineScope.launch {
+		val authorizedUser: User? = userDao.getCurrentUser()
+		val messageRequestBody = SendMessageRequest(
+			chatId = chatId,
+			userId = authorizedUser?.id,
+			content = message
+		)
+
+		Log.d(LOG_CLASSNAME, "sendWebSocketMessage[1]: $messageRequestBody")
+
+		webSocketClient.sendMessage(
+			messageRequest = messageRequestBody,
+			onComplete = onSendMessage,
+			onError = onErrorSendMessage
+		)
+	}
+
+	private fun readMessage(
+		messageId: UUID,
+		onReadMessage: () -> Unit = {},
+		onErrorReadMessage: (Throwable) -> Unit = {}
+	) = coroutineScope.launch {
+		webSocketClient.readMessage(
+			messageId,
+			onComplete = onReadMessage,
+			onError = onErrorReadMessage
+		)
 	}
 
 	private suspend fun subscribeToAllChats() = coroutineScope.launch {
 		userDao.getCurrentUser()?.let { user ->
-			val chats: List<Chat> = chatRepository.getAllChatsByUserId(
-				userId = user.id
-			).getOrNull().orEmpty()
+			val chats: List<Chat> = chatRepository.getAllChatsByUserId(user.id)
+				.getOrNull()
+				.orEmpty()
 
 			with(webSocketClient) {
-				val subscriptions: MutableList<Disposable?> = mutableListOf()
-
 				chats.map { it.id }.forEach { id ->
-					val subscription = subscribe(
+					subscribe(
 						topic = "$WS_GET_MESSAGES_TOPIC/$id",
 						messageListener = ::onReceiveMessageListener,
 						errorListener = ::onSubscribeErrorListener
 					)
-					subscriptions.add(subscription)
 				}
 
 				subscribe(
@@ -125,72 +262,165 @@ class MessengerAndroidService : Service() {
 	}
 
 	private fun onDeleteMessageListener(message: StompMessage) {
-		Log.i("MessengerAndroidService", "onDeleteMessageListener[1]: $message")
+		Log.d(LOG_CLASSNAME, "onDeleteMessageListener[1]: $message")
 		coroutineScope.launch {
 			runCatching { gson.fromJson(message.payload, UUID::class.java) }
 				.onFailure {
 					Log.e(
-						"MessengerAndroidService",
+						LOG_CLASSNAME,
 						"onDeleteMessageListener[2]: ${it.stackTraceToString()}"
 					)
 				}
-				.onSuccess { uiStateDispatcher.sendDeletedMessage(it) }
+				.onSuccess { messageId ->
+					sendMessageBroadcast(DELETE_MESSAGE_RECEIVER, messageId)
+				}
 		}
 	}
 
 	private fun onSubscribeErrorListener(throwable: Throwable) {
 		Log.e(
-			"MessengerAndroidService",
-			"onSubscribeErrorListener: ${throwable.stackTraceToString()}"
+			LOG_CLASSNAME,
+			"onSubscribeErrorListener[1]: ${throwable.stackTraceToString()}"
 		)
 	}
 
-	private fun onReadMessageListener(message: StompMessage) {
-		Log.i("MessengerAndroidService", "onReadMessageListener: $message")
+	private fun onReadMessageListener(message: StompMessage) = coroutineScope.launch {
+		Log.d(LOG_CLASSNAME, "onReadMessageListener[1]: $message")
 		coroutineScope.launch {
 			val readMessage: Message = gson.fromJson(message.payload, Message::class.java)
-			uiStateDispatcher.sendReadMessage(readMessage)
+			sendMessageBroadcast(READ_MESSAGE_RECEIVER, readMessage)
 		}
 	}
 
-	private fun onReceiveMessageListener(message: StompMessage) {
-		Log.i("MessengerAndroidService", "onReceiveMessageListener: $message")
+	private fun onReceiveMessageListener(message: StompMessage) = coroutineScope.launch {
+		Log.d(LOG_CLASSNAME, "onReceiveMessageListener[1]: $message")
+		val response: ReceivedMessageResponse = gson.fromJson(
+			message.payload,
+			ReceivedMessageResponse::class.java
+		)
 
-		val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-			.setSmallIcon(R.drawable.ic_launcher_foreground)
-			.setContentTitle("Напоминание")
-			.setContentText("Пора покормить кота")
-			.setAutoCancel(true)
-			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+		val authorizedUser: User? = userDao.getCurrentUser()
+		val receivedMessage: Message? = messageRepository
+			.getMessageById(response.id)
+			.getOrNull()
 
-		val notificationManager = NotificationManagerCompat.from(this)
-		if (ActivityCompat.checkSelfPermission(
-				this,
-				Manifest.permission.POST_NOTIFICATIONS
-			) != PackageManager.PERMISSION_GRANTED
-		) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
-			return
-		}
-		notificationManager.notify(1, builder.build())
+		receivedMessage?.let { msg ->
+			receivedMessagesCache.emit(msg)
+			val currentAppRoute: String? = uiStateDispatcher.uiState
+				.firstOrNull()
+				?.currentRoute
 
-		coroutineScope.launch {
-			val receivedMessageResponse: ReceivedMessageResponse = gson
-				.fromJson(message.payload, ReceivedMessageResponse::class.java)
+			val isNotSender = authorizedUser?.id != msg.sender?.id
+			val currentChatRoute = ChatRoute.getStringRouteWithNavArg(receivedMessage.chatId.toString())
+			val isNotChatRoute = currentAppRoute != currentChatRoute
 
-			val receivedMessage: Message? = messageRepository.getMessageById(
-				messageId = receivedMessageResponse.id
-			).getOrNull()
+			if (isNotSender && isNotChatRoute) {
+				with(notificationHelper) {
+					val notificationId: Int = generateNotificationId(msg)
+					val notificationBuilder = buildNotification(msg, notificationId)
 
-			receivedMessage?.let {
-				uiStateDispatcher.sendReceivedMessage(it)
+					loadAvatar(msg, notificationBuilder)
+					createNotificationChannelIfNotExists(
+						channelId = CHANNEL_ID,
+						channelName = context.getString(R.string.notification_channel_messenger_name),
+						importance = NotificationManagerCompat.IMPORTANCE_HIGH,
+						setExtraParameters = { channel ->
+							with(channel) {
+								enableLights(true)
+								enableVibration(true)
+							}
+						}
+					)
+					createNotificationGroupIfNotExists(NOTIFICATION_GROUP_ID)
+					sendNotification(notificationBuilder, notificationId)
+				}
 			}
+			sendMessageBroadcast(MESSAGE_RECEIVER, msg)
 		}
+	}
+
+	private fun sendMessageBroadcast(intentAction: String, obj: Serializable?) {
+		Intent(intentAction).apply {
+			putExtra(BROADCAST_MESSAGE_KEY, obj)
+			sendBroadcast(this)
+		}
+	}
+
+	private fun buildNotification(
+		message: Message,
+		notificationId: Int
+	): NotificationCompat.Builder {
+		Log.d(LOG_CLASSNAME, "buildNotification[1] -> notificationId: $notificationId")
+		val intent = Intent(context, MainActivity::class.java).apply {
+			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+			putExtra(Constants.CHAT_NAV_ARG, message.chatId.toString())
+		}
+
+		val pendingIntent = PendingIntent.getActivity(
+			context,
+			FOLLOW_CHAT_REQUEST_CODE,
+			intent,
+			PendingIntent.FLAG_IMMUTABLE
+		)
+
+		return NotificationCompat.Builder(this, CHANNEL_ID)
+			.setSmallIcon(R.drawable.ic_launcher_foreground)
+			.setGroup(NOTIFICATION_GROUP_ID)
+			.setContentTitle(message.sender?.getFullName())
+			.setContentText(message.content)
+			.setAutoCancel(true)
+			.setShowWhen(true)
+			.setContentIntent(pendingIntent)
+			.setPriority(NotificationCompat.PRIORITY_HIGH)
+			.apply {
+				createNotificationActions(message, notificationId).forEach {
+					addAction(it)
+				}
+			}
+	}
+
+	private fun createNotificationActions(
+		message: Message,
+		notificationId: Int
+	): List<NotificationCompat.Action> {
+		val replyInput = RemoteInput.Builder(REPLY_INPUT_KEY)
+			.setLabel(this.getString(R.string.notification_messenger_action_reply_label))
+			.build()
+
+		val replyPendingIntent = notificationHelper.createPendingIntent(
+			action = REPLY_ACTION,
+			requestCode = REPLY_MESSAGE_REQUEST_CODE,
+			flags = PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+			extras = Bundle().apply {
+				putSerializable(CHAT_ID, message.chatId)
+				putInt(NOTIFICATION_ID, notificationId)
+			}
+		)
+
+		val readMessagePendingIntent = notificationHelper.createPendingIntent(
+			action = READ_MESSAGE_ACTION,
+			requestCode = READ_MESSAGE_REQUEST_CODE,
+			flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+			extras = Bundle().apply {
+				putSerializable(MESSAGE_ID_KEY, message.id)
+				putInt(NOTIFICATION_ID, notificationId)
+			}
+		)
+
+		val readMessageAction = NotificationCompat.Action.Builder(
+			null,
+			context.getString(R.string.notification_messenger_action_read_message_title),
+			readMessagePendingIntent
+		).build()
+
+		val replyAction = NotificationCompat.Action.Builder(
+			null,
+			context.getString(R.string.notification_messenger_action_reply_title),
+			replyPendingIntent
+		)
+			.addRemoteInput(replyInput)
+			.build()
+
+		return listOf(replyAction, readMessageAction)
 	}
 }

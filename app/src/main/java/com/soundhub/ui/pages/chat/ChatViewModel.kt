@@ -6,10 +6,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.GsonBuilder
 import com.soundhub.Route
 import com.soundhub.data.api.responses.HttpResult
-import com.soundhub.data.api.responses.ReceivedMessageResponse
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
@@ -17,19 +15,13 @@ import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
-import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
-import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
-import com.soundhub.utils.converters.json.LocalDateTimeAdapter
-import com.soundhub.utils.converters.json.LocalDateWebSocketAdapter
 import com.soundhub.utils.mappers.MessageMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,33 +32,25 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import ua.naiksoftware.stomp.dto.StompMessage
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
-	private val messageRepository: MessageRepository,
 	private val uiStateDispatcher: UiStateDispatcher,
 	private val userCredsStore: UserCredsStore,
-	private val userDao: UserDao
+	private val userDao: UserDao,
 ) : ViewModel() {
 	private lateinit var webSocketClient: WebSocketClient
 	private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
 	val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
-	private val chatSubscription = MutableStateFlow<Disposable?>(null)
-	private val gson = GsonBuilder()
-		.registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter())
-		.registerTypeAdapter(LocalDate::class.java, LocalDateWebSocketAdapter())
-		.create()
-
 	init {
 		initializeWebSocket()
+		viewModelScope.launch {
+			launch { onReceiveMessageListener() }
+		}
 	}
 
 	override fun onCleared() {
@@ -75,71 +59,25 @@ class ChatViewModel @Inject constructor(
 	}
 
 	private fun initializeWebSocket() = viewModelScope.launch {
-		val chatIdFlow: Flow<UUID?> = _chatUiState.map { it.chat?.id }
 		webSocketClient = WebSocketClient(userCredsStore)
 		webSocketClient.apply {
 			connect(SOUNDHUB_WEBSOCKET)
-			subscribe(
-				topic = WS_READ_MESSAGE_TOPIC,
-				messageListener = ::onReadMessageListener,
-				errorListener = ::onSubscribeErrorListener
-			)
-
-			chatIdFlow.collect { id ->
-				id?.let {
-					if (chatSubscription.value == null)
-						chatSubscription.update {
-							subscribe(
-								topic = "$WS_GET_MESSAGES_TOPIC/$id",
-								messageListener = ::onReceiveMessageListener,
-								errorListener = ::onSubscribeErrorListener
-							)
-						}
-				}
-			}
 		}
 	}
 
-	private fun onSubscribeErrorListener(error: Throwable) {
-		Log.e("ChatViewModel", "onSubscribeErrorListener: $error")
-	}
-
-	private fun onReceiveMessageListener(message: StompMessage) =
-		viewModelScope.launch(Dispatchers.IO) {
-			Log.i("ChatViewModel", "Received message: $message")
-			val receivedMessageResponse: ReceivedMessageResponse = gson
-				.fromJson(message.payload, ReceivedMessageResponse::class.java)
-
-			val receivedMessage = messageRepository.getMessageById(
-				receivedMessageResponse.id
-			).getOrNull()
-
-			withContext(Dispatchers.Main) {
-				receivedMessage?.let {
-					_chatUiState.update { state ->
-						val updatedMessages = state.chat?.messages.orEmpty().toMutableList()
-						if (updatedMessages.none { it.id == receivedMessage.id }) {
-							updatedMessages.add(receivedMessage)
-						}
-
-						val updatedChat = state.chat?.copy()?.apply {
-							messages = updatedMessages
-						}
-						state.copy(chat = updatedChat)
-					}
+	private suspend fun onReceiveMessageListener() {
+		uiStateDispatcher.receivedMessages.collect { receivedMessage ->
+			_chatUiState.update { state ->
+				val updatedMessages = state.chat?.messages.orEmpty().toMutableList()
+				if (updatedMessages.none { it.id == receivedMessage.id }) {
+					updatedMessages.add(receivedMessage)
 				}
-			}
-		}
 
-	private fun onReadMessageListener(message: StompMessage) {
-		Log.i("ChatViewModel", "Read message: $message")
-		val readMessage: Message = gson.fromJson(message.payload, Message::class.java)
-
-		_chatUiState.update {
-			val updatedMessages = it.chat?.messages.orEmpty().map { msg ->
-				if (msg.id == readMessage.id) readMessage else msg
+				val updatedChat = state.chat?.copy()?.apply {
+					messages = updatedMessages
+				}
+				state.copy(chat = updatedChat)
 			}
-			it.copy(chat = it.chat?.copy(messages = updatedMessages))
 		}
 	}
 
@@ -216,7 +154,7 @@ class ChatViewModel @Inject constructor(
 		webSocketClient.sendMessage(
 			messageRequest = sendMessageRequest,
 			onComplete = {
-				Log.d("ChatViewModel", "Message sent successfully")
+				Log.i("ChatViewModel", "Message sent successfully")
 			},
 			onError = { error ->
 				Log.e("ChatViewModel", "sendMessage[error]: ${error.stackTraceToString()}")

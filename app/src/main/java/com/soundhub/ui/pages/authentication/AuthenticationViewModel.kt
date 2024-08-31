@@ -122,17 +122,17 @@ class AuthenticationViewModel @Inject constructor(
 			}
 	}
 
-	fun updateUserOnlineStatusDelayed(setOnline: Boolean, delayTime: Long = 0) {
+	fun updateUserOnlineStatusDelayed(online: Boolean, delayTime: Long = 0) {
 		Log.i(
 			"AuthenticationViewModel",
 			"updateUserOnlineStatusDelayed: " +
-					"user will be ${if (setOnline) "online" else "offline"} in ${delayTime / 1000} seconds"
+					"user will be ${if (online) "online" else "offline"} in ${delayTime / 1000} seconds"
 		)
 
 		viewModelScope.launch(Dispatchers.IO) {
 			delay(delayTime)
 			userDao.getCurrentUser()?.let { user ->
-				if (setOnline != user.isOnline) {
+				if (online != user.isOnline) {
 					toggleUserOnline()
 				}
 			}

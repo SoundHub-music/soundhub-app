@@ -13,6 +13,8 @@ import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.states.MessengerUiState
+import com.soundhub.receivers.MessageReceiver
+import com.soundhub.services.MessengerAndroidService.Companion.BROADCAST_MESSAGE_KEY
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.SearchUtils
@@ -44,11 +46,41 @@ class MessengerViewModel @Inject constructor(
 	private val _messengerUiState = MutableStateFlow(MessengerUiState())
 	val messengerUiState = _messengerUiState.asStateFlow()
 
+	private var messageReceiver: MessageReceiver<Message> = MessageReceiver(
+		intentName = BROADCAST_MESSAGE_KEY,
+		clazz = Message::class.java,
+		messageHandler = { message ->
+			uiStateDispatcher.sendReceivedMessage(message)
+		}
+	)
+
+	private var readMessageReceiver: MessageReceiver<Message> = MessageReceiver(
+		intentName = BROADCAST_MESSAGE_KEY,
+		clazz = Message::class.java,
+		messageHandler = { message ->
+			uiStateDispatcher.sendReadMessage(message)
+		}
+	)
+
+	private var deletedMessageReceiver: MessageReceiver<UUID> = MessageReceiver(
+		intentName = BROADCAST_MESSAGE_KEY,
+		clazz = UUID::class.java,
+		messageHandler = { messageId ->
+			uiStateDispatcher.sendDeletedMessage(messageId)
+		}
+	)
+
 	override fun onCleared() {
 		super.onCleared()
 		Log.d("MessengerViewModel", "viewmodel was cleared")
 		_messengerUiState.update { MessengerUiState() }
 	}
+
+	fun getMessageReceiver() = messageReceiver
+
+	fun getReadMessageReceiver() = readMessageReceiver
+
+	fun getDeletedMessageReceiver() = deletedMessageReceiver
 
 	suspend fun updateUnreadMessageCount(
 		cachedChatList: List<Chat> = emptyList()

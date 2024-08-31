@@ -8,6 +8,9 @@ import java.util.UUID
 data class Message(
 	val id: UUID = UUID.randomUUID(),
 
+	@SerializedName("chat_id")
+	val chatId: UUID = UUID.randomUUID(),
+
 	@SerializedName("sender")
 	val sender: User?,
 

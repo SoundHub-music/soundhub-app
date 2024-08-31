@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,12 +53,12 @@ fun FetchStatusContainer(
 		isError = status == ApiStatus.ERROR
 		isLoading = status == ApiStatus.LOADING
 
-		Log.d("MessengerChatList", "status: $status")
+		Log.d("FetchStatusContainer", "status: $status")
 
 		messageScreenText = customErrorMessage
 			?: if (isError) context.getString(R.string.fetch_error_message) else ""
 	}
-	if (isError)
+	if (isError && messageScreenText.isNotEmpty())
 		Column(
 			modifier = modifier.fillMaxSize(),
 			verticalArrangement = Arrangement.Center,
@@ -66,13 +67,18 @@ fun FetchStatusContainer(
 			Row(
 				modifier = Modifier.fillMaxWidth(0.8f)
 			) {
-				if (isLoading && handleLoading) CircleLoader(modifier = loaderModifier)
-				else if (messageScreenText.isNotEmpty())
-					Text(
-						text = messageScreenText,
-						style = errorTextStyle,
-					)
+				Text(
+					text = messageScreenText,
+					style = errorTextStyle,
+				)
 			}
+		}
+	else if (isLoading && handleLoading)
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.Center
+		) {
+			CircleLoader(modifier = loaderModifier)
 		}
 	else content()
 }
