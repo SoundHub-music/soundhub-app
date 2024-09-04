@@ -31,7 +31,7 @@ import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.chat.components.input_box.MessageInputBox
 import com.soundhub.ui.pages.chat.components.message_box_list.MessageBoxList
-import com.soundhub.ui.shared.bars.top.ChatTopAppBar
+import com.soundhub.ui.shared.bars.top.chatbar.ChatTopAppBar
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
@@ -52,12 +52,18 @@ fun ChatScreen(
 	val messages: List<Message> = chatUiState.chat?.messages.orEmpty()
 
 	val lazyListState: LazyListState = rememberLazyListState()
-	val firstVisibleMessageIndex: Int by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
+	val firstVisibleMessageIndex: Int by remember {
+		derivedStateOf { lazyListState.firstVisibleItemIndex }
+	}
 
 	BackHandler {
 		if (isCheckMessageModeEnabled)
 			chatViewModel.unsetCheckMessagesMode()
 		else navController.popBackStack()
+	}
+
+	LaunchedEffect(key1 = true) {
+		chatViewModel.setLazyListState(lazyListState)
 	}
 
 	LaunchedEffect(firstVisibleMessageIndex, messages, authorizedUser) {
@@ -85,11 +91,10 @@ fun ChatScreen(
 				.padding(top = 10.dp),
 		) {
 			Column(
-				verticalArrangement = Arrangement.SpaceBetween,
+				verticalArrangement = Arrangement.spacedBy(10.dp),
 				modifier = Modifier.padding(bottom = 10.dp)
 			) {
 				MessageBoxList(
-					lazyListState = lazyListState,
 					chatViewModel = chatViewModel,
 					modifier = Modifier.weight(1f),
 					uiStateDispatcher = uiStateDispatcher

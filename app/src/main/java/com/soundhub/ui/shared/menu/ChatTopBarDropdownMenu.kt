@@ -29,12 +29,12 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 fun ChatTopBarDropdownMenu(
 	menuState: MutableState<Boolean>,
 	chatViewModel: ChatViewModel,
-	chatState: ChatUiState,
 	navController: NavHostController,
 	uiStateDispatcher: UiStateDispatcher
 ) {
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val currentRoute: String? = uiState.currentRoute
+	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 
 	LaunchedEffect(key1 = currentRoute) {
 		if (menuState.value)
@@ -77,7 +77,7 @@ fun ChatTopBarDropdownMenu(
 				}
 			},
 			onClick = {
-				chatState.chat?.id?.let {
+				chatUiState.chat?.id?.let {
 					chatViewModel.deleteChat(it)
 					navController.popBackStack()
 				}

@@ -2,6 +2,7 @@ package com.soundhub.ui.pages.chat.components.input_box
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
@@ -23,31 +24,38 @@ fun MessageInputBox(
 	chatViewModel: ChatViewModel,
 ) {
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-	val messageCount: Int = chatUiState.chat?.messages?.size ?: 0
+	val isReplyMessageModeEnabled = chatUiState.isReplyMessageModeEnabled
 
-	Row(
-		modifier = modifier
-			.fillMaxWidth()
-			.background(
-				color = MaterialTheme.colorScheme.surfaceContainer,
-				shape = RoundedCornerShape(16.dp)
-			),
-		horizontalArrangement = Arrangement.spacedBy(5.dp),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		AttachFileButton()
-		MessageTextField(
-			chatViewModel = chatViewModel,
-			modifier = Modifier.weight(1f)
-		)
-
-		Row {
-			EmojiButton()
-			SendMessageButton(
-				messageCount = messageCount,
-				lazyListState = lazyListState,
-				chatViewModel = chatViewModel
+	Column(modifier = Modifier.fillMaxWidth()) {
+		ReferencedMessageBox(chatViewModel)
+		Row(
+			modifier = modifier
+				.fillMaxWidth()
+				.background(
+					color = MaterialTheme.colorScheme.surfaceContainer,
+					shape = if (isReplyMessageModeEnabled)
+						RoundedCornerShape(
+							bottomStart = 16.dp,
+							bottomEnd = 16.dp
+						)
+					else RoundedCornerShape(16.dp)
+				),
+			horizontalArrangement = Arrangement.spacedBy(5.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			AttachFileButton()
+			MessageTextField(
+				chatViewModel = chatViewModel,
+				modifier = Modifier.weight(1f)
 			)
+
+			Row {
+				EmojiButton()
+				SendMessageButton(
+					lazyListState = lazyListState,
+					chatViewModel = chatViewModel
+				)
+			}
 		}
 	}
 }

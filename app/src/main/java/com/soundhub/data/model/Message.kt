@@ -11,10 +11,10 @@ data class Message(
 	@SerializedName("chat_id")
 	val chatId: UUID = UUID.randomUUID(),
 
-	@SerializedName("sender")
+	val replyToMessageId: UUID? = null,
+
 	val sender: User?,
 
-	@SerializedName("timestamp")
 	val timestamp: LocalDateTime = LocalDateTime.now(),
 	val content: String = "",
 	var isRead: Boolean = false,

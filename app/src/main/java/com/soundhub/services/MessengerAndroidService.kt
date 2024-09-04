@@ -62,7 +62,7 @@ class MessengerAndroidService : Service() {
 
 		const val REPLY_ACTION = "action.reply"
 		const val REPLY_INPUT_KEY = "reply_input"
-		const val CHAT_ID = "chat.id"
+		const val CHAT_ID_KEY = "chat.id"
 		const val NOTIFICATION_ID = "notification.id"
 
 		const val REPLY_MESSAGE_REQUEST_CODE = 100
@@ -139,6 +139,11 @@ class MessengerAndroidService : Service() {
 		Log.i(LOG_CLASSNAME, "Service destroyed")
 	}
 
+	override fun onUnbind(intent: Intent?): Boolean {
+		webSocketClient.disconnect()
+		return super.onUnbind(intent)
+	}
+
 	override fun onBind(intent: Intent): IBinder = binder
 
 	private fun startWithAction(intent: Intent?) {
@@ -175,18 +180,22 @@ class MessengerAndroidService : Service() {
 
 	private fun processReplyMessage(intent: Intent) {
 		val replyBundle: Bundle? = RemoteInput.getResultsFromIntent(intent)
+
 		val message = replyBundle?.getCharSequence(REPLY_INPUT_KEY)?.toString()
-		val chatId: UUID? = intent.getSerializableExtraExtended(CHAT_ID, UUID::class.java)
+		val chatId: UUID? = intent.getSerializableExtraExtended(CHAT_ID_KEY, UUID::class.java)
+		val replyToMessageId = intent.getSerializableExtraExtended(MESSAGE_ID_KEY, UUID::class.java)
 		val notificationId = intent.getIntExtra(NOTIFICATION_ID, 0)
 
 		Log.d(LOG_CLASSNAME, "processReplyMessage[1] -> Chat id: $chatId")
 		Log.d(LOG_CLASSNAME, "processReplyMessage[2] -> Notification id: $notificationId")
 		Log.d(LOG_CLASSNAME, "processReplyMessage[3] -> message: $message")
+		Log.d(LOG_CLASSNAME, "processReplyMessage[4] -> replyToMessageId: $replyToMessageId")
 
 		if (chatId != null && message != null)
 			sendMessage(
 				chatId = chatId,
 				message = message,
+				replyToMessageId = replyToMessageId,
 				onSendMessage = {
 					Log.i("$LOG_CLASSNAME", "processReplyMessage[4]: Message was sent successfully")
 					notificationHelper.cancelNotification(notificationId)
@@ -200,6 +209,7 @@ class MessengerAndroidService : Service() {
 	private fun sendMessage(
 		chatId: UUID,
 		message: String,
+		replyToMessageId: UUID? = null,
 		onSendMessage: () -> Unit = {},
 		onErrorSendMessage: (Throwable) -> Unit = {}
 	) = coroutineScope.launch {
@@ -207,10 +217,12 @@ class MessengerAndroidService : Service() {
 		val messageRequestBody = SendMessageRequest(
 			chatId = chatId,
 			userId = authorizedUser?.id,
-			content = message
+			content = message,
+			replyToMessageId = replyToMessageId
 		)
 
 		Log.d(LOG_CLASSNAME, "sendWebSocketMessage[1]: $messageRequestBody")
+		Log.d(LOG_CLASSNAME, "sendWebSocketMessage[2] -> replyToMessageId: $replyToMessageId")
 
 		webSocketClient.sendMessage(
 			messageRequest = messageRequestBody,
@@ -292,10 +304,10 @@ class MessengerAndroidService : Service() {
 		}
 	}
 
-	private fun onReceiveMessageListener(message: StompMessage) = coroutineScope.launch {
-		Log.d(LOG_CLASSNAME, "onReceiveMessageListener[1]: $message")
+	private fun onReceiveMessageListener(stompMessage: StompMessage) = coroutineScope.launch {
+		Log.d(LOG_CLASSNAME, "onReceiveMessageListener[1]: $stompMessage")
 		val response: ReceivedMessageResponse = gson.fromJson(
-			message.payload,
+			stompMessage.payload,
 			ReceivedMessageResponse::class.java
 		)
 
@@ -304,38 +316,42 @@ class MessengerAndroidService : Service() {
 			.getMessageById(response.id)
 			.getOrNull()
 
-		receivedMessage?.let { msg ->
-			receivedMessagesCache.emit(msg)
+		receivedMessage?.let { message ->
+			receivedMessagesCache.emit(message)
 			val currentAppRoute: String? = uiStateDispatcher.uiState
 				.firstOrNull()
 				?.currentRoute
 
-			val isNotSender = authorizedUser?.id != msg.sender?.id
+			val isNotSender = authorizedUser?.id != message.sender?.id
 			val currentChatRoute = ChatRoute.getStringRouteWithNavArg(receivedMessage.chatId.toString())
 			val isNotChatRoute = currentAppRoute != currentChatRoute
 
-			if (isNotSender && isNotChatRoute) {
-				with(notificationHelper) {
-					val notificationId: Int = generateNotificationId(msg)
-					val notificationBuilder = buildNotification(msg, notificationId)
+			if (isNotSender && isNotChatRoute)
+				processNotification(message)
 
-					loadAvatar(msg, notificationBuilder)
-					createNotificationChannelIfNotExists(
-						channelId = CHANNEL_ID,
-						channelName = context.getString(R.string.notification_channel_messenger_name),
-						importance = NotificationManagerCompat.IMPORTANCE_HIGH,
-						setExtraParameters = { channel ->
-							with(channel) {
-								enableLights(true)
-								enableVibration(true)
-							}
-						}
-					)
-					createNotificationGroupIfNotExists(NOTIFICATION_GROUP_ID)
-					sendNotification(notificationBuilder, notificationId)
+			sendMessageBroadcast(MESSAGE_RECEIVER, message)
+		}
+	}
+
+	private fun processNotification(message: Message) {
+		with(notificationHelper) {
+			val notificationId: Int = generateNotificationId(message)
+			val notificationBuilder = buildNotification(message, notificationId)
+
+			loadAvatar(message, notificationBuilder)
+			createNotificationChannelIfNotExists(
+				channelId = CHANNEL_ID,
+				channelName = context.getString(R.string.notification_channel_messenger_name),
+				importance = NotificationManagerCompat.IMPORTANCE_HIGH,
+				setExtraParameters = { channel ->
+					with(channel) {
+						enableLights(true)
+						enableVibration(true)
+					}
 				}
-			}
-			sendMessageBroadcast(MESSAGE_RECEIVER, msg)
+			)
+			createNotificationGroupIfNotExists(NOTIFICATION_GROUP_ID)
+			sendNotification(notificationBuilder, notificationId)
 		}
 	}
 
@@ -392,7 +408,8 @@ class MessengerAndroidService : Service() {
 			requestCode = REPLY_MESSAGE_REQUEST_CODE,
 			flags = PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
 			extras = Bundle().apply {
-				putSerializable(CHAT_ID, message.chatId)
+				putSerializable(CHAT_ID_KEY, message.chatId)
+				putSerializable(MESSAGE_ID_KEY, message.id)
 				putInt(NOTIFICATION_ID, notificationId)
 			}
 		)

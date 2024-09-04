@@ -7,6 +7,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
+import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
@@ -15,12 +16,12 @@ import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
+import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
-import com.soundhub.utils.mappers.MessageMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,12 +33,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
+	private val messageRepository: MessageRepository,
 	private val uiStateDispatcher: UiStateDispatcher,
 	private val userCredsStore: UserCredsStore,
 	private val userDao: UserDao,
@@ -45,6 +48,9 @@ class ChatViewModel @Inject constructor(
 	private lateinit var webSocketClient: WebSocketClient
 	private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
 	val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
+
+	private val _lazyListState = MutableStateFlow<LazyListState?>(null)
+	val lazyListState: StateFlow<LazyListState?> = _lazyListState.asStateFlow()
 
 	init {
 		initializeWebSocket()
@@ -82,11 +88,29 @@ class ChatViewModel @Inject constructor(
 	}
 
 	suspend fun scrollToLastMessage(
-		totalMessageCount: Int,
-		lazyListState: LazyListState
+		totalMessageCount: Int = lazyListState.value
+			?.layoutInfo
+			?.totalItemsCount
+			?: 0
 	) {
-		if (totalMessageCount > 0 && !lazyListState.isScrollInProgress) {
-			lazyListState.scrollToItem(totalMessageCount - 1)
+		val lazyList = lazyListState.value
+		if (totalMessageCount > 0 && lazyList?.isScrollInProgress == false) {
+			lazyList.scrollToItem(totalMessageCount - 1)
+		}
+	}
+
+	suspend fun getMessageById(messageId: UUID): Message? {
+		return messageRepository
+			.getMessageById(messageId)
+			.onSuccessReturn()
+	}
+
+	fun activateReplyMessageMode() {
+		if (_chatUiState.value.checkedMessages.size == 1) {
+			_chatUiState.update { it.copy(
+				isReplyMessageModeEnabled = true,
+				isCheckMessageModeEnabled = false
+			) }
 		}
 	}
 
@@ -138,23 +162,58 @@ class ChatViewModel @Inject constructor(
 		it.copy(messageContent = "")
 	}
 
-	fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
+	fun onSendMessageClick(lazyListState: LazyListState) = viewModelScope.launch(Dispatchers.Main) {
+		val (chat) = _chatUiState.value
+		val messageCount = chat?.messages?.size ?: 0
+
+		sendMessage()
+		if (messageCount > 0)
+			 lazyListState.scrollToItem(messageCount - 1)
+	}
+
+	suspend fun scrollToMessageById(messageId: UUID?) = withContext(Dispatchers.Main) {
+		val messageIndex = _chatUiState.value.chat?.messages
+			.orEmpty()
+			.indexOfFirst { it.id == messageId }
+
+		val scrollOffset = 10
+
+		if (messageIndex >= 0) {
+			lazyListState.value?.scrollToItem(messageIndex + scrollOffset)
+		}
+	}
+
+	private fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
 		val authorizedUser: User? = userDao.getCurrentUser()
 		val (chat, messageContent) = _chatUiState.value
+		val replyMode = _chatUiState.value.isReplyMessageModeEnabled
+
 		if (messageContent.isEmpty() || messageContent.isBlank())
 			return@launch
 
-		val sendMessageRequest = MessageMapper.impl.toSendMessageRequest(
-			chat = chat,
+		val replyToMessageId: UUID? = if (replyMode)
+			_chatUiState.value
+				.checkedMessages
+				.firstOrNull()?.id
+		else null
+
+		val sendMessageRequest = SendMessageRequest(
+			chatId = chat?.id,
 			userId = authorizedUser?.id,
-			content = messageContent
+			content = messageContent,
+			replyToMessageId = replyToMessageId
 		)
 
-		clearMessageContent()
 		webSocketClient.sendMessage(
 			messageRequest = sendMessageRequest,
 			onComplete = {
 				Log.i("ChatViewModel", "Message sent successfully")
+				clearMessageContent()
+				unsetReplyMessageMode()
+
+				viewModelScope.launch {
+					scrollToLastMessage()
+				}
 			},
 			onError = { error ->
 				Log.e("ChatViewModel", "sendMessage[error]: ${error.stackTraceToString()}")
@@ -170,8 +229,7 @@ class ChatViewModel @Inject constructor(
 		if (startIndex >= messages.size)
 			return@launch
 
-		val authorizedUser: User? = userDao.getCurrentUser()
-		authorizedUser?.let { user ->
+		userDao.getCurrentUser()?.let { user ->
 			val visibleInterlocutorMessages: List<Message> =
 				messages.subList(startIndex, messages.size)
 					.filter { it.sender?.id != user.id && !it.isRead }
@@ -203,6 +261,12 @@ class ChatViewModel @Inject constructor(
 	fun unsetCheckMessagesMode() = _chatUiState.update {
 		it.copy(isCheckMessageModeEnabled = false, checkedMessages = emptyList())
 	}
+
+	fun unsetReplyMessageMode() = _chatUiState.update {
+		it.copy(isReplyMessageModeEnabled = false, checkedMessages = emptyList())
+	}
+
+	fun setLazyListState(state: LazyListState) = _lazyListState.update { state }
 
 	private fun uncheckMessage(message: Message) {
 		if (_chatUiState.value.isCheckMessageModeEnabled) {

@@ -1,10 +1,10 @@
 package com.soundhub.ui.pages.chat.components.message_box_list
 
+import android.util.Log
 import android.view.View
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,10 +35,10 @@ import java.util.UUID
 fun MessageBoxList(
 	modifier: Modifier = Modifier,
 	chatViewModel: ChatViewModel,
-	lazyListState: LazyListState,
 	uiStateDispatcher: UiStateDispatcher
 ) {
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+	val lazyListState by chatViewModel.lazyListState.collectAsState()
 	val messages: List<Message> = remember(chatUiState.chat?.messages) {
 		chatUiState.chat?.messages.orEmpty().sortedBy { it.timestamp }
 	}
@@ -54,13 +54,14 @@ fun MessageBoxList(
 	}
 
 	val totalMessageCount by remember {
-		derivedStateOf { lazyListState.layoutInfo.totalItemsCount }
+		derivedStateOf { lazyListState?.layoutInfo?.totalItemsCount ?: 0 }
 	}
 
 	var isKeyboardActive by remember { mutableStateOf(false) }
 	val view: View = LocalView.current
 
 	LaunchedEffect(messages) {
+		Log.d("MessageBoxList", messages.size.toString())
 		messagesGroupedByDate = messages
 			.groupBy { it.timestamp.toLocalDate() }
 			.toSortedMap()
@@ -87,7 +88,7 @@ fun MessageBoxList(
 
 	// when keyboard state is changing it scrolls to the last message
 	LaunchedEffect(totalMessageCount, isKeyboardActive) {
-		chatViewModel.scrollToLastMessage(totalMessageCount, lazyListState)
+		chatViewModel.scrollToLastMessage(totalMessageCount)
 	}
 
 	// it sets the keyboard state that allows to navigate to the end of the message list when keyboard was hidden
@@ -103,26 +104,28 @@ fun MessageBoxList(
 		}
 	}
 
-	LazyColumn(
-		state = lazyListState,
-		modifier = modifier.fillMaxSize(),
-		verticalArrangement = Arrangement.spacedBy(10.dp)
-	) {
-		var lastDate: LocalDate? = null
+	lazyListState?.let { state ->
+		LazyColumn(
+			state = state,
+			modifier = modifier.fillMaxSize(),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			var lastDate: LocalDate? = null
 
-		messagesGroupedByDate.forEach { (date, messages) ->
-			if (lastDate != date) {
-				lastDate = date
-				item { MessageDateChip(date = date) }
-			}
+			messagesGroupedByDate.forEach { (date, messages) ->
+				if (lastDate != date) {
+					lastDate = date
+					item { MessageDateChip(date = date) }
+				}
 
-			items(messages, key = { it.id }) { message ->
-				MessageBox(
-					modifier = Modifier,
-					message = message,
-					isOwnMessage = message.sender?.id == authorizedUser?.id,
-					chatViewModel = chatViewModel,
-				)
+				items(messages, key = { it.id }) { message ->
+					MessageBox(
+						modifier = Modifier,
+						message = message,
+						isOwnMessage = message.sender?.id == authorizedUser?.id,
+						chatViewModel = chatViewModel,
+					)
+				}
 			}
 		}
 	}

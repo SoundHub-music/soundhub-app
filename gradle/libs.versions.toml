@@ -1,7 +1,7 @@
 [versions]
 accompanistDrawablepainter = "0.32.0"
 androidxCore = "1.13.1"
-gradle = "8.5.2"
+gradle = "8.6.0"
 haze = "0.7.3"
 lifecycle = "2.8.4"
 activity = "1.9.1"

@@ -19,7 +19,12 @@ interface MessageMapper {
 	@Mapping(target = "userId", source = "userId")
 	@Mapping(target = "chatId", source = "chat", qualifiedByName = ["mapChatToId"])
 	@Mapping(target = "content", source = "content")
-	fun toSendMessageRequest(chat: Chat?, userId: UUID?, content: String): SendMessageRequest?
+	fun toSendMessageRequest(
+		chat: Chat?,
+		userId: UUID?,
+		content: String,
+		replyToMessageId: UUID? = null
+	): SendMessageRequest?
 
 	companion object {
 		val impl: MessageMapper = Mappers.getMapper(MessageMapper::class.java)

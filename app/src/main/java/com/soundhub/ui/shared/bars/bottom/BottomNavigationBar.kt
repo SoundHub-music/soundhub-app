@@ -63,7 +63,7 @@ fun BottomNavigationBar(
 				navBarRoutes.any { checkRoute(it) }
 
 		val selectedItem = if (isInRoutesOrContains) {
-			navBarRoutes.first { checkRoute(it) }
+			navBarRoutes.firstOrNull { checkRoute(it) }
 		} else null
 
 		navBarViewModel.setSelectedItem(selectedItem)
