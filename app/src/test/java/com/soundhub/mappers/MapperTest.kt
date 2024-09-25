@@ -53,7 +53,12 @@ class MapperTest : BaseMapperTest() {
 	@Test
 	fun mapToSendMessageRequestTest() {
 		val result: SendMessageRequest? = MessageMapper
-			.impl.toSendMessageRequest(chat, user.id, messageContent)
+			.impl.toSendMessageRequest(
+				chat = chat,
+				userId = user.id,
+				content = messageContent,
+				replyToMessageId = replyToMessageId
+			)
 
 		assertEquals(result, messageRequest)
 	}

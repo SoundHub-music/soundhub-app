@@ -153,4 +153,7 @@ object Constants {
 	// Discogs API authorization header
 	const val DISCOGS_AUTHORIZATION =
 		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
+
+	const val DEFAULT_MESSAGE_PAGE_SIZE: Int = 100
+	const val DEFAULT_MESSAGE_PAGE = 1
 }

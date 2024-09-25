@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.edit_profile.profile
+package com.soundhub.ui.pages.user_editor.profile
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.model.User
-import com.soundhub.ui.pages.edit_profile.components.EditProfileTopBarButton
+import com.soundhub.ui.pages.user_editor.components.EditProfileTopBarButton
 import com.soundhub.ui.shared.dialogs.DismissChangesDialog
 import com.soundhub.ui.shared.forms.UserDataForm
 

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
+import com.soundhub.data.api.responses.UnreadMessagesResponse
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
@@ -12,6 +13,7 @@ import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
+import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.states.MessengerUiState
 import com.soundhub.receivers.MessageReceiver
 import com.soundhub.services.MessengerAndroidService.Companion.BROADCAST_MESSAGE_KEY
@@ -28,7 +30,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -37,11 +38,14 @@ import javax.inject.Inject
 class MessengerViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
 	private val uiStateDispatcher: UiStateDispatcher,
+	private val messageRepository: MessageRepository,
 	private val userDao: UserDao,
 	userCredsStore: UserCredsStore,
 ) : ViewModel() {
 	private val uiState = uiStateDispatcher.uiState
 	val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
+
+	private val MAX_MESSAGE_PREVIEW_LENGTH = 20
 
 	private val _messengerUiState = MutableStateFlow(MessengerUiState())
 	val messengerUiState = _messengerUiState.asStateFlow()
@@ -82,22 +86,35 @@ class MessengerViewModel @Inject constructor(
 
 	fun getDeletedMessageReceiver() = deletedMessageReceiver
 
-	suspend fun updateUnreadMessageCount(
-		cachedChatList: List<Chat> = emptyList()
-	) = viewModelScope.launch(Dispatchers.IO) {
-		val authorizedUser: User? = userDao.getCurrentUser()
-		val chats = cachedChatList.ifEmpty { getChats().firstOrNull().orEmpty() }
-		val unreadMessageCount = chats.count { chat ->
-			chat.messages.any { m ->
-				!m.isRead && m.sender?.id != authorizedUser?.id
-			}
-		}
+	suspend fun getLastMessageByChatId(chatId: UUID): Message? {
+		return messageRepository.getPagedMessages(
+			chatId = chatId,
+			pageSize = 10,
+			page = 1
+		).onSuccessReturn()
+			?.content
+			?.firstOrNull()
+	}
 
-		withContext(Dispatchers.Main) {
-			_messengerUiState.update {
-				it.copy(unreadMessagesCount = unreadMessageCount)
+	fun updateUnreadMessageCount() = viewModelScope.launch(Dispatchers.Main) {
+		messageRepository.getAllUnreadMessages()
+			.onSuccessWithContext { response ->
+				response.body?.let { body ->
+					_messengerUiState.update {
+						it.copy(unreadMessagesCount = body.count)
+					}
+
+				}
 			}
-		}
+	}
+
+	suspend fun getUnreadChatCount(): Int {
+		return messageRepository.getAllUnreadMessages()
+			.onSuccessReturn()
+			?.messages
+			.orEmpty()
+			.groupBy { msg -> msg.chatId }
+			.count()
 	}
 
 	fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
@@ -105,15 +122,13 @@ class MessengerViewModel @Inject constructor(
 		uiStateDispatcher.sendUiEvent(UiEvent.Navigate(route))
 	}
 
-	fun getUnreadMessageCountByChatId(chatId: UUID?): UInt {
-		val authorizedUser: User? = runBlocking { userDao.getCurrentUser() }
-		val (chats: List<Chat>) = _messengerUiState.value
+	suspend fun getUnreadMessageCountByChatId(chatId: UUID?): Int {
+		val unreadMessages: UnreadMessagesResponse? = messageRepository.getAllUnreadMessages()
+			.onSuccessReturn()
 
-		return chats.find { chat -> chat.id == chatId }
-			?.messages
-			?.count { message ->
-				!message.isRead && message.sender?.id != authorizedUser?.id
-			}?.toUInt() ?: 0u
+		return unreadMessages?.messages
+			?.filter { msg -> msg.chatId == chatId }
+			?.size ?: 0
 	}
 
 	fun filterChats(chats: List<Chat>, searchBarText: String, authorizedUser: User?): List<Chat> {
@@ -129,8 +144,8 @@ class MessengerViewModel @Inject constructor(
 		val authorizedUser: User? = uiState.map { it.authorizedUser }.firstOrNull()
 		var lastMessageContent = lastMessage.content
 
-		if (lastMessageContent.length > 20) {
-			lastMessageContent = "${lastMessageContent.substring(0, 20)}..."
+		if (lastMessageContent.length > MAX_MESSAGE_PREVIEW_LENGTH) {
+			lastMessageContent = "${lastMessageContent.substring(0, MAX_MESSAGE_PREVIEW_LENGTH)}..."
 		}
 
 		lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {

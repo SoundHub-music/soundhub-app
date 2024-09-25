@@ -2,6 +2,7 @@ package com.soundhub.ui.pages.post_editor
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
@@ -72,6 +74,11 @@ class PostEditorViewModel @Inject constructor(
 		}
 	}
 
+	fun onSavePostClick(postId: UUID?, author: User?) = viewModelScope.launch {
+		postId?.let { updatePost() }
+			?: run { createPost(author) }
+	}
+
 	fun deleteImage(uri: String) = _postEditorState.update {
 		val doesPostExist: Boolean = _postEditorState.value.doesPostExist
 		val originalImages: List<String> = _postEditorState.value.oldPostState?.images.orEmpty()
@@ -87,7 +94,7 @@ class PostEditorViewModel @Inject constructor(
 		)
 	}
 
-	suspend fun createPost(author: User?) {
+	private suspend fun createPost(author: User?) {
 		var toastText: UiText = UiText.StringResource(R.string.toast_post_created_successfully)
 		val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
 			.apply {
@@ -109,7 +116,7 @@ class PostEditorViewModel @Inject constructor(
 			}
 	}
 
-	suspend fun updatePost() {
+	private suspend fun updatePost() {
 		val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
 		var toastText: UiText
 

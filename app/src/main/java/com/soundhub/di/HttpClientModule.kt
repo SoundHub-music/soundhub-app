@@ -11,7 +11,6 @@ import com.soundhub.utils.constants.Constants.SIMPLE_HTTP_CLIENT
 import com.soundhub.utils.constants.Constants.UNATHORIZED_HTTP_CLIENT_WITH_CACHE
 import com.soundhub.utils.interceptors.AuthInterceptor
 import com.soundhub.utils.interceptors.CacheInterceptor
-import com.soundhub.utils.interceptors.ForceCacheInterceptor
 import com.soundhub.utils.interceptors.HttpAuthenticator
 import dagger.Module
 import dagger.Provides
@@ -63,7 +62,6 @@ object HttpClientModule {
 		return OkHttpClient.Builder()
 			.addInterceptor(loggingInterceptor)
 			.addInterceptor(authInterceptor)
-			.addInterceptor(ForceCacheInterceptor(context))
 			.addNetworkInterceptor(CacheInterceptor())
 			.authenticator(authenticator)
 			.followRedirects(false)
@@ -88,7 +86,6 @@ object HttpClientModule {
 
 		return OkHttpClient.Builder()
 			.addInterceptor(loggingInterceptor)
-			.addInterceptor(ForceCacheInterceptor(context))
 			.addNetworkInterceptor(CacheInterceptor())
 			.followRedirects(false)
 			.followSslRedirects(false)

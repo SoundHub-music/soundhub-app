@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.edit_profile.music
+package com.soundhub.ui.pages.user_editor.music
 
 import android.util.Log
 import androidx.compose.runtime.Composable

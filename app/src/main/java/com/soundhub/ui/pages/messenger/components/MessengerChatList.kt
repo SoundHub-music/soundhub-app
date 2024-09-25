@@ -24,6 +24,7 @@ import com.soundhub.data.states.MessengerUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.messenger.EmptyMessengerScreen
 import com.soundhub.ui.pages.messenger.MessengerViewModel
+import com.soundhub.ui.pages.messenger.components.chat_card.ChatCard
 import com.soundhub.ui.shared.containers.FetchStatusContainer
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -42,7 +43,7 @@ internal fun MessengerChatList(
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val authorizedUser: User? = uiState.authorizedUser
 
-	val chats: List<Chat> = messengerUiState.chats.filter { it.messages.isNotEmpty() }
+	val chats: List<Chat> = messengerUiState.chats
 	val searchBarText: String = uiState.searchBarText
 	var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
 	val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
@@ -56,7 +57,7 @@ internal fun MessengerChatList(
 	LaunchedEffect(key1 = messageChannel) {
 		messageChannel.collect {
 			messengerViewModel.loadChats()
-			messengerViewModel.updateUnreadMessageCount(chats)
+			messengerViewModel.updateUnreadMessageCount()
 			filteredChats = chats
 		}
 	}

@@ -16,7 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,9 +49,8 @@ fun UserDataForm(
 	onLanguagesChange: (List<String>) -> Unit = {}
 ) {
 	val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
-	val avatarUri = rememberSaveable { mutableStateOf<Uri?>(null) }
-	val formState: State<IUserDataFormState> =
-		formStateFlow.collectAsState(initial = EmptyFormState())
+	val avatarUri = remember { mutableStateOf<Uri?>(null) }
+	val formState: State<IUserDataFormState> = formStateFlow.collectAsState(initial = EmptyFormState())
 	val scrollState = rememberScrollState()
 
 	LaunchedEffect(formState.value) {

@@ -31,10 +31,6 @@ import com.soundhub.ui.pages.authentication.registration.PostRegisterChooseArtis
 import com.soundhub.ui.pages.authentication.registration.PostRegisterChooseGenresScreen
 import com.soundhub.ui.pages.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.pages.chat.ChatScreen
-import com.soundhub.ui.pages.edit_profile.music.EditFavoriteArtistsScreen
-import com.soundhub.ui.pages.edit_profile.music.EditFavoriteGenresScreen
-import com.soundhub.ui.pages.edit_profile.music.EditMusicPreferencesViewModel
-import com.soundhub.ui.pages.edit_profile.profile.EditUserProfileScreen
 import com.soundhub.ui.pages.friends.FriendsScreen
 import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.messenger.MessengerScreen
@@ -50,6 +46,10 @@ import com.soundhub.ui.pages.postline.PostLineScreen
 import com.soundhub.ui.pages.profile.ProfileScreen
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.pages.settings.SettingsScreen
+import com.soundhub.ui.pages.user_editor.music.EditFavoriteArtistsScreen
+import com.soundhub.ui.pages.user_editor.music.EditFavoriteGenresScreen
+import com.soundhub.ui.pages.user_editor.music.EditMusicPreferencesViewModel
+import com.soundhub.ui.pages.user_editor.profile.EditUserProfileScreen
 import com.soundhub.ui.shared.gallery.GalleryScreen
 import com.soundhub.ui.viewmodels.MainViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -85,12 +85,7 @@ fun NavigationHost(
 		Log.d("NavigationHost", "current_route: $currentRoute")
 	}
 
-	LaunchedEffect(authorizedUser) {
-		val gson = mainViewModel.getGson()
-		Log.d("NavigationHost", "authorized_user: ${gson.toJson(authorizedUser)}")
-	}
-
-	LaunchedEffect(userCreds) {
+	LaunchedEffect(key1 = userCreds) {
 		Log.d("NavigationHost", "user_creds: $userCreds")
 	}
 

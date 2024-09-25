@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
@@ -72,6 +73,8 @@ internal fun InterlocutorFullNameWithOnlineIndicator(
 			)
 			Text(
 				text = onlineIndicatorText,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
 				color = MaterialTheme.colorScheme.onSecondaryContainer,
 				fontSize = 12.sp
 			)

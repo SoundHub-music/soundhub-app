@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.Route
+import com.soundhub.data.dao.PostDao
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
@@ -51,6 +52,7 @@ class ProfileViewModel @Inject constructor(
 	private val deletePostByIdUseCase: DeletePostByIdUseCase,
 	private val getUserByIdUseCase: GetUserByIdUseCase,
 	private val userDao: UserDao,
+	private val postDao: PostDao,
 	userCredsStore: UserCredsStore
 ) : ViewModel() {
 	private val uiState: Flow<UiState> = uiStateDispatcher.uiState
@@ -100,7 +102,7 @@ class ProfileViewModel @Inject constructor(
 
 
 	// invite logic
-	fun sendInviteToFriend(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
+	private fun sendInviteToFriend(recipientId: UUID) = viewModelScope.launch(Dispatchers.IO) {
 		val text: UiText.StringResource =
 			UiText.StringResource(R.string.toast_invite_to_friends_was_sent_successfully)
 		var toastEvent: UiEvent = UiEvent.ShowToast(text)
@@ -122,7 +124,7 @@ class ProfileViewModel @Inject constructor(
 		else sendInviteToFriend(recipientId = user.id)
 	}
 
-	fun deleteInviteToFriends() = viewModelScope.launch(Dispatchers.IO) {
+	private fun deleteInviteToFriends() = viewModelScope.launch(Dispatchers.IO) {
 		val text: UiText.StringResource =
 			UiText.StringResource(R.string.toast_invite_deleted_successfully)
 		var toastEvent: UiEvent = UiEvent.ShowToast(text)
@@ -233,26 +235,40 @@ class ProfileViewModel @Inject constructor(
 
 	// post logic
 	fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
-		val (profileOwner: User?) = _profileUiState.value
-		_profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+		val cache: List<Post> = postDao.getWallPosts()
 
-		profileOwner?.let {
-			getPostsByUserUseCase(profileOwner)
-				.onSuccess { response ->
-					withContext(Dispatchers.Main) {
-						_profileUiState.update {
-							it.copy(
-								userPosts = response,
-								postStatus = ApiStatus.SUCCESS
-							)
+		val (profileOwner: User?) = _profileUiState.value
+
+		if (cache.hashCode() != _profileUiState.value.userPosts.hashCode() || _profileUiState.value.userPosts.isEmpty()) {
+			_profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+			profileOwner?.let {
+				getPostsByUserUseCase(profileOwner)
+					.onSuccess { response ->
+						withContext(Dispatchers.Main) {
+							postDao.updateWallPosts(response)
+
+							_profileUiState.update {
+								it.copy(
+									userPosts = response,
+									postStatus = ApiStatus.SUCCESS
+								)
+							}
 						}
 					}
-				}
-				.onFailure {
-					withContext(Dispatchers.Main) {
-						_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
+					.onFailure {
+						withContext(Dispatchers.Main) {
+							_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
+						}
 					}
-				}
+			}
+		}
+		else {
+			_profileUiState.update {
+				it.copy(
+					userPosts = cache,
+					postStatus = ApiStatus.SUCCESS
+				)
+			}
 		}
 	}
 

@@ -1,18 +1,18 @@
 [versions]
 accompanistDrawablepainter = "0.32.0"
 androidxCore = "1.13.1"
-gradle = "8.6.0"
+gradle = "8.6.1"
 haze = "0.7.3"
-lifecycle = "2.8.4"
-activity = "1.9.1"
-composeBom = "2024.08.00"
-compose = "1.6.8"
-material3 = "1.2.1"
+lifecycle = "2.8.6"
+activity = "1.9.2"
+composeBom = "2024.09.02"
+compose = "1.7.2"
+material3 = "1.3.0"
 appcompat = "1.7.0"
 material = "1.12.0"
 annotation = "1.8.2"
 constraintlayout = "2.1.4"
-navigation = "2.7.7"
+navigation = "2.8.1"
 hilt = "2.51"
 kotlinxSerialization = "1.6.0"
 kotlin = "2.0.0"
@@ -21,6 +21,7 @@ espresso = "3.6.1"
 coroutines = "1.7.1"
 glide = "4.14.2"
 datastore = "1.1.1"
+pagingCompose = "3.3.2"
 protobuf = "3.18.0"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
@@ -56,6 +57,7 @@ navigationFragmentKtx = { group = "androidx.navigation", name = "navigation-frag
 navigationUiKtx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
 hiltNavigationCompose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
 
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 activityKtx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
 

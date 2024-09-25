@@ -86,10 +86,17 @@ open class BaseMapperTest {
 		favoriteArtistsIds = user.favoriteArtists.map { it.id }
 	)
 
+	protected val replyToMessageId: UUID = UUID.randomUUID()
+
 	// message mapper constants
 	protected val chat = Chat(createdBy = user)
 	protected val messageContent = "test message"
-	protected val messageRequest = SendMessageRequest(chat.id, user.id, messageContent)
+	protected val messageRequest = SendMessageRequest(
+		chatId = chat.id,
+		userId = user.id,
+		replyToMessageId = replyToMessageId,
+		content = messageContent
+	)
 
 	// post mapper constants
 	private val postContent = "test post content"

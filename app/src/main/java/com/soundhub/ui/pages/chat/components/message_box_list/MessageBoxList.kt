@@ -1,13 +1,12 @@
 package com.soundhub.ui.pages.chat.components.message_box_list
 
-import android.util.Log
-import android.view.View
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -16,116 +15,111 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.ui.pages.chat.components.message_box.MessageBox
+import com.soundhub.ui.shared.pagination.PagingLoadStateContainer
 import com.soundhub.ui.viewmodels.UiStateDispatcher
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.merge
 import java.time.LocalDate
-import java.util.UUID
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MessageBoxList(
 	modifier: Modifier = Modifier,
 	chatViewModel: ChatViewModel,
-	uiStateDispatcher: UiStateDispatcher
+	uiStateDispatcher: UiStateDispatcher,
+	lazyListState: LazyListState
 ) {
+	var initialScroll by remember { mutableStateOf(false) }
+	var currentDate: LocalDate? by remember { mutableStateOf(null) }
+
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
-	val lazyListState by chatViewModel.lazyListState.collectAsState()
-	val messages: List<Message> = remember(chatUiState.chat?.messages) {
-		chatUiState.chat?.messages.orEmpty().sortedBy { it.timestamp }
-	}
+	val currentChat: Chat? = chatUiState.chat
 
-	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-	val readMessageChannel: Flow<Message> = uiStateDispatcher.readMessages
-	val deletedMessageChannel: Flow<UUID> = uiStateDispatcher.deletedMessages
-
+	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val authorizedUser: User? = uiState.authorizedUser
 
-	var messagesGroupedByDate: Map<LocalDate, List<Message>> by remember {
-		mutableStateOf(emptyMap())
+	val pagedMessages = remember(currentChat) { chatViewModel.getPagedMessages() }
+		.collectAsLazyPagingItems()
+
+	val messageSnapshot: List<Message> = pagedMessages.itemSnapshotList
+		.toList()
+		.filterNotNull()
+
+	val layoutInfo by remember { derivedStateOf { lazyListState.layoutInfo } }
+	val totalItemCount = layoutInfo.totalItemsCount
+
+	val receivedMessageChannel = uiStateDispatcher.receivedMessages
+	val deletedMessageChannel = uiStateDispatcher.deletedMessages
+	val readMessageChannel = uiStateDispatcher.readMessages
+
+	val loadState = pagedMessages.loadState
+	val firstVisibleMessageIndex: Int by remember {
+		derivedStateOf { lazyListState.firstVisibleItemIndex }
 	}
 
-	val totalMessageCount by remember {
-		derivedStateOf { lazyListState?.layoutInfo?.totalItemsCount ?: 0 }
+	LaunchedEffect(messageSnapshot) {
+		chatViewModel.cacheMessages(messageSnapshot)
 	}
 
-	var isKeyboardActive by remember { mutableStateOf(false) }
-	val view: View = LocalView.current
-
-	LaunchedEffect(messages) {
-		Log.d("MessageBoxList", messages.size.toString())
-		messagesGroupedByDate = messages
-			.groupBy { it.timestamp.toLocalDate() }
-			.toSortedMap()
-	}
-
-
-	// we listen to event when interlocutor reads our message
-	LaunchedEffect(key1 = readMessageChannel) {
-		readMessageChannel.collect { msg ->
-			messagesGroupedByDate = messagesGroupedByDate.mapValues { entry ->
-				entry.value.map { if (it.id == msg.id) msg else it }
-			}
+	LaunchedEffect(key1 = totalItemCount, key2 = initialScroll) {
+		if (!initialScroll) {
+			chatViewModel.scrollToLastMessage(reverse = true)
+			initialScroll = true
 		}
 	}
 
-	// we listen to event when interlocutor deletes his own message
-	LaunchedEffect(key1 = deletedMessageChannel) {
-		deletedMessageChannel.collect { msgId ->
-			messagesGroupedByDate = messagesGroupedByDate.mapValues { entry ->
-				entry.value.filter { it.id != msgId }
-			}.filter { it.value.isNotEmpty() }
-		}
+	LaunchedEffect(
+		key1 = receivedMessageChannel,
+		key2 = readMessageChannel,
+		key3 = deletedMessageChannel
+	) {
+		merge(receivedMessageChannel, readMessageChannel, deletedMessageChannel)
+			.collect { pagedMessages.refresh() }
 	}
 
-	// when keyboard state is changing it scrolls to the last message
-	LaunchedEffect(totalMessageCount, isKeyboardActive) {
-		chatViewModel.scrollToLastMessage(totalMessageCount)
+	LaunchedEffect(
+		key1 = firstVisibleMessageIndex,
+		key2 = totalItemCount,
+	) {
+		val messages = pagedMessages.itemSnapshotList
+			.toList()
+			.filterNotNull()
+
+			chatViewModel.readVisibleMessagesFromIndex(
+				firstVisibleMessageIndex,
+				messages
+			)
 	}
 
-	// it sets the keyboard state that allows to navigate to the end of the message list when keyboard was hidden
-	DisposableEffect(view) {
-		ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-			val isVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-			isKeyboardActive = isVisible
-			insets
-		}
+	PagingLoadStateContainer(loadState)
+	LazyColumn(
+		state = lazyListState,
+		reverseLayout = true,
+		modifier = modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.spacedBy(10.dp),
+	) {
+		stickyHeader { currentDate?.let { MessageDateChip(it) } }
+		items(count = pagedMessages.itemCount, key = { pagedMessages.peek(it)?.id ?: it }) { index ->
+			pagedMessages[index]?.let { message ->
+				val messageDate = message.timestamp.toLocalDate()
 
-		onDispose {
-			ViewCompat.setOnApplyWindowInsetsListener(view, null)
-		}
-	}
+				if (messageDate != currentDate)
+					currentDate = messageDate
 
-	lazyListState?.let { state ->
-		LazyColumn(
-			state = state,
-			modifier = modifier.fillMaxSize(),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			var lastDate: LocalDate? = null
-
-			messagesGroupedByDate.forEach { (date, messages) ->
-				if (lastDate != date) {
-					lastDate = date
-					item { MessageDateChip(date = date) }
-				}
-
-				items(messages, key = { it.id }) { message ->
-					MessageBox(
-						modifier = Modifier,
-						message = message,
-						isOwnMessage = message.sender?.id == authorizedUser?.id,
-						chatViewModel = chatViewModel,
-					)
-				}
+				MessageBox(
+					modifier = Modifier,
+					message = message,
+					isOwnMessage = message.sender?.id == authorizedUser?.id,
+					chatViewModel = chatViewModel,
+				)
 			}
 		}
 	}

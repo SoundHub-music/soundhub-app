@@ -18,4 +18,6 @@ data class Message(
 	val timestamp: LocalDateTime = LocalDateTime.now(),
 	val content: String = "",
 	var isRead: Boolean = false,
-) : Serializable
+) : Serializable {
+	fun checkIfSentByUser(user: User?) = sender?.id == user?.id
+}

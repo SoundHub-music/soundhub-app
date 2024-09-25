@@ -14,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -26,7 +29,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.Route
 import com.soundhub.data.model.User
-import com.soundhub.data.states.MessengerUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -43,17 +45,10 @@ fun BottomNavigationBar(
 	val navRoute: NavBackStackEntry? by navController.currentBackStackEntryAsState()
 
 	val selectedItemState by navBarViewModel.selectedItem.collectAsState()
-	val receivedMessageChannel = uiStateDispatcher.receivedMessages
 	val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) {
 		navBarViewModel.getNavBarItems(authorizedUser?.id)
 	}
 	val navBarRoutes: List<String> = remember(navBarItems) { navBarItems.map { it.route } }
-
-	LaunchedEffect(key1 = true) {
-		receivedMessageChannel.collect { _ ->
-			messengerViewModel.updateUnreadMessageCount()
-		}
-	}
 
 	LaunchedEffect(key1 = uiState.currentRoute, key2 = navRoute) {
 		val checkRoute: (String) -> Boolean = { route ->
@@ -88,6 +83,7 @@ fun BottomNavigationBar(
 				icon = {
 					NavBarItemBadgeBox(
 						messengerViewModel = messengerViewModel,
+						uiStateDispatcher = uiStateDispatcher,
 						menuItem = menuItem
 					)
 				},
@@ -101,16 +97,22 @@ fun BottomNavigationBar(
 @Composable
 private fun NavBarItemBadgeBox(
 	messengerViewModel: MessengerViewModel,
+	uiStateDispatcher: UiStateDispatcher,
 	menuItem: NavBarItem
 ) {
-	val messengerUiState: MessengerUiState by messengerViewModel
-		.messengerUiState
-		.collectAsState()
+	val receivedMessageChannel = uiStateDispatcher.receivedMessages
+	var unreadMessageCount by rememberSaveable { mutableIntStateOf(0) }
+
+	LaunchedEffect(key1 = receivedMessageChannel) {
+		receivedMessageChannel.collect { _ ->
+			unreadMessageCount = messengerViewModel.getUnreadChatCount()
+		}
+	}
 
 	BadgedBox(
 		badge = {
-			if (messengerUiState.unreadMessagesCount > 0 && menuItem.route == Route.Messenger.route)
-				Badge { Text(text = messengerUiState.unreadMessagesCount.toString()) }
+			if (unreadMessageCount > 0 && menuItem.route == Route.Messenger.route)
+				Badge { Text(text = unreadMessageCount.toString()) }
 		}
 	) { Icon(menuItem.icon, contentDescription = menuItem.route) }
 }

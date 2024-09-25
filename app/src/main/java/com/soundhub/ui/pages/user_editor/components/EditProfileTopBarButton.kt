@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.edit_profile.components
+package com.soundhub.ui.pages.user_editor.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.size
@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.soundhub.data.states.EmptyFormState
-import com.soundhub.ui.pages.edit_profile.profile.EditUserProfileViewModel
+import com.soundhub.ui.pages.user_editor.profile.EditUserProfileViewModel
 import com.soundhub.ui.shared.forms.IUserDataFormState
 import com.soundhub.ui.shared.loaders.CircleLoader
 

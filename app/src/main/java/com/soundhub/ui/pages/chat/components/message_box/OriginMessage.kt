@@ -40,9 +40,7 @@ internal fun OriginMessage(
 				.height(IntrinsicSize.Min)
 				.clickable {
 					coroutineScope.launch {
-						chatViewModel.scrollToMessageById(
-							messageId = replyToMessage.id
-						)
+						chatViewModel.scrollToMessageById(messageId = replyToMessage.id)
 					}
 				},
 			horizontalArrangement = Arrangement.spacedBy(15.dp),

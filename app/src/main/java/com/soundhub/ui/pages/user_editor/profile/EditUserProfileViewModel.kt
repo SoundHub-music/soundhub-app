@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.edit_profile.profile
+package com.soundhub.ui.pages.user_editor.profile
 
 import android.net.Uri
 import android.util.Log

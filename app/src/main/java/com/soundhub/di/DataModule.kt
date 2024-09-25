@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.soundhub.data.dao.CountryDao
 import com.soundhub.data.dao.LastFmDao
+import com.soundhub.data.dao.PostDao
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.database.AppDatabase
 import com.soundhub.data.datastore.UserCredsStore
@@ -57,6 +58,10 @@ object DataModule {
 	@Provides
 	@Singleton
 	fun providesLastFmDao(database: AppDatabase): LastFmDao = database.lastFmDao()
+
+	@Provides
+	@Singleton
+	fun providesWallPostDao(database: AppDatabase): PostDao = database.postDao()
 
 	@Provides
 	@Singleton

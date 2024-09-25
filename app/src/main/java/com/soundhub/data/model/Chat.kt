@@ -8,9 +8,6 @@ data class Chat(
 	@SerializedName("id")
 	val id: UUID = UUID.randomUUID(),
 
-	@SerializedName("messages")
-	var messages: List<Message> = emptyList(),
-
 	@SerializedName("participants")
 	val participants: List<User> = emptyList(),
 	val isGroup: Boolean = false,

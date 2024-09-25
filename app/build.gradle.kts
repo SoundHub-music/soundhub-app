@@ -174,6 +174,8 @@ dependencies {
 
 	implementation(libs.haze)
 	implementation(libs.accompanist.drawablepainter)
+
+	implementation(libs.paging.compose)
 }
 
 kapt {

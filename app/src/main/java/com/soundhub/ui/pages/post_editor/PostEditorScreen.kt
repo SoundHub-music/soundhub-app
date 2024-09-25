@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,7 +33,6 @@ import com.soundhub.data.model.User
 import com.soundhub.data.states.PostEditorState
 import com.soundhub.ui.pages.post_editor.components.ImagePreviewRow
 import com.soundhub.utils.enums.ContentTypes
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
@@ -44,7 +42,6 @@ fun PostEditorScreen(
 	postId: UUID? = null
 ) {
 	val postEditorState: PostEditorState by postEditorViewModel.postEditorState.collectAsState()
-	val coroutineScope = rememberCoroutineScope()
 
 	val activityResultLauncher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.GetMultipleContents()
@@ -94,16 +91,7 @@ fun PostEditorScreen(
 				FloatingActionButton(
 					containerColor = MaterialTheme.colorScheme.secondaryContainer,
 					modifier = Modifier.padding(10.dp),
-					onClick = {
-						coroutineScope.launch {
-							if (postId == null)
-								onCreatePostButtonClick(
-									postEditorViewModel = postEditorViewModel,
-									user = profileOwner
-								)
-							else onUpdatePostButtonClick(postEditorViewModel = postEditorViewModel)
-						}
-					}
+					onClick = { postEditorViewModel.onSavePostClick(postId, profileOwner) }
 				) {
 					Icon(
 						imageVector = Icons.AutoMirrored.Rounded.Send,
@@ -114,11 +102,3 @@ fun PostEditorScreen(
 		}
 	}
 }
-
-private suspend fun onUpdatePostButtonClick(postEditorViewModel: PostEditorViewModel) =
-	postEditorViewModel.updatePost()
-
-private suspend fun onCreatePostButtonClick(
-	postEditorViewModel: PostEditorViewModel,
-	user: User?
-) = postEditorViewModel.createPost(author = user)

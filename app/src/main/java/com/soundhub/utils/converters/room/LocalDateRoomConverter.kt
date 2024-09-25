@@ -14,7 +14,10 @@ class LocalDateRoomConverter {
 	}
 
 	@TypeConverter
-	fun toLocalDate(stringDate: String): LocalDate {
+	fun toLocalDate(stringDate: String): LocalDate? {
+		if (stringDate == "null")
+			return null
+
 		return LocalDate.parse(stringDate, formatter)
 	}
 }

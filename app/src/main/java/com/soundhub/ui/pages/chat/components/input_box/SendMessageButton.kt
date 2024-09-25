@@ -22,7 +22,7 @@ internal fun SendMessageButton(
 
 	IconButton(
 		enabled = messageContent.isNotEmpty(),
-		onClick = { chatViewModel.onSendMessageClick(lazyListState) }
+		onClick = { chatViewModel.onSendMessageClick() }
 	) {
 		Icon(
 			imageVector = Icons.AutoMirrored.Rounded.Send,

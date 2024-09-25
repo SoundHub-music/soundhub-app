@@ -17,7 +17,9 @@ import com.soundhub.utils.enums.AppTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -38,14 +40,26 @@ class UiStateDispatcher @Inject constructor(
 	private val _uiState = MutableStateFlow(UiState())
 	val uiState: Flow<UiState> = _uiState.asStateFlow()
 
-	private val _receivedMessages = Channel<Message>(Channel.BUFFERED)
-	val receivedMessages: Flow<Message> = _receivedMessages.receiveAsFlow()
+	private val _receivedMessages = MutableSharedFlow<Message>(
+		replay = 1,
+		extraBufferCapacity = 100
+	)
 
-	private val _readMessages = Channel<Message>(Channel.BUFFERED)
-	val readMessages: Flow<Message> = _readMessages.receiveAsFlow()
+	val receivedMessages: Flow<Message> = _receivedMessages.asSharedFlow()
 
-	private val _deletedMessages = Channel<UUID>(Channel.BUFFERED)
-	val deletedMessages: Flow<UUID> = _deletedMessages.receiveAsFlow()
+	private val _readMessages = MutableSharedFlow<Message>(
+		replay = 1,
+		extraBufferCapacity = 100
+	)
+
+	val readMessages: Flow<Message> = _readMessages.asSharedFlow()
+
+	private val _deletedMessages = MutableSharedFlow<UUID>(
+		replay = 1,
+		extraBufferCapacity = 100
+	)
+
+	val deletedMessages: Flow<UUID> = _deletedMessages.asSharedFlow()
 
 	override fun onCleared() {
 		super.onCleared()
@@ -56,12 +70,12 @@ class UiStateDispatcher @Inject constructor(
 
 	suspend fun sendReceivedMessage(message: Message) {
 		if (!message.isRead)
-			_receivedMessages.send(message)
+			_receivedMessages.emit(message)
 	}
 
-	suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.send(messageId)
+	suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.emit(messageId)
 
-	suspend fun sendReadMessage(message: Message) = _readMessages.send(message)
+	suspend fun sendReadMessage(message: Message) = _readMessages.emit(message)
 
 	fun setCurrentRoute(route: String?) = _uiState.update {
 		it.copy(currentRoute = route)

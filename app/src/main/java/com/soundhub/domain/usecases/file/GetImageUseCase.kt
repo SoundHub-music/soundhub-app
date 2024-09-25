@@ -12,12 +12,14 @@ class GetImageUseCase @Inject constructor(
 		folderName: String
 	): File? {
 		var file: File? = null
-		fileRepository.getFile(
-			fileNameUrl = fileName,
-			folderName = folderName
-		)
-			.onSuccess { file = it.body }
-			.onFailure { file = null }
+		fileName?.let {
+			fileRepository.getFile(
+				fileNameUrl = fileName,
+				folderName = folderName
+			)
+				.onSuccess { file = it.body }
+				.onFailure { file = null }
+		}
 		return file
 	}
 }

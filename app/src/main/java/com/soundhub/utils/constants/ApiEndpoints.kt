@@ -30,8 +30,14 @@ sealed class ApiEndpoints {
 		const val CHAT_ID_DYNAMIC_PARAM = "chatId"
 		const val MESSAGE_ID_DYNAMIC_PARAM = "messageId"
 
-		const val GET_CHAT_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_ID_DYNAMIC_PARAM}"
+		const val PAGE_PARAM = "page"
+		const val PAGE_SIZE_PARAM = "size"
+		const val SORT_BY_PARAM = "sort"
+		const val ORDER_BY_PARAM = "order"
+
 		const val GET_MESSAGE_BY_ID = "$MESSAGES_ENDPOINT/{$MESSAGE_ID_DYNAMIC_PARAM}"
+		const val GET_PAGED_MESSAGES = "$MESSAGES_ENDPOINT/chat/{$CHAT_ID_DYNAMIC_PARAM}"
+		const val GET_ALL_UNREAD_MESSAGES = "$MESSAGES_ENDPOINT/unread"
 	}
 
 	data object Authentication {
