@@ -145,11 +145,7 @@ object RepositoryModule {
 
 	@Provides
 	@Singleton
-	fun providesMessageRepository(
-		messageService: MessageService,
-		loadAllUserDataUseCase: LoadAllUserDataUseCase
-	): MessageRepository = MessageRepositoryImpl(
-		messageService,
-		loadAllUserDataUseCase
-	)
+	fun providesMessageRepository(messageService: MessageService): MessageRepository {
+		return MessageRepositoryImpl(messageService)
+	}
 }
