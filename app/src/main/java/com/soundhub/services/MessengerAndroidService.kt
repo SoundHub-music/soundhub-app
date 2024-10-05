@@ -243,7 +243,7 @@ class MessengerAndroidService : Service() {
 		)
 	}
 
-	private suspend fun subscribeToAllChats() = coroutineScope.launch {
+	private fun subscribeToAllChats() = coroutineScope.launch {
 		userDao.getCurrentUser()?.let { user ->
 			val chats: List<Chat> = chatRepository.getAllChatsByUserId(user.id)
 				.getOrNull()

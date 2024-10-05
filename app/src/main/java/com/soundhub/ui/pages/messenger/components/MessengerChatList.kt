@@ -49,7 +49,6 @@ internal fun MessengerChatList(
 	val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 	val fetchStatus: ApiStatus = messengerUiState.status
 
-
 	LaunchedEffect(key1 = true) {
 		messengerViewModel.loadChats()
 	}

@@ -13,6 +13,7 @@ import com.soundhub.utils.converters.room.LocalDateRoomConverter
 import com.soundhub.utils.converters.room.LocalDateTimeRoomConverter
 import com.soundhub.utils.converters.room.StringListRoomConverter
 import com.soundhub.utils.converters.room.StringMutableListRoomConverter
+import com.soundhub.utils.converters.room.UUIDRoomConverter
 import com.soundhub.utils.converters.room.UserListRoomConverter
 import java.io.Serializable
 import java.time.LocalDate
@@ -22,6 +23,7 @@ import java.util.UUID
 @Entity
 @TypeConverters(
 	StringListRoomConverter::class,
+	UUIDRoomConverter::class,
 	StringMutableListRoomConverter::class,
 	IntListRoomConverter::class,
 	LocalDateRoomConverter::class,

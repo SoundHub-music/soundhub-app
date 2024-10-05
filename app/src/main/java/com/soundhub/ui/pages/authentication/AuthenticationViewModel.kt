@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
 import com.soundhub.data.api.requests.SignInRequestBody
+import com.soundhub.data.dao.PostDao
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
@@ -31,7 +32,8 @@ class AuthenticationViewModel @Inject constructor(
 	private val uiStateDispatcher: UiStateDispatcher,
 	private val userRepository: UserRepository,
 	private val userCredsStore: UserCredsStore,
-	private val userDao: UserDao
+	private val userDao: UserDao,
+	private val postDao: PostDao
 ) : ViewModel() {
 	private val _authFormState = MutableStateFlow(AuthFormState())
 	val authFormState = _authFormState.asStateFlow()
@@ -55,15 +57,11 @@ class AuthenticationViewModel @Inject constructor(
 			.onSuccessReturn()
 
 		with(authorizedUser) {
-			this?.let { userDao.saveUser(this) }
-				?: run { authorizedUser = userDao.getCurrentUser() }
-
+			this?.let { userDao.saveUserIfNotExists(this) }
 			uiStateDispatcher.setAuthorizedUser(this)
 		}
 
 		onSaveUser()
-		// TODO: This code adds a parameter with folder name to image url. It will be implemented in the future
-		// if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(user.avatarUrl ?: "")) //     user.avatarUrl = user.avatarUrl + HttpUtils.FOLDER_NAME_PARAM + MediaFolder.AVATAR.folderName
 	}
 
 	fun logout() = viewModelScope.launch(Dispatchers.IO) {
@@ -85,6 +83,7 @@ class AuthenticationViewModel @Inject constructor(
 
 	private suspend fun deleteUserData() {
 		userDao.truncateUser()
+		postDao.deleteUserPosts()
 		uiStateDispatcher.setAuthorizedUser(null)
 		userCredsStore.clear()
 	}

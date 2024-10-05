@@ -146,7 +146,7 @@ class RegistrationViewModel @Inject constructor(
 		user: User
 	) {
 		userCredsStore.updateCreds(userCreds)
-		userDao.saveUser(user)
+		userDao.saveUserIfNotExists(user)
 
 		with(uiStateDispatcher) {
 			setAuthorizedUser(user)

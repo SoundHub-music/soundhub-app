@@ -86,7 +86,7 @@ class EditUserProfileViewModel @Inject constructor(
 			updateUserUseCase(user)
 				.onSuccess {
 					withContext(Dispatchers.Main) {
-						userDao.saveUser(user)
+						userDao.saveUserIfNotExists(user)
 						with(uiStateDispatcher) {
 							setAuthorizedUser(user)
 							sendUiEvent(UiEvent.ShowToast(toastText))

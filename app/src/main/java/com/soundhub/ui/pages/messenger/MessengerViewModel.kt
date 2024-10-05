@@ -26,11 +26,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -160,27 +158,22 @@ class MessengerViewModel @Inject constructor(
 	}
 
 	fun loadChats() = viewModelScope.launch(Dispatchers.IO) {
-		getChats().collect { chats ->
-			withContext(Dispatchers.Main) {
-				_messengerUiState.update {
-					it.copy(chats = chats)
-				}
-			}
+		val chats = getChats()
+		_messengerUiState.update {
+			it.copy(chats = chats)
 		}
 	}
 
-	private fun getChats(): Flow<List<Chat>> = flow {
+	private suspend fun getChats(): List<Chat> {
+		var chats: MutableList<Chat> = mutableListOf()
 		userDao.getCurrentUser()?.let { user ->
 			chatRepository.getAllChatsByUserId(user.id)
 				.onSuccess { response ->
-					val chats = response.body.orEmpty()
-					_messengerUiState.update {
-						it.copy(status = ApiStatus.SUCCESS)
-					}
-					emit(chats)
+					val responseChats = response.body.orEmpty()
+					_messengerUiState.update { it.copy(status = ApiStatus.SUCCESS) }
+					chats.addAll(responseChats)
 				}
 				.onFailure { error ->
-					emit(emptyList())
 					val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
 					uiStateDispatcher.sendUiEvent(errorEvent)
 					_messengerUiState.update {
@@ -188,5 +181,7 @@ class MessengerViewModel @Inject constructor(
 					}
 				}
 		}
+
+		return chats
 	}
 }
