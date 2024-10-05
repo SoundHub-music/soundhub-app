@@ -32,6 +32,7 @@ import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
+import kotlinx.coroutines.flow.merge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,13 +101,15 @@ fun BottomNavigationBar(
 private fun NavBarItemBadgeBox(
 	messengerViewModel: MessengerViewModel,
 	uiStateDispatcher: UiStateDispatcher,
-	menuItem: NavBarMenuItem
+	menuItem: NavBarMenuItem,
 ) {
 	val receivedMessageChannel = uiStateDispatcher.receivedMessages
+	val readMessagesChannel = uiStateDispatcher.receivedMessages
 	var unreadMessageCount by rememberSaveable { mutableIntStateOf(0) }
 
-	LaunchedEffect(key1 = receivedMessageChannel) {
-		receivedMessageChannel.collect { _ ->
+	LaunchedEffect(key1 = receivedMessageChannel, key2 = readMessagesChannel) {
+		unreadMessageCount = messengerViewModel.getUnreadChatCount()
+		merge(receivedMessageChannel, readMessagesChannel).collect { _ ->
 			unreadMessageCount = messengerViewModel.getUnreadChatCount()
 		}
 	}

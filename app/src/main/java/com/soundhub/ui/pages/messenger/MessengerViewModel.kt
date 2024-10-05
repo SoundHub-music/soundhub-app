@@ -109,12 +109,16 @@ class MessengerViewModel @Inject constructor(
 	}
 
 	suspend fun getUnreadChatCount(): Int {
-		return messageRepository.getAllUnreadMessages()
+		val authorizedUser: User? = userDao.getCurrentUser()
+		val messages = messageRepository.getAllUnreadMessages()
 			.onSuccessReturn()
 			?.messages
 			.orEmpty()
-			.groupBy { msg -> msg.chatId }
-			.count()
+
+			return messages
+				.filter { msg -> msg.sender?.id != authorizedUser?.id }
+				.groupBy { msg -> msg.chatId }
+				.count()
 	}
 
 	fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
