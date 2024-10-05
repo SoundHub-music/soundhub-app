@@ -8,8 +8,8 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.ui.shared.icons.QueueMusic
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,23 +22,23 @@ class NavBarViewModel @Inject constructor() : ViewModel() {
 	private val _selectedItem = MutableStateFlow<String?>(null)
 	val selectedItem = _selectedItem.asStateFlow()
 
-	fun getNavBarItems(userId: UUID?): List<NavBarItem> {
+	fun getNavBarItems(userId: UUID?): List<NavBarMenuItem> {
 		val navBarButtons = mutableListOf(
-			NavBarItem(
+			NavBarMenuItem(
 				route = Route.PostLine.route,
-				icon = Icons.Rounded.Home,
+				icon = NavBarIconType.VectorIcon(Icons.Rounded.Home),
 			),
-			NavBarItem(
+			NavBarMenuItem(
 				route = Route.Music.route,
-				icon = Icons.Rounded.QueueMusic,
+				icon = NavBarIconType.PainterIcon(R.drawable.round_queue_music_24)
 			),
-			NavBarItem(
+			NavBarMenuItem(
 				route = Route.Messenger.route,
-				icon = Icons.Rounded.Email
+				icon = NavBarIconType.VectorIcon(Icons.Rounded.Email)
 			),
-			NavBarItem(
+			NavBarMenuItem(
 				route = Route.Profile.getStringRouteWithNavArg(userId.toString()),
-				icon = Icons.Rounded.AccountCircle
+				icon = NavBarIconType.VectorIcon(Icons.Rounded.AccountCircle)
 			)
 		)
 
@@ -47,7 +47,7 @@ class NavBarViewModel @Inject constructor() : ViewModel() {
 	}
 
 	fun onMenuItemClick(
-		menuItem: NavBarItem,
+		menuItem: NavBarMenuItem,
 		navController: NavController
 	) {
 		_selectedItem.update { menuItem.route }

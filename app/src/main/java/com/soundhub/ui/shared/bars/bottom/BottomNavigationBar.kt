@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -33,6 +33,7 @@ import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigationBar(
 	navController: NavController,
@@ -45,10 +46,11 @@ fun BottomNavigationBar(
 	val navRoute: NavBackStackEntry? by navController.currentBackStackEntryAsState()
 
 	val selectedItemState by navBarViewModel.selectedItem.collectAsState()
-	val navBarItems: List<NavBarItem> = remember(authorizedUser?.id) {
+	val navBarMenuItems: List<NavBarMenuItem> = remember(authorizedUser?.id) {
 		navBarViewModel.getNavBarItems(authorizedUser?.id)
 	}
-	val navBarRoutes: List<String> = remember(navBarItems) { navBarItems.map { it.route } }
+
+	val navBarRoutes: List<String> = remember(navBarMenuItems) { navBarMenuItems.map { it.route } }
 
 	LaunchedEffect(key1 = uiState.currentRoute, key2 = navRoute) {
 		val checkRoute: (String) -> Boolean = { route ->
@@ -77,7 +79,7 @@ fun BottomNavigationBar(
 		containerColor = MaterialTheme.colorScheme.primaryContainer,
 		contentColor = MaterialTheme.colorScheme.primary,
 	) {
-		navBarItems.forEach { menuItem ->
+		navBarMenuItems.forEach { menuItem ->
 			Log.d("BottomNavigationBar", "menuItem: $menuItem")
 			NavigationBarItem(
 				icon = {
@@ -98,7 +100,7 @@ fun BottomNavigationBar(
 private fun NavBarItemBadgeBox(
 	messengerViewModel: MessengerViewModel,
 	uiStateDispatcher: UiStateDispatcher,
-	menuItem: NavBarItem
+	menuItem: NavBarMenuItem
 ) {
 	val receivedMessageChannel = uiStateDispatcher.receivedMessages
 	var unreadMessageCount by rememberSaveable { mutableIntStateOf(0) }
@@ -114,5 +116,5 @@ private fun NavBarItemBadgeBox(
 			if (unreadMessageCount > 0 && menuItem.route == Route.Messenger.route)
 				Badge { Text(text = unreadMessageCount.toString()) }
 		}
-	) { Icon(menuItem.icon, contentDescription = menuItem.route) }
+	) { NavBarIcon(menuItem.icon, contentDescription = menuItem.route) }
 }
