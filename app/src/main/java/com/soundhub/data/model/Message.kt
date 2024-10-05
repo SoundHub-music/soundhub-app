@@ -20,4 +20,5 @@ data class Message(
 	var isRead: Boolean = false,
 ) : Serializable {
 	fun checkIfSentByUser(user: User?) = sender?.id == user?.id
+	fun isNotReadAndNotSentBy(user: User?) = !checkIfSentByUser(user) && !isRead
 }

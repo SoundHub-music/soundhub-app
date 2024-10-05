@@ -75,11 +75,9 @@ object DomainModule {
 	@Provides
 	@Singleton
 	fun providesLoadAllUserDataUseCase(
-		fileRepository: FileRepository,
 		musicRepository: MusicRepository,
 		userService: UserService,
 	): LoadAllUserDataUseCase = LoadAllUserDataUseCase(
-		fileRepository = fileRepository,
 		musicRepository = musicRepository,
 		userService = userService
 	)

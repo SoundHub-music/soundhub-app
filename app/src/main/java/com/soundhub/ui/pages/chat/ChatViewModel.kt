@@ -1,6 +1,8 @@
 package com.soundhub.ui.pages.chat
 
 import android.util.Log
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -114,6 +116,25 @@ class ChatViewModel @Inject constructor(
 		if (totalItemCount > 0 && lazyList?.isScrollInProgress == false) {
 			lazyList.scrollToItem(if (reverse) 0 else totalItemCount)
 		}
+	}
+
+	suspend fun animateScrollToLastMessage(reverse: Boolean = false) {
+		val slowScrollAnimationSpec = tween<Float>(durationMillis = 500)
+		val lazyList = lazyListState.value
+		val layoutInfo = lazyList?.layoutInfo
+		val totalItemCount = layoutInfo?.totalItemsCount ?: 0
+		val viewportOffset = layoutInfo?.viewportEndOffset ?: 0
+		val firstVisibleItemScrollOffset = lazyList?.firstVisibleItemScrollOffset ?: 0
+
+		layoutInfo?.let {
+			var totalOffset = totalItemCount * viewportOffset - firstVisibleItemScrollOffset
+
+			if (reverse)
+				totalOffset = -totalOffset
+
+			lazyList.animateScrollBy(totalOffset.toFloat(), slowScrollAnimationSpec)
+		}
+
 	}
 
 	suspend fun getMessageById(messageId: UUID): Message? {

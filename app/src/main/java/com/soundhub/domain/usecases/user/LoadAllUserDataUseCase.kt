@@ -4,15 +4,12 @@ import android.util.Log
 import com.soundhub.data.api.services.UserService
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.FileRepository
 import com.soundhub.data.repository.MusicRepository
-import com.soundhub.utils.enums.MediaFolder
 import retrofit2.Response
 import javax.inject.Inject
 
 class LoadAllUserDataUseCase @Inject constructor(
 	private val musicRepository: MusicRepository,
-	private val fileRepository: FileRepository,
 	private val userService: UserService
 ) {
 	suspend operator fun invoke(user: User) {
@@ -22,7 +19,6 @@ class LoadAllUserDataUseCase @Inject constructor(
 			loadUserFavoriteArtists(f)
 		}
 		loadUserFavoriteArtists(user)
-		loadUserAvatar(user)
 	}
 
 	private suspend fun loadUserFriends(user: User) {
@@ -54,12 +50,5 @@ class LoadAllUserDataUseCase @Inject constructor(
 		}
 
 		user.favoriteArtists = artists
-	}
-
-	private suspend fun loadUserAvatar(user: User) {
-		fileRepository.getFile(
-			fileNameUrl = user.avatarUrl,
-			folderName = MediaFolder.AVATAR.folderName
-		)
 	}
 }

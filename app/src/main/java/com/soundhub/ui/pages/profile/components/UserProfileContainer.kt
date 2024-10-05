@@ -13,7 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,7 +40,7 @@ fun UserProfileContainer(
 
 	val authorizedUser: User? = uiState.authorizedUser
 	val profileOwner: User? = profileUiState.profileOwner
-	var isOriginProfile: Boolean by rememberSaveable {
+	var isOriginProfile: Boolean by remember {
 		mutableStateOf(authorizedUser?.id == profileOwner?.id)
 	}
 
