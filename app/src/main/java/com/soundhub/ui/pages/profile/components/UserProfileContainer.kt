@@ -87,7 +87,6 @@ fun UserProfileContainer(
 				navController = navController,
 				uiStateDispatcher = uiStateDispatcher,
 				profileViewModel = profileViewModel,
-				lazyListScope = this@LazyColumn
 			)
 		}
 	}

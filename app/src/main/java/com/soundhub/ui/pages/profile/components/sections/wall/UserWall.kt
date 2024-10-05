@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,7 +30,6 @@ internal fun UserWall(
 	uiStateDispatcher: UiStateDispatcher,
 	profileViewModel: ProfileViewModel,
 	postViewModel: PostViewModel = hiltViewModel(),
-	lazyListScope: LazyListScope
 ) {
 	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
 	val posts: List<Post> = profileUiState.userPosts
@@ -54,7 +51,7 @@ internal fun UserWall(
 			status = fetchStatus,
 			modifier = Modifier.padding(top = 20.dp)
 		) {
-			lazyListScope.items(items = posts, key = { it.id }) { post ->
+			posts.forEach { post ->
 				PostCard(
 					post = post,
 					navController = navController,
