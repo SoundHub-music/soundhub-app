@@ -114,7 +114,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
 			withContext(Dispatchers.Main) {
 				user?.let {
 					val route: Route = Route.Profile.getRouteWithNavArg(user.id.toString())
-					userDao.saveUserIfNotExists(user)
+					userDao.saveOrReplaceUser(user)
 					with(uiStateDispatcher) {
 						setAuthorizedUser(user)
 						sendUiEvent(UiEvent.ShowToast(toastMessage))

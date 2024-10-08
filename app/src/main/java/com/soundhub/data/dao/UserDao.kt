@@ -18,10 +18,18 @@ interface UserDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun saveUser(user: User)
 
-	suspend fun saveUserIfNotExists(user: User) {
+	suspend fun saveOrReplaceUser(user: User) {
 		val currentUser: User? = getCurrentUser()
-		if (currentUser == null || currentUser.id == user.id)
+
+		if (currentUser == null)
 			saveUser(user)
+
+		if (currentUser?.id != user.id) {
+			currentUser?.let {
+				deleteUser(currentUser)
+				saveUser(user)
+			}
+		}
 	}
 
 	@Transaction

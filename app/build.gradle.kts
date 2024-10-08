@@ -172,9 +172,6 @@ dependencies {
 	implementation(libs.stompProtocolAndroid)
 	implementation(libs.rxandroid)
 
-	implementation(libs.haze)
-	implementation(libs.accompanist.drawablepainter)
-
 	implementation(libs.paging.compose)
 }
 

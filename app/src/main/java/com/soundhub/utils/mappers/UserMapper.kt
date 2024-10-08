@@ -13,6 +13,8 @@ import org.mapstruct.factory.Mappers
 @Mapper
 interface UserMapper {
 	@Mapping(target = "friends", ignore = true)
+	@Mapping(target = "online", ignore = true)
+	@Mapping(target = "lastOnline", ignore = true)
 	@Mapping(
 		target = "favoriteArtistsIds",
 		source = "favoriteArtists",
@@ -31,6 +33,8 @@ interface UserMapper {
 	@Mapping(target = "favoriteGenres", ignore = true)
 	@Mapping(target = "favoriteArtists", ignore = true)
 	@Mapping(target = "favoriteArtistsIds", ignore = true)
+	@Mapping(target = "online", ignore = true)
+	@Mapping(target = "lastOnline", ignore = true)
 	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "gender", source = "state.gender")
 	@Mapping(target = "avatarUrl", source = "state.avatarUrl")

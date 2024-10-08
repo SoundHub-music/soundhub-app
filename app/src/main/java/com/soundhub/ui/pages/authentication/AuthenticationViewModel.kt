@@ -57,7 +57,7 @@ class AuthenticationViewModel @Inject constructor(
 			.onSuccessReturn()
 
 		with(authorizedUser) {
-			this?.let { userDao.saveUserIfNotExists(this) }
+			this?.let { userDao.saveOrReplaceUser(this) }
 			uiStateDispatcher.setAuthorizedUser(this)
 		}
 
