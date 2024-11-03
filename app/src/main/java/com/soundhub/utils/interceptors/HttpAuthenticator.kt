@@ -37,6 +37,9 @@ class HttpAuthenticator @Inject constructor(
 	private var isRefreshing = false
 	private var refreshResult: UserPreferences? = null
 
+	private val maxRetryCount = 3
+	private var retryCount = 0
+
 	override fun authenticate(route: HttpRoute?, response: HttpResponse): Request? {
 		Log.d("HttpAuthenticator", "authenticate[response]: $response")
 		val oldCreds: UserPreferences? = runBlocking { userCreds.firstOrNull() }
@@ -46,15 +49,18 @@ class HttpAuthenticator @Inject constructor(
 			return null
 		}
 
-		if (response.code == UNAUTHORIZED_USER_ERROR_CODE) {
+		if (response.code == UNAUTHORIZED_USER_ERROR_CODE && retryCount < maxRetryCount) {
 			val newCreds: UserPreferences? = runBlocking { refreshTokenMutex(oldCreds) }
 			val bearerToken: String = HttpUtils.getBearerToken(newCreds?.accessToken)
+			retryCount++
 
-			if (!response.request.headers.names().contains(AUTHORIZATION_HEADER))
+			if (!response.request.headers.names().contains(AUTHORIZATION_HEADER)) {
+				retryCount = 0
 				return response.request
 					.newBuilder()
 					.header(AUTHORIZATION_HEADER, bearerToken)
 					.build()
+			}
 		}
 
 		return null
