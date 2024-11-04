@@ -1,21 +1,24 @@
 package com.soundhub.data.repository.implementations
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.BuildConfig
-import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.responses.lastfm.LastFmSessionResponse
 import com.soundhub.data.api.responses.lastfm.LastFmUserInfoResponse
 import com.soundhub.data.api.services.LastFmService
+import com.soundhub.data.repository.BaseRepository
 import com.soundhub.data.repository.LastFmRepository
-import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.extensions.string.md5
 import javax.inject.Inject
 
 class LastFmRepositoryImpl @Inject constructor(
-	private val lastFmService: LastFmService
-) : LastFmRepository {
+	private val lastFmService: LastFmService,
+	gson: Gson,
+	context: Context
+) : LastFmRepository, BaseRepository(gson, context) {
+
 	override suspend fun getMobileSession(
 		username: String,
 		password: String
@@ -34,22 +37,9 @@ class LastFmRepositoryImpl @Inject constructor(
 		try {
 			val response = lastFmService.getUserInfo(username)
 			Log.d("LastFmRepository", "getUserInfo[1]: $response")
-
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = Gson()
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-					?: ErrorResponse(status = response.code())
-
-				Log.e("LastFmRepository", "getUserInfo[2]: $errorBody")
-				return HttpResult.Error(errorBody = errorBody)
-			}
-
-			return HttpResult.Success(response.body())
+			return handleResponse(response)
 		} catch (e: Exception) {
-			return HttpResult.Error(
-				throwable = e,
-				errorBody = ErrorResponse(detail = e.localizedMessage)
-			)
+			return handleException(e)
 		}
 	}
 

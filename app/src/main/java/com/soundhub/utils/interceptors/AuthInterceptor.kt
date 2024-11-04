@@ -16,7 +16,10 @@ class AuthInterceptor(private val userCredsStore: UserCredsStore) : Interceptor 
 		val bearerToken: String = HttpUtils.getBearerToken(tokens?.accessToken)
 		val request: Request = chain.request()
 
-		if (!request.headers.names().contains(AUTHORIZATION_HEADER))
+		if (
+			!request.headers.names().contains(AUTHORIZATION_HEADER) &&
+			tokens?.accessToken != null
+		)
 			return chain.proceed(
 				chain.request()
 					.newBuilder()

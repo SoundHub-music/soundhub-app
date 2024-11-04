@@ -13,7 +13,6 @@ import com.soundhub.data.api.services.MessageService
 import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.services.UserService
-import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.CountryRepository
@@ -49,10 +48,14 @@ object RepositoryModule {
 	@Singleton
 	fun providesInviteRepository(
 		inviteService: InviteService,
-		loadAllUserDataUseCase: LoadAllUserDataUseCase
+		loadAllUserDataUseCase: LoadAllUserDataUseCase,
+		gson: Gson,
+		@ApplicationContext context: Context
 	): InviteRepository = InviteRepositoryImpl(
-		inviteService,
-		loadAllUserDataUseCase
+		inviteService = inviteService,
+		loadAllUserDataUseCase = loadAllUserDataUseCase,
+		gson = gson,
+		context = context
 	)
 
 	@Provides
@@ -77,13 +80,11 @@ object RepositoryModule {
 		context: Context,
 		userService: UserService,
 		loadAllUserDataUseCase: LoadAllUserDataUseCase,
-		userCredsStore: UserCredsStore,
 		gson: Gson
 	): UserRepository = UserRepositoryImpl(
 		userService = userService,
 		loadAllUserDataUseCase = loadAllUserDataUseCase,
 		context = context,
-		userCredsStore = userCredsStore,
 		gson = gson
 	)
 
@@ -105,22 +106,39 @@ object RepositoryModule {
 	@Provides
 	@Singleton
 	fun providesCountryRepository(
-		countryService: CountryService
-	): CountryRepository = CountryRepositoryImpl(countryService)
+		countryService: CountryService,
+		gson: Gson,
+		@ApplicationContext context: Context
+	): CountryRepository = CountryRepositoryImpl(
+		countryService = countryService,
+		gson = gson,
+		context = context
+	)
 
 	@Provides
 	@Singleton
 	fun providesChatRepository(
-		chatService: ChatService
-	): ChatRepository = ChatRepositoryImpl(chatService)
+		chatService: ChatService,
+		gson: Gson,
+		@ApplicationContext context: Context
+	): ChatRepository = ChatRepositoryImpl(
+		chatService = chatService,
+		gson = gson,
+		context = context
+	)
 
 	@Provides
 	@Singleton
 	fun providesFileRepository(
 		@ApplicationContext
 		context: Context,
+		gson: Gson,
 		fileService: FileService
-	): FileRepository = FileRepositoryImpl(fileService, context)
+	): FileRepository = FileRepositoryImpl(
+		fileService = fileService,
+		context = context,
+		gson = gson
+	)
 
 	@Provides
 	@Singleton
@@ -129,23 +147,37 @@ object RepositoryModule {
 		context: Context,
 		musicService: MusicService,
 		genreService: GenreService,
-		lastFmService: LastFmService
+		gson: Gson
 	): MusicRepository = MusicRepositoryImpl(
 		musicService = musicService,
-		lastFmService = lastFmService,
 		genreService = genreService,
-		context = context
+		context = context,
+		gson = gson
 	)
 
 	@Provides
 	@Singleton
 	fun providesLastFmRepository(
-		lastFmService: LastFmService
-	): LastFmRepository = LastFmRepositoryImpl(lastFmService)
+		lastFmService: LastFmService,
+		gson: Gson,
+		@ApplicationContext context: Context
+	): LastFmRepository = LastFmRepositoryImpl(
+		lastFmService = lastFmService,
+		gson = gson,
+		context = context
+	)
 
 	@Provides
 	@Singleton
-	fun providesMessageRepository(messageService: MessageService): MessageRepository {
-		return MessageRepositoryImpl(messageService)
+	fun providesMessageRepository(
+		messageService: MessageService,
+		gson: Gson,
+		@ApplicationContext context: Context
+	): MessageRepository {
+		return MessageRepositoryImpl(
+			messageService = messageService,
+			gson = gson,
+			context = context
+		)
 	}
 }

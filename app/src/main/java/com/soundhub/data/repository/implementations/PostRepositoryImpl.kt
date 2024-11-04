@@ -3,14 +3,12 @@ package com.soundhub.data.repository.implementations
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
-import com.soundhub.R
-import com.soundhub.data.api.responses.ErrorResponse
 import com.soundhub.data.api.responses.HttpResult
 import com.soundhub.data.api.services.PostService
 import com.soundhub.data.model.Post
+import com.soundhub.data.repository.BaseRepository
 import com.soundhub.data.repository.PostRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
-import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.lib.HttpUtils
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,35 +24,21 @@ class PostRepositoryImpl @Inject constructor(
 	private val context: Context,
 	private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
 	private val gson: Gson
-) : PostRepository {
+) : PostRepository, BaseRepository(gson, context) {
 	override suspend fun getPostById(postId: UUID): HttpResult<Post?> {
 		try {
 			val response: Response<Post?> = postService.getPostById(postId)
 			Log.d("PostRepository", "getPostById[1]: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-					?: ErrorResponse(
-						status = response.code(),
-						detail = response.message()
-					)
+			return handleResponse<Post?>(response) {
+				val fetchedPost: Post? = response.body()
+				fetchedPost?.author?.let { loadAllUserDataUseCase(it) }
 
-				Log.e("PostRepository", "getPostById[2]: $errorBody")
-				return HttpResult.Error(errorBody = errorBody)
+				return@handleResponse HttpResult.Success(body = fetchedPost)
 			}
-
-
-			val fetchedPost: Post? = response.body()
-			fetchedPost?.author?.let { loadAllUserDataUseCase(it) }
-
-			return HttpResult.Success(body = fetchedPost)
 		} catch (e: Exception) {
-			Log.e("PostRepository", "getPostById[3]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			Log.e("PostRepository", "getPostById[2]: ${e.stackTraceToString()}")
+			return handleException(e)
 		}
 	}
 
@@ -63,29 +47,18 @@ class PostRepositoryImpl @Inject constructor(
 			val response: Response<List<Post>> = postService.getPostsByAuthorId(authorId)
 			Log.d("PostRepository", "getPostsByAuthorId[1]: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-					?: ErrorResponse(
-						status = response.code(),
-						detail = response.message()
-					)
-				Log.e("PostRepository", "getPostsByAuthorId[2]: $errorBody")
-				return HttpResult.Error(errorBody = errorBody)
+			return handleResponse<List<Post>>(response) {
+				val fetchedPosts: List<Post> = response.body().orEmpty()
+				fetchedPosts.forEach { post ->
+					post.author?.let { loadAllUserDataUseCase(it) }
+				}
+
+				return@handleResponse HttpResult.Success(body = fetchedPosts)
 			}
 
-			val fetchedPosts: List<Post> = response.body().orEmpty()
-			fetchedPosts.forEach { post ->
-				post.author?.let { loadAllUserDataUseCase(it) }
-			}
-
-			return HttpResult.Success(body = fetchedPosts)
 		} catch (e: Exception) {
 			Log.e("PostRepository", "getPostsByAuthorId[3]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			return handleException(e)
 		}
 	}
 
@@ -105,25 +78,10 @@ class PostRepositoryImpl @Inject constructor(
 
 			Log.d("PostRepository", "response: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-					?: ErrorResponse(
-						status = response.code(),
-						detail = context.getString(R.string.toast_update_error)
-					)
-
-				Log.e("PostRepository", "addPost[2]: $errorBody")
-				return HttpResult.Error(errorBody = errorBody)
-			}
-
-			return HttpResult.Success(body = response.body())
+			return handleResponse(response)
 		} catch (e: Exception) {
 			Log.e("PostRepository", "addPost[3]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			return handleException(e)
 		}
 	}
 
@@ -132,23 +90,13 @@ class PostRepositoryImpl @Inject constructor(
 			val response: Response<Post> = postService.toggleLike(postId)
 			Log.d("PostRepository", "toggleLike[1]: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-				Log.e("PostRepository", "toggleLike[2]: $errorBody")
-				return HttpResult.Error(errorBody)
-			}
-
-			val updatedPost = response.body()
-			updatedPost?.author?.let { loadAllUserDataUseCase(it) }
-
-			return HttpResult.Success(body = response.body())
+			return handleResponse(response, beforeReturningActions = {
+				val updatedPost = response.body()
+				updatedPost?.author?.let { loadAllUserDataUseCase(it) }
+			})
 		} catch (e: Exception) {
-			Log.e("PostRepository", "toggleLike[3]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			Log.e("PostRepository", "toggleLike[2]: ${e.stackTraceToString()}")
+			return handleException(e)
 		}
 	}
 
@@ -157,20 +105,10 @@ class PostRepositoryImpl @Inject constructor(
 			val response: Response<UUID> = postService.deletePost(postId)
 			Log.d("PostRepository", "deletePost[1]: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson
-					.fromJson(response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE)
-				Log.e("PostRepository", "deletePost[2]: $errorBody")
-				return HttpResult.Error(errorBody)
-			}
-
-			return HttpResult.Success(body = response.body())
+			return handleResponse(response)
 		} catch (e: Exception) {
 			Log.e("PostRepository", "deletePost[3]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			return handleException(e)
 		}
 	}
 
@@ -185,19 +123,16 @@ class PostRepositoryImpl @Inject constructor(
 				HttpUtils.prepareMediaFormData(it, context)
 			}
 
-			Log.d("PostRepository", "updatePost[1]: json -> ${gson.toJson(post)}")
 			val postRequestBody: RequestBody = gson.toJson(post)
 				.toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
 
 			Log.d(
 				"PostRepository",
-				"updatePost[2]: json images to delete: ${gson.toJson(imagesToBeDeleted)}"
+				"updatePost[1]: json images to delete: ${gson.toJson(imagesToBeDeleted)}"
 			)
 
 			val imagesToBeDeletedRequestBody: RequestBody = gson.toJson(imagesToBeDeleted)
 				.toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())
-
-			Log.d("PostRepository", "updatePost[3]: request body: $imagesToBeDeletedRequestBody")
 
 			val response: Response<Post> = postService.updatePost(
 				postId = postId,
@@ -206,27 +141,15 @@ class PostRepositoryImpl @Inject constructor(
 				deleteFiles = imagesToBeDeletedRequestBody
 			)
 
-			Log.d("PostRepository", "updatePost[4]: $response")
+			Log.d("PostRepository", "updatePost[2]: $response")
 
-			if (!response.isSuccessful) {
-				val errorBody: ErrorResponse = gson.fromJson(
-					response.errorBody()?.charStream(), Constants.ERROR_BODY_TYPE
-				) ?: ErrorResponse(status = response.code())
-
-				Log.e("PostRepository", "updatePost[5]: $errorBody")
-				return HttpResult.Error(errorBody = errorBody)
-			}
-
-			val updatedPost: Post? = response.body()
-			updatedPost?.author?.let { loadAllUserDataUseCase(it) }
-
-			return HttpResult.Success(body = response.body())
+			return handleResponse(response, beforeReturningActions = {
+				val updatedPost: Post? = response.body()
+				updatedPost?.author?.let { loadAllUserDataUseCase(it) }
+			})
 		} catch (e: Exception) {
-			Log.e("PostRepository", "updatePost[6]: ${e.stackTraceToString()}")
-			return HttpResult.Error(
-				errorBody = ErrorResponse(detail = e.localizedMessage),
-				throwable = e
-			)
+			Log.e("PostRepository", "updatePost[3]: ${e.stackTraceToString()}")
+			return handleException(e)
 		}
 	}
 }
