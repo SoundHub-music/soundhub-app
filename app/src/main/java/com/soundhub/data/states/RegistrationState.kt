@@ -1,7 +1,7 @@
 package com.soundhub.data.states
 
+import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
 import com.soundhub.ui.shared.forms.IUserDataFormState
 import java.time.LocalDate

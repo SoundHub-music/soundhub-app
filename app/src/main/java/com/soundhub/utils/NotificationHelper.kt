@@ -39,7 +39,7 @@ class NotificationHelper(
 
 	private val userCredsFlow = userCredsStore.getCreds()
 
-	fun generateNotificationId(message: Message) = message.sender?.id.hashCode()
+	fun generateNotificationId(message: Message) = message.author?.id.hashCode()
 
 	fun cancelNotification(notificationId: Int) {
 		Log.i(LOG_CLASSNAME, "Notification with $notificationId canceled")
@@ -53,9 +53,9 @@ class NotificationHelper(
 		setExtraParameters: (NotificationChannel) -> Unit = {}
 	) {
 		val channel: NotificationChannel? = notificationManager
-			.notificationChannels.firstOrNull {
-			c -> c.id == channelId
-		}
+			.notificationChannels.firstOrNull { c ->
+				c.id == channelId
+			}
 
 		if (channel == null) {
 			Log.i(LOG_CLASSNAME, "Channel with id $channelId was not found. Creating...")
@@ -68,8 +68,8 @@ class NotificationHelper(
 	}
 
 	fun createNotificationGroupIfNotExists(groupId: String) {
-		val group = notificationManager.notificationChannelGroups.firstOrNull {
-			g -> g.id == groupId
+		val group = notificationManager.notificationChannelGroups.firstOrNull { g ->
+			g.id == groupId
 		}
 
 		if (group == null) {
@@ -89,15 +89,16 @@ class NotificationHelper(
 			.load(
 				HttpUtils.prepareGlideUrWithAccessToken(
 					userCreds,
-					message.sender?.avatarUrl,
+					message.author?.avatarUrl,
 					MediaFolder.AVATAR
-				))
+				)
+			)
 			.circleCrop()
 			.into(object : CustomTarget<Bitmap>() {
 				override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
 					val person = Person.Builder()
-						.setName(message.sender?.getFullName())
-						.setKey(message.sender?.getFullName())
+						.setName(message.author?.getFullName())
+						.setKey(message.author?.getFullName())
 						.setIcon(IconCompat.createWithBitmap(resource))
 						.build()
 

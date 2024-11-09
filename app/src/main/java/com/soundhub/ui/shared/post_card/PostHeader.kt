@@ -71,7 +71,7 @@ internal fun PostHeader(
 					)
 
 					Text(
-						text = DateFormatter.getRelativeDate(post.publishDate),
+						text = DateFormatter.getRelativeDate(post.createdAt),
 						fontSize = 16.sp,
 						lineHeight = 20.sp,
 						fontWeight = FontWeight.Medium,

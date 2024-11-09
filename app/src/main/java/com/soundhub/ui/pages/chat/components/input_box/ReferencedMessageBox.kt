@@ -54,7 +54,7 @@ internal fun ReferencedMessageBox(chatViewModel: ChatViewModel) {
 					verticalArrangement = Arrangement.spacedBy(2.dp)
 				) {
 					Text(
-						text = messageToReply.sender?.getFullName() ?: "",
+						text = messageToReply.author?.getFullName() ?: "",
 						fontWeight = FontWeight.Bold,
 						fontSize = 16.sp
 					)

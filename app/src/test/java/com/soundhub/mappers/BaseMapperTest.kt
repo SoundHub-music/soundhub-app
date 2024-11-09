@@ -2,9 +2,9 @@ package com.soundhub.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SendMessageRequest
+import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Chat
-import com.soundhub.data.model.Gender
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
@@ -16,8 +16,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 open class BaseMapperTest {
-	private val userAvatar: String =
-		"https://wp-s.ru/wallpapers/9/17/432090200138903/pejzazh-solnechnye-luchi-skvoz-listya-derevev-popadayut-na-ozero.jpg"
+	private val userAvatar: String = "avatar.jpg"
 	private val artist = Artist(name = "Rammstein", id = 126841)
 
 	protected val user = User(
@@ -105,18 +104,17 @@ open class BaseMapperTest {
 
 	private val postId = UUID.randomUUID()
 	protected val post = Post(
-		publishDate = publishTime,
+		createdAt = publishTime,
 		id = postId,
 		author = user,
 		content = postContent,
 		images = postImages
 	)
 	protected val postEditorState = PostEditorState(
-		publishDate = publishTime,
+		createdAt = publishTime,
 		postId = postId,
 		content = postContent,
 		author = user,
 		images = postImages,
-
-		)
+	)
 }

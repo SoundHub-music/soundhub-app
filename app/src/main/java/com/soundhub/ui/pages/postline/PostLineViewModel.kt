@@ -60,7 +60,7 @@ class PostLineViewModel @Inject constructor(
 
 				_postLineUiState.update { state ->
 					state.copy(
-						posts = posts.sortedBy { it.publishDate },
+						posts = posts.sortedBy { it.createdAt },
 						status = ApiStatus.SUCCESS
 					)
 				}

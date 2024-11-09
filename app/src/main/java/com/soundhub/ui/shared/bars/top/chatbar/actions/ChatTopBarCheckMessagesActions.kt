@@ -29,7 +29,7 @@ internal fun ChatTopBarCheckMessagesActions(
 	val authorizedUser: User? = uiState.authorizedUser
 
 	val hasOnlyOwnMessages: Boolean = remember(checkedMessages, authorizedUser) {
-		checkedMessages.all { it.sender?.id == authorizedUser?.id }
+		checkedMessages.all { it.author?.id == authorizedUser?.id }
 	}
 
 	val hasOnlyOneMessage: Boolean = remember(checkedMessages) {

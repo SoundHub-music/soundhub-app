@@ -27,7 +27,7 @@ internal fun MessageTimeAndMarkerRow(
 	) {
 		Text(
 			modifier = Modifier.height(IntrinsicSize.Min),
-			text = DateFormatter.getHourAndMinuteWithSeparator(message.timestamp),
+			text = DateFormatter.getHourAndMinuteWithSeparator(message.createdAt),
 			fontSize = 12.sp,
 			fontWeight = FontWeight.Light,
 			color = contentColor,

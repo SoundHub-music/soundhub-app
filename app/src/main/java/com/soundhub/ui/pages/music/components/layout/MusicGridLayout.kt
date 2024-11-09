@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import com.soundhub.data.model.MusicEntity
+import com.soundhub.data.model.interfaces.MusicEntity
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.layouts.music_preferences.components.MusicItemPlate
 

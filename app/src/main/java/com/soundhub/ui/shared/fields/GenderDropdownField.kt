@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
-import com.soundhub.data.model.Gender
+import com.soundhub.data.enums.Gender
 import com.soundhub.ui.shared.forms.IUserDataFormState
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -1,24 +1,20 @@
 package com.soundhub.data.model
 
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.UUID
 
 data class Message(
-	val id: UUID = UUID.randomUUID(),
-
 	@SerializedName("chat_id")
-	val chatId: UUID = UUID.randomUUID(),
-
+	val chatId: UUID,
 	val replyToMessageId: UUID? = null,
-
-	val sender: User?,
-
-	val timestamp: LocalDateTime = LocalDateTime.now(),
-	val content: String = "",
 	var isRead: Boolean = false,
-) : Serializable {
-	fun checkIfSentByUser(user: User?) = sender?.id == user?.id
+
+	override val id: UUID,
+	override var author: User?,
+	override val createdAt: LocalDateTime,
+	override var content: String
+) : ContentEntity() {
+	fun checkIfSentByUser(user: User?) = author?.id == user?.id
 	fun isNotReadAndNotSentBy(user: User?) = !checkIfSentByUser(user) && !isRead
 }

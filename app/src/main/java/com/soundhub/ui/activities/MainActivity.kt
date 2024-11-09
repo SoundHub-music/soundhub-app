@@ -2,7 +2,6 @@ package com.soundhub.ui.activities
 
 import android.Manifest
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
@@ -43,6 +42,8 @@ import com.soundhub.ui.viewmodels.SplashScreenViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.extensions.context_wrapper.registerReceiverExtended
+import com.soundhub.utils.extensions.context_wrapper.startAndroidService
+import com.soundhub.utils.extensions.context_wrapper.stopAndroidService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -134,10 +135,16 @@ class MainActivity : ComponentActivity() {
 		)
 	}
 
+	override fun onPause() {
+		super.onPause()
+		unregisterReceiver(messengerViewModel.getMessageReceiver())
+	}
+
 	override fun onResume() {
 		super.onResume()
 		Log.d("MainActivity", "onResume: user has opened the app")
 		authViewModel.updateUserOnlineStatusDelayed(online = true)
+		registerReceivers()
 	}
 
 	override fun onStart() {
@@ -147,7 +154,7 @@ class MainActivity : ComponentActivity() {
 				messengerAndroidService.bindService(
 					intent,
 					messengerConnection,
-					Context.BIND_AUTO_CREATE
+					BIND_AUTO_CREATE
 				)
 		}
 	}
@@ -157,7 +164,6 @@ class MainActivity : ComponentActivity() {
 	}
 
 	private fun runActionsOnCreateActivity() {
-		registerReceivers()
 		initSplashScreen()
 		startAndroidService(MessengerAndroidService::class.java)
 		requestPermissions()
@@ -187,7 +193,7 @@ class MainActivity : ComponentActivity() {
 			messengerViewModel.getMessageReceiver(),
 			IntentFilter(MessengerAndroidService.MESSAGE_RECEIVER),
 
-		)
+			)
 
 		registerReceiverExtended(
 			messengerViewModel.getReadMessageReceiver(),
@@ -205,16 +211,6 @@ class MainActivity : ComponentActivity() {
 		splashScreen.setKeepOnScreenCondition { splashScreenViewModel.isLoading.value }
 	}
 
-	private fun <K> startAndroidService(clazz: Class<K>) {
-		val intent = Intent(this, clazz)
-		startService(intent)
-	}
-
-	private fun <K> stopAndroidService(clazz: Class<K>) {
-		val intent = Intent(this, clazz)
-		stopService(intent)
-	}
-
 	private fun requestPermissions() {
 		if (ActivityCompat.checkSelfPermission(
 				this,
@@ -223,7 +219,7 @@ class MainActivity : ComponentActivity() {
 		) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 				val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
-				ActivityCompat.requestPermissions(this, permissions,101)
+				ActivityCompat.requestPermissions(this, permissions, 101)
 			}
 		}
 	}

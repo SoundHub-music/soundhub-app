@@ -7,7 +7,6 @@ import com.soundhub.utils.converters.room.LocalDateTimeRoomConverter
 import com.soundhub.utils.converters.room.StringListRoomConverter
 import com.soundhub.utils.converters.room.UserRoomConverter
 import com.soundhub.utils.converters.room.UserSetRoomConverter
-import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -20,10 +19,11 @@ import java.util.UUID
 )
 data class Post(
 	@PrimaryKey
-	val id: UUID = UUID.randomUUID(),
-	var author: User?,
-	var publishDate: LocalDateTime = LocalDateTime.now(),
-	val content: String = "",
+	override val id: UUID,
+	override var author: User?,
+	override var createdAt: LocalDateTime = LocalDateTime.now(),
+	override var content: String = "",
+
 	var images: List<String> = emptyList(),
 	var likes: Set<User> = emptySet()
-) : Serializable
+) : ContentEntity()

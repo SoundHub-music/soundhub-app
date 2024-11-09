@@ -72,7 +72,7 @@ class MessengerAndroidService : Service() {
 		const val MESSAGE_REPLAY_COUNT = 32
 	}
 
-	inner class LocalBinder: Binder() {
+	inner class LocalBinder : Binder() {
 		fun getService(): MessengerAndroidService = context
 	}
 
@@ -322,8 +322,9 @@ class MessengerAndroidService : Service() {
 				.firstOrNull()
 				?.currentRoute
 
-			val isNotSender = authorizedUser?.id != message.sender?.id
-			val currentChatRoute = ChatRoute.getStringRouteWithNavArg(receivedMessage.chatId.toString())
+			val isNotSender = authorizedUser?.id != message.author?.id
+			val currentChatRoute =
+				ChatRoute.getStringRouteWithNavArg(receivedMessage.chatId.toString())
 			val isNotChatRoute = currentAppRoute != currentChatRoute
 
 			if (isNotSender && isNotChatRoute)
@@ -382,7 +383,7 @@ class MessengerAndroidService : Service() {
 		return NotificationCompat.Builder(this, CHANNEL_ID)
 			.setSmallIcon(R.drawable.ic_launcher_foreground)
 			.setGroup(NOTIFICATION_GROUP_ID)
-			.setContentTitle(message.sender?.getFullName())
+			.setContentTitle(message.author?.getFullName())
 			.setContentText(message.content)
 			.setAutoCancel(true)
 			.setShowWhen(true)

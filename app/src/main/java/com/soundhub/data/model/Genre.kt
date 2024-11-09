@@ -3,6 +3,7 @@ package com.soundhub.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.soundhub.data.model.interfaces.MusicEntity
 import java.io.Serializable
 import java.util.UUID
 
@@ -15,4 +16,4 @@ data class Genre(
 
 	@SerializedName("pictureUrl")
 	override var cover: String? = null
-) : Serializable, MusicEntity<UUID>
+) : Serializable, MusicEntity<UUID>()

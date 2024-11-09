@@ -53,7 +53,7 @@ internal fun OriginMessage(
 			)
 			Column {
 				Text(
-					text = message.sender?.getFullName() ?: "",
+					text = message.author?.getFullName() ?: "",
 					fontSize = 16.sp,
 					color = messageParameters.contentColor
 				)

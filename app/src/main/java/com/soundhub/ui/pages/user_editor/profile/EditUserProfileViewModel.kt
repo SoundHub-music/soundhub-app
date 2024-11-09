@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.data.dao.UserDao
-import com.soundhub.data.model.Gender
+import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.states.UserFormState
 import com.soundhub.domain.usecases.user.UpdateUserUseCase

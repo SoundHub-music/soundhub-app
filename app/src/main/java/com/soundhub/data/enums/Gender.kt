@@ -1,4 +1,4 @@
-package com.soundhub.data.model
+package com.soundhub.data.enums
 
 enum class Gender(val value: String) {
 	MALE("male"),

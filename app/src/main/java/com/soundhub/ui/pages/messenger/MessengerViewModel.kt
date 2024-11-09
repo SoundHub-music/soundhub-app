@@ -113,10 +113,10 @@ class MessengerViewModel @Inject constructor(
 			?.messages
 			.orEmpty()
 
-			return messages
-				.filter { msg -> msg.sender?.id != authorizedUser?.id }
-				.groupBy { msg -> msg.chatId }
-				.count()
+		return messages
+			.filter { msg -> msg.author?.id != authorizedUser?.id }
+			.groupBy { msg -> msg.chatId }
+			.count()
 	}
 
 	fun onChatCardClick(chat: Chat) = viewModelScope.launch(Dispatchers.Main) {
@@ -150,9 +150,9 @@ class MessengerViewModel @Inject constructor(
 			lastMessageContent = "${lastMessageContent.substring(0, MAX_MESSAGE_PREVIEW_LENGTH)}..."
 		}
 
-		lastMessageContent = if (lastMessage.sender?.id == authorizedUser?.id) {
+		lastMessageContent = if (lastMessage.author?.id == authorizedUser?.id) {
 			"$prefix $lastMessageContent"
-		} else "${lastMessage.sender?.firstName}: $lastMessageContent".trim()
+		} else "${lastMessage.author?.firstName}: $lastMessageContent".trim()
 
 		return lastMessageContent
 	}

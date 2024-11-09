@@ -10,7 +10,7 @@ import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.data.model.Gender
+import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.AuthRepository
 import com.soundhub.data.states.RegistrationState

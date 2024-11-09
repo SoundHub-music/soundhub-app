@@ -9,7 +9,7 @@ data class PostEditorState(
 	var postId: UUID = UUID.randomUUID(),
 	var content: String = "",
 	var author: User? = null,
-	var publishDate: LocalDateTime = LocalDateTime.now(),
+	var createdAt: LocalDateTime = LocalDateTime.now(),
 	var likes: Set<User> = emptySet(),
 
 	var images: List<String> = emptyList(),

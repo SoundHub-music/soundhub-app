@@ -18,7 +18,7 @@ class GetPostsByUserUseCase @Inject constructor(
 			authorId = user.id
 		).onSuccess { response ->
 			posts.addAll(response.body
-				?.sortedByDescending { p -> p.publishDate }
+				?.sortedByDescending { p -> p.createdAt }
 				.orEmpty()
 			)
 

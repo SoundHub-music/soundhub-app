@@ -1,6 +1,6 @@
 package com.soundhub.ui.shared.forms
 
-import com.soundhub.data.model.Gender
+import com.soundhub.data.enums.Gender
 import java.time.LocalDate
 import java.util.UUID
 

@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
+import com.soundhub.data.enums.Gender
 import com.soundhub.utils.converters.room.ArtistRoomConverter
 import com.soundhub.utils.converters.room.FileRoomConverter
 import com.soundhub.utils.converters.room.GenreRoomConverter

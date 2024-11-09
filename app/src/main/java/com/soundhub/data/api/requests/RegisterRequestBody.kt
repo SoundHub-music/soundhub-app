@@ -1,6 +1,6 @@
 package com.soundhub.data.api.requests
 
-import com.soundhub.data.model.Gender
+import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.Genre
 import java.time.LocalDate
 import java.time.LocalDateTime

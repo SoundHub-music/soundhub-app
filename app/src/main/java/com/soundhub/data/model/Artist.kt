@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.gson.annotations.SerializedName
+import com.soundhub.data.model.interfaces.MusicEntity
 import com.soundhub.utils.converters.room.AlbumRoomConverter
 import com.soundhub.utils.converters.room.StringListRoomConverter
 import java.io.Serializable
@@ -28,4 +29,4 @@ data class Artist(
 
 	@SerializedName("thumb")
 	override var cover: String? = null
-) : Serializable, MusicEntity<Int>
+) : Serializable, MusicEntity<Int>()

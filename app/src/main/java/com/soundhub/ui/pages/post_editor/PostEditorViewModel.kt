@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -97,10 +96,7 @@ class PostEditorViewModel @Inject constructor(
 	private suspend fun createPost(author: User?) {
 		var toastText: UiText = UiText.StringResource(R.string.toast_post_created_successfully)
 		val post: Post = PostMapper.impl.fromPostEditorStateToPost(_postEditorState.value)
-			.apply {
-				this.author = author
-				this.publishDate = LocalDateTime.now()
-			}
+			.apply { this.author = author }
 
 		postRepository.addPost(post)
 			.onSuccessWithContext {

@@ -116,10 +116,10 @@ fun MessageBoxList(
 			.toList()
 			.filterNotNull()
 
-			chatViewModel.readVisibleMessagesFromIndex(
-				firstVisibleMessageIndex,
-				messages
-			)
+		chatViewModel.readVisibleMessagesFromIndex(
+			firstVisibleMessageIndex,
+			messages
+		)
 	}
 
 	Box(modifier = modifier.fillMaxSize()) {
@@ -133,14 +133,14 @@ fun MessageBoxList(
 			stickyHeader { currentDate?.let { MessageDateChip(it) } }
 			items(pagedMessages.itemCount, key = { pagedMessages.peek(it)?.id ?: it }) { index ->
 				pagedMessages[index]?.let { message ->
-					val messageDate = message.timestamp.toLocalDate()
+					val messageDate = message.createdAt.toLocalDate()
 					if (messageDate != currentDate)
 						currentDate = messageDate
 
 					MessageBox(
 						modifier = Modifier,
 						message = message,
-						isOwnMessage = message.sender?.id == authorizedUser?.id,
+						isOwnMessage = message.author?.id == authorizedUser?.id,
 						chatViewModel = chatViewModel,
 					)
 				}
