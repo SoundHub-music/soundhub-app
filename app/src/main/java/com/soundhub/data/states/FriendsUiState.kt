@@ -8,6 +8,7 @@ data class FriendsUiState(
 	val recommendedFriends: List<User> = emptyList(),
 	val userCompatibilityPercentage: CompatibleUsersResponse? = null,
 	val profileOwner: User? = null,
+	val isOriginProfile: Boolean = true,
 	val foundUsers: List<User> = emptyList(),
 	val status: ApiStatus = ApiStatus.LOADING
 )

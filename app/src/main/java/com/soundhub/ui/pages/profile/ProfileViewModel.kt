@@ -74,7 +74,7 @@ class ProfileViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun getOrCreateChatByUser(user: User?): Flow<Chat?> = flow {
+	fun getOrCreateChatByUser(user: User?): Flow<Chat?> = flow {
 		val (authorizedUser: User?) = _profileUiState.value
 		emit(authorizedUser?.let {
 			getOrCreateChatByUserUseCase(
@@ -155,7 +155,7 @@ class ProfileViewModel @Inject constructor(
 		val profileOwner: User? = _profileUiState.value.profileOwner
 
 		authorizedUser.collect { user ->
-			if (user != null && profileOwner != null) {
+			if (user != null && profileOwner?.id == user.id) {
 				inviteRepository.getInviteBySenderAndRecipientId(
 					senderId = user.id,
 					recipientId = profileOwner.id
@@ -261,8 +261,7 @@ class ProfileViewModel @Inject constructor(
 						}
 					}
 			}
-		}
-		else {
+		} else {
 			_profileUiState.update {
 				it.copy(
 					userPosts = cache,

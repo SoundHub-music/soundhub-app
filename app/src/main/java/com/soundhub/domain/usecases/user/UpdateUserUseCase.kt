@@ -9,7 +9,7 @@ class UpdateUserUseCase @Inject constructor(
 ) {
 	suspend operator fun invoke(user: User?) = runCatching {
 		userRepository
-			.updateUserById(user)
+			.updateUser(user)
 			.onFailure { error ->
 				error.throwable?.let { throw error.throwable }
 					?: throw Exception(error.errorBody.detail)

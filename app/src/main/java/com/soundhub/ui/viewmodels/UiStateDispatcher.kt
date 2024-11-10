@@ -90,8 +90,12 @@ class UiStateDispatcher @Inject constructor(
 		it.copy(isSearchBarActive = !it.isSearchBarActive, searchBarText = "")
 	}
 
-	fun setSearchBarActive(value: Boolean) = _uiState.update {
-		it.copy(isSearchBarActive = value, searchBarText = "")
+	fun setSearchBarActive(value: Boolean) {
+		if (_uiState.value.isSearchBarActive != value) {
+			_uiState.update {
+				it.copy(isSearchBarActive = value, searchBarText = "")
+			}
+		}
 	}
 
 	// search bar content

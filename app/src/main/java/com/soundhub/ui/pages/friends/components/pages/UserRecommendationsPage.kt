@@ -25,7 +25,6 @@ import com.soundhub.data.model.User
 import com.soundhub.data.states.FriendsUiState
 import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.friends.components.UserFriendsContainer
-import com.soundhub.ui.pages.friends.enums.FriendListPage
 import com.soundhub.ui.shared.loaders.CircleLoader
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
@@ -34,12 +33,13 @@ internal fun UserRecommendationsPage(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 	navController: NavHostController,
-	tabs: List<FriendListPage>,
 	page: Int
 ) {
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+	val tabs = friendsViewModel.tabs
 	val recommendedUsers: List<User> = friendsUiState.recommendedFriends
 	var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
+	val isOriginProfile = friendsViewModel.isOriginProfile()
 	val searchBarText: String = uiStateDispatcher.getSearchBarText()
 
 	LaunchedEffect(key1 = searchBarText) {
@@ -47,6 +47,11 @@ internal fun UserRecommendationsPage(
 			occurrenceString = searchBarText,
 			users = recommendedUsers
 		)
+	}
+
+	LaunchedEffect(key1 = isOriginProfile) {
+		if (isOriginProfile)
+			friendsViewModel.loadRecommendedFriends()
 	}
 
 	LaunchedEffect(key1 = recommendedUsers) {

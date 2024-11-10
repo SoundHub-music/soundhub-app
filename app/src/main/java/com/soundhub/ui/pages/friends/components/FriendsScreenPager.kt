@@ -23,9 +23,9 @@ internal fun FriendsScreenPager(
 	navController: NavHostController,
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
-	isOriginProfile: Boolean
 ) {
 	val tabs: List<FriendListPage> = friendsViewModel.tabs
+	val isOriginProfile = friendsViewModel.isOriginProfile()
 
 	ContentContainer {
 		if (isOriginProfile) {
@@ -39,7 +39,7 @@ internal fun FriendsScreenPager(
 					uiStateDispatcher = uiStateDispatcher,
 					selectedTabState = selectedTabState,
 					navController = navController,
-					page = page
+					page = page,
 				)
 			}
 		} else MainFriendsPage(
@@ -47,8 +47,7 @@ internal fun FriendsScreenPager(
 			uiStateDispatcher = uiStateDispatcher,
 			selectedTabState = selectedTabState,
 			navController = navController,
-			tabs = tabs,
-			page = tabs.indexOf(FriendListPage.MAIN)
+			page = tabs.indexOf(FriendListPage.MAIN),
 		)
 	}
 }
@@ -63,27 +62,27 @@ private fun PagerPages(
 	page: Int
 ) {
 	val tabs: List<FriendListPage> = friendsViewModel.tabs
-	when (tabs[page]) {
-		FriendListPage.MAIN -> MainFriendsPage(
-			friendsViewModel = friendsViewModel,
-			uiStateDispatcher = uiStateDispatcher,
-			selectedTabState = selectedTabState,
-			navController = navController,
-			tabs = tabs,
-			page = page
-		)
+	if (page < tabs.size) {
+		when (tabs[page]) {
+			FriendListPage.MAIN -> MainFriendsPage(
+				friendsViewModel = friendsViewModel,
+				uiStateDispatcher = uiStateDispatcher,
+				selectedTabState = selectedTabState,
+				navController = navController,
+				page = page,
+			)
 
-		FriendListPage.RECOMMENDATIONS -> UserRecommendationsPage(
-			friendsViewModel = friendsViewModel,
-			uiStateDispatcher = uiStateDispatcher,
-			navController = navController,
-			tabs = tabs,
-			page = page
-		)
+			FriendListPage.RECOMMENDATIONS -> UserRecommendationsPage(
+				friendsViewModel = friendsViewModel,
+				uiStateDispatcher = uiStateDispatcher,
+				navController = navController,
+				page = page
+			)
 
-		FriendListPage.SEARCH -> SearchUserPage(
-			friendsViewModel = friendsViewModel,
-			navController = navController
-		)
+			FriendListPage.SEARCH -> SearchUserPage(
+				friendsViewModel = friendsViewModel,
+				navController = navController
+			)
+		}
 	}
 }

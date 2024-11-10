@@ -164,6 +164,7 @@
     <string name="friends_empty_list_button_text">Начать поиск</string>
     <string name="friends_search_users_empty_screen">Начните вводить имя пользователя, чтобы увидеть результат</string>
     <string name="friends_search_users_not_found">По вашему запросу ничего не найдено</string>
+    <string name="friends_empty_list_message_unauthorized">У пользователя еще нет друзей</string>
 
     <!-- friends page tabs -->
     <string name="friends_main_page">Ваши друзья</string>

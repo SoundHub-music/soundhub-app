@@ -13,8 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.data.model.User
-import com.soundhub.data.states.FriendsUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.friends.components.FriendsScreenPager
 import com.soundhub.ui.pages.friends.components.FriendsScreenTabs
@@ -31,25 +29,15 @@ fun FriendsScreen(
 	userId: UUID?
 ) {
 	val tabs = friendsViewModel.tabs
-	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val selectedTabState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
-
-	val profileOwner: User? = friendsUiState.profileOwner
-	val authorizedUser: User? = uiState.authorizedUser
-	var isOriginProfile: Boolean by rememberSaveable { mutableStateOf(false) }
+	val isOriginProfile = friendsViewModel.isOriginProfile()
 	var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(friendsViewModel.tabs) }
 
 	val searchBarText: String = uiState.searchBarText
 
-	LaunchedEffect(key1 = userId, key2 = authorizedUser) {
+	LaunchedEffect(key1 = userId) {
 		userId?.let { friendsViewModel.loadProfileOwner(it) }
-	}
-
-	LaunchedEffect(key1 = true) {
-		// loading recommended friends only in authorized user friends page
-		if (profileOwner?.id == authorizedUser?.id)
-			friendsViewModel.loadRecommendedFriends()
 	}
 
 	LaunchedEffect(key1 = searchBarText) {
@@ -57,8 +45,7 @@ fun FriendsScreen(
 			friendsViewModel.searchUsers(searchBarText)
 	}
 
-	LaunchedEffect(key1 = authorizedUser, key2 = profileOwner) {
-		isOriginProfile = authorizedUser?.id == profileOwner?.id
+	LaunchedEffect(key1 = isOriginProfile) {
 		tabState = if (!isOriginProfile)
 			listOf(FriendListPage.MAIN)
 		else friendsViewModel.tabs
@@ -78,7 +65,6 @@ fun FriendsScreen(
 			navController = navController,
 			friendsViewModel = friendsViewModel,
 			uiStateDispatcher = uiStateDispatcher,
-			isOriginProfile = isOriginProfile
 		)
 	}
 }

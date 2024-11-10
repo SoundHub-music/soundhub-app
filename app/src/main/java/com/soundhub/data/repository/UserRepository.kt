@@ -8,7 +8,7 @@ import java.util.UUID
 interface UserRepository {
 	suspend fun getUserById(id: UUID?): HttpResult<User?>
 	suspend fun getCurrentUser(): HttpResult<User?>
-	suspend fun updateUserById(user: User?): HttpResult<User>
+	suspend fun updateUser(user: User?): HttpResult<User>
 	suspend fun addFriend(friendId: UUID): HttpResult<User>
 	suspend fun deleteFriend(friendId: UUID): HttpResult<User>
 	suspend fun getRecommendedFriends(): HttpResult<List<User>>

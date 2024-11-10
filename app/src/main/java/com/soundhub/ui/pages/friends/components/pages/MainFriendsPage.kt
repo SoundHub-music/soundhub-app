@@ -16,8 +16,8 @@ import com.soundhub.data.states.FriendsUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.friends.EmptyFriendsScreen
 import com.soundhub.ui.pages.friends.FriendsViewModel
+import com.soundhub.ui.pages.friends.UnauthorizedEmptyFriendsPage
 import com.soundhub.ui.pages.friends.components.UserFriendsContainer
-import com.soundhub.ui.pages.friends.enums.FriendListPage
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -26,21 +26,18 @@ internal fun MainFriendsPage(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 	navController: NavHostController,
-	tabs: List<FriendListPage>,
 	selectedTabState: PagerState,
 	page: Int
 ) {
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
+	val isOriginProfile = friendsViewModel.isOriginProfile()
+	val tabs = friendsViewModel.tabs
 
 	val profileOwner: User? = friendsUiState.profileOwner
 	val searchBarText: String = uiState.searchBarText
 	val friends: List<User> = profileOwner?.friends.orEmpty().distinct()
 	var filteredFriendList: List<User> by rememberSaveable { mutableStateOf(friends) }
-
-	LaunchedEffect(key1 = friends) {
-		Log.d("MainFriendsPage", "friends: ${friends.size}")
-	}
 
 	LaunchedEffect(key1 = searchBarText) {
 		Log.d("MainFriendsPage", "text: $searchBarText")
@@ -52,11 +49,11 @@ internal fun MainFriendsPage(
 		filteredFriendList = friends
 	}
 
+
 	if (friends.isEmpty()) {
-		EmptyFriendsScreen(
-			selectedTabState = selectedTabState,
-			tabs = tabs
-		)
+		if (!isOriginProfile) {
+			UnauthorizedEmptyFriendsPage()
+		} else EmptyFriendsScreen(selectedTabState, friendsViewModel)
 	} else UserFriendsContainer(
 		friendList = filteredFriendList,
 		navController = navController,

@@ -1,5 +1,7 @@
 package com.soundhub.ui.pages.friends
 
+import android.util.Log
+import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
@@ -50,6 +52,12 @@ class FriendsViewModel @Inject constructor(
 
 	init {
 		viewModelScope.launch { initializeFriendsUiState() }
+	}
+
+	override fun onCleared() {
+		super.onCleared()
+		Log.d("FriendsViewModel", "onCleared: clear vm state")
+		_friendsUiState.update { FriendsUiState() }
 	}
 
 	private suspend fun initializeFriendsUiState() = authorizedUser.update {
@@ -143,12 +151,17 @@ class FriendsViewModel @Inject constructor(
 	}
 
 	fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.IO) {
-		val authorizedUser: User? = authorizedUser.firstOrNull()
-		val profileOwner: User? = if (authorizedUser?.id == id)
-			authorizedUser
+		val profileOwner: User? = if (authorizedUser.value?.id == id)
+			authorizedUser.value
 		else getUserByIdUseCase(id)
 
 		setProfileOwner(profileOwner)
+	}
+
+	fun isOriginProfile(): Boolean {
+		val authorizedUser: User? = authorizedUser.value
+		val profileOwner: User? = _friendsUiState.value.profileOwner
+		return authorizedUser?.id == profileOwner?.id
 	}
 
 	fun loadUsersCompatibility(userIds: List<UUID>) = viewModelScope.launch(Dispatchers.IO) {
@@ -164,5 +177,9 @@ class FriendsViewModel @Inject constructor(
 				val uiEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
 				uiStateDispatcher.sendUiEvent(uiEvent)
 			}
+	}
+
+	fun handleSearchFriendClick(pagerState: PagerState) = viewModelScope.launch {
+		pagerState.animateScrollToPage(tabs.indexOf(FriendListPage.RECOMMENDATIONS))
 	}
 }

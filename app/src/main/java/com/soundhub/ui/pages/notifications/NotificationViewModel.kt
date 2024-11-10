@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -35,13 +36,15 @@ class NotificationViewModel @Inject constructor(
 	val notificationUiState = _notificationUiState.asStateFlow()
 
 	init {
-		init()
+		loadInvitesInitial()
 	}
 
-	private fun init() = viewModelScope.launch {
-		userCreds.collect { creds ->
-			if (creds.accessToken != null) loadInvites()
-		}
+	private fun loadInvitesInitial() = viewModelScope.launch {
+		val authorizedUser = userDao.getCurrentUser()
+		val creds = userCreds.firstOrNull()
+
+		if (creds?.accessToken != null && authorizedUser != null)
+			loadInvites()
 	}
 
 	fun loadInvites() = viewModelScope.launch(Dispatchers.IO) {

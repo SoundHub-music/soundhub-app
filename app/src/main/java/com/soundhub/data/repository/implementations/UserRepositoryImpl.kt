@@ -69,7 +69,7 @@ class UserRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun updateUserById(user: User?): HttpResult<User> {
+	override suspend fun updateUser(user: User?): HttpResult<User> {
 		try {
 			val avatarUri: Uri? = user?.avatarUrl?.toUri()
 			var avatarFormData: MultipartBody.Part? = null
