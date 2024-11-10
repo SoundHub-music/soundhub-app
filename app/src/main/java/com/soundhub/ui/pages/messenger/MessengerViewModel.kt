@@ -16,6 +16,7 @@ import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.states.MessengerUiState
 import com.soundhub.receivers.MessageReceiver
+import com.soundhub.services.MessengerAndroidService
 import com.soundhub.services.MessengerAndroidService.Companion.BROADCAST_MESSAGE_KEY
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -78,11 +79,17 @@ class MessengerViewModel @Inject constructor(
 		_messengerUiState.update { MessengerUiState() }
 	}
 
-	fun getMessageReceiver() = messageReceiver
+	fun getMessageReceiversWithIntentFilters() = listOf(
+		messageReceiver to MessengerAndroidService.MESSAGE_RECEIVER,
+		readMessageReceiver to MessengerAndroidService.READ_MESSAGE_RECEIVER,
+		deletedMessageReceiver to MessengerAndroidService.DELETE_MESSAGE_RECEIVER
+	)
 
-	fun getReadMessageReceiver() = readMessageReceiver
-
-	fun getDeletedMessageReceiver() = deletedMessageReceiver
+	fun getMessageReceivers() = listOf(
+		messageReceiver,
+		readMessageReceiver,
+		deletedMessageReceiver
+	)
 
 	suspend fun getLastMessageByChatId(chatId: UUID): Message? {
 		return messageRepository.getPagedMessages(
@@ -94,7 +101,7 @@ class MessengerViewModel @Inject constructor(
 			?.firstOrNull()
 	}
 
-	fun updateUnreadMessageCount() = viewModelScope.launch(Dispatchers.Main) {
+	fun updateUnreadMessageCount() = viewModelScope.launch(Dispatchers.IO) {
 		messageRepository.getAllUnreadMessages()
 			.onSuccessWithContext { response ->
 				response.body?.let { body ->

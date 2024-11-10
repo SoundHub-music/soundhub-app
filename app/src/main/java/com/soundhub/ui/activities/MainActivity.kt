@@ -1,12 +1,9 @@
 package com.soundhub.ui.activities
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -20,10 +17,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
@@ -44,6 +41,7 @@ import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.extensions.context_wrapper.registerReceiverExtended
 import com.soundhub.utils.extensions.context_wrapper.startAndroidService
 import com.soundhub.utils.extensions.context_wrapper.stopAndroidService
+import com.soundhub.utils.helpers.requestNotificationPermissions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -63,14 +61,12 @@ class MainActivity : ComponentActivity() {
 	@Inject
 	lateinit var userDao: UserDao
 	private lateinit var navController: NavHostController
-
-	private lateinit var messengerAndroidService: MessengerAndroidService
 	private var isMessengerConnected = false
+	private lateinit var messengerAndroidService: MessengerAndroidService
 
 	private val messengerConnection = object : ServiceConnection {
 		override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-			val serviceBinder = service as MessengerAndroidService.LocalBinder
-			messengerAndroidService = serviceBinder.getService()
+			messengerAndroidService = (service as MessengerAndroidService.LocalBinder).getService()
 			isMessengerConnected = true
 		}
 
@@ -81,10 +77,10 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
-		val chatId = intent?.getStringExtra(Constants.CHAT_NAV_ARG)
-		Log.d("MainActivity", chatId.toString())
 		runActionsOnCreateActivity()
+		installSplashScreen().apply {
+			setKeepOnScreenCondition { splashScreenViewModel.isLoading.value }
+		}
 
 		setContent {
 			SoundHubTheme(
@@ -95,6 +91,7 @@ class MainActivity : ComponentActivity() {
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colorScheme.surface
 				) {
+					navController = rememberNavController()
 					NavigationListener()
 					RootLayout(
 						navController = navController,
@@ -110,52 +107,67 @@ class MainActivity : ComponentActivity() {
 		}
 	}
 
+	override fun onStart() {
+		super.onStart()
+		bindMessengerService()
+		registerReceivers()
+	}
+
+	override fun onStop() {
+		super.onStop()
+		unbindMessengerService()
+		unregisterReceivers()
+	}
+
 	override fun onDestroy() {
 		super.onDestroy()
 		Log.d("MainActivity", "onDestroy: user has closed the app")
 
 		uiStateDispatcher.clearState()
 		stopAndroidService(MessengerAndroidService::class.java)
-		authViewModel.updateUserOnlineStatusDelayed(
-			online = false,
-			delayTime = Constants.SET_OFFLINE_DELAY_ON_DESTROY
-		)
+		authViewModel.updateUserOnlineStatusDelayed(false, Constants.SET_OFFLINE_DELAY_ON_DESTROY)
+	}
+
+	private fun bindMessengerService() {
+		Intent(this, MessengerAndroidService::class.java).also { intent ->
+			bindService(intent, messengerConnection, BIND_AUTO_CREATE)
+		}
+	}
+
+	private fun unbindMessengerService() {
 		if (isMessengerConnected) {
-			messengerAndroidService.unbindService(messengerConnection)
+			unbindService(messengerConnection)
 			isMessengerConnected = false
 		}
 	}
 
-	override fun onStop() {
-		super.onStop()
-		Log.d("MainActivity", "onStop: user has minimized the app")
-		authViewModel.updateUserOnlineStatusDelayed(
-			online = false,
-			delayTime = Constants.SET_OFFLINE_DELAY_ON_STOP
-		)
+	private fun registerReceivers() {
+		messengerViewModel.getMessageReceiversWithIntentFilters().forEach { (receiver, action) ->
+			registerReceiverExtended(receiver, IntentFilter(action))
+		}
 	}
 
-	override fun onPause() {
-		super.onPause()
-		unregisterReceiver(messengerViewModel.getMessageReceiver())
+	private fun unregisterReceivers() {
+		messengerViewModel.getMessageReceivers().forEach { unregisterReceiver(it) }
 	}
 
-	override fun onResume() {
-		super.onResume()
-		Log.d("MainActivity", "onResume: user has opened the app")
-		authViewModel.updateUserOnlineStatusDelayed(online = true)
-		registerReceivers()
+	@Composable
+	private fun NavigationListener() {
+		val coroutineScope = rememberCoroutineScope()
+		navController.addOnDestinationChangedListener { controller, destination, _ ->
+			coroutineScope.launch {
+				navigationViewModel.onNavDestinationChangedListener(controller, destination)
+			}
+		}
 	}
 
-	override fun onStart() {
-		super.onStart()
-		Intent(this, MessengerAndroidService::class.java).also { intent ->
-			if (isMessengerConnected)
-				messengerAndroidService.bindService(
-					intent,
-					messengerConnection,
-					BIND_AUTO_CREATE
-				)
+	private fun runActionsOnCreateActivity() {
+		requestNotificationPermissions(this)
+		startAndroidService(MessengerAndroidService::class.java)
+		lifecycleScope.launch {
+			repeatOnLifecycle(Lifecycle.State.STARTED) {
+				observeUiEvents()
+			}
 		}
 	}
 
@@ -163,96 +175,30 @@ class MainActivity : ComponentActivity() {
 		uiStateDispatcher.uiEvent.collect { event -> handleUiEvent(event, navController) }
 	}
 
-	private fun runActionsOnCreateActivity() {
-		initSplashScreen()
-		startAndroidService(MessengerAndroidService::class.java)
-		requestPermissions()
-
-		lifecycleScope.launch {
-			launch { observeUiEvents() }
-		}
-	}
-
-	@Composable
-	private fun NavigationListener() {
-		val coroutineScope = rememberCoroutineScope()
-
-		navController = rememberNavController()
-		navController.addOnDestinationChangedListener { controller, destination, _ ->
-			coroutineScope.launch {
-				navigationViewModel.onNavDestinationChangedListener(
-					controller = controller,
-					destination = destination,
-				)
-			}
-		}
-	}
-
-	private fun registerReceivers() {
-		registerReceiverExtended(
-			messengerViewModel.getMessageReceiver(),
-			IntentFilter(MessengerAndroidService.MESSAGE_RECEIVER),
-
-			)
-
-		registerReceiverExtended(
-			messengerViewModel.getReadMessageReceiver(),
-			IntentFilter(MessengerAndroidService.READ_MESSAGE_RECEIVER)
-		)
-
-		registerReceiverExtended(
-			messengerViewModel.getDeletedMessageReceiver(),
-			IntentFilter(MessengerAndroidService.DELETE_MESSAGE_RECEIVER)
-		)
-	}
-
-	private fun initSplashScreen() {
-		val splashScreen: SplashScreen = installSplashScreen()
-		splashScreen.setKeepOnScreenCondition { splashScreenViewModel.isLoading.value }
-	}
-
-	private fun requestPermissions() {
-		if (ActivityCompat.checkSelfPermission(
-				this,
-				Manifest.permission.POST_NOTIFICATIONS
-			) != PackageManager.PERMISSION_GRANTED
-		) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
-				ActivityCompat.requestPermissions(this, permissions, 101)
-			}
-		}
-	}
-
 	private fun handleUiEvent(event: UiEvent, navController: NavHostController) {
 		Log.d("MainActivity", "handleUiEvent: $event")
 		when (event) {
 			is UiEvent.ShowToast -> {
-				val uiText: String = event.uiText.getString(this@MainActivity)
-				if (uiText.isNotEmpty())
-					Toast.makeText(
-						this@MainActivity,
-						uiText,
-						Toast.LENGTH_SHORT
-					).show()
+				val uiText = event.uiText.getString(this)
+				if (uiText.isNotEmpty()) Toast.makeText(this, uiText, Toast.LENGTH_SHORT).show()
 			}
 
 			is UiEvent.Navigate -> navController.navigate(event.route.route)
 			is UiEvent.PopBackStack -> navController.popBackStack()
 			is UiEvent.SearchButtonClick -> uiStateDispatcher.toggleSearchBarActive()
-			is UiEvent.Error -> {
-				val message: String = event.response.detail
-					?: event.throwable?.localizedMessage
-					?: event.customMessageStringRes?.let { getString(it) }
-					?: getString(R.string.toast_common_error)
+			is UiEvent.Error -> handleErrorEvent(event)
+			is UiEvent.UpdateUserInstance -> lifecycleScope.launch { authViewModel.initializeUser() }
+		}
+	}
 
-				if (event.throwable !is CancellationException && message.isNotEmpty())
-					Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
-			}
+	private fun handleErrorEvent(event: UiEvent.Error) {
+		val message = event.response.detail
+			?: event.throwable?.localizedMessage
+			?: event.customMessageStringRes?.let { getString(it) }
+			?: getString(R.string.toast_common_error)
 
-			is UiEvent.UpdateUserInstance -> lifecycleScope.launch {
-				authViewModel.initializeUser()
-			}
+		if (event.throwable !is CancellationException && message.isNotEmpty()) {
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 		}
 	}
 }
