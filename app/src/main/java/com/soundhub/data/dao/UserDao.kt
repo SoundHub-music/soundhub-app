@@ -20,16 +20,10 @@ interface UserDao {
 
 	suspend fun saveOrReplaceUser(user: User) {
 		val currentUser: User? = getCurrentUser()
+		if (currentUser != null && currentUser.id != user.id)
+			deleteUser(currentUser)
 
-		if (currentUser == null)
-			saveUser(user)
-
-		if (currentUser?.id != user.id) {
-			currentUser?.let {
-				deleteUser(currentUser)
-				saveUser(user)
-			}
-		}
+		saveUser(user)
 	}
 
 	@Transaction
