@@ -1,4 +1,4 @@
-package com.soundhub.data.websocket
+package com.soundhub.data.api.websocket
 
 import android.util.Log
 import com.google.gson.Gson

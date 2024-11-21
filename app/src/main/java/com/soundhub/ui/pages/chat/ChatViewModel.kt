@@ -15,6 +15,7 @@ import androidx.paging.cachedIn
 import com.soundhub.Route
 import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.api.responses.HttpResult
+import com.soundhub.data.api.websocket.WebSocketClient
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
@@ -25,7 +26,6 @@ import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
 import com.soundhub.data.sources.MessageSource
 import com.soundhub.data.states.ChatUiState
-import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
@@ -89,7 +89,7 @@ class ChatViewModel @Inject constructor(
 			.filterNotNull()
 			.distinctUntilChanged()
 			.flatMapLatest { chat ->
-				 Pager(
+				Pager(
 					config = PagingConfig(pageSize = Constants.DEFAULT_MESSAGE_PAGE_SIZE),
 					initialKey = Constants.DEFAULT_MESSAGE_PAGE,
 					pagingSourceFactory = { updateMessageSource(chatId = chat.id) }
@@ -147,10 +147,12 @@ class ChatViewModel @Inject constructor(
 
 	fun activateReplyMessageMode() {
 		if (_chatUiState.value.checkedMessages.size == 1) {
-			_chatUiState.update { it.copy(
-				isReplyMessageModeEnabled = true,
-				isCheckMessageModeEnabled = false
-			) }
+			_chatUiState.update {
+				it.copy(
+					isReplyMessageModeEnabled = true,
+					isCheckMessageModeEnabled = false
+				)
+			}
 		}
 	}
 
@@ -263,7 +265,7 @@ class ChatViewModel @Inject constructor(
 		val isEnabled = _chatUiState.value.isReplyMessageModeEnabled
 		val checkedMessages = _chatUiState.value.checkedMessages
 
-		return  if (isEnabled)
+		return if (isEnabled)
 			checkedMessages.firstOrNull()?.id
 		else null
 	}

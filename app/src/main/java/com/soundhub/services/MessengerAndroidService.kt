@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import com.soundhub.R
 import com.soundhub.data.api.requests.SendMessageRequest
 import com.soundhub.data.api.responses.ReceivedMessageResponse
+import com.soundhub.data.api.websocket.WebSocketClient
 import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.model.Chat
@@ -21,7 +22,6 @@ import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
 import com.soundhub.data.repository.ChatRepository
 import com.soundhub.data.repository.MessageRepository
-import com.soundhub.data.websocket.WebSocketClient
 import com.soundhub.ui.activities.MainActivity
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.NotificationHelper

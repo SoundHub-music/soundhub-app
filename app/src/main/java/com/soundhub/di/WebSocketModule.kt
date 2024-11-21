@@ -1,7 +1,7 @@
 package com.soundhub.di
 
+import com.soundhub.data.api.websocket.WebSocketClient
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.websocket.WebSocketClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
