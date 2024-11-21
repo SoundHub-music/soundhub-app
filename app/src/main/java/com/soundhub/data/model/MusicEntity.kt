@@ -1,4 +1,4 @@
-package com.soundhub.data.model.interfaces
+package com.soundhub.data.model
 
 abstract class MusicEntity<T> {
 	abstract val id: T
