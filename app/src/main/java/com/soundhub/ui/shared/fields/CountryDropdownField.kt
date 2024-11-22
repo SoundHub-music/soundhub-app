@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
 import com.soundhub.data.model.Country
-import com.soundhub.ui.shared.forms.IUserDataFormState
+import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.ui.shared.forms.UserDataFormViewModel
 import java.util.Locale
 
@@ -57,7 +58,7 @@ fun CountryDropdownField(
 			},
 			label = { Text(text = stringResource(id = R.string.text_field_country_label)) },
 			modifier = Modifier
-				.menuAnchor()
+				.menuAnchor(MenuAnchorType.PrimaryNotEditable)
 				.fillMaxWidth()
 		)
 

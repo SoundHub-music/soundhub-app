@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
 import com.soundhub.data.states.EmptyFormState
+import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.ui.shared.avatar.AvatarPicker
 import com.soundhub.ui.shared.fields.CountryDropdownField
 import com.soundhub.ui.shared.fields.DatePicker
@@ -50,7 +51,8 @@ fun UserDataForm(
 ) {
 	val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 	val avatarUri = remember { mutableStateOf<Uri?>(null) }
-	val formState: State<IUserDataFormState> = formStateFlow.collectAsState(initial = EmptyFormState())
+	val formState: State<IUserDataFormState> =
+		formStateFlow.collectAsState(initial = EmptyFormState())
 	val scrollState = rememberScrollState()
 
 	LaunchedEffect(formState.value) {

@@ -9,9 +9,9 @@ import com.soundhub.data.dao.UserDao
 import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.User
 import com.soundhub.data.states.UserFormState
+import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.events.UiEvent
-import com.soundhub.ui.shared.forms.IUserDataFormState
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText
 import com.soundhub.utils.mappers.UserMapper

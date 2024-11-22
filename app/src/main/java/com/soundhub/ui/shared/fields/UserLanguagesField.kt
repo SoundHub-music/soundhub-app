@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
-import com.soundhub.ui.shared.forms.IUserDataFormState
+import com.soundhub.data.states.interfaces.IUserDataFormState
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

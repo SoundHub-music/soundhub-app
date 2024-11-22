@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.soundhub.data.states.EmptyFormState
+import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.ui.pages.user_editor.profile.EditUserProfileViewModel
-import com.soundhub.ui.shared.forms.IUserDataFormState
 import com.soundhub.ui.shared.loaders.CircleLoader
 
 @Composable

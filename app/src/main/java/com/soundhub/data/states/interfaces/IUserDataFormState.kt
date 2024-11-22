@@ -1,4 +1,4 @@
-package com.soundhub.ui.shared.forms
+package com.soundhub.data.states.interfaces
 
 import com.soundhub.data.enums.Gender
 import java.time.LocalDate
