@@ -6,10 +6,10 @@ plugins {
 	id("org.jetbrains.kotlin.android")
 	id("com.google.devtools.ksp")
 	id("kotlinx-serialization")
-	id("kotlin-kapt")
 	id("dagger.hilt.android.plugin")
 	id("com.google.dagger.hilt.android")
 	id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+	id("kotlin-kapt")
 }
 
 android {
@@ -42,7 +42,7 @@ android {
 	defaultConfig {
 		applicationId = "com.soundhub"
 		minSdk = 26
-		targetSdk = 34
+		targetSdk = 35
 		versionCode = 1
 		versionName = "1.0"
 
