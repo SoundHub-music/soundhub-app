@@ -100,6 +100,7 @@ open class BaseMusicPreferencesViewModel(
 		}
 	}
 
+	// TODO: использовать debounce
 	fun onSearchFieldChange(value: String) = viewModelScope.launch {
 		if (value.isEmpty())
 			loadArtists()

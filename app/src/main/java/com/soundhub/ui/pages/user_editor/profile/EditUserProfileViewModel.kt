@@ -12,6 +12,7 @@ import com.soundhub.data.states.UserFormState
 import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.shared.forms.IUserFormViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText
 import com.soundhub.utils.mappers.UserMapper
@@ -31,7 +32,7 @@ class EditUserProfileViewModel @Inject constructor(
 	private val updateUserUseCase: UpdateUserUseCase,
 	private val uiStateDispatcher: UiStateDispatcher,
 	private val userDao: UserDao,
-) : ViewModel() {
+) : ViewModel(), IUserFormViewModel {
 	private val _formState: MutableStateFlow<UserFormState> = MutableStateFlow(UserFormState())
 	val formState: Flow<IUserDataFormState> = _formState.asStateFlow()
 
@@ -44,7 +45,6 @@ class EditUserProfileViewModel @Inject constructor(
 	init {
 		initState()
 	}
-
 
 	private fun initState() = viewModelScope.launch(Dispatchers.Main) {
 		userDao.getCurrentUser()?.let { user -> updateFormStateFromUser(user) }
@@ -119,23 +119,23 @@ class EditUserProfileViewModel @Inject constructor(
 
 	fun setDialogVisibility(state: Boolean) = _isDialogOpened.update { state }
 
-	fun setFirstName(value: String) = _formState.update {
+	override fun setFirstName(value: String) = _formState.update {
 		it.copy(firstName = value)
 	}
 
-	fun setLastName(value: String) = _formState.update {
+	override fun setLastName(value: String) = _formState.update {
 		it.copy(lastName = value)
 	}
 
-	fun setBirthday(value: LocalDate?) = _formState.update {
+	override fun setBirthday(value: LocalDate?) = _formState.update {
 		it.copy(birthday = value)
 	}
 
-	fun setDescription(value: String) = _formState.update {
+	override fun setDescription(value: String) = _formState.update {
 		it.copy(description = value)
 	}
 
-	fun setGender(value: String) = _formState.update {
+	override fun setGender(value: String) = _formState.update {
 		try {
 			it.copy(gender = Gender.valueOf(value))
 		} catch (e: IllegalArgumentException) {
@@ -144,20 +144,20 @@ class EditUserProfileViewModel @Inject constructor(
 		}
 	}
 
-	fun setCountry(value: String) = _formState.update {
+	override fun setCountry(value: String) = _formState.update {
 		it.copy(country = value)
 	}
 
-	fun setCity(value: String) = _formState.update {
+	override fun setCity(value: String) = _formState.update {
 		it.copy(city = value)
 	}
 
-	fun setAvatar(avatarUri: Uri) = _formState.update {
+	override fun setAvatar(avatarUri: Uri?) = _formState.update {
 		Log.d("EditUserProfileViewModel", "setAvatar[uri]: $avatarUri")
 		it.copy(avatarUrl = avatarUri.toString())
 	}
 
-	fun setLanguages(languages: List<String>) = _formState.update {
+	override fun setLanguages(languages: List<String>) = _formState.update {
 		it.copy(languages = languages.toMutableList())
 	}
 }

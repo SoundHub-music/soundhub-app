@@ -20,6 +20,7 @@ import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.pages.authentication.AuthFormState
+import com.soundhub.ui.shared.forms.IUserFormViewModel
 import com.soundhub.ui.viewmodels.BaseMusicPreferencesViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.AuthValidator
@@ -51,7 +52,7 @@ class RegistrationViewModel @Inject constructor(
 	loadArtistsUseCase,
 	searchArtistsUseCase,
 	uiStateDispatcher
-) {
+), IUserFormViewModel {
 	private val uiState = uiStateDispatcher.uiState
 	private val _registerState = MutableStateFlow(RegistrationState())
 	val registerState: Flow<IUserDataFormState> = _registerState.asStateFlow()
@@ -154,22 +155,19 @@ class RegistrationViewModel @Inject constructor(
 		}
 	}
 
-	fun setFirstName(value: String) = _registerState.update {
+	override fun setFirstName(value: String) = _registerState.update {
 		it.copy(firstName = value, isFirstNameValid = value.isNotEmpty())
 	}
 
-
-	fun setLastName(value: String) = _registerState.update {
+	override fun setLastName(value: String) = _registerState.update {
 		it.copy(lastName = value, isLastNameValid = value.isNotEmpty())
 	}
 
-
-	fun setBirthday(value: LocalDate?) = _registerState.update {
+	override fun setBirthday(value: LocalDate?) = _registerState.update {
 		it.copy(birthday = value, isBirthdayValid = value != null)
 	}
 
-
-	fun setGender(value: String) {
+	override fun setGender(value: String) {
 		try {
 			_registerState.update { it.copy(gender = Gender.valueOf(value)) }
 		} catch (e: IllegalArgumentException) {
@@ -180,15 +178,16 @@ class RegistrationViewModel @Inject constructor(
 		}
 	}
 
-	fun setCountry(value: String) = _registerState.update { it.copy(country = value) }
-	fun setCity(value: String) = _registerState.update { it.copy(city = value) }
-	fun setDescription(value: String) = _registerState.update { it.copy(description = value) }
+	override fun setCountry(value: String) = _registerState.update { it.copy(country = value) }
+	override fun setCity(value: String) = _registerState.update { it.copy(city = value) }
+	override fun setDescription(value: String) =
+		_registerState.update { it.copy(description = value) }
 
-	fun setLanguages(languages: List<String>) = _registerState.update {
+	override fun setLanguages(languages: List<String>) = _registerState.update {
 		it.copy(languages = languages.toMutableList())
 	}
 
-	fun setAvatar(avatarUrl: Uri?) = _registerState.update {
+	override fun setAvatar(avatarUrl: Uri?) = _registerState.update {
 		it.copy(avatarUrl = avatarUrl?.toString())
 	}
 }
