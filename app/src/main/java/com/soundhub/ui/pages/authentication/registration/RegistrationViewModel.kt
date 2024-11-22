@@ -20,6 +20,7 @@ import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.pages.authentication.AuthFormState
+import com.soundhub.ui.shared.forms.FormHandler
 import com.soundhub.ui.shared.forms.IUserFormViewModel
 import com.soundhub.ui.viewmodels.BaseMusicPreferencesViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
@@ -56,6 +57,18 @@ class RegistrationViewModel @Inject constructor(
 	private val uiState = uiStateDispatcher.uiState
 	private val _registerState = MutableStateFlow(RegistrationState())
 	val registerState: Flow<IUserDataFormState> = _registerState.asStateFlow()
+
+	override val formHandler = FormHandler(
+		onDescriptionChange = ::setDescription,
+		onLanguagesChange = ::setLanguages,
+		onFirstNameChange = ::setFirstName,
+		onLastNameChange = ::setLastName,
+		onBirthdayChange = ::setBirthday,
+		onCountryChange = ::setCountry,
+		onGenderChange = ::setGender,
+		onAvatarChange = ::setAvatar,
+		onCityChange = ::setCity,
+	)
 
 	override fun onCleared() {
 		super.onCleared()

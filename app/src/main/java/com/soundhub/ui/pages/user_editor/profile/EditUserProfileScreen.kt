@@ -52,15 +52,7 @@ fun EditUserProfileScreen(
 			UserDataForm(
 				modifier = Modifier.padding(it),
 				formStateFlow = formState,
-				onFirstNameChange = editUserProfileViewModel::setFirstName,
-				onLastNameChange = editUserProfileViewModel::setLastName,
-				onBirthdayChange = editUserProfileViewModel::setBirthday,
-				onDescriptionChange = editUserProfileViewModel::setDescription,
-				onGenderChange = editUserProfileViewModel::setGender,
-				onCountryChange = editUserProfileViewModel::setCountry,
-				onCityChange = editUserProfileViewModel::setCity,
-				onAvatarChange = editUserProfileViewModel::setAvatar,
-				onLanguagesChange = editUserProfileViewModel::setLanguages,
+				formHandler = editUserProfileViewModel.formHandler
 			)
 
 		if (isDialogOpened)
@@ -85,9 +77,7 @@ private fun EditUserProfileScaffold(
 			TopAppBar(
 				title = { Text(text = stringResource(id = R.string.screen_title_edit_profile)) },
 				navigationIcon = {
-					IconButton(onClick = {
-						editUserProfileViewModel.onTopNavigationButtonClick()
-					}) {
+					IconButton(onClick = { editUserProfileViewModel.onTopNavigationButtonClick() }) {
 						Icon(
 							imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
 							contentDescription = stringResource(id = R.string.btn_description_back),

@@ -39,15 +39,7 @@ import java.time.format.DateTimeFormatter
 fun UserDataForm(
 	modifier: Modifier = Modifier,
 	formStateFlow: Flow<IUserDataFormState>,
-	onFirstNameChange: (String) -> Unit = {},
-	onLastNameChange: (String) -> Unit = {},
-	onBirthdayChange: (LocalDate?) -> Unit = {},
-	onAvatarChange: (Uri) -> Unit = {},
-	onDescriptionChange: (String) -> Unit = {},
-	onGenderChange: (String) -> Unit = {},
-	onCountryChange: (String) -> Unit = {},
-	onCityChange: (String) -> Unit = {},
-	onLanguagesChange: (List<String>) -> Unit = {}
+	formHandler: FormHandler
 ) {
 	val userDataFormViewModel: UserDataFormViewModel = hiltViewModel()
 	val avatarUri = remember { mutableStateOf<Uri?>(null) }
@@ -61,7 +53,7 @@ fun UserDataForm(
 	}
 
 	LaunchedEffect(key1 = avatarUri.value) {
-		avatarUri.value?.let { onAvatarChange(it) }
+		avatarUri.value?.let { formHandler.onAvatarChange(it) }
 	}
 
 	Column(
@@ -78,7 +70,7 @@ fun UserDataForm(
 		OutlinedTextField(
 			modifier = Modifier.fillMaxWidth(),
 			value = formState.value.firstName,
-			onValueChange = onFirstNameChange,
+			onValueChange = formHandler.onFirstNameChange,
 			singleLine = true,
 			label = { Text(text = stringResource(id = R.string.text_field_name_label)) },
 			isError = !formState.value.isFirstNameValid,
@@ -91,7 +83,7 @@ fun UserDataForm(
 		OutlinedTextField(
 			modifier = Modifier.fillMaxWidth(),
 			value = formState.value.lastName,
-			onValueChange = onLastNameChange,
+			onValueChange = formHandler.onLastNameChange,
 			singleLine = true,
 			label = { Text(stringResource(id = R.string.text_field_last_name_label)) },
 			isError = !formState.value.isLastNameValid,
@@ -103,12 +95,12 @@ fun UserDataForm(
 
 		GenderDropdownField(
 			formState = formState,
-			onGenderChange = onGenderChange
+			onGenderChange = formHandler.onGenderChange
 		)
 
 		CountryDropdownField(
 			formState = formState,
-			onCountryChange = onCountryChange,
+			onCountryChange = formHandler.onCountryChange,
 			userDataFormViewModel = userDataFormViewModel
 		)
 
@@ -117,12 +109,12 @@ fun UserDataForm(
 				modifier = Modifier.fillMaxWidth(),
 				label = { Text(text = stringResource(id = R.string.text_field_city)) },
 				value = formState.value.city ?: "",
-				onValueChange = onCityChange
+				onValueChange = formHandler.onCityChange
 			)
 
 		UserLanguagesField(
 			formState = formState,
-			onLanguagesChange = onLanguagesChange
+			onLanguagesChange = formHandler.onLanguagesChange
 		)
 
 		DatePicker(
@@ -131,7 +123,7 @@ fun UserDataForm(
 			label = stringResource(id = R.string.text_field_birthdate),
 			onValueChange = { value ->
 				val date = LocalDate.parse(value, DateTimeFormatter.ofPattern(DATE_FORMAT))
-				onBirthdayChange(date)
+				formHandler.onBirthdayChange(date)
 			},
 			isError = !formState.value.isBirthdayValid,
 			supportingText = {
@@ -145,7 +137,7 @@ fun UserDataForm(
 				.fillMaxWidth()
 				.height(200.dp),
 			label = { Text(text = stringResource(id = R.string.text_field_description_label)) },
-			onValueChange = onDescriptionChange,
+			onValueChange = formHandler.onDescriptionChange,
 			value = formState.value.description ?: "",
 		)
 	}

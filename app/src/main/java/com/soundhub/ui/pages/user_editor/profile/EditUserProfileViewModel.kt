@@ -12,6 +12,7 @@ import com.soundhub.data.states.UserFormState
 import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.events.UiEvent
+import com.soundhub.ui.shared.forms.FormHandler
 import com.soundhub.ui.shared.forms.IUserFormViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText
@@ -41,6 +42,18 @@ class EditUserProfileViewModel @Inject constructor(
 
 	private val _isLoading = MutableStateFlow(false)
 	val isLoading = _isLoading.asStateFlow()
+
+	override val formHandler = FormHandler(
+		onDescriptionChange = ::setDescription,
+		onLanguagesChange = ::setLanguages,
+		onFirstNameChange = ::setFirstName,
+		onLastNameChange = ::setLastName,
+		onBirthdayChange = ::setBirthday,
+		onCountryChange = ::setCountry,
+		onGenderChange = ::setGender,
+		onAvatarChange = ::setAvatar,
+		onCityChange = ::setCity,
+	)
 
 	init {
 		initState()

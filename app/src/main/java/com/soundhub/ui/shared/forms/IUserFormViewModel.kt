@@ -4,6 +4,8 @@ import android.net.Uri
 import java.time.LocalDate
 
 interface IUserFormViewModel {
+	val formHandler: FormHandler
+
 	fun setFirstName(value: String)
 	fun setLastName(value: String)
 	fun setBirthday(value: LocalDate?)

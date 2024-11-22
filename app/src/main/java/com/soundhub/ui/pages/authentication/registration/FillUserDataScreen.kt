@@ -41,15 +41,7 @@ fun FillUserDataScreen(
 
 			UserDataForm(
 				formStateFlow = registerState,
-				onFirstNameChange = registrationViewModel::setFirstName,
-				onLastNameChange = registrationViewModel::setLastName,
-				onBirthdayChange = registrationViewModel::setBirthday,
-				onGenderChange = registrationViewModel::setGender,
-				onDescriptionChange = registrationViewModel::setDescription,
-				onCountryChange = registrationViewModel::setCountry,
-				onCityChange = registrationViewModel::setCity,
-				onLanguagesChange = registrationViewModel::setLanguages,
-				onAvatarChange = registrationViewModel::setAvatar
+				formHandler = registrationViewModel.formHandler
 			)
 		}
 
