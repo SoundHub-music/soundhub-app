@@ -1,6 +1,8 @@
 package com.soundhub.data.model
 
-abstract class MusicEntity<T> {
+import java.io.Serializable
+
+abstract class MusicEntity<T> : Serializable {
 	abstract val id: T
 	abstract var name: String?
 	abstract var cover: String?

@@ -1,20 +1,21 @@
 package com.soundhub.data.states.interfaces
 
 import com.soundhub.data.enums.Gender
+import com.soundhub.data.model.interfaces.IUser
 import java.time.LocalDate
 import java.util.UUID
 
-interface IUserDataFormState {
+interface IUserDataFormState : IUser {
 	var id: UUID
-	var firstName: String
-	var lastName: String
-	var gender: Gender
-	var country: String?
-	var birthday: LocalDate?
-	var city: String?
-	var description: String?
-	var avatarUrl: String?
-	var languages: MutableList<String>
+	override var firstName: String
+	override var lastName: String
+	override var gender: Gender
+	override var country: String?
+	override var birthday: LocalDate?
+	override var city: String?
+	override var description: String?
+	override var avatarUrl: String?
+	override var languages: MutableList<String>
 
 	var isFirstNameValid: Boolean
 	var isLastNameValid: Boolean

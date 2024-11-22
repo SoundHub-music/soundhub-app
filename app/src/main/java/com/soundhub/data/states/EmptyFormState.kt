@@ -16,6 +16,7 @@ data class EmptyFormState(
 	override var description: String? = null,
 	override var avatarUrl: String? = null,
 	override var languages: MutableList<String> = mutableListOf(),
+
 	override var isFirstNameValid: Boolean = true,
 	override var isLastNameValid: Boolean = true,
 	override var isBirthdayValid: Boolean = true,

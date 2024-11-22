@@ -32,6 +32,4 @@ open class Notification(
 	val type: NotificationType,
 	var obj: Any? = null,
 	val dateTime: LocalDateTime = LocalDateTime.now(),
-) {
-
-}
+)
