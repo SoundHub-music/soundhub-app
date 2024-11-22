@@ -1,23 +1,11 @@
 package com.soundhub.ui.pages.chat.components.message_box_list
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,10 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message
 import com.soundhub.data.model.User
@@ -39,11 +27,11 @@ import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.states.UiState
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.ui.pages.chat.components.message_box.MessageBox
+import com.soundhub.ui.shared.buttons.ScrollToBottomButton
 import com.soundhub.ui.shared.pagination.PagingLoadStateContainer
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -55,9 +43,9 @@ fun MessageBoxList(
 ) {
 	val coroutineScope = rememberCoroutineScope()
 	var initialScroll by remember { mutableStateOf(false) }
-	var currentDate: LocalDate? by remember { mutableStateOf(null) }
+
 	val layoutInfo by remember { derivedStateOf { lazyListState.layoutInfo } }
-	val totalItemCount = layoutInfo.totalItemsCount
+	val totalItemCount by remember { derivedStateOf { layoutInfo.totalItemsCount } }
 
 	var unreadMessageCount: Int by remember { mutableIntStateOf(0) }
 
@@ -92,13 +80,24 @@ fun MessageBoxList(
 		}
 	}
 
-	LaunchedEffect(key1 = totalItemCount, key2 = initialScroll) {
+	val stickyDate by remember {
+		derivedStateOf {
+			if (pagedMessages.itemCount == 0)
+				return@derivedStateOf null
+
+			val message: Message? = pagedMessages[lazyListState.firstVisibleItemIndex]
+			message?.createdAt?.toLocalDate()
+		}
+	}
+
+	LaunchedEffect(key1 = initialScroll, key2 = totalItemCount) {
 		if (!initialScroll) {
 			chatViewModel.scrollToLastMessage(reverse = true)
 			initialScroll = true
 		}
 	}
 
+	// updating page when message from one of 3 channels is coming
 	LaunchedEffect(
 		key1 = receivedMessageChannel,
 		key2 = readMessageChannel,
@@ -130,13 +129,16 @@ fun MessageBoxList(
 			modifier = Modifier.fillMaxSize(),
 			verticalArrangement = Arrangement.spacedBy(10.dp),
 		) {
-			stickyHeader { currentDate?.let { MessageDateChip(it) } }
-			items(pagedMessages.itemCount, key = { pagedMessages.peek(it)?.id ?: it }) { index ->
-				pagedMessages[index]?.let { message ->
-					val messageDate = message.createdAt.toLocalDate()
-					if (messageDate != currentDate)
-						currentDate = messageDate
+			stickyHeader(contentType = pagedMessages.itemContentType()) {
+				stickyDate?.let { MessageDateChip(it) }
+			}
 
+			items(
+				count = pagedMessages.itemCount,
+				key = { pagedMessages.peek(it)?.id ?: it },
+				contentType = { "message" }
+			) { index ->
+				pagedMessages[index]?.let { message ->
 					MessageBox(
 						modifier = Modifier,
 						message = message,
@@ -148,34 +150,13 @@ fun MessageBoxList(
 		}
 
 
-		AnimatedVisibility(
-			visible = lazyListState.canScrollBackward,
-			enter = scaleIn(),
-			exit = scaleOut(),
-			modifier = Modifier
-				.align(Alignment.BottomStart)
-				.padding(bottom = 10.dp),
-		) {
-			BadgedBox(
-				badge = {
-					if (unreadMessageCount > 0)
-						Badge { Text(unreadMessageCount.toString()) }
+		ScrollToBottomButton(
+			lazyListState = lazyListState,
+			unreadMessageCount = unreadMessageCount,
+			onClick = {
+				coroutineScope.launch {
+					chatViewModel.animateScrollToLastMessage(reverse = true)
 				}
-			) {
-				FloatingActionButton(
-					containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-					onClick = {
-						coroutineScope.launch {
-							chatViewModel.animateScrollToLastMessage(reverse = true)
-						}
-					}
-				) {
-					Icon(
-						imageVector = Icons.Rounded.KeyboardArrowDown,
-						contentDescription = "scroll down"
-					)
-				}
-			}
-		}
+			})
 	}
 }

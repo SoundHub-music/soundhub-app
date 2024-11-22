@@ -1,6 +1,5 @@
 package com.soundhub.ui.pages.chat.components.message_box
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,17 +48,13 @@ fun MessageBox(
 	val checkedMessages: List<Message> = chatUiState.checkedMessages
 	var replyToMessage: Message? by remember { mutableStateOf(null) }
 
-	LaunchedEffect(isCheckMessagesModeEnabled) {
-		Log.d("MessageBox", "isCheckedMessagesMode: $isCheckMessagesModeEnabled")
-	}
-
 	LaunchedEffect(message) {
 		if (message.replyToMessageId != null) {
 			replyToMessage = chatViewModel.getMessageById(message.replyToMessageId)
 		}
 	}
 
-	val messageParameters = object: MessageParameters {
+	val messageParameters = object : MessageParameters {
 		override val boxGradient = listOf(
 			Color(0xFFD0BCFF),
 			Color(0xFF966BF1)
