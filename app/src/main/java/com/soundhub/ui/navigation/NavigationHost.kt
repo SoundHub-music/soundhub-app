@@ -36,9 +36,9 @@ import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.messenger.MessengerScreen
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.pages.music.MusicScreen
-import com.soundhub.ui.pages.music.MusicViewModel
 import com.soundhub.ui.pages.music.components.tab_pages.library.FavoriteArtistsScreen
 import com.soundhub.ui.pages.music.components.tab_pages.library.FavoriteGenresScreen
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 import com.soundhub.ui.pages.notifications.NotificationScreen
 import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.ui.pages.post_editor.PostEditorScreen

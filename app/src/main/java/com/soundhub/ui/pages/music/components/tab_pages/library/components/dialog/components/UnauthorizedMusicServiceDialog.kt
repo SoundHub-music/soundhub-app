@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
+import com.soundhub.ui.pages.music.viewmodels.MusicServiceDialogViewModel
 
 @Composable
 internal fun UnauthorizedMusicServiceDialog(
@@ -84,12 +84,14 @@ internal fun UnauthorizedMusicServiceDialog(
 					OutlinedTextField(
 						value = loginState.userName,
 						onValueChange = musicServiceDialogViewModel::setUserName,
-						placeholder = { Text(
-							stringResource(
-								id = R.string.music_service_login_username_placeholder,
-								chosenMusicService
+						placeholder = {
+							Text(
+								stringResource(
+									id = R.string.music_service_login_username_placeholder,
+									chosenMusicService
+								)
 							)
-						) },
+						},
 						leadingIcon = {
 							Icon(
 								painter = painterResource(id = R.drawable.rounded_badge_24),
@@ -102,12 +104,14 @@ internal fun UnauthorizedMusicServiceDialog(
 					OutlinedTextField(
 						value = loginState.password,
 						onValueChange = musicServiceDialogViewModel::setPassword,
-						placeholder = { Text(
-							stringResource(
-								id = R.string.music_service_login_password_placeholder,
-								chosenMusicService
+						placeholder = {
+							Text(
+								stringResource(
+									id = R.string.music_service_login_password_placeholder,
+									chosenMusicService
+								)
 							)
-						) },
+						},
 						leadingIcon = {
 							Icon(
 								painter = painterResource(id = R.drawable.baseline_password_24),

@@ -20,16 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.soundhub.R
-import com.soundhub.ui.pages.music.LastFmViewModel
-import com.soundhub.ui.pages.music.SpotifyViewModel
-import com.soundhub.ui.pages.music.VKViewModel
+import com.soundhub.ui.pages.music.viewmodels.LastFmLoginViewModel
+import com.soundhub.ui.pages.music.viewmodels.SpotifyLoginViewModel
+import com.soundhub.ui.pages.music.viewmodels.VKLoginViewModel
 
 @Composable
 fun MusicServiceList(
 	modifier: Modifier = Modifier,
-	lastFmViewModel: LastFmViewModel = hiltViewModel(),
-	spotifyViewModel: SpotifyViewModel = hiltViewModel(),
-	vkViewModel: VKViewModel = hiltViewModel()
+	lastFmLoginViewModel: LastFmLoginViewModel = hiltViewModel(),
+	spotifyLoginViewModel: SpotifyLoginViewModel = hiltViewModel(),
+	vkLoginViewModel: VKLoginViewModel = hiltViewModel()
 ) {
 	ElevatedCard(
 		modifier = modifier,
@@ -55,15 +55,15 @@ fun MusicServiceList(
 			) {
 				MusicServiceButton(
 					painter = painterResource(id = R.drawable.last_fm),
-					musicServiceDialogViewModel = lastFmViewModel,
+					musicServiceDialogViewModel = lastFmLoginViewModel,
 				)
 				MusicServiceButton(
 					painter = painterResource(id = R.drawable.spotify),
-					musicServiceDialogViewModel = spotifyViewModel,
+					musicServiceDialogViewModel = spotifyLoginViewModel,
 				)
 				MusicServiceButton(
 					painter = painterResource(id = R.drawable.vk_logo),
-					musicServiceDialogViewModel = vkViewModel,
+					musicServiceDialogViewModel = vkLoginViewModel,
 				)
 			}
 		}

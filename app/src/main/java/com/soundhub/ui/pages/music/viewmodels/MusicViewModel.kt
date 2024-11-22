@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music
+package com.soundhub.ui.pages.music.viewmodels
 
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable

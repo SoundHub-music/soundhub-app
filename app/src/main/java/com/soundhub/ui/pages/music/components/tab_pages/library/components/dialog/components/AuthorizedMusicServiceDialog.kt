@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.soundhub.ui.pages.music.LastFmViewModel
-import com.soundhub.ui.pages.music.SpotifyViewModel
-import com.soundhub.ui.pages.music.VKViewModel
 import com.soundhub.ui.pages.music.enums.ChosenMusicService
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
+import com.soundhub.ui.pages.music.viewmodels.LastFmLoginViewModel
+import com.soundhub.ui.pages.music.viewmodels.MusicServiceDialogViewModel
+import com.soundhub.ui.pages.music.viewmodels.SpotifyLoginViewModel
+import com.soundhub.ui.pages.music.viewmodels.VKLoginViewModel
 
 @Composable
 internal fun AuthorizedMusicServiceDialog(
@@ -39,15 +39,15 @@ internal fun AuthorizedMusicServiceDialog(
 			Box {
 				when (chosenMusicService) {
 					ChosenMusicService.LASTFM -> LastFmDetails(
-						lastFmViewModel = musicServiceDialogViewModel as LastFmViewModel
+						lastFmLoginViewModel = musicServiceDialogViewModel as LastFmLoginViewModel
 					)
 
 					ChosenMusicService.VK -> VkDetails(
-						vkViewModel = musicServiceDialogViewModel as VKViewModel
+						vkLoginViewModel = musicServiceDialogViewModel as VKLoginViewModel
 					)
 
 					ChosenMusicService.SPOTIFY -> SpotifyDetails(
-						spotifyViewModel = musicServiceDialogViewModel as SpotifyViewModel
+						spotifyLoginViewModel = musicServiceDialogViewModel as SpotifyLoginViewModel
 					)
 				}
 			}

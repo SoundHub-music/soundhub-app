@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.ui.pages.music.MusicViewModel
 import com.soundhub.ui.pages.music.components.tab_pages.main.sections.recommendations.components.RecommendationPlate
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 
 @Composable
 fun RecommendationSection(musicViewModel: MusicViewModel) {

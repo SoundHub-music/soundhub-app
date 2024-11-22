@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.ui.pages.music.components.MusicScreenPager
 import com.soundhub.ui.pages.music.components.MusicScreenTabRow
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 

@@ -1,4 +1,4 @@
-package com.soundhub.ui.viewmodels
+package com.soundhub.ui.pages.music.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.soundhub.data.enums.ApiStatus

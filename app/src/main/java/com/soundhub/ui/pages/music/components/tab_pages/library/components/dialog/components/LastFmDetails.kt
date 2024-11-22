@@ -28,15 +28,15 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.soundhub.R
 import com.soundhub.data.api.responses.lastfm.LastFmFullUser
-import com.soundhub.ui.pages.music.LastFmViewModel
+import com.soundhub.ui.pages.music.viewmodels.LastFmLoginViewModel
 import com.soundhub.ui.shared.avatar.CircularAvatar
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun LastFmDetails(
-	lastFmViewModel: LastFmViewModel
+	lastFmLoginViewModel: LastFmLoginViewModel
 ) {
-	val lastFmUser: LastFmFullUser? by lastFmViewModel.userInfo.collectAsState()
+	val lastFmUser: LastFmFullUser? by lastFmLoginViewModel.userInfo.collectAsState()
 	val uriHandler = LocalUriHandler.current
 	val lastFmUserAvatar: Uri? = lastFmUser?.images
 		?.firstOrNull { it.size == "medium" }
@@ -47,7 +47,7 @@ internal fun LastFmDetails(
 	}
 
 	Column(modifier = Modifier.fillMaxWidth()) {
-		Row(horizontalArrangement = Arrangement.spacedBy(20.dp),) {
+		Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
 			CircularAvatar(
 				imageUri = lastFmUserAvatar,
 				modifier = Modifier
@@ -82,20 +82,24 @@ internal fun LastFmDetails(
 							id = R.string.last_fm_scrobble_track_count
 						),
 					)
-				}) { Text(
-					text = user.playCount,
-					fontWeight = FontWeight.Black
-				) }
+				}) {
+					Text(
+						text = user.playCount,
+						fontWeight = FontWeight.Black
+					)
+				}
 				SummaryDetails(title = {
 					Text(
 						text = stringResource(
 							id = R.string.last_fm_scrobble_artist_count
 						)
 					)
-				}) { Text(
-					text = user.artistCount,
-					fontWeight = FontWeight.Black
-				) }
+				}) {
+					Text(
+						text = user.artistCount,
+						fontWeight = FontWeight.Black
+					)
+				}
 
 			}
 

@@ -13,9 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.ui.pages.music.MusicViewModel
 import com.soundhub.ui.pages.music.components.tab_pages.library.MusicLibraryPage
 import com.soundhub.ui.pages.music.components.tab_pages.main.MusicMainPage
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)

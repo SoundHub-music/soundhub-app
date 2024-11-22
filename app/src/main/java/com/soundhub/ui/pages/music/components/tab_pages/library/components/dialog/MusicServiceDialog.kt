@@ -28,7 +28,7 @@ import com.soundhub.R
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.dialog.MusicDialogConfig.DIALOG_MIN_HEIGHT
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.dialog.components.AuthorizedMusicServiceDialog
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.dialog.components.UnauthorizedMusicServiceDialog
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
+import com.soundhub.ui.pages.music.viewmodels.MusicServiceDialogViewModel
 
 @Composable
 fun MusicServiceDialog(
@@ -52,9 +52,10 @@ fun MusicServiceDialog(
 			modifier = Modifier
 				.padding(horizontal = 5.dp)
 		) {
-			Card(modifier = Modifier
-				.fillMaxWidth()
-				.defaultMinSize(minHeight = DIALOG_MIN_HEIGHT)
+			Card(
+				modifier = Modifier
+					.fillMaxWidth()
+					.defaultMinSize(minHeight = DIALOG_MIN_HEIGHT)
 			) {
 				Column {
 					Row(

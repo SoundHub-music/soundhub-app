@@ -1,10 +1,9 @@
-package com.soundhub.ui.pages.music
+package com.soundhub.ui.pages.music.viewmodels
 
 import com.soundhub.ui.pages.music.enums.ChosenMusicService
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
 import javax.inject.Inject
 
-class SpotifyViewModel @Inject constructor() : MusicServiceDialogViewModel() {
+class SpotifyLoginViewModel @Inject constructor() : MusicServiceDialogViewModel() {
 	override val chosenMusicService: ChosenMusicService
 		get() = ChosenMusicService.SPOTIFY
 }

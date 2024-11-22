@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.ui.pages.music.MusicViewModel
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.MusicLibraryMenu
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.MusicServiceList
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 
 @Composable
 internal fun MusicLibraryPage(

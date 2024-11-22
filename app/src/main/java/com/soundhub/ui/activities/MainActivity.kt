@@ -31,7 +31,7 @@ import com.soundhub.ui.layout.RootLayout
 import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 import com.soundhub.ui.pages.authentication.registration.RegistrationViewModel
 import com.soundhub.ui.pages.messenger.MessengerViewModel
-import com.soundhub.ui.pages.music.MusicViewModel
+import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.ui.theme.SoundHubTheme
 import com.soundhub.ui.viewmodels.NavigationViewModel

@@ -21,9 +21,10 @@ data class Invite(
 ) : Notification(
 	type = NotificationType.FRIEND_REQUEST,
 	dateTime = createdDateTime
-) { init {
-	obj = this
-}
+) {
+	init {
+		obj = this
+	}
 }
 
 

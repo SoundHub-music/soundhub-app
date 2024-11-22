@@ -25,9 +25,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
 import com.soundhub.ui.pages.music.components.tab_pages.library.components.dialog.MusicServiceDialog
+import com.soundhub.ui.pages.music.viewmodels.MusicServiceDialogViewModel
 import com.soundhub.ui.theme.acceptColor
 import com.soundhub.ui.theme.onAcceptColor
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
 
 @Composable
 fun MusicServiceButton(

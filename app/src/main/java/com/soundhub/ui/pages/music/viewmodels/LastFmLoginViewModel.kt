@@ -1,4 +1,4 @@
-package com.soundhub.ui.pages.music
+package com.soundhub.ui.pages.music.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,6 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.LastFmUser
 import com.soundhub.data.repository.LastFmRepository
 import com.soundhub.ui.pages.music.enums.ChosenMusicService
-import com.soundhub.ui.viewmodels.MusicServiceDialogViewModel
 import com.soundhub.utils.mappers.LastFmMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LastFmViewModel @Inject constructor(
+class LastFmLoginViewModel @Inject constructor(
 	private val lastFmRepository: LastFmRepository,
 	private val lastFmDao: LastFmDao
 ) : MusicServiceDialogViewModel() {
@@ -43,6 +42,7 @@ class LastFmViewModel @Inject constructor(
 	private fun initLastFmUser() = viewModelScope.launch {
 		val user: LastFmUser? = lastFmDao.getLastFmSessionUser()
 		checkAuthority(user)
+
 		_lastFmUser.update { user }
 		getUserInfo()
 	}
