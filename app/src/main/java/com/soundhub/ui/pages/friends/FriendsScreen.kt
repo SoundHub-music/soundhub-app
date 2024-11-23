@@ -28,40 +28,38 @@ fun FriendsScreen(
 	friendsViewModel: FriendsViewModel,
 	userId: UUID?
 ) {
-	val tabs = friendsViewModel.tabs
-	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-	val selectedTabState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
-	val isOriginProfile = friendsViewModel.isOriginProfile()
-	var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(friendsViewModel.tabs) }
+	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
-	val searchBarText: String = uiState.searchBarText
+	val tabs = friendsViewModel.getTabs()
+	var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(tabs) }
+
+	val tabPagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+	val isOriginProfile = friendsViewModel.isOriginProfile()
 
 	LaunchedEffect(key1 = userId) {
 		userId?.let { friendsViewModel.loadProfileOwner(it) }
 	}
 
-	LaunchedEffect(key1 = searchBarText) {
-		if (tabs[selectedTabState.currentPage] == FriendListPage.SEARCH)
-			friendsViewModel.searchUsers(searchBarText)
-	}
-
 	LaunchedEffect(key1 = isOriginProfile) {
 		tabState = if (!isOriginProfile)
 			listOf(FriendListPage.MAIN)
-		else friendsViewModel.tabs
+		else friendsViewModel.getTabs()
 	}
 
-	LaunchedEffect(key1 = selectedTabState.currentPage) {
-		uiStateDispatcher.setSearchBarActive(false)
+	LaunchedEffect(key1 = tabPagerState.currentPage) {
+		if (uiState.isSearchBarActive)
+			uiStateDispatcher.setSearchBarActive(false)
+
+		friendsViewModel.setCurrentTabIndex(tabPagerState.currentPage)
 	}
 
 	Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 		if (isOriginProfile) FriendsScreenTabs(
-			selectedTabState = selectedTabState,
+			selectedTabState = tabPagerState,
 			tabs = tabState
 		)
 		FriendsScreenPager(
-			selectedTabState = selectedTabState,
+			selectedTabState = tabPagerState,
 			navController = navController,
 			friendsViewModel = friendsViewModel,
 			uiStateDispatcher = uiStateDispatcher,

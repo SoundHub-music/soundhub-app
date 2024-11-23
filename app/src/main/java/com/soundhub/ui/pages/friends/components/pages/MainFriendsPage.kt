@@ -32,7 +32,7 @@ internal fun MainFriendsPage(
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
 	val isOriginProfile = friendsViewModel.isOriginProfile()
-	val tabs = friendsViewModel.tabs
+	val tabs = friendsViewModel.getTabs()
 
 	val profileOwner: User? = friendsUiState.profileOwner
 	val searchBarText: String = uiState.searchBarText

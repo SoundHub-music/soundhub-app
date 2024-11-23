@@ -1,7 +1,9 @@
 package com.soundhub.ui.pages.friends.components.pages
 
+import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
@@ -25,6 +27,10 @@ internal fun SearchUserPage(
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
 	val foundUsers: List<User> = friendsUiState.foundUsers
 	val searchStatus: ApiStatus = friendsUiState.status
+
+	LaunchedEffect(foundUsers) {
+		Log.d("SearchUserPage", foundUsers.toString())
+	}
 
 	if (foundUsers.isEmpty()) {
 		Text(

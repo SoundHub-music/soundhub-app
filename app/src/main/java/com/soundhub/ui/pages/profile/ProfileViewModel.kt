@@ -17,7 +17,6 @@ import com.soundhub.data.model.User
 import com.soundhub.data.repository.InviteRepository
 import com.soundhub.data.repository.UserRepository
 import com.soundhub.data.states.ProfileUiState
-import com.soundhub.data.states.UiState
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
@@ -55,7 +54,6 @@ class ProfileViewModel @Inject constructor(
 	private val postDao: PostDao,
 	userCredsStore: UserCredsStore
 ) : ViewModel() {
-	private val uiState: Flow<UiState> = uiStateDispatcher.uiState
 	private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
 	private val _profileUiState: MutableStateFlow<ProfileUiState> =
@@ -151,33 +149,31 @@ class ProfileViewModel @Inject constructor(
 	}
 
 	fun checkInvite() = viewModelScope.launch(Dispatchers.IO) {
-		val authorizedUser: Flow<User?> = uiState.map { it.authorizedUser }
+		val authorizedUser: User? = userDao.getCurrentUser()
 		val profileOwner: User? = _profileUiState.value.profileOwner
 
-		authorizedUser.collect { user ->
-			if (user != null && profileOwner?.id == user.id) {
-				inviteRepository.getInviteBySenderAndRecipientId(
-					senderId = user.id,
-					recipientId = profileOwner.id
-				)
-					.onSuccessWithContext { response ->
-						val invite = response.body
-						val isRequestSent: Boolean = invite?.recipient?.id == profileOwner.id
-						val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
-						_profileUiState.update {
-							it.copy(
-								isRequestSent = isRequestSent,
-								inviteSentByCurrentUser = inviteSentByCurrentUser
-							)
-						}
+		if (authorizedUser != null && profileOwner?.id == authorizedUser.id) {
+			inviteRepository.getInviteBySenderAndRecipientId(
+				senderId = authorizedUser.id,
+				recipientId = profileOwner.id
+			)
+				.onSuccessWithContext { response ->
+					val invite = response.body
+					val isRequestSent: Boolean = invite?.recipient?.id == profileOwner.id
+					val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
+					_profileUiState.update {
+						it.copy(
+							isRequestSent = isRequestSent,
+							inviteSentByCurrentUser = inviteSentByCurrentUser
+						)
 					}
-					.onFailureWithContext { error ->
-						if (error.errorBody.status != 404) {
-							val uiEvent = UiEvent.Error(error.errorBody, error.throwable)
-							uiStateDispatcher.sendUiEvent(uiEvent)
-						}
+				}
+				.onFailureWithContext { error ->
+					if (error.errorBody.status != 404) {
+						val uiEvent = UiEvent.Error(error.errorBody, error.throwable)
+						uiStateDispatcher.sendUiEvent(uiEvent)
 					}
-			}
+				}
 		}
 	}
 

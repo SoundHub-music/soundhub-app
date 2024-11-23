@@ -19,18 +19,24 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class FriendsViewModel @Inject constructor(
 	private val userRepository: UserRepository,
@@ -44,14 +50,30 @@ class FriendsViewModel @Inject constructor(
 
 	private val _friendsUiState = MutableStateFlow(FriendsUiState())
 	val friendsUiState: StateFlow<FriendsUiState> = _friendsUiState.asStateFlow()
-	val tabs: List<FriendListPage> = listOf(
+
+	private val tabs: List<FriendListPage> = listOf(
 		FriendListPage.MAIN,
 		FriendListPage.RECOMMENDATIONS,
 		FriendListPage.SEARCH
 	)
 
+	private val _currentTabIndex = MutableStateFlow(0)
+	var currentTabIndex = _currentTabIndex.asStateFlow()
+
 	init {
-		viewModelScope.launch { initializeFriendsUiState() }
+		viewModelScope.launch {
+			initializeFriendsUiState()
+
+			uiStateDispatcher.uiState.map { it.searchBarText }
+				.debounce(500)
+				.distinctUntilChanged()
+				.collect {
+					when (tabs[currentTabIndex.value]) {
+						FriendListPage.SEARCH -> searchUsers(it)
+						else -> {}
+					}
+				}
+		}
 	}
 
 	override fun onCleared() {
@@ -63,6 +85,10 @@ class FriendsViewModel @Inject constructor(
 	private suspend fun initializeFriendsUiState() = authorizedUser.update {
 		userDao.getCurrentUser()
 	}
+
+	fun getTabs() = tabs
+
+	fun setCurrentTabIndex(index: Int) = _currentTabIndex.update { index }
 
 	fun onNavigateToChatBtnClick(user: User) = viewModelScope.launch(Dispatchers.Main) {
 		getOrCreateChat(user)
@@ -103,10 +129,12 @@ class FriendsViewModel @Inject constructor(
 		} ?: emit(null)
 	}
 
-	fun filterFriendsList(occurrenceString: String, users: List<User>): List<User> {
-		return if (occurrenceString.isNotEmpty() && occurrenceString.isNotBlank())
-			users.filter { SearchUtils.compareWithUsername(it, occurrenceString) }
-		else users
+	suspend fun filterFriendsList(occurrenceString: String, users: List<User>): List<User> {
+		if (occurrenceString.isEmpty() || occurrenceString.isBlank())
+			return users
+
+		delay(500)
+		return users.filter { SearchUtils.compareWithUsername(it, occurrenceString) }
 	}
 
 	fun searchUsers(username: String) {

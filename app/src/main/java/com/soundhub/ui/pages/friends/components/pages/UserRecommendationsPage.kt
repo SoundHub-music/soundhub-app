@@ -36,7 +36,7 @@ internal fun UserRecommendationsPage(
 	page: Int
 ) {
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-	val tabs = friendsViewModel.tabs
+	val tabs = friendsViewModel.getTabs()
 	val recommendedUsers: List<User> = friendsUiState.recommendedFriends
 	var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
 	val isOriginProfile = friendsViewModel.isOriginProfile()

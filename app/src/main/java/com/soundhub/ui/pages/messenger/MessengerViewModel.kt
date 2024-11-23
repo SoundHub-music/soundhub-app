@@ -23,6 +23,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -140,13 +141,19 @@ class MessengerViewModel @Inject constructor(
 			?.size ?: 0
 	}
 
-	fun filterChats(chats: List<Chat>, searchBarText: String, authorizedUser: User?): List<Chat> {
-		return if (searchBarText.isNotEmpty()) {
-			chats.filter { chat ->
-				val otherUser = chat.participants.firstOrNull { it.id != authorizedUser?.id }
-				otherUser != null && SearchUtils.compareWithUsername(otherUser, searchBarText)
-			}
-		} else chats
+	suspend fun filterChats(
+		chats: List<Chat>,
+		searchBarText: String,
+		authorizedUser: User?
+	): List<Chat> {
+		if (searchBarText.isEmpty())
+			return chats
+
+		delay(500)
+		return chats.filter { chat ->
+			val otherUser = chat.participants.firstOrNull { it.id != authorizedUser?.id }
+			otherUser != null && SearchUtils.compareWithUsername(otherUser, searchBarText)
+		}
 	}
 
 	suspend fun prepareMessagePreview(prefix: String, lastMessage: Message): String {

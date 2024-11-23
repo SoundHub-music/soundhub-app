@@ -24,7 +24,7 @@ internal fun FriendsScreenPager(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 ) {
-	val tabs: List<FriendListPage> = friendsViewModel.tabs
+	val tabs: List<FriendListPage> = friendsViewModel.getTabs()
 	val isOriginProfile = friendsViewModel.isOriginProfile()
 
 	ContentContainer {
@@ -61,7 +61,7 @@ private fun PagerPages(
 	navController: NavHostController,
 	page: Int
 ) {
-	val tabs: List<FriendListPage> = friendsViewModel.tabs
+	val tabs: List<FriendListPage> = friendsViewModel.getTabs()
 	if (page < tabs.size) {
 		when (tabs[page]) {
 			FriendListPage.MAIN -> MainFriendsPage(
