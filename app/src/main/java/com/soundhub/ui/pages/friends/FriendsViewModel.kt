@@ -20,7 +20,6 @@ import com.soundhub.utils.lib.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +44,6 @@ class FriendsViewModel @Inject constructor(
 	private val getUserByIdUseCase: GetUserByIdUseCase,
 	private val userDao: UserDao,
 ) : ViewModel() {
-	private var searchUsersJob: Job? = null
 	private val authorizedUser = MutableStateFlow<User?>(null)
 
 	private val _friendsUiState = MutableStateFlow(FriendsUiState())
@@ -68,9 +66,8 @@ class FriendsViewModel @Inject constructor(
 				.debounce(500)
 				.distinctUntilChanged()
 				.collect {
-					when (tabs[currentTabIndex.value]) {
-						FriendListPage.SEARCH -> searchUsers(it)
-						else -> {}
+					if (tabs[currentTabIndex.value] == FriendListPage.SEARCH) {
+						searchUsers(it)
 					}
 				}
 		}
@@ -138,14 +135,12 @@ class FriendsViewModel @Inject constructor(
 	}
 
 	fun searchUsers(username: String) {
-		searchUsersJob?.cancel()
-
 		if (username.isEmpty() || username.isBlank()) {
 			_friendsUiState.update { it.copy(foundUsers = emptyList()) }
 			return
 		}
 
-		searchUsersJob = viewModelScope.launch(Dispatchers.IO) {
+		viewModelScope.launch(Dispatchers.IO) {
 			userRepository.searchUserByFullName(username)
 				.onSuccess { response ->
 					val otherUsers: List<User> = response.body
