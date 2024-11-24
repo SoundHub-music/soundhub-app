@@ -12,6 +12,7 @@ data class Chat(
 	val participants: List<User> = emptyList(),
 	val isGroup: Boolean = false,
 	val chatName: String? = null,
+	val totalMessages: Long = 0,
 
 	@SerializedName("createdBy")
 	val createdBy: User

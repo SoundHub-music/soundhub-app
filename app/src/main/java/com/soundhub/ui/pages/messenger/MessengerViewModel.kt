@@ -183,7 +183,7 @@ class MessengerViewModel @Inject constructor(
 		userDao.getCurrentUser()?.let { user ->
 			chatRepository.getAllChatsByUserId(user.id)
 				.onSuccess { response ->
-					val responseChats = response.body.orEmpty()
+					val responseChats = response.body.orEmpty().filter { it.totalMessages > 0 }
 					_messengerUiState.update { it.copy(status = ApiStatus.SUCCESS) }
 					chats.addAll(responseChats)
 				}
