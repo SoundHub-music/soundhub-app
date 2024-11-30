@@ -56,7 +56,7 @@ class FriendsViewModel @Inject constructor(
 	)
 
 	private val _currentTabIndex = MutableStateFlow(0)
-	var currentTabIndex = _currentTabIndex.asStateFlow()
+	val currentTabIndex = _currentTabIndex.asStateFlow()
 
 	init {
 		viewModelScope.launch {
@@ -100,11 +100,26 @@ class FriendsViewModel @Inject constructor(
 
 	fun loadRecommendedFriends() = viewModelScope.launch(Dispatchers.IO) {
 		_friendsUiState.update { it.copy(status = ApiStatus.LOADING) }
+		val cachedRecommendedUsers = _friendsUiState.value.recommendedFriends
+
+		// caching recommended users in viewmodel scope
+		if (cachedRecommendedUsers.isNotEmpty()) {
+			_friendsUiState.update {
+				it.copy(
+					recommendedFriends = cachedRecommendedUsers,
+					status = ApiStatus.SUCCESS
+				)
+			}
+
+			return@launch
+		}
+
 		userRepository.getRecommendedFriends()
 			.onSuccess { response ->
+				val users: List<User> = response.body.orEmpty()
 				_friendsUiState.update {
 					it.copy(
-						recommendedFriends = response.body.orEmpty(),
+						recommendedFriends = users,
 						status = ApiStatus.SUCCESS
 					)
 				}
