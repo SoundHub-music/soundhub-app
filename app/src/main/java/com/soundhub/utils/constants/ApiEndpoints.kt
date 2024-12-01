@@ -8,9 +8,12 @@ sealed class ApiEndpoints {
 
 		private const val USERS_ENDPOINT: String = "users"
 		const val USER_ID_DYNAMIC_PARAM: String = "userId"
+		const val USER_EMAIL_DYNAMIC_PARAM: String = "email"
 		const val FRIEND_ID_DYNAMIC_PARAM: String = "friendId"
 
 		const val CURRENT_USER: String = "$USERS_ENDPOINT/currentUser"
+
+		const val CHECK_USER_EXISTENCE = "$USERS_ENDPOINT/checkUser/{$USER_EMAIL_DYNAMIC_PARAM}"
 
 		const val GET_USER_BY_ID: String = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}"
 		const val UPDATE_USER: String = "$USERS_ENDPOINT/update/{$USER_ID_DYNAMIC_PARAM}"

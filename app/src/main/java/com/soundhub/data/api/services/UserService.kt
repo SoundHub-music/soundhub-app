@@ -2,8 +2,10 @@ package com.soundhub.data.api.services
 
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
+import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.model.User
 import com.soundhub.utils.constants.ApiEndpoints.Users.ADD_FRIEND
+import com.soundhub.utils.constants.ApiEndpoints.Users.CHECK_USER_EXISTENCE
 import com.soundhub.utils.constants.ApiEndpoints.Users.COMPATIBLE_USERS
 import com.soundhub.utils.constants.ApiEndpoints.Users.CURRENT_USER
 import com.soundhub.utils.constants.ApiEndpoints.Users.DELETE_FRIEND
@@ -15,6 +17,7 @@ import com.soundhub.utils.constants.ApiEndpoints.Users.SEARCH_PARAM_NAME
 import com.soundhub.utils.constants.ApiEndpoints.Users.SEARCH_USER
 import com.soundhub.utils.constants.ApiEndpoints.Users.TOGGLE_ONLINE
 import com.soundhub.utils.constants.ApiEndpoints.Users.UPDATE_USER
+import com.soundhub.utils.constants.ApiEndpoints.Users.USER_EMAIL_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Users.USER_REQUEST_BODY_NAME
 import okhttp3.MultipartBody
@@ -33,6 +36,12 @@ import java.util.UUID
 interface UserService {
 	@GET(CURRENT_USER)
 	suspend fun getCurrentUser(): Response<User?>
+
+	@GET(CHECK_USER_EXISTENCE)
+	suspend fun checkUserExistenceByEmail(
+		@Path(USER_EMAIL_DYNAMIC_PARAM)
+		email: String
+	): Response<UserExistenceResponse>
 
 	@GET(GET_USER_BY_ID)
 	suspend fun getUserById(

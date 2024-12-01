@@ -9,6 +9,7 @@ import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.data.api.responses.internal.HttpResult
+import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.api.services.UserService
 import com.soundhub.data.model.User
 import com.soundhub.domain.repository.BaseRepository
@@ -145,6 +146,18 @@ class UserRepositoryImpl @Inject constructor(
 			return handleResponse(response)
 		} catch (e: Exception) {
 			Log.e("UserRepository", "getUsersCompatibilityPercentage[2]: ${e.stackTraceToString()}")
+			return handleException(e)
+		}
+	}
+
+	override suspend fun checkUserExistenceByEmail(email: String): HttpResult<UserExistenceResponse> {
+		try {
+			val response = userService.checkUserExistenceByEmail(email)
+			Log.d("UserRepository", "checkUserExistenceByEmail[1]: $response")
+
+			return handleResponse(response)
+		} catch (e: Exception) {
+			Log.e("UserRepository", "checkUserExistenceByEmail[2]: ${e.stackTraceToString()}")
 			return handleException(e)
 		}
 	}

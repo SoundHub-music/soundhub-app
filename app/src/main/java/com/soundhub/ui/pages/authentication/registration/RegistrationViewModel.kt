@@ -15,6 +15,7 @@ import com.soundhub.data.model.User
 import com.soundhub.data.states.RegistrationState
 import com.soundhub.data.states.interfaces.IUserDataFormState
 import com.soundhub.domain.repository.AuthRepository
+import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
@@ -44,6 +45,7 @@ class RegistrationViewModel @Inject constructor(
 	private val uiStateDispatcher: UiStateDispatcher,
 	private val authRepository: AuthRepository,
 	private val userCredsStore: UserCredsStore,
+	private val userRepository: UserRepository,
 	private val userDao: UserDao,
 	loadGenresUseCase: LoadGenresUseCase,
 	loadArtistsUseCase: LoadArtistsUseCase,
@@ -131,14 +133,30 @@ class RegistrationViewModel @Inject constructor(
 
 	fun onSignUpButtonClick(authForm: AuthFormState) = viewModelScope.launch(Dispatchers.Main) {
 		Log.d("PostRegistrationViewModel", "authForm: $authForm")
-		_registerState.update {
-			it.copy(
-				email = authForm.email,
-				password = authForm.password
-			)
+		userRepository.checkUserExistenceByEmail(authForm.email).onSuccess { response ->
+			val isUserExists = response.body?.isUserExists == true
+			var uiEvent: UiEvent = if (isUserExists) {
+				val message = UiText.StringResource(
+					R.string.toast_user_with_such_email_already_exists
+				)
+
+				_registerState.update {
+					it.copy(
+						email = authForm.email,
+						password = authForm.password
+					)
+				}
+
+				UiEvent.ShowToast(message)
+			} else UiEvent.Navigate(Authentication.ChooseGenres)
+
+			uiStateDispatcher.sendUiEvent(uiEvent)
+		}.onFailure {
+			val message = UiText.StringResource(R.string.toast_registration_error)
+			val uiEvent: UiEvent = UiEvent.ShowToast(message)
+
+			uiStateDispatcher.sendUiEvent(uiEvent)
 		}
-		val uiEvent = UiEvent.Navigate(Authentication.ChooseGenres)
-		uiStateDispatcher.sendUiEvent(uiEvent)
 	}
 
 

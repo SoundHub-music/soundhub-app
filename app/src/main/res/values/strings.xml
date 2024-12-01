@@ -96,9 +96,11 @@
     <!-- toast error messages-->
     <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
     <string name="toast_authorization_error">Ошибка авторизации</string>
+    <string name="toast_registration_error">Ошибка регистрации, попробуйте позже</string>
     <string name="toast_critical_error">Произошла критическая ошибка: %s</string>
     <string name="toast_no_internet_connection">Нет подключения к интернету</string>
     <string name="toast_register_error">Ошибка регистрации пользователя</string>
+    <string name="toast_user_with_such_email_already_exists">Пользователь с таким email уже существует</string>
     <string name="toast_logout_error">Ошибка выхода из аккаунта</string>
     <string name="toast_fetch_user_data_error">Истекло время сессии пользователя</string>
     <string name="toast_file_loading_error">Ошибка загрузки файла</string>

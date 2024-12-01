@@ -54,6 +54,7 @@ fun AuthForm(
 ) {
 	val density: Density = LocalDensity.current
 	val context: Context = LocalContext.current
+	val passwordFieldOffsetY = with(density) { -40.dp.roundToPx() }
 
 	val authFormState by authViewModel.authFormState.collectAsState()
 	var buttonFormText: String = getButtonFormText(authFormState.isRegisterForm, context)
@@ -111,10 +112,10 @@ fun AuthForm(
 		// repeated password field
 		AnimatedVisibility(
 			visible = authFormState.isRegisterForm,
-			enter = slideInVertically(initialOffsetY = { with(density) { -40.dp.roundToPx() } }) +
+			enter = slideInVertically(initialOffsetY = { passwordFieldOffsetY }) +
 					expandVertically(expandFrom = Alignment.Top) +
 					fadeIn(initialAlpha = 0.3f),
-			exit = slideOutVertically(targetOffsetY = { with(density) { -40.dp.roundToPx() } }) +
+			exit = slideOutVertically(targetOffsetY = { passwordFieldOffsetY }) +
 					shrinkVertically(shrinkTowards = Alignment.Top) +
 					fadeOut()
 		) {
@@ -163,15 +164,6 @@ fun AuthForm(
 	}
 }
 
-private fun onSubmitButtonClick(
-	authFormState: AuthFormState,
-	registrationViewModel: RegistrationViewModel,
-	authViewModel: AuthenticationViewModel
-) {
-	if (authFormState.isRegisterForm)
-		registrationViewModel.onSignUpButtonClick(authFormState)
-	else authViewModel.signIn()
-}
 
 @Composable
 private fun ErrorPasswordFieldMessage(authFormState: AuthFormState) {
@@ -187,6 +179,16 @@ private fun ErrorPasswordFieldMessage(authFormState: AuthFormState) {
 				color = MaterialTheme.colorScheme.error
 			)
 	}
+}
+
+private fun onSubmitButtonClick(
+	authFormState: AuthFormState,
+	registrationViewModel: RegistrationViewModel,
+	authViewModel: AuthenticationViewModel
+) {
+	if (authFormState.isRegisterForm)
+		registrationViewModel.onSignUpButtonClick(authFormState)
+	else authViewModel.signIn()
 }
 
 private fun getButtonFormText(isRegisterForm: Boolean, context: Context): String {

@@ -2,6 +2,7 @@ package com.soundhub.domain.repository
 
 import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.api.responses.internal.HttpResult
+import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.model.User
 import java.util.UUID
 
@@ -15,6 +16,8 @@ interface UserRepository {
 	suspend fun getUsersCompatibilityPercentage(
 		userIds: List<UUID>
 	): HttpResult<CompatibleUsersResponse>
+
+	suspend fun checkUserExistenceByEmail(email: String): HttpResult<UserExistenceResponse>
 
 	suspend fun getFriendsByUserId(userId: UUID): HttpResult<List<User>>
 	suspend fun searchUserByFullName(name: String): HttpResult<List<User>>
