@@ -2,16 +2,16 @@ package com.soundhub.data.sources
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.soundhub.data.api.responses.HttpResult
-import com.soundhub.data.api.responses.PageableMessagesResponse
+import com.soundhub.data.api.responses.internal.HttpResult
+import com.soundhub.data.api.responses.internal.PageableMessagesResponse
 import com.soundhub.data.model.Message
-import com.soundhub.data.repository.MessageRepository
+import com.soundhub.domain.repository.MessageRepository
 import java.util.UUID
 
 class MessageSource(
 	private val messageRepository: MessageRepository,
 	private val chatId: UUID?
-): PagingSource<Int, Message>() {
+) : PagingSource<Int, Message>() {
 	override fun getRefreshKey(state: PagingState<Int, Message>): Int? {
 		return state.anchorPosition?.let { anchorPosition ->
 			val anchorPage = state.closestPageToPosition(anchorPosition)
@@ -37,8 +37,7 @@ class MessageSource(
 				nextKey = if (data.isNotEmpty()) nextPageNumber + 1 else null,
 				data = data
 			)
-		}
-		catch (e: Error) {
+		} catch (e: Error) {
 			return LoadResult.Error(e)
 		}
 	}

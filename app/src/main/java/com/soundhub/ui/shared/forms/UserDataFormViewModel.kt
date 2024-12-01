@@ -2,9 +2,9 @@ package com.soundhub.ui.shared.forms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soundhub.data.dao.CountryDao
+import com.soundhub.data.local_database.dao.CountryDao
 import com.soundhub.data.model.Country
-import com.soundhub.data.repository.CountryRepository
+import com.soundhub.domain.repository.CountryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

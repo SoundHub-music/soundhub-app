@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.dao.UserDao
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.Genre
 import com.soundhub.data.model.LibraryItemData

@@ -1,6 +1,6 @@
 package com.soundhub.data.api.services
 
-import com.soundhub.data.model.Post
+import com.soundhub.domain.model.Post
 import com.soundhub.utils.constants.ApiEndpoints.Posts.ADD_POST
 import com.soundhub.utils.constants.ApiEndpoints.Posts.AUTHOR_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Posts.DELETE_POST

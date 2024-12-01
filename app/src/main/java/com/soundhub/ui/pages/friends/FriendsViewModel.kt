@@ -5,12 +5,12 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.enums.ApiStatus
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.UserRepository
 import com.soundhub.data.states.FriendsUiState
+import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.ui.events.UiEvent

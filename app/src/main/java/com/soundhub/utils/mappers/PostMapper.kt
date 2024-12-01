@@ -1,7 +1,7 @@
 package com.soundhub.utils.mappers
 
-import com.soundhub.data.model.Post
 import com.soundhub.data.states.PostEditorState
+import com.soundhub.domain.model.Post
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers

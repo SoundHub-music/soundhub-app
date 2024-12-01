@@ -1,7 +1,7 @@
 package com.soundhub.data.states
 
-import com.soundhub.data.model.Post
 import com.soundhub.data.model.User
+import com.soundhub.domain.model.Post
 import java.time.LocalDateTime
 import java.util.UUID
 

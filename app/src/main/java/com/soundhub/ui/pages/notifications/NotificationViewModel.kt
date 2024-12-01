@@ -3,13 +3,13 @@ package com.soundhub.ui.pages.notifications
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.Invite
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.InviteRepository
 import com.soundhub.data.states.NotificationUiState
+import com.soundhub.domain.repository.InviteRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText

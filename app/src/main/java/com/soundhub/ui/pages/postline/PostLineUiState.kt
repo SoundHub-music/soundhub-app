@@ -1,7 +1,7 @@
 package com.soundhub.ui.pages.postline
 
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Post
+import com.soundhub.domain.model.Post
 
 data class PostLineUiState(
 	val posts: List<Post> = emptyList(),

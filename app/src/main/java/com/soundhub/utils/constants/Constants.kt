@@ -3,7 +3,7 @@ package com.soundhub.utils.constants
 import com.google.gson.reflect.TypeToken
 import com.soundhub.BuildConfig
 import com.soundhub.Route
-import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.api.responses.internal.ErrorResponse
 import java.lang.reflect.Type
 
 object Constants {

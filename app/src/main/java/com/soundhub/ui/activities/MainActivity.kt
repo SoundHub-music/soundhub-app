@@ -24,7 +24,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
-import com.soundhub.data.dao.UserDao
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.services.MessengerAndroidService
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.layout.RootLayout

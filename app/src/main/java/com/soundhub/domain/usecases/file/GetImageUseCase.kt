@@ -1,6 +1,6 @@
 package com.soundhub.domain.usecases.file
 
-import com.soundhub.data.repository.FileRepository
+import com.soundhub.domain.repository.FileRepository
 import java.io.File
 import javax.inject.Inject
 

@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.enums.Gender
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.User
 import com.soundhub.data.states.UserFormState
 import com.soundhub.data.states.interfaces.IUserDataFormState

@@ -1,7 +1,7 @@
 package com.soundhub.data.api.services
 
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
-import com.soundhub.data.api.responses.CompatibleUsersResponse
+import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.model.User
 import com.soundhub.utils.constants.ApiEndpoints.Users.ADD_FRIEND
 import com.soundhub.utils.constants.ApiEndpoints.Users.COMPATIBLE_USERS

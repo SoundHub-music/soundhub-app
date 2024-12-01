@@ -7,9 +7,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.soundhub.Route
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.User
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,7 +56,7 @@ class NavigationViewModel @Inject constructor(
 	) {
 		val userInstance: User? = userDao.getCurrentUser()
 		val isUserAuthorized: Boolean = !userCreds?.accessToken.isNullOrEmpty()
-				&& !userCreds?.refreshToken.isNullOrEmpty()
+				&& !userCreds.refreshToken.isNullOrEmpty()
 				&& userInstance != null
 
 		val containsAuthFormRoute: Boolean = route?.contains(Route.Authentication.route) == true

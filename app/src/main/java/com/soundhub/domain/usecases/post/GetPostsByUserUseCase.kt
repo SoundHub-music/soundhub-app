@@ -1,9 +1,9 @@
 package com.soundhub.domain.usecases.post
 
-import com.soundhub.data.api.responses.ErrorResponse
-import com.soundhub.data.model.Post
+import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.PostRepository
+import com.soundhub.domain.model.Post
+import com.soundhub.domain.repository.PostRepository
 import javax.inject.Inject
 
 class GetPostsByUserUseCase @Inject constructor(

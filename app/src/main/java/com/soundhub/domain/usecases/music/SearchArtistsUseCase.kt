@@ -1,7 +1,7 @@
 package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.model.Artist
-import com.soundhub.data.repository.MusicRepository
+import com.soundhub.domain.repository.MusicRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 

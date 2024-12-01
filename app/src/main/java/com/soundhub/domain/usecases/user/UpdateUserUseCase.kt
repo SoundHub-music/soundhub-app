@@ -1,7 +1,7 @@
 package com.soundhub.domain.usecases.user
 
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.UserRepository
+import com.soundhub.domain.repository.UserRepository
 import javax.inject.Inject
 
 class UpdateUserUseCase @Inject constructor(

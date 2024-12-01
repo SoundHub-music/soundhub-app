@@ -5,13 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
 import com.soundhub.data.api.requests.SignInRequestBody
-import com.soundhub.data.dao.PostDao
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
+import com.soundhub.data.local_database.dao.PostDao
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.AuthRepository
-import com.soundhub.data.repository.UserRepository
+import com.soundhub.domain.repository.AuthRepository
+import com.soundhub.domain.repository.UserRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.AuthValidator

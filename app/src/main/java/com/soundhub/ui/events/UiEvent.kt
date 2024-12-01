@@ -2,7 +2,7 @@ package com.soundhub.ui.events
 
 import androidx.annotation.StringRes
 import com.soundhub.Route
-import com.soundhub.data.api.responses.ErrorResponse
+import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.utils.lib.UiText
 
 sealed class UiEvent {

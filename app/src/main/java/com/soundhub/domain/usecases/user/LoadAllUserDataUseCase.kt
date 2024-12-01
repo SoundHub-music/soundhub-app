@@ -3,7 +3,7 @@ package com.soundhub.domain.usecases.user
 import android.util.Log
 import com.soundhub.data.model.Artist
 import com.soundhub.data.model.User
-import com.soundhub.data.repository.MusicRepository
+import com.soundhub.domain.repository.MusicRepository
 import javax.inject.Inject
 
 class LoadAllUserDataUseCase @Inject constructor(

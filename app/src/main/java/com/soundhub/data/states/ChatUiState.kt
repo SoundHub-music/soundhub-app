@@ -1,6 +1,6 @@
 package com.soundhub.data.states
 
-import com.soundhub.data.api.responses.PageableMessagesResponse
+import com.soundhub.data.api.responses.internal.PageableMessagesResponse
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.Chat
 import com.soundhub.data.model.Message

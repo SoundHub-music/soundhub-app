@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.Post
+import com.soundhub.domain.model.Post
 import java.util.UUID
 
 @Composable

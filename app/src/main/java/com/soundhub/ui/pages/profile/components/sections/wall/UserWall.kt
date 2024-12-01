@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.data.model.Post
 import com.soundhub.data.states.ProfileUiState
+import com.soundhub.domain.model.Post
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.pages.profile.components.SectionLabel
 import com.soundhub.ui.shared.containers.FetchStatusContainer

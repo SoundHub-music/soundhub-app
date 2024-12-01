@@ -1,6 +1,6 @@
 package com.soundhub.data.states
 
-import com.soundhub.data.api.responses.CompatibleUsersResponse
+import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.model.User
 import com.soundhub.data.states.interfaces.UiStatusState

@@ -1,10 +1,10 @@
 package com.soundhub.di
 
-import com.soundhub.data.repository.ChatRepository
-import com.soundhub.data.repository.FileRepository
-import com.soundhub.data.repository.MusicRepository
-import com.soundhub.data.repository.PostRepository
-import com.soundhub.data.repository.UserRepository
+import com.soundhub.domain.repository.ChatRepository
+import com.soundhub.domain.repository.FileRepository
+import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.repository.PostRepository
+import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.file.GetImageUseCase

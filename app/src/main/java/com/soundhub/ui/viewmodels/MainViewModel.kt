@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.soundhub.Route
-import com.soundhub.data.dao.UserDao
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.datastore.model.UserSettings
+import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

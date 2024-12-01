@@ -1,6 +1,6 @@
 package com.soundhub.domain.usecases.post
 
-import com.soundhub.data.repository.PostRepository
+import com.soundhub.domain.repository.PostRepository
 import java.util.UUID
 import javax.inject.Inject
 
