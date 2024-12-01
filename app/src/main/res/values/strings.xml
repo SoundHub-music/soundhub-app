@@ -2,218 +2,218 @@
     <string name="app_name">SoundHub</string>
 
     <!-- authentication page -->
-    <string name="lets_start_login_btn">Давайте начнем</string>
-    <string name="get_account_switch_label">Стать частью сообщества</string>
+    <string name="lets_start_login_btn">Let\'s Start</string>
+    <string name="get_account_switch_label">Become a Part of the Community</string>
     <string name="email_placeholder">example@mail.com</string>
-    <string name="password_placeholder">Ваш пароль. Не менее 8 символов</string>
-    <string name="repeat_password_label">Повторите пароль</string>
-    <string name="password_label">Пароль</string>
+    <string name="password_placeholder">Your password. At least 8 characters</string>
+    <string name="repeat_password_label">Repeat Password</string>
+    <string name="password_label">Password</string>
     <string name="email_label">Email</string>
 
-    <!-- messenger page-->
-    <string name="messenger_screen_last_message_prefix">Вы: </string>
+    <!-- messenger page -->
+    <string name="messenger_screen_last_message_prefix">You: </string>
 
-    <!-- authentication button names-->
-    <string name="auth_button_login_name">Войти</string>
-    <string name="auth_button_register_name">Зарегистрироваться</string>
+    <!-- authentication button names -->
+    <string name="auth_button_login_name">Login</string>
+    <string name="auth_button_register_name">Register</string>
 
-    <!-- validation strings-->
-    <string name="invalid_email">Некорректный адрес</string>
-    <string name="passwords_mismatch">Пароли не совпадают</string>
-    <string name="invalid_password">Пароль меньше 8 символов</string>
+    <!-- validation strings -->
+    <string name="invalid_email">Invalid email address</string>
+    <string name="passwords_mismatch">Passwords do not match</string>
+    <string name="invalid_password">Password is less than 8 characters</string>
 
-    <!-- page titles-->
-    <string name="screen_title_postline">Главная</string>
-    <string name="screen_title_settings">Настройки</string>
-    <string name="screen_title_music">Музыка</string>
-    <string name="screen_title_favorite_genres">Любимые жанры</string>
-    <string name="screen_title_favorite_artists">Любимые исполнители</string>
-    <string name="screen_title_messenger">Мессенджер</string>
-    <string name="screen_title_edit_profile">Изменить профиль</string>
-    <string name="screen_title_notifications">Уведомления</string>
-    <string name="screen_title_create_post">Новый пост</string>
-    <string name="screen_title_update_post">Редактирование поста</string>
-    <string name="screen_title_friends">Друзья</string>
+    <!-- page titles -->
+    <string name="screen_title_postline">Home</string>
+    <string name="screen_title_settings">Settings</string>
+    <string name="screen_title_music">Music</string>
+    <string name="screen_title_favorite_genres">Favorite Genres</string>
+    <string name="screen_title_favorite_artists">Favorite Artists</string>
+    <string name="screen_title_messenger">Messenger</string>
+    <string name="screen_title_edit_profile">Edit Profile</string>
+    <string name="screen_title_notifications">Notifications</string>
+    <string name="screen_title_create_post">New Post</string>
+    <string name="screen_title_update_post">Edit Post</string>
+    <string name="screen_title_friends">Friends</string>
 
     <!-- music page tabs -->
-    <string name="music_main_page">Главная</string>
-    <string name="music_library_page">Библиотека</string>
+    <string name="music_main_page">Home</string>
+    <string name="music_library_page">Library</string>
 
-    <!-- post registration page titles-->
-    <string name="screen_title_choose_genres">Выберите жанры</string>
-    <string name="screen_title_choose_artists">Выберите исполнителей</string>
-    <string name="screen_title_fill_user_data">Пришло время знакомиться!</string>
+    <!-- post registration page titles -->
+    <string name="screen_title_choose_genres">Choose Genres</string>
+    <string name="screen_title_choose_artists">Choose Artists</string>
+    <string name="screen_title_fill_user_data">Time to Get Acquainted!</string>
 
-    <!-- user data form field placeholders-->
-    <string name="text_field_name_label">Имя*</string>
-    <string name="text_field_last_name_label">Фамилия*</string>
-    <string name="text_field_description_label">Расскажите о себе</string>
-    <string name="dropdown_label_gender">Пол*</string>
-    <string name="gender_item_female">Женский</string>
-    <string name="gender_item_male">Мужской</string>
-    <string name="gender_item_unknown">Не указан</string>
+    <!-- user data form field placeholders -->
+    <string name="text_field_name_label">First Name*</string>
+    <string name="text_field_last_name_label">Last Name*</string>
+    <string name="text_field_description_label">Tell Us About Yourself</string>
+    <string name="dropdown_label_gender">Gender*</string>
+    <string name="gender_item_female">Female</string>
+    <string name="gender_item_male">Male</string>
+    <string name="gender_item_unknown">Not Specified</string>
 
-    <string name="text_field_country_label">Страна</string>
-    <string name="text_field_city">Город</string>
-    <string name="text_field_birthdate">Дата рождения*</string>
-    <string name="text_field_languages">Языки</string>
+    <string name="text_field_country_label">Country</string>
+    <string name="text_field_city">City</string>
+    <string name="text_field_birthdate">Date of Birth*</string>
+    <string name="text_field_languages">Languages</string>
 
-    <string name="btn_description_back">Назад</string>
+    <string name="btn_description_back">Back</string>
 
-    <!-- user data form error messages-->
-    <string name="user_form_firstname_error_message">Имя не может быть пустым</string>
-    <string name="user_form_lastname_error_message">Фамилия не может быть пустой</string>
-    <string name="user_form_birthday_error_message">Дата рождения должна быть задана</string>
-    <string name="user_form_invalid_birthday_error_message">Некорректная дата рождения</string>
-    <string name="choose_genres_warning">Сначала выберите хотя бы один жанр</string>
-    <string name="choose_artist_warning">Сначала выберите хотя бы одного исполнителя</string>
-    <string name="toast_update_music_preferences_successful">Музыкальные предпочтения обновлены</string>
-    <string name="toast_update_music_preferences_failed">Ошибка обновления музыкальных предпочтений</string>
+    <!-- user data form error messages -->
+    <string name="user_form_firstname_error_message">First name cannot be empty</string>
+    <string name="user_form_lastname_error_message">Last name cannot be empty</string>
+    <string name="user_form_birthday_error_message">Date of birth must be set</string>
+    <string name="user_form_invalid_birthday_error_message">Invalid date of birth</string>
+    <string name="choose_genres_warning">Please select at least one genre first</string>
+    <string name="choose_artist_warning">Please select at least one artist first</string>
+    <string name="toast_update_music_preferences_successful">Music preferences updated</string>
+    <string name="toast_update_music_preferences_failed">Failed to update music preferences</string>
 
     <!-- profile screen -->
-    <string name="profile_screen_photo_section_caption">Фотографии</string>
-    <string name="profile_screen_friend_section_caption">Друзья</string>
-    <string name="profile_screen_favorite_genres_section_caption">Любимые жанры</string>
-    <string name="profile_screen_user_birthday">День рождения: </string>
-    <string name="profile_screen_user_languages">Языки: </string>
-    <string name="profile_screen_user_description">О себе: </string>
-    <string name="profile_screen_user_posts">Посты</string>
-    <string name="profile_screen_edit_profile_btn_content">Редактировать профиль</string>
-    <string name="profile_screen_write_message_btn_content">Написать сообщение</string>
-    <string name="toast_friend_deleted_successfully">%s удалён из друзей</string>
+    <string name="profile_screen_photo_section_caption">Photos</string>
+    <string name="profile_screen_friend_section_caption">Friends</string>
+    <string name="profile_screen_favorite_genres_section_caption">Favorite Genres</string>
+    <string name="profile_screen_user_birthday">Birthday: </string>
+    <string name="profile_screen_user_languages">Languages: </string>
+    <string name="profile_screen_user_description">About: </string>
+    <string name="profile_screen_user_posts">Posts</string>
+    <string name="profile_screen_edit_profile_btn_content">Edit Profile</string>
+    <string name="profile_screen_write_message_btn_content">Send Message</string>
+    <string name="toast_friend_deleted_successfully">%s removed from friends</string>
 
-    <!-- menu actions-->
-    <string name="menu_action_open_avatar">Открыть фото</string>
-    <string name="menu_action_change_avatar">Обновить аватар</string>
+    <!-- menu actions -->
+    <string name="menu_action_open_avatar">Open Photo</string>
+    <string name="menu_action_change_avatar">Update Avatar</string>
 
-    <!-- chat menu actions-->
-    <string name="chat_menu_open_profile">Открыть профиль</string>
-    <string name="chat_menu_search">Поиск</string>
-    <string name="chat_menu_delete_history">Удалить историю</string>
+    <!-- chat menu actions -->
+    <string name="chat_menu_open_profile">Open Profile</string>
+    <string name="chat_menu_search">Search</string>
+    <string name="chat_menu_delete_history">Delete History</string>
 
-    <string name="chat_check_mode_count">Выбрано: %d</string>
+    <string name="chat_check_mode_count">Selected: %d</string>
 
-    <!-- toast error messages-->
-    <string name="toast_user_profile_error">Произошла ошибка при переходе в профиль пользователя</string>
-    <string name="toast_authorization_error">Ошибка авторизации</string>
-    <string name="toast_registration_error">Ошибка регистрации, попробуйте позже</string>
-    <string name="toast_critical_error">Произошла критическая ошибка: %s</string>
-    <string name="toast_no_internet_connection">Нет подключения к интернету</string>
-    <string name="toast_register_error">Ошибка регистрации пользователя</string>
-    <string name="toast_user_with_such_email_already_exists">Пользователь с таким email уже существует</string>
-    <string name="toast_logout_error">Ошибка выхода из аккаунта</string>
-    <string name="toast_fetch_user_data_error">Истекло время сессии пользователя</string>
-    <string name="toast_file_loading_error">Ошибка загрузки файла</string>
-    <string name="toast_common_error">Произошла ошибка</string>
-    <string name="toast_update_error">Ошибка обновления данных</string>
-    <string name="toast_delete_post_error">Ошибка удаления поста</string>
-    <string name="toast_delete_friend_error">Возникла ошибка удаления %s из друзей</string>
+    <!-- toast error messages -->
+    <string name="toast_user_profile_error">Error accessing user profile</string>
+    <string name="toast_authorization_error">Authorization error</string>
+    <string name="toast_registration_error">Registration error, please try again later</string>
+    <string name="toast_critical_error">Critical error occurred: %s</string>
+    <string name="toast_no_internet_connection">No internet connection</string>
+    <string name="toast_register_error">User registration error</string>
+    <string name="toast_user_with_such_email_already_exists">A user with this email already exists</string>
+    <string name="toast_logout_error">Logout error</string>
+    <string name="toast_fetch_user_data_error">User session timed out</string>
+    <string name="toast_file_loading_error">File loading error</string>
+    <string name="toast_common_error">An error occurred</string>
+    <string name="toast_update_error">Data update error</string>
+    <string name="toast_delete_post_error">Error deleting post</string>
+    <string name="toast_delete_friend_error">Error removing %s from friends</string>
 
     <!-- invite toast messages -->
-    <string name="toast_reject_invite_error">Ошибка отклонения заявки</string>
-    <string name="toast_accept_invite_error">Ошибка принятия заявки</string>
-    <string name="toast_invite_deleted_successfully">Заявка удалена</string>
-    <string name="toast_delete_invite_error">Не получилось удалить заявку</string>
-    <string name="toast_invite_to_friends_was_sent_successfully">Приглашение в друзья отправлено</string>
-    <string name="toast_invite_accepted_successfully">Заявка в друзья принята</string>
-    <string name="toast_invite_rejected_successfully">Заявка в друзья отклонена</string>
+    <string name="toast_reject_invite_error">Error rejecting invitation</string>
+    <string name="toast_accept_invite_error">Error accepting invitation</string>
+    <string name="toast_invite_deleted_successfully">Invitation deleted</string>
+    <string name="toast_delete_invite_error">Failed to delete invitation</string>
+    <string name="toast_invite_to_friends_was_sent_successfully">Friend invitation sent</string>
+    <string name="toast_invite_accepted_successfully">Friend request accepted</string>
+    <string name="toast_invite_rejected_successfully">Friend request rejected</string>
 
     <!-- post toast messages -->
-    <string name="toast_post_created_successfully">Пост успешно создан</string>
-    <string name="toast_post_deleted_successfully">Пост успешно удален</string>
-    <string name="toast_post_updated_successfully">Пост успешно обновлен</string>
-    <string name="toast_update_post_error">Ошибка обновления поста</string>
+    <string name="toast_post_created_successfully">Post created successfully</string>
+    <string name="toast_post_deleted_successfully">Post deleted successfully</string>
+    <string name="toast_post_updated_successfully">Post updated successfully</string>
+    <string name="toast_update_post_error">Error updating post</string>
 
-    <string name="message_input_placeholder">Ваше сообщение</string>
+    <string name="message_input_placeholder">Your message</string>
 
-    <!-- settings menu items-->
-    <string name="dark_theme_settings">Темная тема</string>
-    <string name="account_settings">Аккаунт</string>
-    <string name="appearance_settings">Внешний вид</string>
-    <string name="notification_settings">Уведомления</string>
-    <string name="about_app_settings">О приложении</string>
+    <!-- settings menu items -->
+    <string name="dark_theme_settings">Dark Theme</string>
+    <string name="account_settings">Account</string>
+    <string name="appearance_settings">Appearance</string>
+    <string name="notification_settings">Notifications</string>
+    <string name="about_app_settings">About App</string>
 
-    <!-- empty messenger strings-->
-    <string name="empty_messenger_screen">У вас еще нет истории переписок</string>
-    <string name="empty_messenger_screen_button">Написать другу</string>
+    <!-- empty messenger strings -->
+    <string name="empty_messenger_screen">You have no chat history yet</string>
+    <string name="empty_messenger_screen_button">Message a Friend</string>
 
-    <!-- empty post line strings-->
-    <string name="empty_postline_screen">Здесь всё ещё пусто :(</string>
-    <string name="fetch_error_message">Произошла ошибка во время загрузки :(</string>
-    <string name="empty_notification_screen">Здесь появятся ваши уведомления</string>
+    <!-- empty post line strings -->
+    <string name="empty_postline_screen">It\'s still empty here :(</string>
+    <string name="fetch_error_message">Error loading content :(</string>
+    <string name="empty_notification_screen">Your notifications will appear here</string>
 
-    <!-- music section titles-->
-    <string name="music_recommendation_section_title">Подобрано для вас</string>
-    <string name="music_friend_music_section_title">Что слушают ваши друзья</string>
+    <!-- music section titles -->
+    <string name="music_recommendation_section_title">Recommended for You</string>
+    <string name="music_friend_music_section_title">What Your Friends Are Listening To</string>
 
-    <!-- music recommendation plate titles-->
-    <string name="music_new_of_the_week">Новинки недели</string>
-    <string name="music_new_of_the_month">Новинки месяца</string>
-    <string name="music_recommendations">Неизведанное вами</string>
+    <!-- music recommendation plate titles -->
+    <string name="music_new_of_the_week">New This Week</string>
+    <string name="music_new_of_the_month">New This Month</string>
+    <string name="music_recommendations">Unexplored by You</string>
 
-    <!-- library page items-->
-    <string name="music_library_page_playlists">Плейлисты</string>
-    <string name="music_library_page_albums">Альбомы</string>
-    <string name="music_library_page_favorites">Жанры</string>
-    <string name="music_library_page_artists">Исполнители</string>
+    <!-- library page items -->
+    <string name="music_library_page_playlists">Playlists</string>
+    <string name="music_library_page_albums">Albums</string>
+    <string name="music_library_page_favorites">Genres</string>
+    <string name="music_library_page_artists">Artists</string>
 
-    <string name="music_auth_service_text">Получить доступ к своей библиотеке</string>
+    <string name="music_auth_service_text">Access your library</string>
 
-    <!-- friend page strings-->
-    <string name="friends_recommendation_page_card_caption">На %.1f%% похожие предпочтения в исполнителях</string>
-    <string name="friends_empty_list_message">У вас все ещё нет друзей :(\nВперед к новым знакомствам!</string>
-    <string name="friends_recommended_friends_error_message">Пока что мы не можем найти для вас друзей</string>
-    <string name="friends_empty_list_button_text">Начать поиск</string>
-    <string name="friends_search_users_empty_screen">Начните вводить имя пользователя, чтобы увидеть результат</string>
-    <string name="friends_search_users_not_found">По вашему запросу ничего не найдено</string>
-    <string name="friends_empty_list_message_unauthorized">У пользователя еще нет друзей</string>
+    <!-- friend page strings -->
+    <string name="friends_recommendation_page_card_caption">%.1f%% similar taste in artists</string>
+    <string name="friends_empty_list_message">You still have no friends :(\nTime to meet new people!</string>
+    <string name="friends_recommended_friends_error_message">We can\'t find friends for you at the moment</string>
+    <string name="friends_empty_list_button_text">Start Searching</string>
+    <string name="friends_search_users_empty_screen">Start typing a username to see results</string>
+    <string name="friends_search_users_not_found">No results found for your query</string>
+    <string name="friends_empty_list_message_unauthorized">This user has no friends yet</string>
 
     <!-- friends page tabs -->
-    <string name="friends_main_page">Ваши друзья</string>
-    <string name="friends_recommendations_page">Рекомендации</string>
-    <string name="friends_search_page">Поиск</string>
+    <string name="friends_main_page">Your Friends</string>
+    <string name="friends_recommendations_page">Recommendations</string>
+    <string name="friends_search_page">Search</string>
 
-    <!-- create post strings-->
-    <string name="create_post_field_placeholder">Поделитесь своими мыслями…</string>
-    <string name="pin_image_button">Прикрепить фото</string>
+    <!-- create post strings -->
+    <string name="create_post_field_placeholder">Share your thoughts…</string>
+    <string name="pin_image_button">Attach Photo</string>
 
-    <!-- post dropdown menu-->
-    <string name="delete_post_dropdown_menu">Удалить</string>
-    <string name="edit_post_dropdown_menu">Редактировать пост</string>
+    <!-- post dropdown menu -->
+    <string name="delete_post_dropdown_menu">Delete</string>
+    <string name="edit_post_dropdown_menu">Edit Post</string>
 
     <!-- online indicator -->
-    <string name="online_indicator_user_online">Онлайн</string>
-    <string name="online_indicator_user_offline_with_time">Был(а) в сети %s</string>
-    <string name="online_indicator_user_offline">Не в сети</string>
+    <string name="online_indicator_user_online">Online</string>
+    <string name="online_indicator_user_offline_with_time">Last online: %s</string>
+    <string name="online_indicator_user_offline">Offline</string>
 
     <!-- notifications -->
-    <string name="notification_screen_friend_request_content">отправил вам заявку в друзья</string>
-    <string name="notification_screen_accept_invite_text">Принять</string>
-    <string name="notification_screen_reject_invite_text">Отклонить</string>
+    <string name="notification_screen_friend_request_content">sent you a friend request</string>
+    <string name="notification_screen_accept_invite_text">Accept</string>
+    <string name="notification_screen_reject_invite_text">Reject</string>
 
     <!-- edit user profile -->
-    <string name="toast_profile_edited_successfully">Профиль успешно обновлён</string>
-    <string name="edit_profile_alert_dialog_title">Отменить изменения?</string>
-    <string name="edit_profile_alert_dialog_content">Есть несохраненные изменения вашего профиля. Вы действительно хотите отменить их?</string>
-    <string name="edit_profile_alert_dialog_dismiss_btn">Продолжить редактирование</string>
-    <string name="edit_profile_alert_dialog_confirm_btn">Отмена</string>
+    <string name="toast_profile_edited_successfully">Profile updated successfully</string>
+    <string name="edit_profile_alert_dialog_title">Discard changes?</string>
+    <string name="edit_profile_alert_dialog_content">You have unsaved changes. Do you really want to discard them?</string>
+    <string name="edit_profile_alert_dialog_dismiss_btn">Continue Editing</string>
+    <string name="edit_profile_alert_dialog_confirm_btn">Discard</string>
 
-    <!-- last fm login window -->
-    <string name="music_service_login_form_success">Вы вошли</string>
-    <string name="music_service_login_form_error">Произошла ошибка</string>
+    <!-- last.fm login window -->
+    <string name="music_service_login_form_success">You are logged in</string>
+    <string name="music_service_login_form_error">An error occurred</string>
 
-    <string name="music_service_login_signin_button">Войти в %s</string>
-    <string name="music_service_login_username_placeholder">Логин %s</string>
-    <string name="music_service_login_password_placeholder">Пароль %s</string>
+    <string name="music_service_login_signin_button">Login to %s</string>
+    <string name="music_service_login_username_placeholder">%s Username</string>
+    <string name="music_service_login_password_placeholder">%s Password</string>
 
-    <string name="last_fm_follow_profile">Перейти к профилю</string>
-    <string name="last_fm_scrobble_artist_count">Артисты</string>
-    <string name="last_fm_scrobble_track_count">Скробблы</string>
+    <string name="last_fm_follow_profile">Go to Profile</string>
+    <string name="last_fm_scrobble_artist_count">Artists</string>
+    <string name="last_fm_scrobble_track_count">Scrobbles</string>
 
-    <string name="notification_channel_messenger_name">Мессенджер</string>
+    <string name="notification_channel_messenger_name">Messenger</string>
 
-    <!-- Messenger notification actions-->
-    <string name="notification_messenger_action_reply_label">Ваше сообщение…</string>
-    <string name="notification_messenger_action_read_message_title">Пометить как прочитанное</string>
-    <string name="notification_messenger_action_reply_title">Ответить</string>
+    <!-- Messenger notification actions -->
+    <string name="notification_messenger_action_reply_label">Your message…</string>
+    <string name="notification_messenger_action_read_message_title">Mark as Read</string>
+    <string name="notification_messenger_action_reply_title">Reply</string>
 </resources>

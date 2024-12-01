@@ -110,19 +110,29 @@ class MainActivity : ComponentActivity() {
 	override fun onStart() {
 		super.onStart()
 		bindMessengerService()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		authViewModel.updateUserOnlineStatusDelayed(true)
 		registerReceivers()
+	}
+
+	override fun onPause() {
+		super.onPause()
+		unregisterReceivers()
 	}
 
 	override fun onStop() {
 		super.onStop()
-		unbindMessengerService()
-		unregisterReceivers()
+		authViewModel.updateUserOnlineStatusDelayed(false, Constants.SET_OFFLINE_DELAY_ON_STOP)
 	}
 
 	override fun onDestroy() {
 		super.onDestroy()
 		Log.d("MainActivity", "onDestroy: user has closed the app")
 
+		unbindMessengerService()
 		uiStateDispatcher.clearState()
 		stopAndroidService(MessengerAndroidService::class.java)
 		authViewModel.updateUserOnlineStatusDelayed(false, Constants.SET_OFFLINE_DELAY_ON_DESTROY)
