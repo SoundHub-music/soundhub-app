@@ -1,7 +1,7 @@
 package com.soundhub.utils.mappers
 
 import com.soundhub.data.api.requests.SendMessageRequest
-import com.soundhub.data.model.Chat
+import com.soundhub.domain.model.Chat
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named

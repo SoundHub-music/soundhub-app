@@ -1,8 +1,8 @@
 package com.soundhub.domain.usecases.user
 
 import android.util.Log
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.MusicRepository
 import javax.inject.Inject
 

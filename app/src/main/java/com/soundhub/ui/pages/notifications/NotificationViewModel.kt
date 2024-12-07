@@ -6,9 +6,9 @@ import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.Invite
-import com.soundhub.data.model.User
 import com.soundhub.data.states.NotificationUiState
+import com.soundhub.domain.model.Invite
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.InviteRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher

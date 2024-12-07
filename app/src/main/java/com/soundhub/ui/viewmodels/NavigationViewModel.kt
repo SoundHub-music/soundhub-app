@@ -10,7 +10,7 @@ import com.soundhub.Route
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull

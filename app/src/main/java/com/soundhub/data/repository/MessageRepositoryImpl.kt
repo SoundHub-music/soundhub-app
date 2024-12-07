@@ -8,7 +8,7 @@ import com.soundhub.data.api.responses.internal.PageableMessagesResponse
 import com.soundhub.data.api.responses.internal.PagedMessageOrderType
 import com.soundhub.data.api.responses.internal.UnreadMessagesResponse
 import com.soundhub.data.api.services.MessageService
-import com.soundhub.data.model.Message
+import com.soundhub.domain.model.Message
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MessageRepository
 import retrofit2.Response

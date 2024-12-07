@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.utils.lib.UserUtils
 
@@ -40,12 +40,12 @@ internal fun InterlocutorFullNameWithOnlineIndicator(
 
 	val friendName: String = "${interlocutor?.firstName} ${interlocutor?.lastName}".trim()
 
-	var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.isOnline ?: false) }
+	var isOnline: Boolean by rememberSaveable { mutableStateOf(interlocutor?.online == true) }
 	var onlineIndicator: Int by rememberSaveable { mutableIntStateOf(R.drawable.offline_indicator) }
 	var onlineIndicatorText: String by rememberSaveable { mutableStateOf("") }
 
 	LaunchedEffect(interlocutor) {
-		isOnline = interlocutor?.isOnline ?: false
+		isOnline = interlocutor?.online == true
 		UserUtils.updateOnlineStatusIndicator(
 			context = context,
 			user = interlocutor

@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
+import com.soundhub.domain.model.User
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase

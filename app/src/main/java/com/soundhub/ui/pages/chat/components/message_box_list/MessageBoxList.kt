@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.Message
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.Message
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.ui.pages.chat.components.message_box.MessageBox
 import com.soundhub.ui.shared.buttons.ScrollToBottomButton

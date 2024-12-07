@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import com.soundhub.R
-import com.soundhub.data.model.Message
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Message
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 

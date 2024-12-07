@@ -3,7 +3,7 @@ package com.soundhub.data.api.services
 import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.requests.CreateGroupChatRequestBody
 import com.soundhub.data.api.responses.internal.ApiStateResponse
-import com.soundhub.data.model.Chat
+import com.soundhub.domain.model.Chat
 import com.soundhub.utils.constants.ApiEndpoints.Chats.ADD_USER_TO_GROUP
 import com.soundhub.utils.constants.ApiEndpoints.Chats.CHAT_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Chats.CHAT_NAME_DYNAMIC_PARAM

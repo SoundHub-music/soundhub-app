@@ -3,7 +3,7 @@ package com.soundhub.data.api.services
 import com.soundhub.data.api.requests.CompatibleUsersRequestBody
 import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.api.responses.internal.UserExistenceResponse
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.utils.constants.ApiEndpoints.Users.ADD_FRIEND
 import com.soundhub.utils.constants.ApiEndpoints.Users.CHECK_USER_EXISTENCE
 import com.soundhub.utils.constants.ApiEndpoints.Users.COMPATIBLE_USERS
@@ -15,7 +15,7 @@ import com.soundhub.utils.constants.ApiEndpoints.Users.GET_RECOMMENDED_FRIENDS
 import com.soundhub.utils.constants.ApiEndpoints.Users.GET_USER_BY_ID
 import com.soundhub.utils.constants.ApiEndpoints.Users.SEARCH_PARAM_NAME
 import com.soundhub.utils.constants.ApiEndpoints.Users.SEARCH_USER
-import com.soundhub.utils.constants.ApiEndpoints.Users.TOGGLE_ONLINE
+import com.soundhub.utils.constants.ApiEndpoints.Users.UPDATE_ONLINE
 import com.soundhub.utils.constants.ApiEndpoints.Users.UPDATE_USER
 import com.soundhub.utils.constants.ApiEndpoints.Users.USER_EMAIL_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Users.USER_ID_DYNAMIC_PARAM
@@ -91,6 +91,9 @@ interface UserService {
 		name: String
 	): Response<List<User>>
 
-	@PUT(TOGGLE_ONLINE)
-	suspend fun toggleUserOnline(): Response<User?>
+	@PUT(UPDATE_ONLINE)
+	suspend fun updateUserOnline(
+		@Query("value")
+		value: Boolean
+	): Response<User>
 }

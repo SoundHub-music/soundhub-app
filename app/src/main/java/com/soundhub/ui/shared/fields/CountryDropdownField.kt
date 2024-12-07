@@ -19,8 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.soundhub.R
-import com.soundhub.data.model.Country
 import com.soundhub.data.states.interfaces.IUserDataFormState
+import com.soundhub.domain.model.Country
 import com.soundhub.ui.shared.forms.UserDataFormViewModel
 import java.util.Locale
 

@@ -25,8 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.containers.FetchStatusContainer
 import com.soundhub.ui.shared.post_card.PostCard

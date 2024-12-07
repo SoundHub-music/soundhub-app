@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch

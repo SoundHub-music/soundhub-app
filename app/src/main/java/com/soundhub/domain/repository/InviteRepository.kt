@@ -1,7 +1,7 @@
 package com.soundhub.domain.repository
 
 import com.soundhub.data.api.responses.internal.HttpResult
-import com.soundhub.data.model.Invite
+import com.soundhub.domain.model.Invite
 import java.util.UUID
 
 interface InviteRepository {

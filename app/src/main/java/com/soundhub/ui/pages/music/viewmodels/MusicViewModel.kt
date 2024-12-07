@@ -10,10 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
-import com.soundhub.data.model.LibraryItemData
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
+import com.soundhub.domain.model.LibraryItemData
+import com.soundhub.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

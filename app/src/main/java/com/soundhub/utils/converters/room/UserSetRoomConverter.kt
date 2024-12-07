@@ -4,7 +4,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.utils.converters.json.LocalDateAdapter
 import com.soundhub.utils.converters.json.LocalDateTimeAdapter
 import java.lang.reflect.Type

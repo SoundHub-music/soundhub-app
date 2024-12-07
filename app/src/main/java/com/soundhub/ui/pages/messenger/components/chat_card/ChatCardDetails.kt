@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 

@@ -1,7 +1,7 @@
 package com.soundhub.utils.converters.room
 
 import androidx.room.TypeConverter
-import com.soundhub.data.model.CountryName
+import com.soundhub.domain.model.CountryName
 
 class CountryNameRoomConverter {
 	@TypeConverter

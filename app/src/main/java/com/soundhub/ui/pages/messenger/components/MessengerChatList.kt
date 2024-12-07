@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.Message
-import com.soundhub.data.model.User
 import com.soundhub.data.states.MessengerUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.Message
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.messenger.EmptyMessengerScreen
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.pages.messenger.components.chat_card.ChatCard

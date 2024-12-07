@@ -1,7 +1,7 @@
 package com.soundhub.data.states
 
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Genre
+import com.soundhub.domain.model.Genre
 
 data class GenreUiState(
 	val status: ApiStatus = ApiStatus.LOADING,

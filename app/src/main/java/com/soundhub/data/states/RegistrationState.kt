@@ -1,9 +1,9 @@
 package com.soundhub.data.states
 
 import com.soundhub.data.enums.Gender
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
 import com.soundhub.data.states.interfaces.IUserDataFormState
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
 import java.time.LocalDate
 import java.util.UUID
 

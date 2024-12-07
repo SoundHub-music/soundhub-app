@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.User
 import com.soundhub.data.states.FriendsUiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.friends.FriendsViewModel
 import com.soundhub.ui.pages.friends.components.UserFriendsContainer
 import com.soundhub.ui.pages.friends.enums.FriendListPage

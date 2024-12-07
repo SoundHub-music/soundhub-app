@@ -1,6 +1,6 @@
 package com.soundhub.domain.usecases.user
 
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.UserRepository
 import java.util.UUID
 import javax.inject.Inject

@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Genre
 import com.soundhub.data.states.GenreUiState
+import com.soundhub.domain.model.Genre
 import com.soundhub.ui.shared.buttons.FloatingNextButton
 import com.soundhub.ui.shared.layouts.music_preferences.components.MusicItemPlate
 import com.soundhub.ui.shared.loaders.CircleLoader

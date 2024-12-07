@@ -3,7 +3,7 @@ package com.soundhub.domain.repository
 import com.soundhub.data.api.requests.CreateChatRequestBody
 import com.soundhub.data.api.responses.internal.ApiStateResponse
 import com.soundhub.data.api.responses.internal.HttpResult
-import com.soundhub.data.model.Chat
+import com.soundhub.domain.model.Chat
 import java.util.UUID
 
 interface ChatRepository {

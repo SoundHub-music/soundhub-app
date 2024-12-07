@@ -2,7 +2,7 @@ package com.soundhub.ui.pages.music.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.LastFmUser
+import com.soundhub.domain.model.LastFmUser
 import com.soundhub.ui.pages.music.enums.ChosenMusicService
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel

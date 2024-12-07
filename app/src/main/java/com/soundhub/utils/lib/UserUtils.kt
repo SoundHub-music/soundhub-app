@@ -2,7 +2,7 @@ package com.soundhub.utils.lib
 
 import android.content.Context
 import com.soundhub.R
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.math.abs
@@ -20,7 +20,7 @@ class UserUtils {
 			user: User?,
 			updateCallback: (icon: Int, color: Int, text: String) -> Unit
 		) {
-			val isOnline: Boolean = user?.isOnline ?: false
+			val isOnline: Boolean = user?.online == true
 			val maxOnlineStatusMinutes = 5
 			val minuteDifference: Long = user?.lastOnline?.let {
 				abs(Duration.between(LocalDateTime.now(), user.lastOnline).toMinutes())

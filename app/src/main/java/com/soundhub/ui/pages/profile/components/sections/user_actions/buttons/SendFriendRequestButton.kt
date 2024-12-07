@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.soundhub.data.model
+package com.soundhub.domain.model
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -47,7 +47,7 @@ data class User(
 	override var description: String? = "",
 	override var languages: MutableList<String> = mutableListOf(),
 
-	var isOnline: Boolean = false,
+	var online: Boolean = false,
 	var lastOnline: LocalDateTime? = null,
 	var friends: List<User> = emptyList(),
 

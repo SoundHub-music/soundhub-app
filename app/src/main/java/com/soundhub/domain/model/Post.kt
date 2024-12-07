@@ -3,8 +3,6 @@ package com.soundhub.domain.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.soundhub.data.model.ContentEntity
-import com.soundhub.data.model.User
 import com.soundhub.utils.converters.room.LocalDateTimeRoomConverter
 import com.soundhub.utils.converters.room.StringListRoomConverter
 import com.soundhub.utils.converters.room.UserRoomConverter

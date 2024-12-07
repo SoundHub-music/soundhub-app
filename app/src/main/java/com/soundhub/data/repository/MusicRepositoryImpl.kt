@@ -12,8 +12,8 @@ import com.soundhub.data.api.services.GenreService
 import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.Track
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MusicRepository

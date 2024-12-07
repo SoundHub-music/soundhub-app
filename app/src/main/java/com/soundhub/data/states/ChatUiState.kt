@@ -2,9 +2,9 @@ package com.soundhub.data.states
 
 import com.soundhub.data.api.responses.internal.PageableMessagesResponse
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.Message
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.Message
+import com.soundhub.domain.model.User
 
 data class ChatUiState(
 	var chat: Chat? = null,

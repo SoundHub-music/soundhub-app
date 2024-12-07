@@ -1,4 +1,4 @@
-package com.soundhub.data.model
+package com.soundhub.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

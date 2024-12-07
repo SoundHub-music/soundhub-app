@@ -2,9 +2,9 @@ package com.soundhub.data.states
 
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Invite
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Invite
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 
 data class ProfileUiState(
 	val profileOwner: User? = null,

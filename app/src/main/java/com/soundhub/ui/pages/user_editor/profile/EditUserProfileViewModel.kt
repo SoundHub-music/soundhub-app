@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.data.enums.Gender
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UserFormState
 import com.soundhub.data.states.interfaces.IUserDataFormState
+import com.soundhub.domain.model.User
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.shared.forms.FormHandler

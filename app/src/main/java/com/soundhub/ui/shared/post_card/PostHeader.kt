@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.Route
-import com.soundhub.data.model.User
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.ui.shared.avatar.CircularAvatar
 import com.soundhub.ui.shared.menu.PostDropdownMenu
 import com.soundhub.utils.lib.DateFormatter

@@ -28,8 +28,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.soundhub.Route
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.merge

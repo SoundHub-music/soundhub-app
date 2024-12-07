@@ -20,8 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soundhub.R
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.pages.profile.components.SectionLabel
 

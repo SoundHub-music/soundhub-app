@@ -2,9 +2,9 @@ package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Artist
 import com.soundhub.data.states.ArtistUiState
 import com.soundhub.data.states.GenreUiState
+import com.soundhub.domain.model.Artist
 import com.soundhub.domain.repository.MusicRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

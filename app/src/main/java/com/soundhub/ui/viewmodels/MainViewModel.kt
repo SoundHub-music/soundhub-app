@@ -9,7 +9,7 @@ import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.datastore.model.UserSettings
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

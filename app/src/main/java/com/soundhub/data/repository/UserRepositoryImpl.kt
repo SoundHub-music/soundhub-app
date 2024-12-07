@@ -11,7 +11,7 @@ import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.api.services.UserService
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
@@ -186,12 +186,12 @@ class UserRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun toggleUserOnline(): HttpResult<User?> {
+	override suspend fun updateUserOnline(online: Boolean): HttpResult<User> {
 		try {
-			val response: Response<User?> = userService.toggleUserOnline()
-			Log.d("UserRepository", "toggleUserOnline[1]: $response")
+			val response: Response<User> = userService.updateUserOnline(online)
+			Log.d("UserRepository", "updateUserOnline[1]: $response")
 
-			return handleResponse<User?>(response) {
+			return handleResponse<User>(response) {
 				val user = response.body()
 				user?.let { loadAllUserDataUseCase(user) }
 
@@ -199,7 +199,7 @@ class UserRepositoryImpl @Inject constructor(
 			}
 
 		} catch (e: Exception) {
-			Log.e("UserRepository", "toggleUserOnline[2]: ${e.stackTraceToString()}")
+			Log.e("UserRepository", "updateUserOnline[2]: ${e.stackTraceToString()}")
 			return handleException(e)
 		}
 	}

@@ -11,9 +11,9 @@ import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.Gender
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
 import com.soundhub.data.states.RegistrationState
 import com.soundhub.data.states.interfaces.IUserDataFormState
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase

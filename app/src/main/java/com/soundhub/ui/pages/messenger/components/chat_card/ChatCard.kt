@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import com.soundhub.data.model.Chat
+import com.soundhub.domain.model.Chat
 import com.soundhub.ui.pages.messenger.MessengerViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 

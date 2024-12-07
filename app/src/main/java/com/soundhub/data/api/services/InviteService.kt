@@ -1,6 +1,6 @@
 package com.soundhub.data.api.services
 
-import com.soundhub.data.model.Invite
+import com.soundhub.domain.model.Invite
 import com.soundhub.utils.constants.ApiEndpoints.Invites.ACCEPT_INVITE
 import com.soundhub.utils.constants.ApiEndpoints.Invites.CREATE_INVITE
 import com.soundhub.utils.constants.ApiEndpoints.Invites.DELETE_INVITE

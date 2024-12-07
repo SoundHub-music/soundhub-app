@@ -2,7 +2,7 @@ package com.soundhub.data.states
 
 import com.soundhub.data.api.responses.discogs.DiscogsResponsePagination
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Artist
+import com.soundhub.domain.model.Artist
 
 data class ArtistUiState(
 	val status: ApiStatus = ApiStatus.LOADING,

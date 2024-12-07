@@ -1,8 +1,8 @@
 package com.soundhub.utils.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
-import com.soundhub.data.model.Artist
 import com.soundhub.data.states.RegistrationState
+import com.soundhub.domain.model.Artist
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named

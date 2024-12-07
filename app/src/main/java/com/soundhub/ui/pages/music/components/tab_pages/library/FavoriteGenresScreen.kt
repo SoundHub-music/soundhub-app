@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.soundhub.data.model.Genre
+import com.soundhub.domain.model.Genre
 import com.soundhub.ui.pages.music.components.layout.MusicGridLayout
 import com.soundhub.ui.pages.music.viewmodels.MusicViewModel
 

@@ -2,10 +2,10 @@ package com.soundhub.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SendMessageRequest
-import com.soundhub.data.model.User
 import com.soundhub.data.states.PostEditorState
 import com.soundhub.data.states.UserFormState
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.utils.mappers.MessageMapper
 import com.soundhub.utils.mappers.PostMapper
 import com.soundhub.utils.mappers.RegisterDataMapper

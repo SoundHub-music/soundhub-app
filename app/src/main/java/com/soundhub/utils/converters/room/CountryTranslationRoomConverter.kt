@@ -3,7 +3,7 @@ package com.soundhub.utils.converters.room
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.soundhub.data.model.CountryTranslation
+import com.soundhub.domain.model.CountryTranslation
 import java.lang.reflect.Type
 
 class CountryTranslationRoomConverter {

@@ -1,4 +1,4 @@
-package com.soundhub.data.model
+package com.soundhub.domain.model
 
 import androidx.compose.ui.graphics.painter.Painter
 

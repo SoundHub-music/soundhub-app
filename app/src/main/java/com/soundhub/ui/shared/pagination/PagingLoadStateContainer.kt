@@ -39,6 +39,7 @@ fun PagingLoadStateContainer(
 			unsetLoading()
 			onRefreshError()
 		}
+
 		is LoadState.NotLoading -> {
 			unsetLoading()
 			onRefreshNotLoading()
@@ -50,10 +51,12 @@ fun PagingLoadStateContainer(
 			setLoading()
 			onPrependLoading()
 		}
+
 		is LoadState.Error -> {
 			unsetLoading()
 			onPrependError()
 		}
+
 		is LoadState.NotLoading -> {
 			unsetLoading()
 			onPrependNotLoading()

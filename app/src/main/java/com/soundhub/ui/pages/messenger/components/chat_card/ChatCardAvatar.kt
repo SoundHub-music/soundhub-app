@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.ui.shared.avatar.CircularAvatar
 
 @Composable

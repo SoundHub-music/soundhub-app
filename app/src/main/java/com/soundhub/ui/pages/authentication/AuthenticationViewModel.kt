@@ -9,7 +9,7 @@ import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.ui.events.UiEvent
@@ -17,6 +17,7 @@ import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.AuthValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,7 @@ class AuthenticationViewModel @Inject constructor(
 ) : ViewModel() {
 	private val _authFormState = MutableStateFlow(AuthFormState())
 	val authFormState = _authFormState.asStateFlow()
+	var onlineStatusJob: Job? = null
 
 	private val userCredsFlow: Flow<UserPreferences> = userCredsStore.getCreds()
 
@@ -112,27 +114,48 @@ class AuthenticationViewModel @Inject constructor(
 			}
 	}
 
-	private suspend fun toggleUserOnline() {
-		userRepository.toggleUserOnline()
-			.onSuccessWithContext { response -> uiStateDispatcher.setAuthorizedUser(response.body) }
-			.onFailureWithContext { error ->
+	private fun updateUserOnline(online: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+		userRepository.updateUserOnline(online)
+			.onSuccess { response ->
+				val user: User? = response.body
+
+				Log.d(
+					"AuthenticationViewModel",
+					"updateUserOnline: user online = ${user?.online}"
+				)
+
+				if (user != null) {
+					userDao.saveOrReplaceUser(user)
+					uiStateDispatcher.setAuthorizedUser(user)
+				}
+			}
+			.onFailure { error ->
 				val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
 				uiStateDispatcher.sendUiEvent(errorEvent)
 			}
 	}
 
 	fun updateUserOnlineStatusDelayed(online: Boolean, delayTime: Long = 0) {
+		if (onlineStatusJob != null && onlineStatusJob?.isCompleted == false) {
+			onlineStatusJob?.cancel()
+			onlineStatusJob = null
+		}
+
 		Log.i(
 			"AuthenticationViewModel",
-			"updateUserOnlineStatusDelayed: " +
+			"updateUserOnlineStatusDelayed[1]: " +
 					"user will be ${if (online) "online" else "offline"} in ${delayTime / 1000} seconds"
 		)
 
-		viewModelScope.launch(Dispatchers.IO) {
+		onlineStatusJob = viewModelScope.launch(Dispatchers.IO) {
 			delay(delayTime)
 			userDao.getCurrentUser()?.let { user ->
-				if (online != user.isOnline) {
-					toggleUserOnline()
+				if (online != user.online) {
+					Log.d(
+						"AuthenticationViewModel",
+						"updateUserOnlineStatusDelayed[2]: online status is setting to $online"
+					)
+					updateUserOnline(online)
 				}
 			}
 		}

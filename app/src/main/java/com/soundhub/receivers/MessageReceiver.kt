@@ -10,11 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.Serializable
 
-class MessageReceiver<T: Serializable>(
+class MessageReceiver<T : Serializable>(
 	private var messageHandler: suspend (T) -> Unit = {},
 	private val intentName: String,
 	private val clazz: Class<T>
-): BroadcastReceiver() {
+) : BroadcastReceiver() {
 	val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 	override fun onReceive(context: Context?, intent: Intent?) {

@@ -1,9 +1,9 @@
 package com.soundhub.utils.mappers
 
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.User
 import com.soundhub.data.states.RegistrationState
 import com.soundhub.data.states.UserFormState
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.User
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
@@ -25,7 +25,7 @@ interface UserMapper {
 	@Mapping(target = "firstNameValid", ignore = true)
 	@Mapping(target = "lastNameValid", ignore = true)
 	@Mapping(target = "birthdayValid", ignore = true)
-	@Mapping(target = "user.isOnline", ignore = true)
+	@Mapping(target = "user.online", ignore = true)
 	@Mapping(target = "user.lastOnline", ignore = true)
 	fun toFormState(user: User): UserFormState
 

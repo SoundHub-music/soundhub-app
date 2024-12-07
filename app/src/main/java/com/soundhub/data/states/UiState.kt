@@ -1,6 +1,6 @@
 package com.soundhub.data.states
 
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 
 data class UiState(
 	val isSearchBarActive: Boolean = false,

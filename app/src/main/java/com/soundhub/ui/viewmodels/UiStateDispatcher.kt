@@ -9,9 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.datastore.model.UserSettings
-import com.soundhub.data.model.Message
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Message
+import com.soundhub.domain.model.User
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.utils.enums.AppTheme
 import dagger.hilt.android.lifecycle.HiltViewModel

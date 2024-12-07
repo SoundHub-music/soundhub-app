@@ -3,10 +3,10 @@ package com.soundhub.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
 import com.soundhub.data.states.ArtistUiState
 import com.soundhub.data.states.GenreUiState
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase

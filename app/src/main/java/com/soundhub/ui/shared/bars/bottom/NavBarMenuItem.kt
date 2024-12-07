@@ -14,8 +14,8 @@ data class NavBarMenuItem(
 )
 
 sealed class NavBarIconType {
-	data class VectorIcon(var icon: ImageVector): NavBarIconType()
-	data class PainterIcon(var iconId: Int): NavBarIconType()
+	data class VectorIcon(var icon: ImageVector) : NavBarIconType()
+	data class PainterIcon(var iconId: Int) : NavBarIconType()
 }
 
 @Composable

@@ -1,7 +1,7 @@
 package com.soundhub.data.api.requests
 
 import com.soundhub.data.enums.Gender
-import com.soundhub.data.model.Genre
+import com.soundhub.domain.model.Genre
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -19,6 +19,6 @@ data class RegisterRequestBody(
 	var languages: List<String> = emptyList(),
 	var favoriteGenres: List<Genre> = emptyList(),
 	var favoriteArtistsIds: List<Int> = emptyList(),
-	var isOnline: Boolean = false,
+	var online: Boolean = false,
 	var lastOnline: LocalDateTime? = null
 )

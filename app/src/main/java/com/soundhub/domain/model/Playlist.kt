@@ -1,7 +1,6 @@
 package com.soundhub.domain.model
 
 import com.google.gson.annotations.SerializedName
-import com.soundhub.data.model.User
 import java.io.Serializable
 import java.util.UUID
 

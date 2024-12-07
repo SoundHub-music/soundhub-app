@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.User
 import com.soundhub.data.states.FriendsUiState
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase

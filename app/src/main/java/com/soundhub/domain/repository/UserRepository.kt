@@ -3,7 +3,7 @@ package com.soundhub.domain.repository
 import com.soundhub.data.api.responses.internal.CompatibleUsersResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.UserExistenceResponse
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import java.util.UUID
 
 interface UserRepository {
@@ -21,5 +21,5 @@ interface UserRepository {
 
 	suspend fun getFriendsByUserId(userId: UUID): HttpResult<List<User>>
 	suspend fun searchUserByFullName(name: String): HttpResult<List<User>>
-	suspend fun toggleUserOnline(): HttpResult<User?>
+	suspend fun updateUserOnline(online: Boolean): HttpResult<User>
 }

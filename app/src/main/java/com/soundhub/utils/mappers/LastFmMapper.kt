@@ -1,7 +1,7 @@
 package com.soundhub.utils.mappers
 
 import com.soundhub.data.api.responses.lastfm.LastFmSessionBody
-import com.soundhub.data.model.LastFmUser
+import com.soundhub.domain.model.LastFmUser
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers

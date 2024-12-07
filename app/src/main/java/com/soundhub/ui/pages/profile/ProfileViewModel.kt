@@ -10,11 +10,11 @@ import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.Invite
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.Invite
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.InviteRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase

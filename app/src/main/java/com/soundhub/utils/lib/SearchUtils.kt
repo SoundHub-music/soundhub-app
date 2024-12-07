@@ -1,6 +1,6 @@
 package com.soundhub.utils.lib
 
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 
 class SearchUtils {
 	companion object {

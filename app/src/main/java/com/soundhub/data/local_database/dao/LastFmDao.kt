@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.soundhub.data.model.LastFmUser
+import com.soundhub.domain.model.LastFmUser
 import com.soundhub.utils.constants.Queries
 
 @Dao

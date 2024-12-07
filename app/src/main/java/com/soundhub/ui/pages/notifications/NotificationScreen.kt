@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.data.model.Invite
 import com.soundhub.data.states.NotificationUiState
+import com.soundhub.domain.model.Invite
 import com.soundhub.ui.pages.notifications.components.FriendRequestNotification
 import com.soundhub.ui.shared.containers.ContentContainer
 

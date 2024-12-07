@@ -1,6 +1,6 @@
 [versions]
 androidxCore = "1.15.0"
-gradle = "8.7.2"
+gradle = "8.7.3"
 lifecycle = "2.8.7"
 activity = "1.9.3"
 composeBom = "2024.10.01"

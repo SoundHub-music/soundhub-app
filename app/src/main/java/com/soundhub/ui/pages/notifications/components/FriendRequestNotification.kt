@@ -27,8 +27,8 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.Invite
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Invite
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.notifications.NotificationViewModel
 import com.soundhub.ui.shared.avatar.CircularAvatar
 

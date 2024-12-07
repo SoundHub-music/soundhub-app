@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.CountryService
-import com.soundhub.data.model.Country
+import com.soundhub.domain.model.Country
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.CountryRepository
 import retrofit2.Response

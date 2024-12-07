@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.PageableMessagesResponse
-import com.soundhub.data.model.Message
+import com.soundhub.domain.model.Message
 import com.soundhub.domain.repository.MessageRepository
 import java.util.UUID
 

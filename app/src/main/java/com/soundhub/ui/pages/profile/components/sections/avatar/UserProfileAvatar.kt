@@ -38,9 +38,9 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ProfileUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.profile.ProfileViewModel
 import com.soundhub.ui.shared.avatar.AvatarViewModel
 import com.soundhub.ui.shared.menu.AvatarDropdownMenu

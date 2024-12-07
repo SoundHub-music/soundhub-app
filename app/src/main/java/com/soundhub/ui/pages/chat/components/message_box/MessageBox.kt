@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import com.soundhub.data.model.Message
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.domain.model.Message
 import com.soundhub.ui.pages.chat.ChatViewModel
 
 internal interface MessageParameters {

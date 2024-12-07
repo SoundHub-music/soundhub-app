@@ -22,7 +22,7 @@ sealed class ApiEndpoints {
 		const val GET_RECOMMENDED_FRIENDS = "$USERS_ENDPOINT/recommendedFriends"
 		const val GET_FRIENDS = "$USERS_ENDPOINT/{$USER_ID_DYNAMIC_PARAM}/friends"
 		const val SEARCH_USER = "$USERS_ENDPOINT/search"
-		const val TOGGLE_ONLINE = "$USERS_ENDPOINT/toggleOnline"
+		const val UPDATE_ONLINE = "$USERS_ENDPOINT/user/online"
 		const val COMPATIBLE_USERS = "$USERS_ENDPOINT/compatibleUsers"
 
 		const val SEARCH_PARAM_NAME = "name"

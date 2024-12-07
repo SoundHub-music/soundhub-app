@@ -1,8 +1,8 @@
 package com.soundhub.domain.usecases.post
 
 import com.soundhub.data.api.responses.internal.ErrorResponse
-import com.soundhub.data.model.User
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.PostRepository
 import javax.inject.Inject
 
@@ -17,9 +17,10 @@ class GetPostsByUserUseCase @Inject constructor(
 		postRepository.getPostsByAuthorId(
 			authorId = user.id
 		).onSuccess { response ->
-			posts.addAll(response.body
-				?.sortedByDescending { p -> p.createdAt }
-				.orEmpty()
+			posts.addAll(
+				response.body
+					?.sortedByDescending { p -> p.createdAt }
+					.orEmpty()
 			)
 
 		}

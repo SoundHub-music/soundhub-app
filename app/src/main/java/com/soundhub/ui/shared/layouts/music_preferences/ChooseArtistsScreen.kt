@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.model.Artist
 import com.soundhub.data.states.ArtistUiState
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.Artist
 import com.soundhub.ui.shared.buttons.FloatingNextButton
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.layouts.music_preferences.components.MusicItemPlate

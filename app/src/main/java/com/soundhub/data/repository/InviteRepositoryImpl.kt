@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.InviteService
-import com.soundhub.data.model.Invite
+import com.soundhub.domain.model.Invite
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.InviteRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase

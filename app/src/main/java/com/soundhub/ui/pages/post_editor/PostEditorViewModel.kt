@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.soundhub.R
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.data.model.User
 import com.soundhub.data.states.PostEditorState
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher

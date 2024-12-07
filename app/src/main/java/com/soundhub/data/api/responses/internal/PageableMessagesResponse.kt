@@ -1,6 +1,6 @@
 package com.soundhub.data.api.responses.internal
 
-import com.soundhub.data.model.Message
+import com.soundhub.domain.model.Message
 
 data class PageableMessagesResponse(
 	val content: List<Message> = emptyList(),

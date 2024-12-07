@@ -6,7 +6,7 @@ import com.soundhub.R
 import com.soundhub.data.api.responses.lastfm.LastFmFullUser
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.LastFmDao
-import com.soundhub.data.model.LastFmUser
+import com.soundhub.domain.model.LastFmUser
 import com.soundhub.domain.repository.LastFmRepository
 import com.soundhub.ui.pages.music.enums.ChosenMusicService
 import com.soundhub.utils.mappers.LastFmMapper

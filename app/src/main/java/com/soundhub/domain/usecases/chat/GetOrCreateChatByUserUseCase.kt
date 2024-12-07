@@ -2,8 +2,8 @@ package com.soundhub.domain.usecases.chat
 
 import android.util.Log
 import com.soundhub.data.api.requests.CreateChatRequestBody
-import com.soundhub.data.model.Chat
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.Chat
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.ChatRepository
 import java.util.UUID
 import javax.inject.Inject

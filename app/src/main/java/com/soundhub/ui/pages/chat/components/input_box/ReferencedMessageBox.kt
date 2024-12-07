@@ -25,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.soundhub.data.model.Message
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.domain.model.Message
 import com.soundhub.ui.pages.chat.ChatViewModel
 
 @Composable

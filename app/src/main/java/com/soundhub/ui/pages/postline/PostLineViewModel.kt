@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.model.User
 import com.soundhub.domain.model.Post
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase

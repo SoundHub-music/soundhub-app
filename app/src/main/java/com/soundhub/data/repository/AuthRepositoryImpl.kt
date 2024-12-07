@@ -10,7 +10,7 @@ import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.LogoutResponse
 import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.UserRepository
@@ -70,8 +70,8 @@ class AuthRepositoryImpl @Inject constructor(
 			Log.d("AuthRepository", "logout[1]: $logoutResponse")
 
 			return handleResponse(logoutResponse, beforeReturningActions = {
-				if (authorizedUser?.isOnline == true)
-					userRepository.toggleUserOnline()
+				if (authorizedUser?.online == true)
+					userRepository.updateUserOnline(false)
 			})
 
 		} catch (e: Exception) {

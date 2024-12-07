@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.data.model.User
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.user_editor.components.EditProfileTopBarButton
 import com.soundhub.ui.shared.dialogs.DismissChangesDialog
 import com.soundhub.ui.shared.forms.UserDataForm

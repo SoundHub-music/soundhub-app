@@ -20,7 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.model.Message
+import com.soundhub.domain.model.Message
 import com.soundhub.utils.enums.MediaFolder
 import com.soundhub.utils.lib.HttpUtils
 import kotlinx.coroutines.flow.firstOrNull

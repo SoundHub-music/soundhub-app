@@ -22,8 +22,8 @@ import androidx.navigation.navArgument
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.authentication.AuthenticationScreen
 import com.soundhub.ui.pages.authentication.AuthenticationViewModel
 import com.soundhub.ui.pages.authentication.registration.FillUserDataScreen

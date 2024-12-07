@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.data.model.User
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable

@@ -3,8 +3,8 @@ package com.soundhub.domain.repository
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.enums.DiscogsSortType
-import com.soundhub.data.model.Artist
-import com.soundhub.data.model.Genre
+import com.soundhub.domain.model.Artist
+import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.Track
 
 interface MusicRepository {

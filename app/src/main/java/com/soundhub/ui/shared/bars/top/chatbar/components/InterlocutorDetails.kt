@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.soundhub.Route
-import com.soundhub.data.model.User
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.domain.model.User
 import com.soundhub.ui.pages.chat.ChatViewModel
 import com.soundhub.ui.shared.avatar.CircularAvatar
 
