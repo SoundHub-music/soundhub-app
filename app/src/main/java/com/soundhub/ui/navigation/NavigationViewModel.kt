@@ -62,8 +62,8 @@ class NavigationViewModel @Inject constructor(
 		val isAuthRoute: Boolean = route?.contains(Route.Authentication.route) == true
 
 		val targetRoute: String? = when {
-			!isUserAuthorized -> Route.Authentication.route
-			isAuthRoute -> Route.PostLine.route
+			!(isUserAuthorized || isAuthRoute) -> Route.Authentication.route
+			isUserAuthorized && isAuthRoute -> Route.PostLine.route
 			else -> null
 		}
 
