@@ -23,14 +23,12 @@ import com.soundhub.data.states.UiState
 import com.soundhub.domain.model.Post
 import com.soundhub.domain.model.User
 import com.soundhub.ui.shared.buttons.LikeButton
-import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 
 @Composable
 internal fun PostBottomPanel(
 	post: Post,
-	postViewModel: PostViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 	onLikePost: (UUID) -> Unit
 ) {
@@ -41,7 +39,7 @@ internal fun PostBottomPanel(
 	}
 
 	LaunchedEffect(key1 = post, key2 = authorizedUser) {
-		isFavorite = postViewModel.isPostLiked(authorizedUser, post)
+		isFavorite = post.isPostLikedByUser(authorizedUser, post)
 	}
 
 	Row(
@@ -57,6 +55,7 @@ internal fun PostBottomPanel(
 				fontWeight = FontWeight.Bold,
 				fontFamily = FontFamily(Font(R.font.nunito_bold_italic))
 			)
+
 		LikeButton(isFavorite = isFavorite) {
 			isFavorite = !isFavorite
 

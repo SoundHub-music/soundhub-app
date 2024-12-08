@@ -2,7 +2,6 @@ package com.soundhub.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.soundhub.Route
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.UserSettingsStore
@@ -23,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	private val userDao: UserDao,
-	private val gson: Gson,
 	userSettingsStore: UserSettingsStore,
 	userCredsStore: UserCredsStore,
 ) : ViewModel() {
@@ -44,16 +42,11 @@ class MainViewModel @Inject constructor(
 
 	private suspend fun defineStartDestination(creds: UserPreferences) {
 		val authorizedUser: User? = userDao.getCurrentUser()
-		if (
-			!creds.refreshToken.isNullOrEmpty() &&
-			!creds.accessToken.isNullOrEmpty() &&
-			authorizedUser != null
-		)
+		if (creds.isValid() && authorizedUser != null)
 			_startDestination.update { Route.PostLine.route }
 		else _startDestination.update { Route.Authentication.route }
 	}
 
-	fun getGson(): Gson = gson
 
 	fun setTopBarTitle(value: String?) = _topBarTitle.update {
 		value

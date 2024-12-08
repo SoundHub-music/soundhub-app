@@ -6,6 +6,7 @@ import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.states.UiState
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.User
@@ -13,7 +14,6 @@ import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.BaseMusicPreferencesViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText

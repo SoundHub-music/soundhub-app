@@ -13,6 +13,7 @@ import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -100,12 +101,12 @@ open class BaseMusicPreferencesViewModel(
 		}
 	}
 
-	// TODO: использовать debounce
 	fun onSearchFieldChange(value: String) = viewModelScope.launch {
 		if (value.isEmpty())
 			loadArtists()
 		else {
 			uiStateDispatcher.updateSearchBarText(value)
+			delay(500)
 			searchArtists(value)
 		}
 	}

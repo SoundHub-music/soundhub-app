@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.data.states.UiState
-import com.soundhub.ui.events.UiEvent
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 

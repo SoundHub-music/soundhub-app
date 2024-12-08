@@ -9,10 +9,10 @@ import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.data.local_database.dao.UserDao
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
 import com.soundhub.domain.repository.UserRepository
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.AuthValidator
 import dagger.hilt.android.lifecycle.HiltViewModel

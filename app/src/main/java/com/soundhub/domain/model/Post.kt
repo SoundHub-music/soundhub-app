@@ -26,4 +26,7 @@ data class Post(
 
 	var images: List<String> = emptyList(),
 	var likes: Set<User> = emptySet()
-) : ContentEntity()
+) : ContentEntity() {
+	fun isPostLikedByUser(user: User?, post: Post): Boolean = post.likes
+		.map { it.id }.contains(user?.id)
+}

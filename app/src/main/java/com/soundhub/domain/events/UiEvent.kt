@@ -1,4 +1,4 @@
-package com.soundhub.ui.events
+package com.soundhub.domain.events
 
 import androidx.annotation.StringRes
 import com.soundhub.Route

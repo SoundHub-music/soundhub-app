@@ -30,14 +30,12 @@ import com.soundhub.domain.model.User
 import com.soundhub.ui.shared.containers.ContentContainer
 import com.soundhub.ui.shared.containers.FetchStatusContainer
 import com.soundhub.ui.shared.post_card.PostCard
-import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 
 @Composable
 fun PostLineScreen(
 	modifier: Modifier = Modifier,
 	postLineViewModel: PostLineViewModel = hiltViewModel(),
-	postViewModel: PostViewModel = hiltViewModel(),
 	uiStateDispatcher: UiStateDispatcher,
 	navController: NavHostController,
 ) {
@@ -81,9 +79,8 @@ fun PostLineScreen(
 						navController = navController,
 						post = post,
 						uiStateDispatcher = uiStateDispatcher,
-						postViewModel = postViewModel,
-						onDeletePost = { id -> postLineViewModel.deletePostById(id) },
-						onLikePost = { id -> postLineViewModel.togglePostLikeAndUpdatePostList(id) }
+						onDeletePost = { postLineViewModel::deletePostById },
+						onLikePost = { postLineViewModel::togglePostLikeAndUpdatePostList }
 					)
 				}
 			}

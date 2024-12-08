@@ -11,6 +11,7 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.states.ProfileUiState
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Chat
 import com.soundhub.domain.model.Invite
 import com.soundhub.domain.model.Post
@@ -22,7 +23,6 @@ import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel

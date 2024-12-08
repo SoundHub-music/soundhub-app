@@ -12,13 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.data.states.UiState
 import com.soundhub.domain.model.Post
 import com.soundhub.domain.model.User
 import com.soundhub.ui.theme.borderColor
-import com.soundhub.ui.viewmodels.PostViewModel
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import java.util.UUID
 
@@ -27,7 +25,6 @@ fun PostCard(
 	modifier: Modifier = Modifier,
 	navController: NavHostController,
 	uiStateDispatcher: UiStateDispatcher,
-	postViewModel: PostViewModel = hiltViewModel(),
 	post: Post,
 	onLikePost: (UUID) -> Unit = {},
 	onDeletePost: (UUID) -> Unit = {}
@@ -64,7 +61,6 @@ fun PostCard(
 		authorizedUser?.let {
 			PostBottomPanel(
 				post = post,
-				postViewModel = postViewModel,
 				uiStateDispatcher = uiStateDispatcher,
 				onLikePost = onLikePost
 			)

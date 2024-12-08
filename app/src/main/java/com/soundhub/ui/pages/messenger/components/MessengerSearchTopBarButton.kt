@@ -9,7 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.soundhub.data.datastore.UserSettingsStore
-import com.soundhub.ui.events.UiEvent
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.launch
 

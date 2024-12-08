@@ -1,4 +1,4 @@
-package com.soundhub.receivers
+package com.soundhub.domain.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

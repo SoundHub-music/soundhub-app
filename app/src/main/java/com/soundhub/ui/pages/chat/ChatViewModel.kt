@@ -21,12 +21,12 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.data.sources.MessageSource
 import com.soundhub.data.states.ChatUiState
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Chat
 import com.soundhub.domain.model.Message
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.MessageRepository
-import com.soundhub.ui.events.UiEvent
 import com.soundhub.ui.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET

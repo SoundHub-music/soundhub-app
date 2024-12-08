@@ -1,4 +1,4 @@
-package com.soundhub.services
+package com.soundhub.domain.services
 
 import android.app.PendingIntent
 import android.app.Service
