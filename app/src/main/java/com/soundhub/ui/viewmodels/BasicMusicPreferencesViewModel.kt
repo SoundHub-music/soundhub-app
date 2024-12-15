@@ -1,5 +1,6 @@
 package com.soundhub.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.data.enums.ApiStatus
@@ -12,13 +13,18 @@ import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 open class BaseMusicPreferencesViewModel(
 	private val loadGenresUseCase: LoadGenresUseCase,
 	private val loadArtistsUseCase: LoadArtistsUseCase,
@@ -34,6 +40,24 @@ open class BaseMusicPreferencesViewModel(
 
 	protected var searchJob: Job? = null
 	protected var loadArtistsJob: Job? = null
+
+	init {
+		viewModelScope.launch {
+			val debouncedSearchBarText: Flow<String> =
+				uiStateDispatcher.uiState
+					.map { it.searchBarText }
+					.debounce(500)
+					.distinctUntilChanged()
+
+			debouncedSearchBarText.collect { query ->
+				if (query.isEmpty()) {
+					loadArtists()
+				} else {
+					searchArtists(query)
+				}
+			}
+		}
+	}
 
 	open fun loadGenres() = viewModelScope.launch(Dispatchers.IO) {
 		loadGenresUseCase(genreUiState = _genreUiState)
@@ -55,18 +79,22 @@ open class BaseMusicPreferencesViewModel(
 	}
 
 	private fun searchArtists(value: String) {
-		searchJob?.cancel()
-		searchJob = viewModelScope.launch(Dispatchers.IO) {
-			searchArtistsUseCase(searchString = value)
-				.onSuccess { response ->
-					_artistUiState.update {
-						it.copy(
-							status = ApiStatus.SUCCESS,
-							artists = response
-						)
+		try {
+			searchJob?.cancel()
+			searchJob = viewModelScope.launch(Dispatchers.IO) {
+				searchArtistsUseCase(searchString = value)
+					.onSuccess { response ->
+						_artistUiState.update {
+							it.copy(
+								status = ApiStatus.SUCCESS,
+								artists = response
+							)
+						}
 					}
-				}
-				.onFailure { _artistUiState.update { it.copy(status = ApiStatus.ERROR) } }
+					.onFailure { _artistUiState.update { it.copy(status = ApiStatus.ERROR) } }
+			}
+		} catch (exception: Exception) {
+			Log.e("BasicMusicPreferencesViewModel", "searchArtists: ${exception.localizedMessage}")
 		}
 	}
 
@@ -94,21 +122,17 @@ open class BaseMusicPreferencesViewModel(
 	}
 
 	fun onGenreItemClick(isChosen: Boolean, genre: Genre) = viewModelScope.launch {
-		if (isChosen) addChosenGenre(genre)
-		else {
-			val filteredChosenGenres = _genreUiState.value.chosenGenres.filter { it.id != genre.id }
-			setChosenGenres(filteredChosenGenres)
+		if (isChosen) {
+			addChosenGenre(genre)
+			return@launch
 		}
+
+		val filteredChosenGenres = _genreUiState.value.chosenGenres.filter { it.id != genre.id }
+		setChosenGenres(filteredChosenGenres)
 	}
 
 	fun onSearchFieldChange(value: String) = viewModelScope.launch {
-		if (value.isEmpty())
-			loadArtists()
-		else {
-			uiStateDispatcher.updateSearchBarText(value)
-			delay(500)
-			searchArtists(value)
-		}
+		uiStateDispatcher.updateSearchBarText(value)
 	}
 
 	private fun setChosenGenres(genres: List<Genre>) = _genreUiState.update {
