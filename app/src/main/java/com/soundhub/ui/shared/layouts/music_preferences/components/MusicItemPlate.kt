@@ -1,11 +1,11 @@
 package com.soundhub.ui.shared.layouts.music_preferences.components
 
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +17,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -26,10 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
+import coil.compose.AsyncImage
 import com.soundhub.R
 
 @Composable
@@ -44,18 +42,20 @@ fun MusicItemPlate(
 	height: Dp = 72.dp
 ) {
 	val tertiaryColor = MaterialTheme.colorScheme.tertiary
-	var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
-	var itemBoxModifier: Modifier = Modifier
-		.width(width)
-		.height(height)
+	val placeholder: Painter = painterResource(id = R.drawable.musical_note)
 
-	if (isItemChosen && clickable)
-		itemBoxModifier = itemBoxModifier
-			.border(
-				width = 8.dp,
-				color = tertiaryColor,
-				shape = RoundedCornerShape(16.dp)
-			)
+	var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
+
+	val borderWidth by animateDpAsState(
+		targetValue = if (isItemChosen) 4.dp else 0.dp,
+		animationSpec = tween(durationMillis = 300), label = "b.width"
+	)
+
+	val borderColor by animateColorAsState(
+		targetValue = if (isItemChosen) tertiaryColor else Color.Transparent,
+		animationSpec = tween(durationMillis = 300), label = "b.color"
+	)
+
 
 	Column(
 		modifier = modifier,
@@ -63,7 +63,14 @@ fun MusicItemPlate(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		ElevatedCard(
-			modifier = itemBoxModifier,
+			modifier = Modifier
+				.width(width)
+				.height(height)
+				.border(
+					width = borderWidth,
+					color = borderColor,
+					shape = RoundedCornerShape(16.dp)
+				),
 			shape = RoundedCornerShape(16.dp),
 			onClick = {
 				if (clickable) {
@@ -72,30 +79,15 @@ fun MusicItemPlate(
 				}
 			}
 		) {
-			SubcomposeAsyncImage(
-				model = ImageRequest.Builder(LocalContext.current)
-					.addHeader("mode", "no-cors")
-					.data(thumbnailUrl)
-					.crossfade(true)
-					.build(),
-				contentDescription = caption,
+			AsyncImage(
+				model = thumbnailUrl,
 				contentScale = ContentScale.Crop,
-			) {
-				val state = painter.state
-				if (state is AsyncImagePainter.State.Error || state is AsyncImagePainter.State.Loading)
-					SubcomposeAsyncImageContent(
-						modifier = Modifier.fillMaxSize(),
-						contentScale = ContentScale.Crop,
-						painter = painterResource(id = R.drawable.musical_note)
-					)
-			}
-//            GlideImage(
-//                model = HttpUtils.prepareGlideUrlDiscogs(thumbnailUrl) ?: "kkk",
-//                failure = placeholder(painterResource(id = R.drawable.musical_note)),
-//                contentScale = ContentScale.Crop,
-//                contentDescription = thumbnailUrl,
-//                modifier = Modifier.fillMaxSize()
-//            )
+				modifier = Modifier.fillMaxSize(),
+				contentDescription = null,
+				placeholder = placeholder,
+				fallback = placeholder,
+				error = placeholder
+			)
 		}
 		Text(
 			text = caption,
