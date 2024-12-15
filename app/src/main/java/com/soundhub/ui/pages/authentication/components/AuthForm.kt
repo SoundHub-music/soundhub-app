@@ -3,6 +3,7 @@ package com.soundhub.ui.pages.authentication.components
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -73,6 +74,7 @@ fun AuthForm(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
+			.animateContentSize()
 			.padding(start = 30.dp, end = 30.dp, bottom = 20.dp),
 		verticalArrangement = Arrangement.spacedBy(5.dp)
 	) {
