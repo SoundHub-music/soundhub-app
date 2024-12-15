@@ -43,6 +43,10 @@ class EditMusicPreferencesViewModel @Inject constructor(
 ) {
 	private val uiState: Flow<UiState> = uiStateDispatcher.uiState
 
+	init {
+		loadArtists()
+	}
+
 	override fun onCleared() {
 		super.onCleared()
 		_artistUiState.update { it.copy(artists = emptyList()) }
@@ -91,6 +95,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
 		if (_genreUiState.value.chosenGenres.isEmpty()) {
 			val toastMessage =
 				UiEvent.ShowToast(UiText.StringResource(R.string.choose_genres_warning))
+
 			uiStateDispatcher.sendUiEvent(toastMessage)
 			return@launch
 		}

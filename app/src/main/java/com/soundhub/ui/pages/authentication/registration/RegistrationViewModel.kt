@@ -72,6 +72,10 @@ class RegistrationViewModel @Inject constructor(
 		onCityChange = ::setCity,
 	)
 
+	init {
+		loadGenres()
+	}
+
 	override fun onCleared() {
 		super.onCleared()
 		Log.d("PostRegistrationViewModel", "viewmodel was cleared")
@@ -89,6 +93,14 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 	override fun onChooseGenresNextButtonClick() = viewModelScope.launch(Dispatchers.Main) {
+		if (_genreUiState.value.chosenGenres.isEmpty()) {
+			val toastEvent =
+				UiEvent.ShowToast(UiText.StringResource(R.string.choose_artist_warning))
+
+			uiStateDispatcher.sendUiEvent(toastEvent)
+			return@launch
+		}
+
 		_registerState.update {
 			it.copy(favoriteGenres = _genreUiState.value.chosenGenres)
 		}
@@ -113,8 +125,12 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 	private fun handleFillUserData() = viewModelScope.launch(Dispatchers.Main) {
-		loadArtistsJob?.cancel()
-		searchJob?.cancel()
+		try {
+			loadArtistsJob?.cancel()
+			searchJob?.cancel()
+		} catch (e: Exception) {
+			Log.e("RegistrationViewModel", "handleFillUserData: ${e.localizedMessage}")
+		}
 
 		_registerState.update {
 			it.copy(

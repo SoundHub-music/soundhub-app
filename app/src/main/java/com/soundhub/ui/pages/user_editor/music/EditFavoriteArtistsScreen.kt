@@ -20,7 +20,6 @@ fun EditFavoriteArtistsScreen(
 	val lazyGridState = rememberLazyGridState()
 
 	LaunchedEffect(key1 = artistUiState) {
-//        Log.d("EditFavoriteArtistsScreen", "artist state: $artistUiState")
 		Log.d("EditFavoriteArtistsScreen", "chosen artists: ${artistUiState.chosenArtists}")
 	}
 
@@ -28,10 +27,6 @@ fun EditFavoriteArtistsScreen(
 		if (!lazyGridState.canScrollForward) {
 			editMusicPrefViewModel.loadArtists(artistUiState.pagination?.urls?.next)
 		}
-	}
-
-	LaunchedEffect(key1 = true) {
-		editMusicPrefViewModel.loadArtists()
 	}
 
 	ChooseArtistsScreen(

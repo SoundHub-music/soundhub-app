@@ -18,14 +18,6 @@ fun PostRegisterChooseGenresScreen(registrationViewModel: RegistrationViewModel)
 		Log.d("PostRegisterChooseGenresScreen", "chosen genres: ${genreUiState.chosenGenres}")
 	}
 
-	LaunchedEffect(key1 = genreUiState) {
-		Log.d("PostRegisterChooseGenresScreen", "ui state: $genreUiState")
-	}
-
-	LaunchedEffect(key1 = true) {
-		registrationViewModel.loadGenres()
-	}
-
 	ChooseGenresScreen(
 		genreUiState = genreUiState,
 		onItemPlateClick = registrationViewModel::onGenreItemClick,

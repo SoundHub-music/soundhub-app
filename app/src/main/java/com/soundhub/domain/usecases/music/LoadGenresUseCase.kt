@@ -1,5 +1,6 @@
 package com.soundhub.domain.usecases.music
 
+import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.states.GenreUiState
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.repository.MusicRepository
@@ -21,7 +22,7 @@ class LoadGenresUseCase @Inject constructor(
 			.onSuccess { response ->
 				genreUiState.update {
 					it.copy(
-						status = response.status,
+						status = ApiStatus.SUCCESS,
 						genres = response.body.orEmpty()
 					)
 				}
