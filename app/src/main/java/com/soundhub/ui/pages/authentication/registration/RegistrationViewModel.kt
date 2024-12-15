@@ -131,32 +131,33 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 
-	fun onSignUpButtonClick(authForm: AuthFormState) = viewModelScope.launch(Dispatchers.Main) {
+	fun onSignUpButtonClick(authForm: AuthFormState) = viewModelScope.launch {
 		Log.d("PostRegistrationViewModel", "authForm: $authForm")
+		var uiEvent: UiEvent = UiEvent.Navigate(Authentication.ChooseGenres)
+
 		userRepository.checkUserExistenceByEmail(authForm.email).onSuccess { response ->
 			val isUserExists = response.body?.isUserExists == true
-			var uiEvent: UiEvent = if (isUserExists) {
-				val message = UiText.StringResource(
-					R.string.toast_user_with_such_email_already_exists
-				)
 
+			if (!isUserExists) {
 				_registerState.update {
 					it.copy(
 						email = authForm.email,
 						password = authForm.password
 					)
 				}
+			} else {
+				val message = UiText.StringResource(
+					R.string.toast_user_with_such_email_already_exists
+				)
 
-				UiEvent.ShowToast(message)
-			} else UiEvent.Navigate(Authentication.ChooseGenres)
+				uiEvent = UiEvent.ShowToast(message)
+			}
 
-			uiStateDispatcher.sendUiEvent(uiEvent)
 		}.onFailure {
 			val message = UiText.StringResource(R.string.toast_registration_error)
-			val uiEvent: UiEvent = UiEvent.ShowToast(message)
-
-			uiStateDispatcher.sendUiEvent(uiEvent)
+			uiEvent = UiEvent.ShowToast(message)
 		}
+			.finally { uiStateDispatcher.sendUiEvent(uiEvent) }
 	}
 
 
