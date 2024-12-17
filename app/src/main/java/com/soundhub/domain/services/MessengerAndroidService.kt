@@ -22,8 +22,8 @@ import com.soundhub.domain.model.Message
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.MessageRepository
-import com.soundhub.ui.activities.MainActivity
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.presentation.activities.MainActivity
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.NotificationHelper
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC

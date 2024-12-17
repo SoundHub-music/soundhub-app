@@ -7,7 +7,7 @@ import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.domain.events.UiEvent
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants.UNAUTHORIZED_USER_ERROR_CODE
 import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER

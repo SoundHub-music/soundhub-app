@@ -2,15 +2,15 @@ package com.soundhub.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SendMessageRequest
-import com.soundhub.data.enums.Gender
-import com.soundhub.data.states.PostEditorState
-import com.soundhub.data.states.RegistrationState
-import com.soundhub.data.states.UserFormState
+import com.soundhub.domain.enums.Gender
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Chat
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.Post
 import com.soundhub.domain.model.User
+import com.soundhub.domain.states.PostEditorState
+import com.soundhub.domain.states.RegistrationState
+import com.soundhub.domain.states.UserFormState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID

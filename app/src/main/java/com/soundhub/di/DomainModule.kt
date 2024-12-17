@@ -17,7 +17,7 @@ import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

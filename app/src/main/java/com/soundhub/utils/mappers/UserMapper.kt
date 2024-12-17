@@ -1,9 +1,9 @@
 package com.soundhub.utils.mappers
 
-import com.soundhub.data.states.RegistrationState
-import com.soundhub.data.states.UserFormState
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.User
+import com.soundhub.domain.states.RegistrationState
+import com.soundhub.domain.states.UserFormState
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget

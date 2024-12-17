@@ -1,7 +1,7 @@
 package com.soundhub.di
 
 import com.soundhub.data.datastore.UserSettingsStore
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

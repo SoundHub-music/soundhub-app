@@ -1,10 +1,10 @@
 package com.soundhub.domain.usecases.music
 
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.states.GenreUiState
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.repository.MusicRepository
-import com.soundhub.ui.viewmodels.UiStateDispatcher
+import com.soundhub.domain.states.GenreUiState
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.lib.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

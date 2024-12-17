@@ -1,6 +1,6 @@
 package com.soundhub.data.model.interfaces
 
-import com.soundhub.data.enums.Gender
+import com.soundhub.domain.enums.Gender
 import java.io.Serializable
 import java.time.LocalDate
 

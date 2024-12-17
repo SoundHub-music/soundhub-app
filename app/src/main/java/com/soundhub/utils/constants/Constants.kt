@@ -1,10 +1,7 @@
 package com.soundhub.utils.constants
 
-import com.google.gson.reflect.TypeToken
 import com.soundhub.BuildConfig
 import com.soundhub.Route
-import com.soundhub.data.api.responses.internal.ErrorResponse
-import java.lang.reflect.Type
 
 object Constants {
 	const val PASSWORD_MIN_LENGTH: Int = 8
@@ -118,7 +115,6 @@ object Constants {
 	const val MUSIC_PLAYLISTS = "music-playlists"
 
 	// response error body type
-	val ERROR_BODY_TYPE: Type = object : TypeToken<ErrorResponse>() {}.type
 	const val METHOD_NOT_IMPLEMENTED_ERROR = "This method should be implemented"
 	const val PROPERTY_NOT_IMPLEMENTED_ERROR = "This property should be implemented"
 

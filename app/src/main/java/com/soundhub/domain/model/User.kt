@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.soundhub.data.enums.Gender
 import com.soundhub.data.model.interfaces.IUser
+import com.soundhub.domain.enums.Gender
 import com.soundhub.utils.converters.room.ArtistRoomConverter
 import com.soundhub.utils.converters.room.FileRoomConverter
 import com.soundhub.utils.converters.room.GenreRoomConverter
