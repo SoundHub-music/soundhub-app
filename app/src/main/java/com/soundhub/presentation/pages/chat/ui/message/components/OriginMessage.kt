@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 internal fun OriginMessage(
 	replyToMessage: Message?,
 	chatViewModel: ChatViewModel,
+	lazyListState: LazyListState,
 	messageParameters: MessageParameters = EmptyMessageParameters,
 ) {
 	val coroutineScope = rememberCoroutineScope()
@@ -42,7 +44,7 @@ internal fun OriginMessage(
 				.height(IntrinsicSize.Min)
 				.clickable {
 					coroutineScope.launch {
-						chatViewModel.scrollToMessageById(messageId = replyToMessage.id)
+						chatViewModel.scrollToMessageById(lazyListState, replyToMessage.id)
 					}
 				},
 			horizontalArrangement = Arrangement.spacedBy(15.dp),

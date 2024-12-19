@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.soundhub.presentation.pages.chat.ui.input.components.SendMessageButto
 @Composable
 internal fun MessageInputBox(
 	modifier: Modifier = Modifier,
+	lazyListState: LazyListState,
 	chatViewModel: ChatViewModel,
 ) {
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
@@ -54,7 +56,7 @@ internal fun MessageInputBox(
 
 			Row {
 				EmojiButton()
-				SendMessageButton(chatViewModel)
+				SendMessageButton(chatViewModel, lazyListState)
 			}
 		}
 	}

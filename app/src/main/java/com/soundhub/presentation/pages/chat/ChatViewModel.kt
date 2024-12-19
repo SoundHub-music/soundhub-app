@@ -61,7 +61,6 @@ class ChatViewModel @Inject constructor(
 	private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
 	val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
-	private val lazyListState = MutableStateFlow<LazyListState?>(null)
 	private val _messageSource = MutableStateFlow<MessageSource?>(null)
 	private var pagingDataState: Flow<PagingData<Message>>
 
@@ -109,32 +108,27 @@ class ChatViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun scrollToLastMessage(reverse: Boolean = false) {
-		val lazyList = lazyListState.value
-		val totalItemCount = lazyList?.layoutInfo?.totalItemsCount ?: 0
+	suspend fun scrollToLastMessage(lazyListState: LazyListState, reverse: Boolean = false) {
+		val totalItemCount = lazyListState.layoutInfo.totalItemsCount
 
-		if (totalItemCount > 0 && lazyList?.isScrollInProgress == false) {
-			lazyList.scrollToItem(if (reverse) 0 else totalItemCount)
+		if (totalItemCount > 0 && lazyListState.isScrollInProgress == false) {
+			lazyListState.scrollToItem(if (reverse) 0 else totalItemCount)
 		}
 	}
 
-	suspend fun animateScrollToLastMessage(reverse: Boolean = false) {
+	suspend fun animateScrollToLastMessage(lazyListState: LazyListState, reverse: Boolean = false) {
 		val slowScrollAnimationSpec = tween<Float>(durationMillis = 500)
-		val lazyList = lazyListState.value
-		val layoutInfo = lazyList?.layoutInfo
-		val totalItemCount = layoutInfo?.totalItemsCount ?: 0
-		val viewportOffset = layoutInfo?.viewportEndOffset ?: 0
-		val firstVisibleItemScrollOffset = lazyList?.firstVisibleItemScrollOffset ?: 0
+		val layoutInfo = lazyListState.layoutInfo
+		val totalItemCount = layoutInfo.totalItemsCount
+		val viewportOffset = layoutInfo.viewportEndOffset
+		val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
 
-		layoutInfo?.let {
-			var totalOffset = totalItemCount * viewportOffset - firstVisibleItemScrollOffset
+		var totalOffset = totalItemCount * viewportOffset - firstVisibleItemScrollOffset
 
-			if (reverse)
-				totalOffset = -totalOffset
+		if (reverse)
+			totalOffset = -totalOffset
 
-			lazyList.animateScrollBy(totalOffset.toFloat(), slowScrollAnimationSpec)
-		}
-
+		lazyListState.animateScrollBy(totalOffset.toFloat(), slowScrollAnimationSpec)
 	}
 
 	suspend fun getMessageById(messageId: UUID): Message? {
@@ -201,20 +195,20 @@ class ChatViewModel @Inject constructor(
 		it.copy(messageContent = "")
 	}
 
-	fun onSendMessageClick() = viewModelScope.launch(Dispatchers.Main) {
+	fun onSendMessageClick(lazyListState: LazyListState) = viewModelScope.launch(Dispatchers.Main) {
 		sendMessage()
-		scrollToLastMessage(reverse = true)
+		scrollToLastMessage(lazyListState, true)
 	}
 
-	suspend fun scrollToMessageById(messageId: UUID?) = withContext(Dispatchers.Main) {
-		val messages = _chatUiState.value.cachedMessages
-		val lazyListState = lazyListState.value
-		val messageIndex = messages.indexOfFirst { it.id == messageId }
+	suspend fun scrollToMessageById(lazyListState: LazyListState, messageId: UUID?) =
+		withContext(Dispatchers.Main) {
+			val messages = _chatUiState.value.cachedMessages
+			val messageIndex = messages.indexOfFirst { it.id == messageId }
 
-		if (messageIndex >= 0) {
-			lazyListState?.scrollToItem(messageIndex)
+			if (messageIndex >= 0) {
+				lazyListState.scrollToItem(messageIndex)
+			}
 		}
-	}
 
 	private fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
 		val (chat: Chat?, messageContent: String) = _chatUiState.value
@@ -308,8 +302,6 @@ class ChatViewModel @Inject constructor(
 			}
 		}
 	}
-
-	fun setLazyListState(state: LazyListState) = lazyListState.update { state }
 
 	private fun uncheckMessage(message: Message) {
 		if (_chatUiState.value.isCheckMessageModeEnabled) {

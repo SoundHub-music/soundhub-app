@@ -3,6 +3,7 @@ package com.soundhub.presentation.pages.chat.ui.message
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,6 +43,7 @@ internal fun MessageBox(
 	message: Message,
 	isOwnMessage: Boolean,
 	chatViewModel: ChatViewModel,
+	lazyListState: LazyListState
 ) {
 	var contentAlignment by remember { mutableStateOf(Alignment.CenterEnd) }
 
@@ -108,6 +110,7 @@ internal fun MessageBox(
 				messageParameters = messageParameters,
 				isOwnMessage = isOwnMessage,
 				chatViewModel = chatViewModel,
+				lazyListState = lazyListState
 			)
 		}
 	}

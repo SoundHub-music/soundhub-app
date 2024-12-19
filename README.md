@@ -1,10 +1,15 @@
 # О проекте
+
 **SoundHub** - социальная сеть, ориентированная на *музыку* и *общение*.
 Пользователи могут находить собеседников, потенциальных друзей по схожим музыкальным предпочтениям.
-Социальная сеть SoundHub позволяет пользователям подписываться на новости музыкантов и следить за их публикациями и предлагает ему похожих исполнителей.
-Предусмотрена интеграция музыкальных сервисов, таких как *VK*, *Last.FM* для загрузки плейлистов и треков пользователя.
+Социальная сеть SoundHub позволяет пользователям подписываться на новости музыкантов и следить за их
+публикациями и предлагает ему похожих исполнителей.
+Предусмотрена интеграция музыкальных сервисов, таких как *VK*, *Last.FM* для загрузки плейлистов и
+треков пользователя.
 
-Для успешной сборки проекта необходимо включить некоторые константы в файл `local.properties` в корне проекта, а именно:
+Для успешной сборки проекта необходимо включить некоторые константы в файл `local.properties` в
+корне проекта, а именно:
+
 ```properties
 DISCOGS_KEY="Discogs key"
 DISCOGS_SECRET="Discogs secret"
@@ -13,15 +18,20 @@ LAST_FM_API_KEY="last fm api key"
 LAST_FM_SHARED_SECRET="last fm shared secret"
 ```
 
- Также необходимо создать в корне проекта файл `gradle.properties` и установить свойство:
+Также необходимо создать в корне проекта файл `gradle.properties` и установить свойство:
+
 ```properties
 android.useAndroidX=true
 ```
 
-Все необходимые [Discogs](https://www.discogs.com/ru/applications/edit) и [Last.FM](https://www.last.fm/api/accounts?suspend=1) ключи можно получить при регистрации приложения API
+Все необходимые [Discogs](https://www.discogs.com/ru/applications/edit)
+и [Last.FM](https://www.last.fm/api/accounts?suspend=1) ключи можно получить при регистрации
+приложения API
 
-[SoundHub API](https://github.com/LilYxa/soundhub-api)
+[SoundHub API](https://github.com/Pr0gger1/soundhub-api)
+
 # Участники проекта
+
 - [Pr0gger1](https://github.com/Pr0gger1/)
 - [LilYxa](https://github.com/LilYxa)
 - [GaMe-PaDeR](https://github.com/GaMe-PaDeR)

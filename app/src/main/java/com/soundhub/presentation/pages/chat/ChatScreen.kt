@@ -48,10 +48,6 @@ fun ChatScreen(
 		else navController.popBackStack()
 	}
 
-	LaunchedEffect(key1 = true) {
-		chatViewModel.setLazyListState(lazyListState)
-	}
-
 	LaunchedEffect(key1 = chatId) {
 		chatViewModel.loadChatById(chatId)
 	}
@@ -81,6 +77,7 @@ fun ChatScreen(
 				MessageInputBox(
 					modifier = Modifier,
 					chatViewModel = chatViewModel,
+					lazyListState = lazyListState
 				)
 			}
 		}
