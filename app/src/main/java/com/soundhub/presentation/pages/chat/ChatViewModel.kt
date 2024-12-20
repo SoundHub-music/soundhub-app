@@ -1,9 +1,11 @@
 package com.soundhub.presentation.pages.chat
 
 import android.util.Log
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
@@ -33,6 +35,7 @@ import com.soundhub.utils.constants.Constants.SOUNDHUB_WEBSOCKET
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -63,6 +67,9 @@ class ChatViewModel @Inject constructor(
 
 	private val _messageSource = MutableStateFlow<MessageSource?>(null)
 	private var pagingDataState: Flow<PagingData<Message>>
+
+	private val _highlightedMessageId = MutableStateFlow<UUID?>(null)
+	val highlightedMessageId: StateFlow<UUID?> = _highlightedMessageId.asStateFlow()
 
 	init {
 		initializeWebSocket()
@@ -108,27 +115,30 @@ class ChatViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun scrollToLastMessage(lazyListState: LazyListState, reverse: Boolean = false) {
-		val totalItemCount = lazyListState.layoutInfo.totalItemsCount
+	suspend fun scrollToLastMessage(
+		lazyListState: LazyListState,
+		coroutineContext: CoroutineContext? = null,
+		reverse: Boolean = false,
+		animate: Boolean = false
+	) {
+		withContext(coroutineContext ?: Dispatchers.Main) {
+			val layoutInfo = lazyListState.layoutInfo
+			val totalItemCount = layoutInfo.totalItemsCount
+			val viewportOffset = layoutInfo.viewportEndOffset
+			val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
 
-		if (totalItemCount > 0 && lazyListState.isScrollInProgress == false) {
-			lazyListState.scrollToItem(if (reverse) 0 else totalItemCount)
+			var totalOffset = totalItemCount * viewportOffset - firstVisibleItemScrollOffset
+
+			if (reverse)
+				totalOffset = -totalOffset
+
+			if (animate) {
+				val slowScrollAnimationSpec =
+					tween<Float>(durationMillis = 1000, easing = FastOutSlowInEasing)
+
+				lazyListState.animateScrollBy(totalOffset.toFloat(), slowScrollAnimationSpec)
+			} else lazyListState.scrollBy(totalOffset.toFloat())
 		}
-	}
-
-	suspend fun animateScrollToLastMessage(lazyListState: LazyListState, reverse: Boolean = false) {
-		val slowScrollAnimationSpec = tween<Float>(durationMillis = 500)
-		val layoutInfo = lazyListState.layoutInfo
-		val totalItemCount = layoutInfo.totalItemsCount
-		val viewportOffset = layoutInfo.viewportEndOffset
-		val firstVisibleItemScrollOffset = lazyListState.firstVisibleItemScrollOffset
-
-		var totalOffset = totalItemCount * viewportOffset - firstVisibleItemScrollOffset
-
-		if (reverse)
-			totalOffset = -totalOffset
-
-		lazyListState.animateScrollBy(totalOffset.toFloat(), slowScrollAnimationSpec)
 	}
 
 	suspend fun getMessageById(messageId: UUID): Message? {
@@ -197,18 +207,21 @@ class ChatViewModel @Inject constructor(
 
 	fun onSendMessageClick(lazyListState: LazyListState) = viewModelScope.launch(Dispatchers.Main) {
 		sendMessage()
-		scrollToLastMessage(lazyListState, true)
+		scrollToLastMessage(lazyListState = lazyListState, reverse = true)
 	}
 
-	suspend fun scrollToMessageById(lazyListState: LazyListState, messageId: UUID?) =
-		withContext(Dispatchers.Main) {
-			val messages = _chatUiState.value.cachedMessages
-			val messageIndex = messages.indexOfFirst { it.id == messageId }
+	suspend fun scrollToMessageById(
+		coroutineContext: CoroutineContext,
+		lazyListState: LazyListState,
+		messageId: UUID?
+	) = withContext(coroutineContext) {
+		val messages = _chatUiState.value.cachedMessages
+		val messageIndex = messages.indexOfFirst { it.id == messageId }
 
-			if (messageIndex >= 0) {
-				lazyListState.scrollToItem(messageIndex)
-			}
+		if (messageIndex >= 0) {
+			lazyListState.animateScrollToItem(messageIndex)
 		}
+	}
 
 	private fun sendMessage() = viewModelScope.launch(Dispatchers.IO) {
 		val (chat: Chat?, messageContent: String) = _chatUiState.value
@@ -315,6 +328,24 @@ class ChatViewModel @Inject constructor(
 
 	private fun addCheckedMessage(message: Message) = _chatUiState.update {
 		it.copy(checkedMessages = it.checkedMessages + message)
+	}
+
+	fun onReplyToMessageClick(
+		coroutineContext: CoroutineContext,
+		lazyListState: LazyListState,
+		id: UUID
+	) = viewModelScope.launch {
+		scrollToMessageById(coroutineContext, lazyListState, id)
+		highlightMessageWithTimeout(id)
+	}
+
+	fun highlightMessageWithTimeout(
+		messageId: UUID,
+		timeout: Long = Constants.HIGHLIGHT_MESSAGE_TIMEOUT.toLong()
+	) = viewModelScope.launch {
+		_highlightedMessageId.emit(messageId)
+		delay(timeout)
+		_highlightedMessageId.emit(null)
 	}
 
 	suspend fun onMessagePointerInputEvent(

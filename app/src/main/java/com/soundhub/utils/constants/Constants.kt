@@ -152,4 +152,6 @@ object Constants {
 
 	const val DEFAULT_MESSAGE_PAGE_SIZE: Int = 100
 	const val DEFAULT_MESSAGE_PAGE = 1
+
+	const val HIGHLIGHT_MESSAGE_TIMEOUT = 1500
 }

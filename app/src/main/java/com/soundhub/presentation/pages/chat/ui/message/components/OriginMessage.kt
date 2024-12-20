@@ -26,7 +26,6 @@ import com.soundhub.domain.model.Message
 import com.soundhub.presentation.pages.chat.ChatViewModel
 import com.soundhub.presentation.pages.chat.ui.message.EmptyMessageParameters
 import com.soundhub.presentation.pages.chat.ui.message.MessageParameters
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun OriginMessage(
@@ -43,9 +42,11 @@ internal fun OriginMessage(
 				.fillMaxWidth()
 				.height(IntrinsicSize.Min)
 				.clickable {
-					coroutineScope.launch {
-						chatViewModel.scrollToMessageById(lazyListState, replyToMessage.id)
-					}
+					chatViewModel.onReplyToMessageClick(
+						coroutineScope.coroutineContext,
+						lazyListState,
+						message.id
+					)
 				},
 			horizontalArrangement = Arrangement.spacedBy(15.dp),
 			verticalAlignment = Alignment.CenterVertically,

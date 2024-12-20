@@ -1,14 +1,19 @@
 package com.soundhub.presentation.pages.chat.ui.message
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.EaseInOutQuart
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +29,8 @@ import com.soundhub.domain.states.ChatUiState
 import com.soundhub.presentation.pages.chat.ChatViewModel
 import com.soundhub.presentation.pages.chat.ui.message.components.MessageBoxContent
 import com.soundhub.presentation.pages.chat.ui.message.components.MessageCheckbox
+import com.soundhub.utils.constants.Constants
+import java.util.UUID
 
 internal interface MessageParameters {
 	val boxGradient: List<Color>
@@ -47,10 +54,27 @@ internal fun MessageBox(
 ) {
 	var contentAlignment by remember { mutableStateOf(Alignment.CenterEnd) }
 
+	val highlightedMessageId: UUID? by chatViewModel.highlightedMessageId.collectAsState()
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 	val isCheckMessagesModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
 	val checkedMessages: List<Message> = chatUiState.checkedMessages
 	var replyToMessage: Message? by remember { mutableStateOf(null) }
+
+	var isHighlighted = remember(highlightedMessageId) {
+		derivedStateOf { message.id == highlightedMessageId }
+	}
+
+	var bgColor =
+		animateColorAsState(
+			targetValue = if (isHighlighted.value) MaterialTheme.colorScheme
+				.tertiaryContainer.copy(alpha = 0.7f)
+			else Color.Transparent,
+			label = "highlightedMessageColor",
+			animationSpec = tween(
+				durationMillis = Constants.HIGHLIGHT_MESSAGE_TIMEOUT,
+				easing = EaseInOutQuart
+			)
+		)
 
 	LaunchedEffect(message) {
 		if (message.replyToMessageId != null) {
@@ -96,7 +120,12 @@ internal fun MessageBox(
 					isCheckMessagesMode = isCheckMessagesModeEnabled,
 					message = message
 				)
-			},
+			}
+			.background(
+				color = bgColor.value,
+				shape = RoundedCornerShape(5.dp)
+			)
+			.padding(vertical = 5.dp),
 		contentAlignment = contentAlignment
 	) {
 		MessageCheckbox(

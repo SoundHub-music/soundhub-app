@@ -92,7 +92,10 @@ fun MessageBoxList(
 
 	LaunchedEffect(key1 = initialScroll, key2 = totalItemCount) {
 		if (!initialScroll) {
-			chatViewModel.scrollToLastMessage(lazyListState, true)
+			chatViewModel.scrollToLastMessage(
+				lazyListState = lazyListState,
+				reverse = true
+			)
 			initialScroll = true
 		}
 	}
@@ -140,24 +143,29 @@ fun MessageBoxList(
 				contentType = { "message" }
 			) { index ->
 				pagedMessages[index]?.let { message ->
-					MessageBox(
-						modifier = Modifier,
-						message = message,
-						isOwnMessage = message.author?.id == authorizedUser?.id,
-						chatViewModel = chatViewModel,
-						lazyListState = lazyListState
-					)
+					Box(modifier = Modifier.animateItem()) {
+						MessageBox(
+							modifier = Modifier,
+							message = message,
+							isOwnMessage = message.author?.id == authorizedUser?.id,
+							chatViewModel = chatViewModel,
+							lazyListState = lazyListState
+						)
+					}
 				}
 			}
 		}
-
 
 		ScrollToBottomButton(
 			lazyListState = lazyListState,
 			unreadMessageCount = unreadMessageCount,
 			onClick = {
 				coroutineScope.launch {
-					chatViewModel.animateScrollToLastMessage(lazyListState, true)
+					chatViewModel.scrollToLastMessage(
+						lazyListState = lazyListState,
+						reverse = true,
+						animate = true
+					)
 				}
 			})
 	}
