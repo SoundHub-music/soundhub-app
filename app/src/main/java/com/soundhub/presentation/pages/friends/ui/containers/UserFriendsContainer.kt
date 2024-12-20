@@ -10,14 +10,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soundhub.domain.model.User
 import com.soundhub.presentation.pages.friends.FriendsViewModel
-import com.soundhub.presentation.pages.friends.enums.FriendListPage
 import com.soundhub.presentation.pages.friends.ui.cards.friend_card.FriendCard
+import com.soundhub.utils.lib.UserUtils
 
 @Composable
 fun UserFriendsContainer(
 	friendList: List<User>,
 	navController: NavHostController,
-	chosenPage: FriendListPage,
 	friendsViewModel: FriendsViewModel
 ) {
 	LazyColumn(
@@ -28,8 +27,8 @@ fun UserFriendsContainer(
 			FriendCard(
 				user = user,
 				navController = navController,
-				chosenPage = chosenPage,
-				friendsViewModel = friendsViewModel
+				friendsViewModel = friendsViewModel,
+				additionalInfo = UserUtils.getUserLocation(user.city, user.country)
 			)
 		}
 	}

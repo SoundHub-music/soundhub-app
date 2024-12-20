@@ -5,6 +5,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.Route
+import com.soundhub.data.api.responses.internal.UserCompatibility
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.domain.events.UiEvent
@@ -202,14 +203,26 @@ class FriendsViewModel @Inject constructor(
 		return authorizedUser?.id == profileOwner?.id
 	}
 
-	fun loadUsersCompatibility(userIds: List<UUID>) = viewModelScope.launch(Dispatchers.IO) {
+	fun loadUserCompatibilities() = viewModelScope.launch(Dispatchers.IO) {
+		val recommendedUsers: List<User> = _friendsUiState.value.recommendedFriends
+		val userIds: List<UUID> = recommendedUsers.map { it.id }
+
 		userRepository.getUsersCompatibilityPercentage(userIds)
 			.onSuccess { response ->
-				_friendsUiState.update {
-					it.copy(
-						userCompatibilityPercentage = response.body
-					)
+				val compatibilities: List<UserCompatibility> =
+					response.body?.userCompatibilities.orEmpty()
+
+				val compatibilityMap: Map<User, Float> = recommendedUsers.associate {
+					val foundUserCompatibility =
+						compatibilities.find { c -> it.id == c.user.id }?.compatibility ?: 0f
+
+					it to foundUserCompatibility
 				}
+					.entries
+					.sortedByDescending { it.value }
+					.associate { it.toPair() }
+
+				_friendsUiState.update { it.copy(userCompatibilityPercentage = compatibilityMap) }
 			}
 			.onFailure { error ->
 				val uiEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)

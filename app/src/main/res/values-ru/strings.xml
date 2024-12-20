@@ -160,7 +160,7 @@
     <string name="music_auth_service_text">Получить доступ к своей библиотеке</string>
 
     <!-- friend page strings-->
-    <string name="friends_recommendation_page_card_caption">На %.1f%% похожие предпочтения в исполнителях</string>
+    <string name="friends_recommendation_page_card_caption">На %.1f%% похожие музыкальные предпочтения</string>
     <string name="friends_empty_list_message">У вас все ещё нет друзей :(\nВперед к новым знакомствам!</string>
     <string name="friends_recommended_friends_error_message">Пока что мы не можем найти для вас друзей</string>
     <string name="friends_empty_list_button_text">Начать поиск</string>

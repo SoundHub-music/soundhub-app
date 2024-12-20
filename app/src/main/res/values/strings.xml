@@ -160,7 +160,7 @@
     <string name="music_auth_service_text">Access your library</string>
 
     <!-- friend page strings -->
-    <string name="friends_recommendation_page_card_caption">%.1f%% similar taste in artists</string>
+    <string name="friends_recommendation_page_card_caption">%.1f%% similar musical tastes</string>
     <string name="friends_empty_list_message">You still have no friends :(\nTime to meet new people!</string>
     <string name="friends_recommended_friends_error_message">We can\'t find friends for you at the moment</string>
     <string name="friends_empty_list_button_text">Start Searching</string>

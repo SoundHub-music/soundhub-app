@@ -12,12 +12,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,21 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.domain.model.User
-import com.soundhub.domain.states.FriendsUiState
 import com.soundhub.presentation.pages.friends.FriendsViewModel
-import com.soundhub.presentation.pages.friends.enums.FriendListPage
 import com.soundhub.presentation.shared.avatar.CircularAvatar
-import com.soundhub.utils.lib.UserUtils
 
 @Composable
 fun FriendCard(
 	modifier: Modifier = Modifier,
 	navController: NavHostController,
 	friendsViewModel: FriendsViewModel,
-	chosenPage: FriendListPage,
+	additionalInfo: String? = null,
 	user: User,
 ) {
 	ElevatedCard(
@@ -52,11 +44,9 @@ fun FriendCard(
 			disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
 		),
 		onClick = {
-			navController
-				.navigate(
-					Route.Profile
-						.getStringRouteWithNavArg(user.id.toString())
-				)
+			navController.navigate(
+				Route.Profile.getStringRouteWithNavArg(user.id.toString())
+			)
 		}
 	) {
 		Row(
@@ -78,8 +68,7 @@ fun FriendCard(
 
 				UserDescriptionColumn(
 					user = user,
-					chosenPage = chosenPage,
-					friendsViewModel = friendsViewModel
+					additionalInfo = additionalInfo,
 				)
 			}
 
@@ -94,44 +83,21 @@ fun FriendCard(
 @Composable
 private fun UserDescriptionColumn(
 	user: User,
-	chosenPage: FriendListPage,
-	friendsViewModel: FriendsViewModel
+	additionalInfo: String? = null,
 ) {
-	val userFullName = remember(user) { "${user.firstName} ${user.lastName}".trim() }
-	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-
-	val userCompatibilities = friendsUiState.userCompatibilityPercentage
-	val userCompatibility = remember(userCompatibilities) {
-		userCompatibilities?.userCompatibilities.orEmpty()
-			.filter { it.user.id == user.id }
-			.firstNotNullOfOrNull { it }
-	}
-
-	val additionalText: String = when (chosenPage) {
-		in listOf(FriendListPage.MAIN, FriendListPage.SEARCH) ->
-			UserUtils.getUserLocation(city = user.city, country = user.country)
-
-		FriendListPage.RECOMMENDATIONS ->
-			stringResource(
-				R.string.friends_recommendation_page_card_caption,
-				userCompatibility?.compatibility ?: 0.0f
-			)
-
-		else -> ""
-	}
-
 	Column(modifier = Modifier.fillMaxWidth(0.8f)) {
 		Text(
-			text = userFullName,
+			text = user.getFullName(),
 			fontWeight = FontWeight.Medium,
 			fontSize = 20.sp,
 			overflow = TextOverflow.Ellipsis
 		)
 
-		if (additionalText.isNotEmpty())
+		if (additionalInfo?.isNotEmpty() == true)
 			Text(
-				text = additionalText,
+				text = additionalInfo,
 				fontSize = 12.sp,
+				lineHeight = 16.sp,
 				fontWeight = FontWeight.ExtraLight,
 				color = MaterialTheme.colorScheme.onBackground,
 				textAlign = TextAlign.Left,

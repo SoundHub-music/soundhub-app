@@ -2,8 +2,11 @@ package com.soundhub.presentation.pages.friends.ui.pager.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +27,7 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.FriendsUiState
 import com.soundhub.presentation.pages.friends.FriendsViewModel
-import com.soundhub.presentation.pages.friends.ui.containers.UserFriendsContainer
+import com.soundhub.presentation.pages.friends.ui.cards.friend_card.FriendCard
 import com.soundhub.presentation.shared.loaders.CircleLoader
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 
@@ -33,11 +36,11 @@ internal fun UserRecommendationsPage(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 	navController: NavHostController,
-	page: Int
 ) {
 	val friendsUiState: FriendsUiState by friendsViewModel.friendsUiState.collectAsState()
-	val tabs = friendsViewModel.getTabs()
 	val recommendedUsers: List<User> = friendsUiState.recommendedFriends
+	val compatibilityPercentages: Map<User, Float> = friendsUiState.userCompatibilityPercentage
+
 	var filteredUserList by rememberSaveable { mutableStateOf(recommendedUsers) }
 	val isOriginProfile = friendsViewModel.isOriginProfile()
 	val searchBarText: String = uiStateDispatcher.getSearchBarText()
@@ -55,7 +58,7 @@ internal fun UserRecommendationsPage(
 	}
 
 	LaunchedEffect(key1 = recommendedUsers) {
-		friendsViewModel.loadUsersCompatibility(recommendedUsers.map { it.id })
+		friendsViewModel.loadUserCompatibilities()
 	}
 
 	when (friendsUiState.status) {
@@ -74,12 +77,22 @@ internal fun UserRecommendationsPage(
 		}
 
 		ApiStatus.SUCCESS -> {
-			UserFriendsContainer(
-				friendList = recommendedUsers,
-				navController = navController,
-				chosenPage = tabs[page],
-				friendsViewModel = friendsViewModel
-			)
+			LazyColumn(
+				modifier = Modifier.fillMaxSize(),
+				verticalArrangement = Arrangement.spacedBy(5.dp)
+			) {
+				items(items = compatibilityPercentages.keys.toList(), key = { it.id }) { user ->
+					FriendCard(
+						user = user,
+						navController = navController,
+						friendsViewModel = friendsViewModel,
+						additionalInfo = stringResource(
+							R.string.friends_recommendation_page_card_caption,
+							compatibilityPercentages[user] ?: 0f
+						)
+					)
+				}
+			}
 		}
 
 		else -> {}

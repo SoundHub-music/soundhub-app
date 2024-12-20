@@ -24,7 +24,6 @@ internal fun FriendsScreenPager(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 ) {
-	val tabs: List<FriendListPage> = friendsViewModel.getTabs()
 	val isOriginProfile = friendsViewModel.isOriginProfile()
 
 	ContentContainer {
@@ -47,7 +46,6 @@ internal fun FriendsScreenPager(
 			uiStateDispatcher = uiStateDispatcher,
 			selectedTabState = selectedTabState,
 			navController = navController,
-			page = tabs.indexOf(FriendListPage.MAIN),
 		)
 	}
 }
@@ -69,14 +67,12 @@ private fun ActivePage(
 				uiStateDispatcher = uiStateDispatcher,
 				selectedTabState = selectedTabState,
 				navController = navController,
-				page = page,
 			)
 
 			FriendListPage.RECOMMENDATIONS -> UserRecommendationsPage(
 				friendsViewModel = friendsViewModel,
 				uiStateDispatcher = uiStateDispatcher,
 				navController = navController,
-				page = page
 			)
 
 			FriendListPage.SEARCH -> SearchUserPage(

@@ -16,7 +16,6 @@ import com.soundhub.data.enums.ApiStatus
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.FriendsUiState
 import com.soundhub.presentation.pages.friends.FriendsViewModel
-import com.soundhub.presentation.pages.friends.enums.FriendListPage
 import com.soundhub.presentation.pages.friends.ui.containers.UserFriendsContainer
 
 @Composable
@@ -49,7 +48,6 @@ internal fun SearchUserPage(
 	} else UserFriendsContainer(
 		friendList = foundUsers,
 		navController = navController,
-		chosenPage = FriendListPage.SEARCH,
 		friendsViewModel = friendsViewModel
 	)
 }
