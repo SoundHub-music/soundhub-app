@@ -28,7 +28,6 @@ import com.soundhub.R
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.ChatUiState
 import com.soundhub.presentation.pages.chat.ChatViewModel
-import com.soundhub.utils.lib.UserUtils
 
 @Composable
 internal fun InterlocutorFullNameWithOnlineIndicator(
@@ -46,12 +45,9 @@ internal fun InterlocutorFullNameWithOnlineIndicator(
 
 	LaunchedEffect(interlocutor) {
 		isOnline = interlocutor?.online == true
-		UserUtils.updateOnlineStatusIndicator(
-			context = context,
-			user = interlocutor
-		) { indicatorIcon, _, text ->
+		interlocutor?.updateOnlineStatusIndicator { indicatorIcon, _, text ->
 			onlineIndicator = indicatorIcon
-			onlineIndicatorText = text
+			onlineIndicatorText = text.getString(context)
 		}
 	}
 

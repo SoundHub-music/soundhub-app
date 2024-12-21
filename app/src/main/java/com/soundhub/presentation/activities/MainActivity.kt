@@ -38,10 +38,10 @@ import com.soundhub.presentation.theme.SoundHubTheme
 import com.soundhub.presentation.viewmodels.SplashScreenViewModel
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.extensions.activity.requestNotificationPermissions
 import com.soundhub.utils.extensions.context_wrapper.registerReceiverExtended
 import com.soundhub.utils.extensions.context_wrapper.startAndroidService
 import com.soundhub.utils.extensions.context_wrapper.stopAndroidService
-import com.soundhub.utils.helpers.requestNotificationPermissions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
 	}
 
 	private fun runActionsOnCreateActivity() {
-		requestNotificationPermissions(this)
+		requestNotificationPermissions()
 		startAndroidService(MessengerAndroidService::class.java)
 		lifecycleScope.launch {
 			repeatOnLifecycle(Lifecycle.State.STARTED) {

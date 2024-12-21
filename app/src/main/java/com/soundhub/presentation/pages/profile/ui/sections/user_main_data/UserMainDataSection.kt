@@ -30,7 +30,6 @@ import com.soundhub.domain.model.User
 import com.soundhub.domain.states.ProfileUiState
 import com.soundhub.presentation.pages.profile.ProfileViewModel
 import com.soundhub.presentation.pages.profile.ui.sections.user_actions.UserNameWithDescription
-import com.soundhub.utils.lib.UserUtils
 
 @Composable
 internal fun UserMainDataSection(profileViewModel: ProfileViewModel) {
@@ -56,12 +55,9 @@ private fun OnlineStatusBlock(profileViewModel: ProfileViewModel) {
 	}
 
 	LaunchedEffect(key1 = profileOwner?.online) {
-		UserUtils.updateOnlineStatusIndicator(
-			context = context,
-			user = profileOwner
-		) { _, indicatorColor, onlineIndicatorText ->
+		profileOwner?.updateOnlineStatusIndicator { _, indicatorColor, onlineIndicatorText ->
 			indicatorColorState = indicatorColor
-			onlineIndicatorTextState = onlineIndicatorText
+			onlineIndicatorTextState = onlineIndicatorText.getString(context)
 		}
 	}
 
@@ -90,7 +86,7 @@ private fun UserLocationText(profileViewModel: ProfileViewModel) {
 
 	val profileOwner: User? = profileUiState.profileOwner
 	val userLocation: String = rememberSaveable(profileOwner) {
-		UserUtils.getUserLocation(profileOwner?.city, profileOwner?.country)
+		profileOwner?.getUserLocation() ?: ""
 	}
 
 	Text(
