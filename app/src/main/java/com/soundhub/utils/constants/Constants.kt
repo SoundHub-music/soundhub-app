@@ -130,7 +130,7 @@ object Constants {
 	const val SIMPLE_HTTP_CLIENT = "simple_http_client"
 	const val AUTHORIZED_HTTP_CLIENT_WITH_CACHE = "authorized_http_client"
 
-	// newtwork constants
+	// network constants
 	const val COUNTRIES_API = "https://restcountries.com/v3.1/"
 	const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
 	const val LAST_FM_API = "https://ws.audioscrobbler.com/"
@@ -150,8 +150,10 @@ object Constants {
 	const val DISCOGS_AUTHORIZATION =
 		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 
-	const val DEFAULT_MESSAGE_PAGE_SIZE: Int = 100
+	// Paging constants
+	const val DEFAULT_MESSAGE_PAGE_SIZE = 100
 	const val DEFAULT_MESSAGE_PAGE = 1
 
+	// highlight message timeout after click
 	const val HIGHLIGHT_MESSAGE_TIMEOUT = 1500
 }
