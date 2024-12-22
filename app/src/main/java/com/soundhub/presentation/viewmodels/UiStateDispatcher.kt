@@ -121,7 +121,7 @@ class UiStateDispatcher @Inject constructor(
 	}
 
 	@Composable
-	fun getBooleanThemeValue(): Boolean {
+	fun isDarkTheme(): Boolean {
 		val settings by userSettings.collectAsState(initial = UserSettings())
 		return when (settings.appTheme) {
 			AppTheme.DARK -> true

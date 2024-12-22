@@ -56,7 +56,6 @@ fun PostCard(
 		PostImages(
 			images = post.images,
 			navController = navController,
-			uiStateDispatcher = uiStateDispatcher
 		)
 		authorizedUser?.let {
 			PostBottomPanel(

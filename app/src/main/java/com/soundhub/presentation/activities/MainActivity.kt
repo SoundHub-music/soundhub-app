@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			SoundHubTheme(
 				dynamicColor = false,
-				darkTheme = uiStateDispatcher.getBooleanThemeValue()
+				darkTheme = uiStateDispatcher.isDarkTheme()
 			) {
 				Surface(
 					modifier = Modifier.fillMaxSize(),
@@ -133,8 +133,8 @@ class MainActivity : ComponentActivity() {
 		Log.d("MainActivity", "onDestroy: user has closed the app")
 
 		unbindMessengerService()
-		uiStateDispatcher.clearState()
 		stopAndroidService(MessengerAndroidService::class.java)
+		uiStateDispatcher.clearState()
 		authViewModel.updateUserOnlineStatusDelayed(false, Constants.SET_OFFLINE_DELAY_ON_DESTROY)
 	}
 

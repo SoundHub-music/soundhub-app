@@ -11,9 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.soundhub.presentation.shared.gallery.ImageHorizontalPager
+import com.soundhub.presentation.pages.gallery.HorizontalImagePager
 import com.soundhub.presentation.shared.pagination.PagerPaginationDots
-import com.soundhub.presentation.viewmodels.UiStateDispatcher
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -21,7 +20,6 @@ internal fun PostImages(
 	modifier: Modifier = Modifier,
 	images: List<String>,
 	navController: NavHostController,
-	uiStateDispatcher: UiStateDispatcher
 ) {
 	val sliderState = rememberPagerState(initialPage = 0, pageCount = { images.size })
 
@@ -30,11 +28,10 @@ internal fun PostImages(
 		contentAlignment = Alignment.Center
 	) {
 		Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-			ImageHorizontalPager(
+			HorizontalImagePager(
 				navController = navController,
 				pagerState = sliderState,
 				images = images,
-				uiStateDispatcher = uiStateDispatcher
 			)
 			PagerPaginationDots(sliderState = sliderState)
 		}

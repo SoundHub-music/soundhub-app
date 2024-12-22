@@ -29,6 +29,7 @@ import com.soundhub.presentation.pages.authentication.AuthenticationViewModel
 import com.soundhub.presentation.pages.chat.ChatScreen
 import com.soundhub.presentation.pages.friends.FriendsScreen
 import com.soundhub.presentation.pages.friends.FriendsViewModel
+import com.soundhub.presentation.pages.gallery.GalleryScreen
 import com.soundhub.presentation.pages.messenger.MessengerScreen
 import com.soundhub.presentation.pages.messenger.MessengerViewModel
 import com.soundhub.presentation.pages.music.FavoriteArtistsScreen
@@ -50,7 +51,6 @@ import com.soundhub.presentation.pages.user_editor.music.EditFavoriteArtistsScre
 import com.soundhub.presentation.pages.user_editor.music.EditFavoriteGenresScreen
 import com.soundhub.presentation.pages.user_editor.music.EditMusicPreferencesViewModel
 import com.soundhub.presentation.pages.user_editor.profile.EditUserProfileScreen
-import com.soundhub.presentation.shared.gallery.GalleryScreen
 import com.soundhub.presentation.viewmodels.MainViewModel
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
@@ -256,7 +256,6 @@ fun NavigationHost(
 			GalleryScreen(
 				images = images,
 				initialPage = initialPage,
-				uiStateDispatcher = uiStateDispatcher
 			)
 		}
 

@@ -1,4 +1,4 @@
-package com.soundhub.presentation.shared.gallery
+package com.soundhub.presentation.pages.gallery
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -20,24 +20,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.soundhub.Route
-import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.enums.MediaFolder
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ImageHorizontalPager(
+fun HorizontalImagePager(
 	modifier: Modifier = Modifier,
 	pagerState: PagerState,
 	images: List<String>,
 	navController: NavHostController? = null,
-	uiStateDispatcher: UiStateDispatcher,
 	contentScale: ContentScale = ContentScale.Crop,
 	height: Dp = 300.dp,
 	clickable: Boolean = true,
 	mediaFolder: MediaFolder = MediaFolder.POST_PICTURE,
-	imageGalleryViewModel: ImageGalleryViewModel = hiltViewModel()
+	pagerViewModel: HorizontalImagePagerViewModel = hiltViewModel()
 ) {
 	HorizontalPager(
 		state = pagerState,
@@ -56,41 +53,26 @@ fun ImageHorizontalPager(
 				.clip(RoundedCornerShape(16.dp))
 		) {
 			GlideImage(
-				model = imageGalleryViewModel.getGlideUrlOrImageUri(images[page], mediaFolder),
+				model = pagerViewModel.getGlideUrlOrImageUri(
+					images[page],
+					mediaFolder
+				),
 				contentDescription = images[page],
 				contentScale = contentScale,
 				modifier = Modifier
 					.fillMaxSize()
 					.height(height)
 					.clickable {
-						onImageClick(
+						pagerViewModel.onImageClick(
 							clickable = clickable,
-							uiStateDispatcher = uiStateDispatcher,
 							navController = navController,
 							images = images,
 							page = page
 						)
 					}
-					.alpha(getImageOpacity(pagerState, page)),
+					.alpha(pagerViewModel.getImageOpacity(pagerState, page)),
 			)
 		}
 	}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-private fun getImageOpacity(pagerState: PagerState, page: Int): Float {
-	return if (pagerState.currentPage == page) 1f else 0.5f
-}
-
-private fun onImageClick(
-	clickable: Boolean = false,
-	uiStateDispatcher: UiStateDispatcher,
-	navController: NavHostController?,
-	images: List<String>,
-	page: Int
-) {
-	if (clickable) {
-		uiStateDispatcher.setGalleryUrls(images)
-		navController?.navigate("${Route.Gallery.route}/${page}")
-	}
-}
