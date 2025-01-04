@@ -26,11 +26,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -63,14 +60,11 @@ class FriendsViewModel @Inject constructor(
 		viewModelScope.launch {
 			initializeFriendsUiState()
 
-			uiStateDispatcher.uiState.map { it.searchBarText }
-				.debounce(500)
-				.distinctUntilChanged()
-				.collect {
-					if (tabs[currentTabIndex.value] == FriendListPage.SEARCH) {
-						searchUsers(it)
-					}
+			uiStateDispatcher.onSearchValueDebounceChange {
+				if (tabs[currentTabIndex.value] == FriendListPage.SEARCH) {
+					searchUsers(it)
 				}
+			}
 		}
 	}
 
@@ -137,6 +131,7 @@ class FriendsViewModel @Inject constructor(
 				interlocutor = interlocutor,
 				userId = user.id
 			)
+
 			emit(chat)
 
 		} ?: emit(null)

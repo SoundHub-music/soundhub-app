@@ -13,15 +13,20 @@ import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Message
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.UiState
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.AppTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -71,6 +76,13 @@ class UiStateDispatcher @Inject constructor(
 	suspend fun sendReceivedMessage(message: Message) {
 		if (!message.isRead)
 			_receivedMessages.emit(message)
+	}
+
+	@OptIn(FlowPreview::class)
+	fun onSearchValueDebounceChange(callback: (String) -> Unit) = viewModelScope.launch {
+		_uiState.map { it.searchBarText }.debounce(Constants.SEARCH_DEBOUNCE_VALUE)
+			.distinctUntilChanged()
+			.collect { value -> callback(value) }
 	}
 
 	suspend fun sendDeletedMessage(messageId: UUID) = _deletedMessages.emit(messageId)

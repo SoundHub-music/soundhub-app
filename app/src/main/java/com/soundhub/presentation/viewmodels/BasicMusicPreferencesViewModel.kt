@@ -15,12 +15,8 @@ import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -42,20 +38,9 @@ open class BaseMusicPreferencesViewModel(
 	protected var loadArtistsJob: Job? = null
 
 	init {
-		viewModelScope.launch {
-			val debouncedSearchBarText: Flow<String> =
-				uiStateDispatcher.uiState
-					.map { it.searchBarText }
-					.debounce(500)
-					.distinctUntilChanged()
-
-			debouncedSearchBarText.collect { query ->
-				if (query.isEmpty()) {
-					loadArtists()
-				} else {
-					searchArtists(query)
-				}
-			}
+		uiStateDispatcher.onSearchValueDebounceChange { query ->
+			val queryValue: String? = if (query.isEmpty()) null else query
+			searchArtists(queryValue)
 		}
 	}
 
@@ -78,7 +63,7 @@ open class BaseMusicPreferencesViewModel(
 		}
 	}
 
-	private fun searchArtists(value: String) {
+	private fun searchArtists(value: String?) {
 		try {
 			searchJob?.cancel()
 			searchJob = viewModelScope.launch(Dispatchers.IO) {

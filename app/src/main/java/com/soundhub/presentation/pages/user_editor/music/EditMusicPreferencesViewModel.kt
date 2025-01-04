@@ -2,6 +2,8 @@ package com.soundhub.presentation.pages.user_editor.music
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
@@ -9,6 +11,7 @@ import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.User
+import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.states.UiState
 import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
@@ -16,12 +19,17 @@ import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
 import com.soundhub.presentation.viewmodels.BaseMusicPreferencesViewModel
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,6 +41,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
 	private val updateUserUseCase: UpdateUserUseCase,
 	private val loadGenresUseCase: LoadGenresUseCase,
 	private val userDao: UserDao,
+	private val musicRepository: MusicRepository,
 	loadArtistsUseCase: LoadArtistsUseCase,
 	searchArtistsUseCase: SearchArtistsUseCase,
 ) : BaseMusicPreferencesViewModel(
@@ -41,15 +50,33 @@ class EditMusicPreferencesViewModel @Inject constructor(
 	searchArtistsUseCase,
 	uiStateDispatcher
 ) {
+	private var searchText = MutableStateFlow<String?>(null)
 	private val uiState: Flow<UiState> = uiStateDispatcher.uiState
 
 	init {
 		loadArtists()
+		viewModelScope.launch {
+			uiState.map { it.searchBarText }.collect { text ->
+				searchText.update { text }
+			}
+		}
+	}
+
+	@OptIn(ExperimentalCoroutinesApi::class)
+	fun getArtistPage(): Flow<PagingData<Artist>> {
+		return searchText.flatMapLatest { text ->
+			musicRepository.getArtistPage(
+				genreUiState = _genreUiState.value,
+				searchText = text,
+				pageSize = Constants.DEFAULT_ARTIST_PAGE_SIZE,
+			).cachedIn(viewModelScope)
+		}
 	}
 
 	override fun onCleared() {
 		super.onCleared()
 		_artistUiState.update { it.copy(artists = emptyList()) }
+		searchText.update { null }
 
 		Log.d("EditMusicPreferencesViewModel", "viewmodel was cleared")
 	}
@@ -75,7 +102,7 @@ class EditMusicPreferencesViewModel @Inject constructor(
 			val favoriteArtists = user?.favoriteArtists.orEmpty()
 			_artistUiState.update {
 				it.copy(
-					artists = (favoriteArtists + it.artists).distinctBy { a -> a.id },
+					artists = (favoriteArtists + it.artists).distinctBy { it.id },
 					chosenArtists = favoriteArtists
 				)
 			}

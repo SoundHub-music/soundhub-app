@@ -18,12 +18,6 @@ fun PostRegisterChooseArtistsScreen(
 	val artistUiState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
 	val lazyGridState = rememberLazyGridState()
 
-	LaunchedEffect(key1 = lazyGridState.canScrollForward) {
-		if (!lazyGridState.canScrollForward) {
-			registrationViewModel.loadArtists(artistUiState.pagination?.urls?.next)
-		}
-	}
-
 	LaunchedEffect(key1 = true) {
 		registrationViewModel.loadArtists()
 	}
@@ -33,7 +27,9 @@ fun PostRegisterChooseArtistsScreen(
 	}
 
 	ChooseArtistsScreen(
-		artistUiState = artistUiState,
+		artists = artistUiState.artists,
+		chosenArtists = artistUiState.chosenArtists,
+		isLoading = artistUiState.status.isLoading(),
 		onItemPlateClick = registrationViewModel::onArtistItemClick,
 		onNextButtonClick = registrationViewModel::onNextButtonClick,
 		onSearchFieldChange = registrationViewModel::onSearchFieldChange,

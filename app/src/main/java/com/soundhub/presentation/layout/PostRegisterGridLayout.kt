@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.soundhub.domain.model.MusicEntity
 import com.soundhub.presentation.shared.buttons.FloatingNextButton
 import com.soundhub.presentation.shared.containers.ContentContainer
@@ -27,8 +30,9 @@ import com.soundhub.presentation.shared.layouts.music_preferences.components.Mus
 import com.soundhub.presentation.shared.loaders.CircleLoader
 
 @Composable
-fun <T> PostRegisterGridLayout(
-	items: List<MusicEntity<T>>,
+fun <T : Any> PostRegisterGridLayout(
+	items: List<MusicEntity<T>>? = null,
+	pagedItems: LazyPagingItems<out MusicEntity<T>>? = null,
 	chosenItems: List<MusicEntity<T>>,
 	isLoading: Boolean = true,
 	title: String,
@@ -37,6 +41,12 @@ fun <T> PostRegisterGridLayout(
 	lazyGridState: LazyGridState = rememberLazyGridState(),
 	topContent: @Composable ColumnScope.() -> Unit = {},
 ) {
+	val loadState: CombinedLoadStates? = pagedItems?.loadState
+
+	val isRefreshLoading: Boolean = loadState?.refresh is LoadState.Loading
+	val isAppendLoading: Boolean = loadState?.append is LoadState.Loading
+	val isLoading: Boolean = isRefreshLoading || isAppendLoading || isLoading
+
 	ContentContainer(
 		modifier = Modifier
 			.background(MaterialTheme.colorScheme.background)
@@ -49,7 +59,12 @@ fun <T> PostRegisterGridLayout(
 			Text(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(start = 15.dp, top = 20.dp, end = 15.dp, bottom = 30.dp),
+					.padding(
+						start = 15.dp,
+						top = 20.dp,
+						end = 15.dp,
+						bottom = 30.dp
+					),
 				text = title,
 				fontSize = 32.sp,
 				lineHeight = 42.sp,
@@ -59,21 +74,33 @@ fun <T> PostRegisterGridLayout(
 
 			topContent()
 
-			if (isLoading) CircleLoader()
-			else LazyVerticalGrid(
+
+			if (isRefreshLoading)
+				CircleLoader(modifier = Modifier.padding(top = 20.dp))
+
+			LazyVerticalGrid(
 				state = lazyGridState,
 				columns = GridCells.Adaptive(minSize = 100.dp),
 				contentPadding = PaddingValues(all = 10.dp),
 				content = {
-					items(items = items, key = { it.id as Any }) { item ->
-						MusicItemPlate(
-							modifier = Modifier.padding(bottom = 20.dp),
-							caption = item.name ?: "",
-							thumbnailUrl = item.cover,
-							onClick = { isChosen -> onItemPlateClick(isChosen, item) },
-							isChosen = item.id in chosenItems.map { it.id },
-							width = 90.dp,
-							height = 90.dp
+					if (pagedItems != null) {
+						items(
+							count = pagedItems.itemCount,
+							key = { "${pagedItems.peek(it)?.id}_$it" }
+						) { index ->
+							val item = pagedItems[index] ?: return@items
+
+							GridItem(
+								item = item,
+								onItemPlateClick = onItemPlateClick,
+								chosenItems = chosenItems
+							)
+						}
+					} else items(items = items.orEmpty(), key = { it.id }) { item ->
+						GridItem(
+							item = item,
+							onItemPlateClick = onItemPlateClick,
+							chosenItems = chosenItems
 						)
 					}
 				}
@@ -88,4 +115,21 @@ fun <T> PostRegisterGridLayout(
 			isLoading = isLoading
 		)
 	}
+}
+
+@Composable
+private fun <T : Any> GridItem(
+	item: MusicEntity<T>,
+	onItemPlateClick: (isChosen: Boolean, item: MusicEntity<T>) -> Unit,
+	chosenItems: List<MusicEntity<T>>
+) {
+	MusicItemPlate(
+		modifier = Modifier.padding(bottom = 20.dp),
+		caption = item.name ?: "",
+		thumbnailUrl = item.cover,
+		onClick = { isChosen -> onItemPlateClick(isChosen, item) },
+		isChosen = item.id in chosenItems.map { it.id },
+		width = 90.dp,
+		height = 90.dp
+	)
 }

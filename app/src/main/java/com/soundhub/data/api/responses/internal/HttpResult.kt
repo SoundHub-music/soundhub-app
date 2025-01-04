@@ -16,6 +16,12 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 		val throwable: Exception? = null
 	) : HttpResult<T>(status = ApiStatus.ERROR)
 
+	private var isSuccess: Boolean = false
+		get() = this is Success
+
+	private var isFailure: Boolean = false
+		get() = this is Error
+
 	suspend fun onSuccess(callback: suspend (Success<T>) -> Unit): HttpResult<T> {
 		if (this is Success) callback(this)
 		return this
@@ -56,4 +62,28 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 	): HttpResult<T> = withContext(context) { onSuccess(callback) }
 
 	fun getOrNull(): T? = if (this is Success) body else null
+
+	fun <X : Exception> getOrThrow(callback: () -> X): HttpResult<T> {
+		if (this is Success)
+			return this
+
+		throw callback()
+	}
+
+	fun getOrThrow(): T? {
+		if (this is Success)
+			return this.body
+
+		var throwable: Exception? = null
+		var errorDetail: String? = null
+
+		if (this is Error) {
+			errorDetail = this.errorBody.detail
+			throwable = this.throwable
+		}
+
+		val message: String? = errorDetail ?: throwable?.message
+
+		throw IllegalStateException(message)
+	}
 }

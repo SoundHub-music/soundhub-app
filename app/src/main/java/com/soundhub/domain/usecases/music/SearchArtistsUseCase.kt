@@ -1,32 +1,38 @@
 package com.soundhub.domain.usecases.music
 
+import android.util.Log
+import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.repository.MusicRepository
-import kotlinx.coroutines.delay
+import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.mappers.DiscogsMapper
 import javax.inject.Inject
 
 class SearchArtistsUseCase @Inject constructor(
 	private val musicRepository: MusicRepository
 ) {
-	suspend operator fun invoke(searchString: String): Result<List<Artist>> = runCatching {
+	suspend operator fun invoke(searchString: String?): Result<List<Artist>> = runCatching {
 		var searchResult: List<Artist> = emptyList()
-		delay(500)
+		Log.d("SearchArtistsUseCase", "searchString: $searchString")
 
-		if (searchString.isNotEmpty()) {
-			musicRepository.searchArtists(searchString)
-				.onSuccess { response ->
-					val duplicateEntityRegex = Regex("\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)")
-					val artists: List<Artist> = response.body.orEmpty().filter { artist ->
-						!duplicateEntityRegex.matches(artist.name ?: "")
-					}
+		musicRepository.searchEntityByType(searchString, DiscogsSearchType.Artist)
+			.onSuccess { response ->
+				Log.d("SearchArtistsUseCase", "response: ${response.body}")
 
-					searchResult = artists
-				}
-				.onFailure { error ->
-					error.throwable?.let { throw error.throwable }
-						?: throw Exception(error.errorBody.detail)
-				}
-		}
+				val duplicateEntityRegex = Regex(Constants.DUPLICATE_MUSIC_ENTITY_PATTERN)
+
+				val artists: List<Artist> =
+					response.body?.results.orEmpty().map { DiscogsMapper.impl.toArtist(it) }
+						.filter { artist ->
+							!duplicateEntityRegex.matches(artist.name ?: "")
+						}
+
+				searchResult = artists
+			}
+			.onFailure { error ->
+				error.throwable?.let { throw error.throwable }
+					?: throw Exception(error.errorBody.detail)
+			}
 
 		return@runCatching searchResult
 	}

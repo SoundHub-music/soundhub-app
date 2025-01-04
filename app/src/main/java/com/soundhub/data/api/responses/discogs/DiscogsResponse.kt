@@ -1,11 +1,11 @@
 package com.soundhub.data.api.responses.discogs
 
-import com.google.gson.annotations.SerializedName
+interface IDiscogsResponse<T> {
+	val results: List<T>
+	val pagination: DiscogsResponsePagination
+}
 
 data class DiscogsResponse(
-	@SerializedName("results")
-	val results: List<DiscogsEntityResponse>,
-
-	@SerializedName("pagination")
-	val pagination: DiscogsResponsePagination
-)
+	override val results: List<DiscogsEntityResponse>,
+	override val pagination: DiscogsResponsePagination
+) : IDiscogsResponse<DiscogsEntityResponse>

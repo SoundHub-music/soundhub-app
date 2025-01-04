@@ -4,24 +4,40 @@ import com.soundhub.BuildConfig
 import com.soundhub.Route
 
 object Constants {
-	const val PASSWORD_MIN_LENGTH: Int = 8
+	//region date constants
 	const val DATE_FORMAT = "yyyy-MM-dd"
 	const val LOCAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss"
 	const val FALLBACK_LOCAL_DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm"
 
+	//endregion
+
+	//region numeric constants
+	const val PASSWORD_MIN_LENGTH = 8
+
+	// search debounce in milliseconds
+	const val SEARCH_DEBOUNCE_VALUE = 300L
+
 	// online status
 	// after destroy: 1 minute
-	const val SET_OFFLINE_DELAY_ON_DESTROY: Long = 60 * 1000
+	const val SET_OFFLINE_DELAY_ON_DESTROY = 60 * 1000L
 
 	// after stop: 5 minutes
-	const val SET_OFFLINE_DELAY_ON_STOP: Long = 5 * 60 * 1000
+	const val SET_OFFLINE_DELAY_ON_STOP = 5 * 60 * 1000L
 
-	// regular expressions
+	// highlight message timeout after click
+	const val HIGHLIGHT_MESSAGE_TIMEOUT = 1500
+
+	//endregion
+
+	//region regular expressions
 	const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
 	const val DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
 	const val URL_WITH_PARAMS_REGEX: String = "/\\S+\\?\\w+=\\w+"
+	const val DUPLICATE_MUSIC_ENTITY_PATTERN = "\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)"
 
-	// datastore identifiers
+	// endregion
+
+	//region datastore identifiers
 	const val DATASTORE_USER_SETTINGS = "user_settings"
 	const val DATASTORE_APP_THEME = "settings_app_theme"
 
@@ -32,7 +48,9 @@ object Constants {
 	// room db
 	const val ROOM_DB_NAME = "soundhub_db"
 
-	// route list constants
+	//endregion
+
+	//region route list constants
 	val ROUTES_WITH_CUSTOM_TOP_APP_BAR: List<String> = listOf(
 		Route.PostLine.route,
 		Route.Music.route,
@@ -67,7 +85,9 @@ object Constants {
 		Route.Profile.Friends.route
 	)
 
-	// nav arguments
+	//endregion
+
+	//region nav arguments
 	const val POST_REGISTER_NAV_ARG = "postAuthId"
 	const val PROFILE_NAV_ARG = "userId"
 	const val CHAT_NAV_ARG = "chatId"
@@ -82,7 +102,9 @@ object Constants {
 		POST_EDITOR_NAV_ARG
 	)
 
-	// routes
+	//endregion
+
+	//region routes
 	// authentication routes
 	const val AUTHENTICATION_ROUTE = "authentication"
 	const val CHOOSE_GENRES_ROUTE = "$AUTHENTICATION_ROUTE/chooseGenres"
@@ -114,11 +136,15 @@ object Constants {
 	const val MUSIC_FAVORITE_ARTISTS = "music-favorite-artists"
 	const val MUSIC_PLAYLISTS = "music-playlists"
 
-	// response error body type
+	//endregion
+
+	//region response error body type
 	const val METHOD_NOT_IMPLEMENTED_ERROR = "This method should be implemented"
 	const val PROPERTY_NOT_IMPLEMENTED_ERROR = "This property should be implemented"
 
-	// named hilt injections
+	//endregion
+
+	//region named hilt injections
 	const val COUNTRIES_API_RETROFIT = "countries_api"
 	const val AUTHORIZED_SOUNDHUB_API_RETROFIT = "authorized_soundhub_api"
 	const val UNAUTHORIZED_SOUNDHUB_API_RETROFIT = "soundhub_api"
@@ -130,7 +156,9 @@ object Constants {
 	const val SIMPLE_HTTP_CLIENT = "simple_http_client"
 	const val AUTHORIZED_HTTP_CLIENT_WITH_CACHE = "authorized_http_client"
 
-	// network constants
+	// endregion
+
+	//region network constants
 	const val COUNTRIES_API = "https://restcountries.com/v3.1/"
 	const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
 	const val LAST_FM_API = "https://ws.audioscrobbler.com/"
@@ -150,10 +178,13 @@ object Constants {
 	const val DISCOGS_AUTHORIZATION =
 		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 
-	// Paging constants
+	//endregion
+
+	//region Paging constants
 	const val DEFAULT_MESSAGE_PAGE_SIZE = 100
 	const val DEFAULT_MESSAGE_PAGE = 1
 
-	// highlight message timeout after click
-	const val HIGHLIGHT_MESSAGE_TIMEOUT = 1500
+	const val DEFAULT_ARTIST_PAGE_SIZE = 30
+
+	//endregion
 }

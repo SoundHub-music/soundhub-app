@@ -66,17 +66,13 @@ class ChatViewModel @Inject constructor(
 	val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
 	private val _messageSource = MutableStateFlow<MessageSource?>(null)
-	private var pagingDataState: Flow<PagingData<Message>>
 
 	private val _highlightedMessageId = MutableStateFlow<UUID?>(null)
 	val highlightedMessageId: StateFlow<UUID?> = _highlightedMessageId.asStateFlow()
 
 	init {
 		initializeWebSocket()
-		pagingDataState = getMessagePage()
 	}
-
-	fun getPagedMessages() = pagingDataState
 
 	private fun updateMessageSource(chatId: UUID): MessageSource {
 		val messageSourceInstance = MessageSource(

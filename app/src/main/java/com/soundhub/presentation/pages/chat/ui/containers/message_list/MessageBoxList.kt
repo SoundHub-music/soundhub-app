@@ -56,7 +56,7 @@ fun MessageBoxList(
 	val authorizedUser: User? = uiState.authorizedUser
 
 	val pagedMessages = remember(currentChat) {
-		chatViewModel.getPagedMessages()
+		chatViewModel.getMessagePage()
 	}.collectAsLazyPagingItems()
 
 	val messageSnapshot: List<Message> = pagedMessages.itemSnapshotList

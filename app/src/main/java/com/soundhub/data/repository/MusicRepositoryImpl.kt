@@ -2,6 +2,9 @@ package com.soundhub.data.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.google.gson.Gson
 import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
@@ -12,11 +15,14 @@ import com.soundhub.data.api.services.GenreService
 import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
+import com.soundhub.data.sources.ArtistSource
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.Track
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.states.GenreUiState
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -39,16 +45,16 @@ class MusicRepositoryImpl @Inject constructor(
 	}
 
 	override suspend fun getArtistsByGenres(
-		genres: List<String>,
-		styles: List<String>,
+		genres: List<String>?,
+		styles: List<String>?,
 		page: Int,
 		countPerPage: Int
 	): HttpResult<DiscogsResponse> {
 		try {
 			val response: Response<DiscogsResponse> = musicService.searchData(
 				type = DiscogsSearchType.Release.type,
-				genre = genres.joinToString("|") { it.lowercase() },
-				style = styles.joinToString("|") { it.lowercase() },
+				genre = genres?.joinToString("|") { it.lowercase() },
+				style = styles?.joinToString("|") { it.lowercase() },
 				countPerPage = countPerPage,
 				page = page
 			)
@@ -62,7 +68,7 @@ class MusicRepositoryImpl @Inject constructor(
 	}
 
 
-	override suspend fun searchArtistInReleaseResponse(artistName: String): HttpResult<Artist?> {
+	override suspend fun searchArtistInReleases(artistName: String): HttpResult<Artist?> {
 		try {
 			val response: Response<DiscogsResponse> = musicService.searchData(
 				query = artistName,
@@ -140,30 +146,21 @@ class MusicRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun searchArtists(artistName: String): HttpResult<List<Artist>> {
+	override suspend fun searchEntityByType(
+		query: String?,
+		type: DiscogsSearchType,
+		countPerPage: Int
+	): HttpResult<DiscogsResponse> {
 		try {
 			val response: Response<DiscogsResponse> = musicService.searchData(
-				query = artistName,
-				type = DiscogsSearchType.Artist.type
+				query = query,
+				type = type.type,
+				countPerPage = countPerPage
 			)
 
 			Log.d("MusicRepository", "searchArtists[1]: $response")
 
-			return handleResponse<DiscogsResponse, List<Artist>>(response) {
-				val desiredArtists: List<Artist> = response.body()
-					?.results
-					?.map {
-						Artist(
-							id = it.id,
-							name = it.title,
-							genre = it.genre.orEmpty(),
-							style = it.style.orEmpty(),
-							cover = it.thumb
-						)
-					}.orEmpty()
-
-				return@handleResponse HttpResult.Success(body = desiredArtists)
-			}
+			return handleResponse<DiscogsResponse>(response)
 
 		} catch (e: Exception) {
 			Log.e("MusicRepository", "searchArtists[3]: ${e.stackTraceToString()}")
@@ -193,4 +190,13 @@ class MusicRepositoryImpl @Inject constructor(
 			)
 		}
 	}
+
+	override fun getArtistPage(
+		genreUiState: GenreUiState,
+		searchText: String?,
+		pageSize: Int
+	): Flow<PagingData<Artist>> = Pager(
+		config = PagingConfig(pageSize = pageSize),
+		pagingSourceFactory = { ArtistSource(this, genreUiState, searchText) }
+	).flow
 }

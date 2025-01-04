@@ -14,23 +14,25 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.soundhub.R
 import com.soundhub.data.datastore.UserSettingsStore
 import com.soundhub.domain.model.Artist
-import com.soundhub.domain.states.ArtistUiState
 import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.layout.PostRegisterGridLayout
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 
 @Composable
 fun ChooseArtistsScreen(
-	artistUiState: ArtistUiState,
+	artists: List<Artist>,
+	pagedArtists: LazyPagingItems<Artist>? = null,
+	chosenArtists: List<Artist>,
+	isLoading: Boolean = false,
 	onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
 	uiStateDispatcher: UiStateDispatcher,
 	onNextButtonClick: () -> Unit,
@@ -38,16 +40,16 @@ fun ChooseArtistsScreen(
 	lazyGridState: LazyGridState,
 ) {
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-	val artists = remember(artistUiState.artists) { artistUiState.artists }
 
 	PostRegisterGridLayout<Int>(
 		items = artists,
-		chosenItems = artistUiState.chosenArtists,
+		pagedItems = pagedArtists,
+		chosenItems = chosenArtists,
 		title = stringResource(id = R.string.screen_title_choose_artists),
 		onItemPlateClick = { isChosen, item -> onItemPlateClick(isChosen, item as Artist) },
 		onNextButtonClick = onNextButtonClick,
 		lazyGridState = lazyGridState,
-		isLoading = artistUiState.status.isLoading(),
+		isLoading = isLoading,
 		topContent = {
 			OutlinedTextField(
 				value = uiState.searchBarText,
@@ -77,10 +79,11 @@ private fun ChooseArtistsPreview() {
 	val context = LocalContext.current
 	ChooseArtistsScreen(
 		onItemPlateClick = { _, _ -> },
-		artistUiState = ArtistUiState(),
 		uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context)),
 		onNextButtonClick = {},
 		onSearchFieldChange = {},
+		artists = emptyList(),
+		chosenArtists = emptyList(),
 		lazyGridState = rememberLazyGridState()
 	)
 }

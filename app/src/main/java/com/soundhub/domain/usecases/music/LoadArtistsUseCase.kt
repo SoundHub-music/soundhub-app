@@ -66,7 +66,7 @@ class LoadArtistsUseCase @Inject constructor(
 		data.forEach { entity ->
 			val artistName: String = entity.title.split("-")[0].trim()
 
-			musicRepository.searchArtistInReleaseResponse(artistName)
+			musicRepository.searchArtistInReleases(artistName)
 				.onSuccess { artist ->
 					artist.body?.let { artistBody ->
 						artistBody.genre = entity.genre.orEmpty()

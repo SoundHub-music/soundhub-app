@@ -2,10 +2,12 @@ package com.soundhub.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SendMessageRequest
+import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Post
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.PostEditorState
 import com.soundhub.domain.states.UserFormState
+import com.soundhub.utils.mappers.DiscogsMapper
 import com.soundhub.utils.mappers.MessageMapper
 import com.soundhub.utils.mappers.PostMapper
 import com.soundhub.utils.mappers.RegisterDataMapper
@@ -78,5 +80,12 @@ class MapperTest : BaseMapperTest() {
 			.impl.fromPostToPostEditorState(post)
 
 		assertEquals(result, postEditorState)
+	}
+
+	// discogs mapper
+	@Test
+	fun mapToArtistTest() {
+		val result: Artist = DiscogsMapper.impl.toArtist(discogsArtist)
+		assertEquals(artist, result)
 	}
 }
