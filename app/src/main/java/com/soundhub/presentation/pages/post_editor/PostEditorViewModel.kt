@@ -1,27 +1,19 @@
 package com.soundhub.presentation.pages.post_editor
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.datastore.UserCredsStore
-import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Post
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.domain.states.PostEditorState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
-import com.soundhub.utils.enums.MediaFolder
-import com.soundhub.utils.enums.UriScheme
-import com.soundhub.utils.lib.HttpUtils
 import com.soundhub.utils.lib.UiText
 import com.soundhub.utils.mappers.PostMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -31,9 +23,7 @@ import javax.inject.Inject
 class PostEditorViewModel @Inject constructor(
 	private val postRepository: PostRepository,
 	private val uiStateDispatcher: UiStateDispatcher,
-	userCredsStore: UserCredsStore
 ) : ViewModel() {
-	private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 	private val _postEditorState = MutableStateFlow(PostEditorState())
 	val postEditorState = _postEditorState.asStateFlow()
 
@@ -133,17 +123,5 @@ class PostEditorViewModel @Inject constructor(
 				toastText = UiText.StringResource(R.string.toast_update_post_error)
 				uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
 			}
-
-	}
-
-	suspend fun getGlideUrl(imageUrl: Uri?): Any? {
-		val creds: UserPreferences? = userCreds.firstOrNull()
-		return if (imageUrl?.scheme == UriScheme.HTTP.scheme)
-			HttpUtils.prepareGlideUrWithAccessToken(
-				creds,
-				imageUrl.toString(),
-				MediaFolder.POST_PICTURE
-			)
-		else imageUrl.toString()
 	}
 }

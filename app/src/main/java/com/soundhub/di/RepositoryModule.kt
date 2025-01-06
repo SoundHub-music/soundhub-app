@@ -34,6 +34,7 @@ import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -146,12 +147,14 @@ object RepositoryModule {
 		@ApplicationContext
 		context: Context,
 		musicService: MusicService,
+		uiStateDispatcher: UiStateDispatcher,
 		genreService: GenreService,
 		gson: Gson
 	): MusicRepository = MusicRepositoryImpl(
 		musicService = musicService,
 		genreService = genreService,
 		context = context,
+		uiStateDispatcher = uiStateDispatcher,
 		gson = gson
 	)
 

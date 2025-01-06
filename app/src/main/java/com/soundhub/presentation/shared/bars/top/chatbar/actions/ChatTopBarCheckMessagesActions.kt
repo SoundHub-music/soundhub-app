@@ -1,5 +1,6 @@
 package com.soundhub.presentation.shared.bars.top.chatbar.actions
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
@@ -25,7 +26,7 @@ internal fun ChatTopBarCheckMessagesActions(
 ) {
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-	val checkedMessages: List<Message> = chatUiState.checkedMessages
+	val checkedMessages: Set<Message> = chatUiState.checkedMessages
 	val authorizedUser: User? = uiState.authorizedUser
 
 	val hasOnlyOwnMessages: Boolean = remember(checkedMessages, authorizedUser) {
@@ -37,23 +38,24 @@ internal fun ChatTopBarCheckMessagesActions(
 	}
 
 	Row {
-		if (hasOnlyOwnMessages) IconButton(
-			onClick = {
-				authorizedUser?.let { user ->
-					checkedMessages.forEach { message ->
-						chatViewModel.deleteMessage(message, user.id)
-					}
+		AnimatedVisibility(visible = hasOnlyOwnMessages) {
+			IconButton(
+				onClick = {
+					authorizedUser?.let { user ->
+						checkedMessages.forEach { message ->
+							chatViewModel.deleteMessage(message, user.id)
+						}
+					}.also { chatViewModel.setCheckMessageMode(false) }
 				}
-				chatViewModel.setCheckMessageMode(false)
+			) {
+				Icon(
+					imageVector = Icons.Rounded.Delete,
+					contentDescription = "Delete message option"
+				)
 			}
-		) {
-			Icon(
-				imageVector = Icons.Rounded.Delete,
-				contentDescription = "Delete message option"
-			)
 		}
 
-		if (hasOnlyOneMessage)
+		AnimatedVisibility(visible = hasOnlyOneMessage) {
 			IconButton(
 				onClick = chatViewModel::activateReplyMessageMode
 			) {
@@ -62,5 +64,6 @@ internal fun ChatTopBarCheckMessagesActions(
 					contentDescription = "Reply message option"
 				)
 			}
+		}
 	}
 }

@@ -14,12 +14,11 @@ import com.soundhub.domain.enums.Gender
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
+import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.states.RegistrationState
 import com.soundhub.domain.states.interfaces.IUserDataFormState
-import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
-import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.presentation.pages.authentication.AuthFormState
 import com.soundhub.presentation.shared.forms.FormHandler
 import com.soundhub.presentation.shared.forms.IUserFormViewModel
@@ -47,14 +46,12 @@ class RegistrationViewModel @Inject constructor(
 	private val userCredsStore: UserCredsStore,
 	private val userRepository: UserRepository,
 	private val userDao: UserDao,
+	musicRepository: MusicRepository,
 	loadGenresUseCase: LoadGenresUseCase,
-	loadArtistsUseCase: LoadArtistsUseCase,
-	searchArtistsUseCase: SearchArtistsUseCase,
 ) : BaseMusicPreferencesViewModel(
-	loadGenresUseCase,
-	loadArtistsUseCase,
-	searchArtistsUseCase,
-	uiStateDispatcher
+	loadGenresUseCase = loadGenresUseCase,
+	uiStateDispatcher = uiStateDispatcher,
+	musicRepository = musicRepository
 ), IUserFormViewModel {
 	private val uiState = uiStateDispatcher.uiState
 	private val _registerState = MutableStateFlow(RegistrationState())
@@ -105,7 +102,6 @@ class RegistrationViewModel @Inject constructor(
 			it.copy(favoriteGenres = _genreUiState.value.chosenGenres)
 		}
 
-		loadArtists()
 		uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Authentication.ChooseArtists))
 	}
 
@@ -125,13 +121,6 @@ class RegistrationViewModel @Inject constructor(
 	}
 
 	private fun handleFillUserData() = viewModelScope.launch(Dispatchers.Main) {
-		try {
-			loadArtistsJob?.cancel()
-			searchJob?.cancel()
-		} catch (e: Exception) {
-			Log.e("RegistrationViewModel", "handleFillUserData: ${e.localizedMessage}")
-		}
-
 		_registerState.update {
 			it.copy(
 				isFirstNameValid = it.firstName.isNotEmpty(),

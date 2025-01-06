@@ -12,7 +12,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -32,6 +31,7 @@ import com.soundhub.presentation.shared.pagination.PagingLoadStateContainer
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,7 +42,6 @@ fun MessageBoxList(
 	lazyListState: LazyListState
 ) {
 	val coroutineScope = rememberCoroutineScope()
-	var initialScroll by remember { mutableStateOf(false) }
 
 	val layoutInfo by remember { derivedStateOf { lazyListState.layoutInfo } }
 	val totalItemCount by remember { derivedStateOf { layoutInfo.totalItemsCount } }
@@ -56,7 +55,7 @@ fun MessageBoxList(
 	val authorizedUser: User? = uiState.authorizedUser
 
 	val pagedMessages = remember(currentChat) {
-		chatViewModel.getMessagePage()
+		chatViewModel.pagingDataState
 	}.collectAsLazyPagingItems()
 
 	val messageSnapshot: List<Message> = pagedMessages.itemSnapshotList
@@ -80,23 +79,15 @@ fun MessageBoxList(
 		}
 	}
 
-	val stickyDate by remember {
+	val stickyDate: LocalDate? by remember {
 		derivedStateOf {
 			if (pagedMessages.itemCount == 0)
 				return@derivedStateOf null
 
-			val message: Message? = pagedMessages[lazyListState.firstVisibleItemIndex]
-			message?.createdAt?.toLocalDate()
-		}
-	}
-
-	LaunchedEffect(key1 = initialScroll, key2 = totalItemCount) {
-		if (!initialScroll) {
-			chatViewModel.scrollToLastMessage(
-				lazyListState = lazyListState,
-				reverse = true
-			)
-			initialScroll = true
+			runCatching {
+				val message: Message? = pagedMessages.peek(lazyListState.firstVisibleItemIndex)
+				return@runCatching message?.createdAt?.toLocalDate()
+			}.getOrNull()
 		}
 	}
 

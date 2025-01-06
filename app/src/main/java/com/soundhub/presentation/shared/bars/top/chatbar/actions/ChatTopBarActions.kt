@@ -1,5 +1,6 @@
 package com.soundhub.presentation.shared.bars.top.chatbar.actions
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
@@ -25,12 +26,14 @@ internal fun ChatTopBarActions(
 	val chatUiState by chatViewModel.chatUiState.collectAsState()
 	val isCheckMessagesModeEnabled = chatUiState.isCheckMessageModeEnabled
 
-	if (isCheckMessagesModeEnabled)
+	AnimatedVisibility(visible = isCheckMessagesModeEnabled) {
 		ChatTopBarCheckMessagesActions(
 			chatViewModel = chatViewModel,
 			uiStateDispatcher = uiStateDispatcher
 		)
-	else {
+	}
+
+	AnimatedVisibility(visible = !isCheckMessagesModeEnabled) {
 		IconButton(onClick = { isMenuExpanded.value = !isMenuExpanded.value }) {
 			Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "options")
 		}

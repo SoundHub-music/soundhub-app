@@ -31,18 +31,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.domain.model.User
 import com.soundhub.domain.states.ProfileUiState
 import com.soundhub.presentation.pages.profile.ProfileViewModel
-import com.soundhub.presentation.shared.avatar.AvatarViewModel
 import com.soundhub.presentation.shared.menu.AvatarDropdownMenu
+import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.lib.ImageUtils
 
 @Composable
 internal fun UserProfileAvatar(
@@ -94,24 +93,27 @@ private fun UserSettingsButton(
 @Composable
 private fun Avatar(
 	isAvatarMenuExpandedState: MutableState<Boolean>,
-	avatarViewModel: AvatarViewModel = hiltViewModel(),
 	profileViewModel: ProfileViewModel
 ) {
 	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
 	val profileOwner: User? = profileUiState.profileOwner
 
 	val userFullName: String = profileOwner?.getFullName() ?: ""
-	var glideUrl: Any? by remember { mutableStateOf(null) }
+	var modelUrl: Any? by remember { mutableStateOf(null) }
 	val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
 	LaunchedEffect(key1 = profileOwner) {
-		glideUrl = avatarViewModel.getGlideUrlOrImageUri(profileOwner?.avatarUrl?.toUri())
+		modelUrl =
+			ImageUtils.getFileUrlOrLocalPath(
+				profileOwner?.avatarUrl?.toUri(),
+				MediaFolder.AVATAR
+			)
 	}
 
-	GlideImage(
-		model = glideUrl,
+	AsyncImage(
+		model = modelUrl,
 		contentScale = ContentScale.Crop,
-		failure = placeholder(defaultAvatar),
+		error = defaultAvatar,
 		contentDescription = userFullName,
 		modifier = Modifier
 			.fillMaxSize()

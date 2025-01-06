@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.soundhub.Route
@@ -21,7 +19,6 @@ import com.soundhub.data.api.websocket.WebSocketClient
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.data.sources.MessageSource
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Chat
 import com.soundhub.domain.model.Message
@@ -53,6 +50,7 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ChatViewModel @Inject constructor(
 	private val chatRepository: ChatRepository,
@@ -65,37 +63,20 @@ class ChatViewModel @Inject constructor(
 	private val _chatUiState: MutableStateFlow<ChatUiState> = MutableStateFlow(ChatUiState())
 	val chatUiState: StateFlow<ChatUiState> = _chatUiState.asStateFlow()
 
-	private val _messageSource = MutableStateFlow<MessageSource?>(null)
+	var pagingDataState: Flow<PagingData<Message>>
+		private set
 
 	private val _highlightedMessageId = MutableStateFlow<UUID?>(null)
 	val highlightedMessageId: StateFlow<UUID?> = _highlightedMessageId.asStateFlow()
 
 	init {
 		initializeWebSocket()
-	}
-
-	private fun updateMessageSource(chatId: UUID): MessageSource {
-		val messageSourceInstance = MessageSource(
-			messageRepository = messageRepository,
-			chatId = chatId
-		)
-
-		_messageSource.update { messageSourceInstance }
-		return messageSourceInstance
-	}
-
-	@OptIn(ExperimentalCoroutinesApi::class)
-	fun getMessagePage(): Flow<PagingData<Message>> {
-		return _chatUiState
+		pagingDataState = _chatUiState
 			.map { it.chat }
 			.filterNotNull()
 			.distinctUntilChanged()
 			.flatMapLatest { chat ->
-				Pager(
-					config = PagingConfig(pageSize = Constants.DEFAULT_MESSAGE_PAGE_SIZE),
-					initialKey = Constants.DEFAULT_MESSAGE_PAGE,
-					pagingSourceFactory = { updateMessageSource(chatId = chat.id) }
-				).flow.cachedIn(viewModelScope)
+				messageRepository.getMessagePage(chat.id).cachedIn(viewModelScope)
 			}
 	}
 
@@ -299,7 +280,7 @@ class ChatViewModel @Inject constructor(
 	fun unsetCheckMessagesMode() = _chatUiState.update {
 		it.copy(
 			isCheckMessageModeEnabled = false,
-			checkedMessages = emptyList()
+			checkedMessages = emptySet()
 		)
 	}
 
@@ -307,17 +288,23 @@ class ChatViewModel @Inject constructor(
 		val isReplyModeEnabled = _chatUiState.value.isReplyMessageModeEnabled
 		if (isReplyModeEnabled) {
 			_chatUiState.update {
-				it.copy(isReplyMessageModeEnabled = false, checkedMessages = emptyList())
+				it.copy(isReplyMessageModeEnabled = false, checkedMessages = emptySet())
 			}
 		}
 	}
 
 	private fun uncheckMessage(message: Message) {
-		if (_chatUiState.value.isCheckMessageModeEnabled) {
+		var isCheckMessageModeEnabled: Boolean = _chatUiState.value.isCheckMessageModeEnabled
+
+		if (isCheckMessageModeEnabled) {
 			_chatUiState.update {
 				val messages: List<Message> = it.checkedMessages.filter { msg -> msg != message }
-				val isCheckMessagesMode = messages.isNotEmpty()
-				it.copy(checkedMessages = messages, isCheckMessageModeEnabled = isCheckMessagesMode)
+				isCheckMessageModeEnabled = messages.isNotEmpty()
+
+				it.copy(
+					checkedMessages = messages.toSet(),
+					isCheckMessageModeEnabled = isCheckMessageModeEnabled
+				)
 			}
 		}
 	}
@@ -348,18 +335,18 @@ class ChatViewModel @Inject constructor(
 		scope: PointerInputScope,
 		message: Message,
 		isCheckMessagesMode: Boolean,
-		checkedMessages: List<Message>
+		checkedMessages: Set<Message>
 	) = scope.detectTapGestures(
 		onLongPress = {
 			setCheckMessageMode(true)
 			addCheckedMessage(message)
 		},
 		onTap = {
-			if (isCheckMessagesMode) {
-				if (message in checkedMessages)
-					uncheckMessage(message)
-				else addCheckedMessage(message)
-			}
+			if (!isCheckMessagesMode) return@detectTapGestures
+
+			if (message in checkedMessages)
+				uncheckMessage(message)
+			else addCheckedMessage(message)
 		}
 	)
 }

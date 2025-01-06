@@ -4,13 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.LazyHeaders
-import com.soundhub.data.datastore.model.UserPreferences
-import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
-import com.soundhub.utils.enums.MediaFolder
-import com.soundhub.utils.enums.UriScheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -23,7 +17,7 @@ import java.util.UUID
 class HttpUtils {
 	companion object {
 		const val AUTHORIZATION_HEADER: String = "Authorization"
-		private const val FOLDER_NAME_PARAM: String = "?folderName="
+		const val FOLDER_NAME_PARAM: String = "?folderName="
 		private const val FILE_REQUEST_NAME = "files"
 
 		/**
@@ -107,48 +101,6 @@ class HttpUtils {
 			val fileType: String? = context.contentResolver.getType(fileUri)
 			Log.d("HttpUtils", "getFileExtension[1]: fileType = $fileType")
 			return MimeTypeMap.getSingleton().getExtensionFromMimeType(fileType)
-		}
-
-		/**
-		 * returns GlideUrl if URI has http scheme else string image path
-		 * @param userCreds UserPreferences object with access and refresh tokens
-		 * @param imageUri image URI object
-		 * @return GlideUrl or String or null
-		 */
-		fun getGlideUrlOrImagePath(
-			userCreds: UserPreferences?,
-			imageUri: Uri?,
-			mediaFolder: MediaFolder
-		): Any? = imageUri?.let {
-			if (imageUri.scheme == UriScheme.HTTP.scheme)
-				prepareGlideUrWithAccessToken(userCreds, imageUri.toString(), mediaFolder)
-			else imageUri.toString()
-		}
-
-		/**
-		 * prepares image url for glide by adding access token and media folder name
-		 * @param userCreds creds datastore container
-		 * @param imageUrl image url (get file endpoint)
-		 * @param folder enum type with certain folder
-		 */
-		fun prepareGlideUrWithAccessToken(
-			userCreds: UserPreferences?,
-			imageUrl: String?,
-			folder: MediaFolder
-		): GlideUrl? {
-			return imageUrl?.let { url ->
-				var urlWithParam: String = url
-				if (!Regex(Constants.URL_WITH_PARAMS_REGEX).matches(url)) {
-					urlWithParam += FOLDER_NAME_PARAM + folder.folderName
-				}
-
-				userCreds?.accessToken?.let { token ->
-					val headers = LazyHeaders.Builder()
-						.addHeader(AUTHORIZATION_HEADER, getBearerToken(token))
-						.build()
-					GlideUrl(urlWithParam, headers)
-				}
-			}
 		}
 	}
 }

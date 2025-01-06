@@ -2,15 +2,21 @@ package com.soundhub.data.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.PageableMessagesResponse
 import com.soundhub.data.api.responses.internal.PagedMessageOrderType
 import com.soundhub.data.api.responses.internal.UnreadMessagesResponse
 import com.soundhub.data.api.services.MessageService
+import com.soundhub.data.sources.MessageSource
 import com.soundhub.domain.model.Message
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MessageRepository
+import com.soundhub.utils.constants.Constants
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -69,4 +75,16 @@ class MessageRepositoryImpl @Inject constructor(
 			return handleException(e)
 		}
 	}
+
+	override fun getMessagePage(chatId: UUID, pageSize: Int): Flow<PagingData<Message>> = Pager(
+		config = PagingConfig(pageSize = pageSize),
+		initialKey = Constants.DEFAULT_MESSAGE_PAGE,
+		pagingSourceFactory = {
+			MessageSource(
+				messageRepository = this,
+				chatId = chatId,
+				pageSize = pageSize
+			)
+		}
+	).flow
 }

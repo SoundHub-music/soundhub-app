@@ -8,9 +8,7 @@ import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.file.GetImageUseCase
-import com.soundhub.domain.usecases.music.LoadArtistsUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
-import com.soundhub.domain.usecases.music.SearchArtistsUseCase
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
@@ -47,11 +45,6 @@ object DomainModule {
 
 	@Provides
 	@Singleton
-	fun providesLoadArtistsUseCase(musicRepository: MusicRepository): LoadArtistsUseCase =
-		LoadArtistsUseCase(musicRepository)
-
-	@Provides
-	@Singleton
 	fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase =
 		GetAllChatsByUserUseCase(chatRepository)
 
@@ -59,11 +52,6 @@ object DomainModule {
 	@Singleton
 	fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase =
 		GetOrCreateChatByUserUseCase(chatRepository)
-
-	@Provides
-	@Singleton
-	fun providesSearchArtistsUseCase(musicRepository: MusicRepository): SearchArtistsUseCase =
-		SearchArtistsUseCase(musicRepository)
 
 	@Provides
 	@Singleton

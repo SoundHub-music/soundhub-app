@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.soundhub.domain.states.ArtistUiState
 import com.soundhub.presentation.shared.layouts.music_preferences.ChooseArtistsScreen
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
@@ -18,8 +20,11 @@ fun PostRegisterChooseArtistsScreen(
 	val artistUiState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
 	val lazyGridState = rememberLazyGridState()
 
+	val pagedArtists = remember { registrationViewModel.getArtistPage() }
+		.collectAsLazyPagingItems()
+
 	LaunchedEffect(key1 = true) {
-		registrationViewModel.loadArtists()
+		uiStateDispatcher.onSearchValueDebounceChange { pagedArtists.refresh() }
 	}
 
 	LaunchedEffect(key1 = artistUiState) {
@@ -27,9 +32,8 @@ fun PostRegisterChooseArtistsScreen(
 	}
 
 	ChooseArtistsScreen(
-		artists = artistUiState.artists,
 		chosenArtists = artistUiState.chosenArtists,
-		isLoading = artistUiState.status.isLoading(),
+		pagedArtists = pagedArtists,
 		onItemPlateClick = registrationViewModel::onArtistItemClick,
 		onNextButtonClick = registrationViewModel::onNextButtonClick,
 		onSearchFieldChange = registrationViewModel::onSearchFieldChange,

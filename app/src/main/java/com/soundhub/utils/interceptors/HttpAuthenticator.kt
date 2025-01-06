@@ -75,7 +75,7 @@ class HttpAuthenticator @Inject constructor(
 	}
 
 	private fun navigateToAuthForm() {
-		CoroutineScope(Dispatchers.IO).launch {
+		CoroutineScope(Dispatchers.Main).launch {
 			uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Authentication))
 			userCredsStore.clear()
 		}

@@ -43,8 +43,8 @@ android {
 		applicationId = "com.soundhub"
 		minSdk = 26
 		targetSdk = 35
-		versionCode = 104
-		versionName = "1.0.4"
+		versionCode = 110
+		versionName = "1.1.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -169,7 +169,8 @@ dependencies {
 	kapt(libs.mapstructProcessor)
 
 	// Coil
-	implementation(libs.coilCompose)
+	implementation(libs.coil.compose)
+	implementation(libs.coil.network.okhttp)
 
 	// Room
 	implementation(libs.roomRuntime)

@@ -29,20 +29,18 @@ import com.soundhub.presentation.viewmodels.UiStateDispatcher
 
 @Composable
 fun ChooseArtistsScreen(
-	artists: List<Artist>,
 	pagedArtists: LazyPagingItems<Artist>? = null,
 	chosenArtists: List<Artist>,
 	isLoading: Boolean = false,
 	onItemPlateClick: (isChosen: Boolean, artist: Artist) -> Unit,
-	uiStateDispatcher: UiStateDispatcher,
 	onNextButtonClick: () -> Unit,
 	onSearchFieldChange: (value: String) -> Unit,
+	uiStateDispatcher: UiStateDispatcher,
 	lazyGridState: LazyGridState,
 ) {
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
 	PostRegisterGridLayout<Int>(
-		items = artists,
 		pagedItems = pagedArtists,
 		chosenItems = chosenArtists,
 		title = stringResource(id = R.string.screen_title_choose_artists),
@@ -82,7 +80,6 @@ private fun ChooseArtistsPreview() {
 		uiStateDispatcher = UiStateDispatcher(UserSettingsStore(context)),
 		onNextButtonClick = {},
 		onSearchFieldChange = {},
-		artists = emptyList(),
 		chosenArtists = emptyList(),
 		lazyGridState = rememberLazyGridState()
 	)

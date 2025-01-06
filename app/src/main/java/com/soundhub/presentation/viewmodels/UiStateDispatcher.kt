@@ -79,7 +79,7 @@ class UiStateDispatcher @Inject constructor(
 	}
 
 	@OptIn(FlowPreview::class)
-	fun onSearchValueDebounceChange(callback: (String) -> Unit) = viewModelScope.launch {
+	fun onSearchValueDebounceChange(callback: suspend (String) -> Unit) = viewModelScope.launch {
 		_uiState.map { it.searchBarText }.debounce(Constants.SEARCH_DEBOUNCE_VALUE)
 			.distinctUntilChanged()
 			.collect { value -> callback(value) }

@@ -18,7 +18,7 @@ import com.soundhub.domain.model.Message
 @Composable
 internal fun MessageCheckbox(
 	message: Message,
-	checkedMessages: List<Message>,
+	checkedMessages: Set<Message>,
 	isCheckMessagesModeEnabled: Boolean,
 	content: @Composable () -> Unit,
 ) {

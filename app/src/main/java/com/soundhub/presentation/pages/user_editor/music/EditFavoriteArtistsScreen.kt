@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.soundhub.domain.states.ArtistUiState
-import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.shared.layouts.music_preferences.ChooseArtistsScreen
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.FlowPreview
@@ -24,19 +23,18 @@ fun EditFavoriteArtistsScreen(
 	val artistUiState: ArtistUiState by editMusicPrefViewModel
 		.artistUiState.collectAsState()
 
-
-	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-
 	val lazyGridState = rememberLazyGridState()
-
 	val pagedArtists = remember { editMusicPrefViewModel.getArtistPage() }
 		.collectAsLazyPagingItems()
 
 	val loadState = pagedArtists.loadState
 
-	val isLoading = loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading
+	val isRefreshLoading = loadState.refresh is LoadState.Loading
+	val isAppendLoading = loadState.append is LoadState.Loading
 
-	LaunchedEffect(uiState.searchBarText) {
+	val isLoading = isRefreshLoading || isAppendLoading
+
+	LaunchedEffect(key1 = true) {
 		uiStateDispatcher.onSearchValueDebounceChange {
 			pagedArtists.refresh()
 		}
@@ -51,7 +49,6 @@ fun EditFavoriteArtistsScreen(
 	}
 
 	ChooseArtistsScreen(
-		artists = artistUiState.artists,
 		pagedArtists = pagedArtists,
 		chosenArtists = artistUiState.chosenArtists,
 		isLoading = isLoading,

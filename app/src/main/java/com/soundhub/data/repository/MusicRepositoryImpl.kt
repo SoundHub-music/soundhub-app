@@ -22,6 +22,7 @@ import com.soundhub.domain.model.Track
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.states.GenreUiState
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import javax.inject.Inject
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class MusicRepositoryImpl @Inject constructor(
 	private val musicService: MusicService,
 	private val genreService: GenreService,
+	private val uiStateDispatcher: UiStateDispatcher,
 	context: Context,
 	gson: Gson
 ) : MusicRepository, BaseRepository(gson, context) {
@@ -197,6 +199,12 @@ class MusicRepositoryImpl @Inject constructor(
 		pageSize: Int
 	): Flow<PagingData<Artist>> = Pager(
 		config = PagingConfig(pageSize = pageSize),
-		pagingSourceFactory = { ArtistSource(this, genreUiState, searchText) }
+		pagingSourceFactory = {
+			ArtistSource(
+				musicRepository = this,
+				genreUiState = genreUiState,
+				uiStateDispatcher = uiStateDispatcher
+			)
+		}
 	).flow
 }

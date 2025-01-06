@@ -33,7 +33,7 @@ import com.soundhub.presentation.pages.chat.ChatViewModel
 internal fun ReferencedMessageBox(chatViewModel: ChatViewModel) {
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 	val isReplyMessageModeEnabled = chatUiState.isReplyMessageModeEnabled
-	val checkedMessages: List<Message> = chatUiState.checkedMessages
+	val checkedMessages: Set<Message> = chatUiState.checkedMessages
 	val messageToReply: Message? = checkedMessages.firstOrNull()
 
 	if (isReplyMessageModeEnabled && messageToReply != null)

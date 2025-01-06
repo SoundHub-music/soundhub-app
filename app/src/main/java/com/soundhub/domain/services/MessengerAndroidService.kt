@@ -24,12 +24,12 @@ import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.MessageRepository
 import com.soundhub.presentation.activities.MainActivity
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
-import com.soundhub.utils.NotificationHelper
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_DELETE_MESSAGE_TOPIC
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_GET_MESSAGES_TOPIC
 import com.soundhub.utils.constants.ApiEndpoints.ChatWebSocket.WS_READ_MESSAGE_TOPIC
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.extensions.intent.getSerializableExtraExtended
+import com.soundhub.utils.lib.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -120,10 +120,7 @@ class MessengerAndroidService : Service() {
 		startWithAction(intent)
 
 		coroutineScope.launch {
-			notificationHelper = NotificationHelper(
-				context = context,
-				userCredsStore = userCredsStore
-			)
+			notificationHelper = NotificationHelper(context)
 
 			webSocketClient.connect(Constants.SOUNDHUB_WEBSOCKET)
 			subscribeToAllChats()

@@ -1,5 +1,6 @@
 package com.soundhub.presentation.shared.bars.top.chatbar
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
@@ -44,12 +45,20 @@ fun ChatTopAppBar(
 					chatViewModel.unsetCheckMessagesMode()
 				} else navController.popBackStack()
 			}) {
-				Icon(
-					imageVector = if (isCheckMessageModeEnabled) Icons.Rounded.Close
-					else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
-					contentDescription = stringResource(id = R.string.btn_description_back),
-					modifier = Modifier.size(28.dp)
-				)
+				Crossfade(
+					targetState = if (isCheckMessageModeEnabled) {
+						Icons.Rounded.Close
+					} else {
+						Icons.AutoMirrored.Rounded.KeyboardArrowLeft
+					},
+					label = "control icon"
+				) { state ->
+					Icon(
+						imageVector = state,
+						contentDescription = stringResource(id = R.string.btn_description_back),
+						modifier = Modifier.size(28.dp)
+					)
+				}
 			}
 		},
 		actions = {

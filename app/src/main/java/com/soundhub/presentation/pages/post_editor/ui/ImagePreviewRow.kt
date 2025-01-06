@@ -28,10 +28,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil3.compose.AsyncImage
 import com.soundhub.domain.states.PostEditorState
 import com.soundhub.presentation.pages.post_editor.PostEditorViewModel
+import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.lib.ImageUtils
 
 @Composable
 internal fun ImagePreviewRow(
@@ -56,17 +57,16 @@ internal fun ImagePreviewRow(
 	}
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun ImageItem(
 	modifier: Modifier = Modifier,
 	postEditorViewModel: PostEditorViewModel,
 	imageUrl: String
 ) {
-	var glideUrl: Any? by remember { mutableStateOf(null) }
+	var url: Any? by remember { mutableStateOf(null) }
 
 	LaunchedEffect(imageUrl) {
-		glideUrl = postEditorViewModel.getGlideUrl(imageUrl.toUri())
+		url = ImageUtils.getFileUrlOrLocalPath(imageUrl.toUri(), MediaFolder.POST_PICTURE)
 	}
 
 	Box(
@@ -85,8 +85,8 @@ private fun ImageItem(
 					.padding(0.dp)
 			)
 		}
-		GlideImage(
-			model = glideUrl,
+		AsyncImage(
+			model = url,
 			contentDescription = imageUrl,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier

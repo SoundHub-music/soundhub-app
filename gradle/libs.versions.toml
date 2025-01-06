@@ -1,5 +1,7 @@
 [versions]
 androidxCore = "1.15.0"
+coilCompose = "3.0.4"
+coilNetworkOkhttp = "3.0.4"
 gradle = "8.7.3"
 lifecycle = "2.8.7"
 activity = "1.9.3"
@@ -16,7 +18,7 @@ kotlinxSerialization = "1.6.3"
 kotlin = "2.0.0"
 junit = "4.13.2"
 espresso = "3.6.1"
-coroutines = "1.8.1-Beta"
+coroutines = "1.9.0"
 glide = "4.14.2"
 datastore = "1.1.1"
 pagingCompose = "3.3.5"
@@ -25,13 +27,14 @@ retrofit = "2.9.0"
 okhttp = "4.12.0"
 splashscreen = "1.0.1"
 mapstruct = "1.5.5.Final"
-coil = "2.6.0"
 room = "2.6.1"
 stomp = "1.6.6"
 rxandroid = "2.1.1"
 
 [libraries]
 androidCoreKtx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -66,7 +69,7 @@ testExtJunit = { group = "androidx.test.ext", name = "junit", version = "1.2.1" 
 espressoCore = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 composeUiTooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
 composeUiTestManifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
-coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.8.1-Beta" }
+coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.9.0" }
 
 coroutinesCore = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 
@@ -91,8 +94,6 @@ coreSplashscreen = { group = "androidx.core", name = "core-splashscreen", versio
 
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstructProcessor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
-
-coilCompose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }

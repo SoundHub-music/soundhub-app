@@ -57,7 +57,7 @@ internal fun MessageBox(
 	val highlightedMessageId: UUID? by chatViewModel.highlightedMessageId.collectAsState()
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
 	val isCheckMessagesModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
-	val checkedMessages: List<Message> = chatUiState.checkedMessages
+	val checkedMessages: Set<Message> = chatUiState.checkedMessages
 	var replyToMessage: Message? by remember { mutableStateOf(null) }
 
 	var isHighlighted = remember(highlightedMessageId) {

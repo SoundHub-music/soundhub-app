@@ -1,5 +1,6 @@
-package com.soundhub.utils
+package com.soundhub.utils.lib
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.PendingIntent
@@ -19,16 +20,12 @@ import androidx.core.graphics.drawable.IconCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.domain.model.Message
 import com.soundhub.utils.enums.MediaFolder
-import com.soundhub.utils.lib.HttpUtils
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 
 class NotificationHelper(
-	private val context: Context,
-	userCredsStore: UserCredsStore
+	private val context: Context
 ) {
 	companion object {
 		val LOG_CLASSNAME = this::class.simpleName
@@ -36,8 +33,6 @@ class NotificationHelper(
 
 	private var notificationManager: NotificationManagerCompat =
 		NotificationManagerCompat.from(context)
-
-	private val userCredsFlow = userCredsStore.getCreds()
 
 	fun generateNotificationId(message: Message) = message.author?.id.hashCode()
 
@@ -82,13 +77,10 @@ class NotificationHelper(
 		message: Message,
 		notificationBuilder: Builder
 	) = runBlocking {
-		val userCreds = userCredsFlow.firstOrNull()
-
 		Glide.with(context)
 			.asBitmap()
 			.load(
-				HttpUtils.prepareGlideUrWithAccessToken(
-					userCreds,
+				ImageUtils.getImageUrlWithFolderQuery(
 					message.author?.avatarUrl,
 					MediaFolder.AVATAR
 				)
@@ -138,7 +130,7 @@ class NotificationHelper(
 	fun sendNotification(notificationBuilder: Builder, id: Int) {
 		if (ActivityCompat.checkSelfPermission(
 				context,
-				android.Manifest.permission.POST_NOTIFICATIONS
+				Manifest.permission.POST_NOTIFICATIONS
 			) == PackageManager.PERMISSION_GRANTED
 		) {
 			notificationManager.notify(id, notificationBuilder.build())

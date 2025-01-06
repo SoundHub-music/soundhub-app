@@ -9,14 +9,29 @@ import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.states.GenreUiState
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ArtistSource @Inject constructor(
 	private val musicRepository: MusicRepository,
 	private val genreUiState: GenreUiState,
-	private val searchText: String? = null
+	private val uiStateDispatcher: UiStateDispatcher,
 ) : PagingSource<String, Artist>() {
+	// unique page result cache
+	private val loadedArtistIds = mutableSetOf<Int>()
+	private var searchArtistJob: Job? = null
+	private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+	override val keyReuseSupported: Boolean = true
 
 	override fun getRefreshKey(state: PagingState<String, Artist>): String? {
 		return state.anchorPosition?.let {
@@ -26,7 +41,6 @@ class ArtistSource @Inject constructor(
 
 	override suspend fun load(params: LoadParams<String>): LoadResult<String, Artist> {
 		return try {
-			Log.d("ArtistSource", "params: ${params.loadSize}")
 			val nextPageUrl: String? = params.key
 
 			if (nextPageUrl == null) fetchArtistsWithoutUrl(Constants.DEFAULT_ARTIST_PAGE_SIZE)
@@ -37,24 +51,39 @@ class ArtistSource @Inject constructor(
 		}
 	}
 
-	private suspend fun fetchArtistsWithoutUrl(loadSize: Int): LoadResult<String, Artist> {
+	private suspend fun fetchArtistsWithoutUrl(countPerPage: Int): LoadResult<String, Artist> {
 		return try {
-			val chosenGenreNames = genreUiState.chosenGenres.mapNotNull { it.name }
-			var response: DiscogsResponse? = null
+			val uiState = uiStateDispatcher.uiState.firstOrNull()
+			val searchText: String? = uiState?.searchBarText
 
-			response = (if (searchText?.isNotEmpty() == true) {
-				musicRepository.searchEntityByType(
-					query = searchText,
-					type = DiscogsSearchType.Artist,
-					countPerPage = loadSize
-				)
-			} else {
-				musicRepository.getArtistsByGenres(
-					genres = chosenGenreNames,
-					styles = chosenGenreNames,
-					countPerPage = loadSize
-				)
-			}).getOrThrow()
+			Log.d("ArtistSource", "fetchArtistsWithoutUrl[search]: $searchText")
+
+			val chosenGenreNames = genreUiState.chosenGenres.mapNotNull { it.name }
+
+			if (searchText?.isNotEmpty() == true) {
+				searchArtistJob?.cancelAndJoin()
+
+				var response: DiscogsResponse? = null
+
+				searchArtistJob = scope.launch {
+					response = musicRepository.searchEntityByType(
+						query = searchText,
+						type = DiscogsSearchType.Artist,
+						countPerPage = countPerPage
+					).getOrThrow()
+
+				}
+
+				searchArtistJob?.join()
+
+				return createPageFromResponse(response)
+			}
+
+			val response = musicRepository.getArtistsByGenres(
+				genres = chosenGenreNames,
+				styles = chosenGenreNames,
+				countPerPage = countPerPage
+			).getOrThrow()
 
 			createPageFromResponse(response)
 		} catch (e: Exception) {
@@ -94,6 +123,7 @@ class ArtistSource @Inject constructor(
 
 		return data.mapNotNull { entity ->
 			val artistName = entity.title.substringBefore("-").trim()
+			delay(500)
 
 			musicRepository.searchArtistInReleases(artistName)
 				.getOrNull()?.let { artistBody ->
@@ -104,6 +134,8 @@ class ArtistSource @Inject constructor(
 						artistBody
 					} else null
 				}
-		}.distinctBy { it.name }.distinctBy { it.id }
+		}.filter { it.id !in loadedArtistIds }
+			.distinctBy { it.id }
+			.also { artists -> loadedArtistIds.addAll(artists.map { it.id }) }
 	}
 }

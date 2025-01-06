@@ -10,7 +10,8 @@ import java.util.UUID
 
 class MessageSource(
 	private val messageRepository: MessageRepository,
-	private val chatId: UUID?
+	private val chatId: UUID?,
+	private val pageSize: Int
 ) : PagingSource<Int, Message>() {
 	override fun getRefreshKey(state: PagingState<Int, Message>): Int? {
 		return state.anchorPosition?.let { anchorPosition ->
@@ -26,7 +27,7 @@ class MessageSource(
 				messageRepository.getPagedMessages(
 					chatId = it,
 					page = nextPageNumber,
-					pageSize = 50
+					pageSize = pageSize
 				)
 			}
 

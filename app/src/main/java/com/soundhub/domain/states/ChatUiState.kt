@@ -14,7 +14,7 @@ data class ChatUiState(
 	val unreadMessageCount: Int = 0,
 	val status: ApiStatus = ApiStatus.NOT_LAUNCHED,
 	val interlocutor: User? = null,
-	val checkedMessages: List<Message> = emptyList(),
+	val checkedMessages: Set<Message> = emptySet(),
 
 	val isCheckMessageModeEnabled: Boolean = false,
 	val isReplyMessageModeEnabled: Boolean = false
