@@ -30,10 +30,10 @@ fun FriendsScreen(
 ) {
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
-	val tabs = friendsViewModel.getTabs()
-	var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(tabs) }
+	var tabState: List<FriendListPage> by rememberSaveable { mutableStateOf(FriendsViewModel.Tabs) }
 
-	val tabPagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+	val tabPagerState =
+		rememberPagerState(initialPage = 0, pageCount = { FriendsViewModel.Tabs.size })
 	val isOriginProfile = friendsViewModel.isOriginProfile()
 
 	LaunchedEffect(key1 = userId) {
@@ -43,7 +43,7 @@ fun FriendsScreen(
 	LaunchedEffect(key1 = isOriginProfile) {
 		tabState = if (!isOriginProfile)
 			listOf(FriendListPage.MAIN)
-		else friendsViewModel.getTabs()
+		else FriendsViewModel.Tabs
 	}
 
 	LaunchedEffect(key1 = tabPagerState.currentPage) {

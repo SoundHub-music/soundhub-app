@@ -33,7 +33,7 @@ internal fun FriendsScreenPager(
 				modifier = Modifier.fillMaxSize(),
 				verticalAlignment = Alignment.CenterVertically
 			) { page ->
-				ActivePage(
+				ActiveFriendsPage(
 					friendsViewModel = friendsViewModel,
 					uiStateDispatcher = uiStateDispatcher,
 					selectedTabState = selectedTabState,
@@ -52,14 +52,14 @@ internal fun FriendsScreenPager(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ActivePage(
+private fun ActiveFriendsPage(
 	friendsViewModel: FriendsViewModel,
 	uiStateDispatcher: UiStateDispatcher,
 	selectedTabState: PagerState,
 	navController: NavHostController,
 	page: Int
 ) {
-	val tabs: List<FriendListPage> = friendsViewModel.getTabs()
+	val tabs: List<FriendListPage> = FriendsViewModel.Tabs
 	if (page < tabs.size) {
 		when (tabs[page]) {
 			FriendListPage.MAIN -> MainFriendsPage(

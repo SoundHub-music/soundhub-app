@@ -33,7 +33,7 @@ object Constants {
 	const val EMAIL_REGEX: String = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
 	const val DYNAMIC_PARAM_REGEX: String = """\{[^}]*\}"""
 	const val URL_WITH_PARAMS_REGEX: String = "/\\S+\\?\\w+=\\w+"
-	const val DUPLICATE_MUSIC_ENTITY_PATTERN = "\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)"
+	const val DUPLICATE_MUSIC_ENTITY_PATTERN: String = "\\p{L}+(?:\\s+\\p{L}+)*\\s*\\(\\d+\\)"
 
 	// endregion
 

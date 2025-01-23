@@ -10,11 +10,11 @@ fun Request.withAppAuthorization(userCreds: UserPreferences?): Request {
 }
 
 fun Request.withAppAuthorization(bearerToken: String?): Request {
-	val headerNames: Set<String> = this.headers.names()
+	val headerNames: Set<String> = headers.names()
 	val hasAuthorizationHeader: Boolean = headerNames.contains(AUTHORIZATION_HEADER)
 	val hasAccessToken: Boolean = bearerToken != null
 
-	if (hasAuthorizationHeader || hasAccessToken)
+	if (hasAuthorizationHeader || !hasAccessToken)
 		return this
 
 	val bearerToken: String = HttpUtils.getBearerToken(bearerToken)

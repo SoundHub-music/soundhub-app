@@ -57,12 +57,10 @@ fun PostCard(
 			images = post.images,
 			navController = navController,
 		)
-		authorizedUser?.let {
-			PostBottomPanel(
-				post = post,
-				uiStateDispatcher = uiStateDispatcher,
-				onLikePost = onLikePost
-			)
-		}
+		PostBottomPanel(
+			post = post,
+			uiStateDispatcher = uiStateDispatcher,
+			onLikePost = onLikePost
+		)
 	}
 }

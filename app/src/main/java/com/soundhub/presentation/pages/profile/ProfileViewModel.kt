@@ -199,16 +199,19 @@ class ProfileViewModel @Inject constructor(
 			.finallyWithContext { uiStateDispatcher.sendUiEvent(uiEvent) }
 	}
 
-	fun loadProfileOwner(id: UUID) = viewModelScope.launch(Dispatchers.Main) {
+	suspend fun loadProfileOwner(id: UUID) {
 		val authorizedUser: User? = userDao.getCurrentUser()
-		if (authorizedUser?.id == id)
+
+		if (authorizedUser?.id == id) {
 			setProfileOwner(authorizedUser)
-		else {
-			val profileOwner: User? = getUserByIdUseCase(id)
-			if (authorizedUser == null || profileOwner == null)
-				return@launch
-			setProfileOwner(profileOwner, authorizedUser)
+			return
 		}
+
+		val profileOwner: User? = getUserByIdUseCase(id)
+		if (authorizedUser == null || profileOwner == null)
+			return
+
+		setProfileOwner(profileOwner, authorizedUser)
 	}
 
 	private fun setProfileOwner(profileOwner: User) = _profileUiState.update {

@@ -47,8 +47,7 @@ internal fun GenresFlowRow(
 		horizontalArrangement = Arrangement.spacedBy(5.dp),
 		verticalArrangement = Arrangement.spacedBy(10.dp),
 		maxItemsInEachRow = maxItemsPerRow,
-
-		) {
+	) {
 		genreList.forEachIndexed { index, genre ->
 			genre.name?.let {
 				FavoriteGenreItem(

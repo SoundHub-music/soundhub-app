@@ -47,21 +47,23 @@ class FriendsViewModel @Inject constructor(
 	private val _friendsUiState = MutableStateFlow(FriendsUiState())
 	val friendsUiState: StateFlow<FriendsUiState> = _friendsUiState.asStateFlow()
 
-	private val tabs: List<FriendListPage> = listOf(
-		FriendListPage.MAIN,
-		FriendListPage.RECOMMENDATIONS,
-		FriendListPage.SEARCH
-	)
-
 	private val _currentTabIndex = MutableStateFlow(0)
 	val currentTabIndex = _currentTabIndex.asStateFlow()
+
+	companion object {
+		val Tabs: List<FriendListPage> = listOf(
+			FriendListPage.MAIN,
+			FriendListPage.RECOMMENDATIONS,
+			FriendListPage.SEARCH
+		)
+	}
 
 	init {
 		viewModelScope.launch {
 			initializeFriendsUiState()
 
 			uiStateDispatcher.onSearchValueDebounceChange {
-				if (tabs[currentTabIndex.value] == FriendListPage.SEARCH) {
+				if (Tabs[currentTabIndex.value] == FriendListPage.SEARCH) {
 					searchUsers(it)
 				}
 			}
@@ -77,8 +79,6 @@ class FriendsViewModel @Inject constructor(
 	private suspend fun initializeFriendsUiState() = authorizedUser.update {
 		userDao.getCurrentUser()
 	}
-
-	fun getTabs() = tabs
 
 	fun setCurrentTabIndex(index: Int) = _currentTabIndex.update { index }
 
@@ -226,6 +226,6 @@ class FriendsViewModel @Inject constructor(
 	}
 
 	fun handleSearchFriendClick(pagerState: PagerState) = viewModelScope.launch {
-		pagerState.animateScrollToPage(tabs.indexOf(FriendListPage.RECOMMENDATIONS))
+		pagerState.animateScrollToPage(Tabs.indexOf(FriendListPage.RECOMMENDATIONS))
 	}
 }

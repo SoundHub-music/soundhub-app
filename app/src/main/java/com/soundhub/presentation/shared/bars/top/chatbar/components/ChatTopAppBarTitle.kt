@@ -26,15 +26,11 @@ internal fun ChatTopAppBarTitle(
 	val isCheckMessageModeEnabled = chatUiState.isCheckMessageModeEnabled
 	val checkedMessagesCount: Int = chatUiState.checkedMessages.size
 
-	Box(
-		modifier = Modifier
-			.fillMaxSize()
-	) {
+	Box(modifier = Modifier.fillMaxSize()) {
 		AnimatedVisibility(
 			visible = !isCheckMessageModeEnabled,
 			enter = fadeIn(),
 			exit = fadeOut(),
-			modifier = Modifier.align(Alignment.Center)
 		) {
 			InterlocutorDetails(chatViewModel, navController)
 		}

@@ -10,6 +10,8 @@ import org.mapstruct.factory.Mappers
 interface DiscogsMapper {
 	@Mapping(target = "name", source = "title")
 	@Mapping(target = "cover", source = "thumb")
+	@Mapping(target = "description", ignore = true)
+	@Mapping(target = "albums", ignore = true)
 	fun toArtist(entity: DiscogsEntityResponse): Artist
 
 	companion object {
