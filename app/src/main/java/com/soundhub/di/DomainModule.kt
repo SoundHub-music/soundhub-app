@@ -1,5 +1,6 @@
 package com.soundhub.di
 
+import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.FileRepository
 import com.soundhub.domain.repository.MusicRepository
@@ -70,7 +71,8 @@ object DomainModule {
 	@Singleton
 	fun providesGetPostsByUserUseCase(
 		postRepository: PostRepository,
-	): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository)
+		postDao: PostDao
+	): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository, postDao)
 
 	@Provides
 	@Singleton

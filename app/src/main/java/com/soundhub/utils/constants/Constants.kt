@@ -170,6 +170,7 @@ object Constants {
 	const val DESTINATION_HEADER = "destination"
 
 	const val UNAUTHORIZED_USER_ERROR_CODE = 401
+	const val NOT_FOUND_ERROR_CODE = 404
 	const val CONNECTION_TIMEOUT = 10L
 
 	const val CACHE_SIZE: Long = 10 * 1024 * 1024

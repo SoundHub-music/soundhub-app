@@ -8,7 +8,6 @@ import com.soundhub.Route
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Chat
@@ -24,6 +23,7 @@ import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -51,7 +50,6 @@ class ProfileViewModel @Inject constructor(
 	private val deletePostByIdUseCase: DeletePostByIdUseCase,
 	private val getUserByIdUseCase: GetUserByIdUseCase,
 	private val userDao: UserDao,
-	private val postDao: PostDao,
 	userCredsStore: UserCredsStore
 ) : ViewModel() {
 	private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
@@ -152,29 +150,34 @@ class ProfileViewModel @Inject constructor(
 		val authorizedUser: User? = userDao.getCurrentUser()
 		val profileOwner: User? = _profileUiState.value.profileOwner
 
-		if (authorizedUser != null && profileOwner?.id == authorizedUser.id) {
-			inviteRepository.getInviteBySenderAndRecipientId(
-				senderId = authorizedUser.id,
-				recipientId = profileOwner.id
-			)
-				.onSuccessWithContext { response ->
-					val invite = response.body
-					val isRequestSent: Boolean = invite?.recipient?.id == profileOwner.id
-					val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
-					_profileUiState.update {
-						it.copy(
-							isRequestSent = isRequestSent,
-							inviteSentByCurrentUser = inviteSentByCurrentUser
-						)
-					}
+		if (
+			authorizedUser == null ||
+			profileOwner == null ||
+			profileOwner.id != authorizedUser.id
+		)
+			return@launch
+
+		inviteRepository.getInviteBySenderAndRecipientId(
+			senderId = authorizedUser.id,
+			recipientId = profileOwner.id
+		)
+			.onSuccessWithContext { response ->
+				val invite = response.body
+				val isRequestSent: Boolean = invite?.recipient?.id == profileOwner.id
+				val inviteSentByCurrentUser: Invite? = if (isRequestSent) invite else null
+				_profileUiState.update {
+					it.copy(
+						isRequestSent = isRequestSent,
+						inviteSentByCurrentUser = inviteSentByCurrentUser
+					)
 				}
-				.onFailureWithContext { error ->
-					if (error.errorBody.status != 404) {
-						val uiEvent = UiEvent.Error(error.errorBody, error.throwable)
-						uiStateDispatcher.sendUiEvent(uiEvent)
-					}
+			}
+			.onFailureWithContext { error ->
+				if (error.errorBody.status != Constants.NOT_FOUND_ERROR_CODE) {
+					val uiEvent = UiEvent.Error(error.errorBody, error.throwable)
+					uiStateDispatcher.sendUiEvent(uiEvent)
 				}
-		}
+			}
 	}
 
 	private fun deleteFriend(user: User) = viewModelScope.launch(Dispatchers.IO) {
@@ -234,59 +237,38 @@ class ProfileViewModel @Inject constructor(
 
 	// post logic
 	fun loadPostsByUser() = viewModelScope.launch(Dispatchers.IO) {
-		val cache: List<Post> = postDao.getWallPosts()
-
 		val (profileOwner: User?) = _profileUiState.value
 
-		if (cache.hashCode() != _profileUiState.value.userPosts.hashCode() || _profileUiState.value.userPosts.isEmpty()) {
-			_profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
-			profileOwner?.let {
-				getPostsByUserUseCase(profileOwner)
-					.onSuccess { response ->
-						withContext(Dispatchers.Main) {
-							postDao.updateWallPosts(response)
+		if (profileOwner == null)
+			return@launch
 
-							_profileUiState.update {
-								it.copy(
-									userPosts = response,
-									postStatus = ApiStatus.SUCCESS
-								)
-							}
-						}
-					}
-					.onFailure {
-						withContext(Dispatchers.Main) {
-							_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
-						}
-					}
-			}
-		} else {
+		_profileUiState.update { it.copy(postStatus = ApiStatus.LOADING) }
+
+		getPostsByUserUseCase(profileOwner, _profileUiState.value).onSuccess { response ->
 			_profileUiState.update {
 				it.copy(
-					userPosts = cache,
+					userPosts = response,
 					postStatus = ApiStatus.SUCCESS
 				)
 			}
 		}
+			.onFailure {
+				_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
+			}
 	}
 
 	fun deletePostById(postId: UUID) = viewModelScope.launch(Dispatchers.IO) {
-		deletePostByIdUseCase(postId)
-			.onSuccess { response ->
-				withContext(Dispatchers.Main) {
-					_profileUiState.update { state ->
-						val deletedPostId: UUID? = response
-						state.copy(
-							userPosts = state.userPosts.filter { deletedPostId != it.id },
-							postStatus = ApiStatus.SUCCESS
-						)
-					}
-				}
+		Log.d("ProfileViewModel", "deletePOstById: $postId")
+		deletePostByIdUseCase(postId).onSuccess { deletedPostId ->
+			_profileUiState.update { state ->
+				state.copy(
+					userPosts = state.userPosts.filter { deletedPostId != it.id },
+					postStatus = ApiStatus.SUCCESS
+				)
 			}
+		}
 			.onFailure {
-				withContext(Dispatchers.Main) {
-					_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
-				}
+				_profileUiState.update { it.copy(postStatus = ApiStatus.ERROR) }
 			}
 	}
 
@@ -294,19 +276,15 @@ class ProfileViewModel @Inject constructor(
 		val posts: List<Post> = _profileUiState.value.userPosts
 		togglePostLikeAndUpdateListUseCase(postId, posts)
 			.onSuccess { response ->
-				withContext(Dispatchers.Main) {
-					_profileUiState.update {
-						val updatedPostList: List<Post> = response
-						it.copy(userPosts = updatedPostList)
-					}
+				_profileUiState.update {
+					val updatedPostList: List<Post> = response
+					it.copy(userPosts = updatedPostList)
 				}
 			}
 			.onFailure { error ->
-				withContext(Dispatchers.Main) {
-					error.message?.let {
-						val toastText: UiText = UiText.DynamicString(it)
-						uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
-					}
+				error.message?.let {
+					val toastText: UiText = UiText.DynamicString(it)
+					uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
 				}
 			}
 	}

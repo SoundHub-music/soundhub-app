@@ -54,8 +54,8 @@ internal fun UserWall(
 					post = post,
 					navController = navController,
 					uiStateDispatcher = uiStateDispatcher,
-					onDeletePost = { profileViewModel::deletePostById },
-					onLikePost = { profileViewModel::togglePostLikeAndUpdatePostList }
+					onDeletePost = { id -> profileViewModel.deletePostById(id) },
+					onLikePost = { id -> profileViewModel.togglePostLikeAndUpdatePostList(id) }
 				)
 			}
 		}
