@@ -5,13 +5,14 @@ import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants.AUTHORIZED_HTTP_CLIENT_WITH_CACHE
-import com.soundhub.utils.constants.Constants.CACHE_SIZE
 import com.soundhub.utils.constants.Constants.CONNECTION_TIMEOUT
 import com.soundhub.utils.constants.Constants.SIMPLE_HTTP_CLIENT
 import com.soundhub.utils.constants.Constants.UNATHORIZED_HTTP_CLIENT_WITH_CACHE
+import com.soundhub.utils.extensions.createCache
 import com.soundhub.utils.interceptors.AuthInterceptor
 import com.soundhub.utils.interceptors.CacheInterceptor
 import com.soundhub.utils.interceptors.HttpAuthenticator
+import com.soundhub.utils.interceptors.OfflineCacheInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,6 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -30,20 +30,17 @@ import javax.inject.Singleton
 object HttpClientModule {
 	@Provides
 	@Singleton
-	fun providesAuthInterceptor(userCredsStore: UserCredsStore): AuthInterceptor =
-		AuthInterceptor(userCredsStore)
+	fun providesAuthInterceptor(userCredsStore: UserCredsStore): AuthInterceptor {
+		return AuthInterceptor(userCredsStore)
+	}
 
 	@Provides
 	@Singleton
-	fun providesHttpAuthenticator(
-		userCredsStore: UserCredsStore,
-		uiStateDispatcher: UiStateDispatcher,
-		authService: AuthService
-	): HttpAuthenticator = HttpAuthenticator(
-		userCredsStore,
-		uiStateDispatcher,
-		authService
-	)
+	fun providesLoggingInterceptor(): HttpLoggingInterceptor {
+		return HttpLoggingInterceptor().apply {
+			level = HttpLoggingInterceptor.Level.BODY
+		}
+	}
 
 	@Provides
 	@Singleton
@@ -51,18 +48,26 @@ object HttpClientModule {
 	fun providesOkHttpClient(
 		@ApplicationContext context: Context,
 		authInterceptor: AuthInterceptor,
-		authenticator: HttpAuthenticator
+		loggingInterceptor: HttpLoggingInterceptor,
+		userCredsStore: UserCredsStore,
+		uiStateDispatcher: UiStateDispatcher,
+		authService: AuthService
 	): OkHttpClient {
-		val loggingInterceptor = HttpLoggingInterceptor()
-		loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+		val cache = Cache.createCache(context = context)
+		val authenticator = HttpAuthenticator(
+			userCredsStore,
+			uiStateDispatcher,
+			authService
+		)
 
-		val cacheDirectory = File(context.cacheDir, "http-cache")
-		val cache = Cache(cacheDirectory, CACHE_SIZE)
+		val offlineCacheInterceptor = OfflineCacheInterceptor()
+		val networkInterceptor = CacheInterceptor()
 
 		return OkHttpClient.Builder()
 			.addInterceptor(loggingInterceptor)
 			.addInterceptor(authInterceptor)
-			.addNetworkInterceptor(CacheInterceptor())
+			.addInterceptor(offlineCacheInterceptor)
+			.addNetworkInterceptor(networkInterceptor)
 			.authenticator(authenticator)
 			.followRedirects(false)
 			.followSslRedirects(false)
@@ -76,17 +81,18 @@ object HttpClientModule {
 	@Singleton
 	@Named(UNATHORIZED_HTTP_CLIENT_WITH_CACHE)
 	fun providesUnauthorizedOkHttpClient(
-		@ApplicationContext context: Context
+		@ApplicationContext context: Context,
+		loggingInterceptor: HttpLoggingInterceptor
 	): OkHttpClient {
-		val loggingInterceptor = HttpLoggingInterceptor()
-		loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+		val cache = Cache.createCache(context = context)
 
-		val cacheDirectory = File(context.cacheDir, "http-cache")
-		val cache = Cache(cacheDirectory, CACHE_SIZE)
+		val offlineCacheInterceptor = OfflineCacheInterceptor()
+		val networkInterceptor = CacheInterceptor()
 
 		return OkHttpClient.Builder()
 			.addInterceptor(loggingInterceptor)
-			.addNetworkInterceptor(CacheInterceptor())
+			.addInterceptor(offlineCacheInterceptor)
+			.addNetworkInterceptor(networkInterceptor)
 			.followRedirects(false)
 			.followSslRedirects(false)
 			.retryOnConnectionFailure(true)
@@ -98,10 +104,7 @@ object HttpClientModule {
 	@Singleton
 	@Provides
 	@Named(SIMPLE_HTTP_CLIENT)
-	fun providesSimpleOkHttpClient(): OkHttpClient {
-		val loggingInterceptor = HttpLoggingInterceptor()
-		loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
+	fun providesSimpleOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
 		return OkHttpClient.Builder()
 			.addInterceptor(loggingInterceptor)
 			.followRedirects(false)
