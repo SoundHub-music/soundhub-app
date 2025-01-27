@@ -56,11 +56,7 @@ fun FriendMusicSection(
 		)
 		LazyRow(
 			state = lazyListState,
-			modifier = Modifier
-				.padding(top = 20.dp),
-//				.pointerInput(isRowDragged) {
-//					musicViewModel.horizontalDragHandler(this@pointerInput)
-//				},
+			modifier = Modifier.padding(top = 20.dp),
 			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
 			items(items = friends, key = { it.id }) { friend ->

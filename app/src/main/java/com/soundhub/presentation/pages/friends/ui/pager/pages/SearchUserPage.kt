@@ -38,7 +38,7 @@ internal fun SearchUserPage(
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Bold
 		)
-	} else if (searchStatus == ApiStatus.ERROR) {
+	} else if (searchStatus.isError()) {
 		Text(
 			text = stringResource(id = R.string.friends_search_users_not_found),
 			textAlign = TextAlign.Center,

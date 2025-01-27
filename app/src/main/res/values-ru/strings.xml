@@ -137,6 +137,8 @@
     <string name="empty_messenger_screen">У вас еще нет истории переписок</string>
     <string name="empty_messenger_screen_button">Написать другу</string>
 
+    <string name="refresh_button">Обновить</string>
+
     <!-- empty post line strings-->
     <string name="empty_postline_screen">Здесь всё ещё пусто :(</string>
     <string name="fetch_error_message">Произошла ошибка во время загрузки :(</string>

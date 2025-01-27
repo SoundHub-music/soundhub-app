@@ -24,6 +24,7 @@ import com.soundhub.presentation.viewmodels.UiStateDispatcher
 
 @Composable
 internal fun EmptyMessengerScreen(
+	modifier: Modifier = Modifier,
 	navController: NavHostController,
 	uiStateDispatcher: UiStateDispatcher
 ) {
@@ -31,7 +32,7 @@ internal fun EmptyMessengerScreen(
 	val authorizedUser: User? = uiState.authorizedUser
 
 	Column(
-		modifier = Modifier.fillMaxSize(),
+		modifier = modifier.fillMaxSize(),
 		verticalArrangement = Arrangement.spacedBy(
 			space = 10.dp,
 			alignment = Alignment.CenterVertically

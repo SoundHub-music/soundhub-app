@@ -2,10 +2,11 @@ package com.soundhub.presentation.pages.messenger.ui.containers
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +30,7 @@ import com.soundhub.presentation.shared.containers.FetchStatusContainer
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MessengerChatList(
 	modifier: Modifier = Modifier,
@@ -49,10 +51,6 @@ internal fun MessengerChatList(
 	val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 	val fetchStatus: ApiStatus = messengerUiState.status
 
-	LaunchedEffect(key1 = true) {
-		messengerViewModel.loadChats()
-	}
-
 	LaunchedEffect(key1 = messageChannel) {
 		messageChannel.collect {
 			messengerViewModel.loadChats()
@@ -71,18 +69,24 @@ internal fun MessengerChatList(
 		)
 	}
 
-	FetchStatusContainer(status = fetchStatus) {
-		if (filteredChats.isEmpty())
-			EmptyMessengerScreen(
-				navController = navController,
-				uiStateDispatcher = uiStateDispatcher
-			)
-		else LazyColumn(
+	FetchStatusContainer(
+		status = fetchStatus,
+		modifier = Modifier.fillMaxSize(),
+		onRefresh = { messengerViewModel.loadChats() }
+	) {
+		LazyColumn(
 			modifier = modifier
-				.fillMaxWidth()
+				.fillMaxSize()
 				.padding(vertical = 5.dp),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
 		) {
+			item {
+				if (filteredChats.isEmpty())
+					EmptyMessengerScreen(
+						navController = navController,
+						uiStateDispatcher = uiStateDispatcher
+					)
+			}
 			items(items = filteredChats, key = { it.id }) { chat ->
 				ChatCard(
 					chat = chat,

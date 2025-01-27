@@ -74,6 +74,12 @@ class MessengerViewModel @Inject constructor(
 		}
 	)
 
+	init {
+		viewModelScope.launch(Dispatchers.IO) {
+			loadChats()
+		}
+	}
+
 	override fun onCleared() {
 		super.onCleared()
 		Log.d("MessengerViewModel", "viewmodel was cleared")
@@ -171,7 +177,7 @@ class MessengerViewModel @Inject constructor(
 		return lastMessageContent
 	}
 
-	fun loadChats() = viewModelScope.launch(Dispatchers.IO) {
+	suspend fun loadChats() {
 		val chats = getChats()
 		_messengerUiState.update {
 			it.copy(chats = chats)

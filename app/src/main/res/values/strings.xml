@@ -137,6 +137,8 @@
     <string name="empty_messenger_screen">You have no chat history yet</string>
     <string name="empty_messenger_screen_button">Message a Friend</string>
 
+    <string name="refresh_button">Refresh</string>
+
     <!-- empty post line strings -->
     <string name="empty_postline_screen">It\'s still empty here :(</string>
     <string name="fetch_error_message">Error loading content :(</string>

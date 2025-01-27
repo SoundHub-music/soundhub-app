@@ -37,15 +37,20 @@ class PostLineViewModel @Inject constructor(
 	)
 	val postLineUiState: Flow<PostLineUiState> = _postLineUiState.asStateFlow()
 
-	fun loadPosts() = viewModelScope.launch(Dispatchers.IO) {
+	init {
+		viewModelScope.launch {
+			loadPosts()
+		}
+	}
+
+	suspend fun loadPosts() {
 		_postLineUiState.update { it.copy(status = ApiStatus.LOADING) }
 
 		val authorizedUser: User? = userDao.getCurrentUser()
 		val friends: List<User> = authorizedUser?.friends.orEmpty()
 
 		friends.forEach { user -> fetchAndProcessPosts(user) }.also {
-			if (friends.isEmpty())
-				_postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
+			_postLineUiState.update { it.copy(status = ApiStatus.SUCCESS) }
 		}
 	}
 
