@@ -4,6 +4,7 @@ import com.soundhub.domain.enums.Gender
 import com.soundhub.domain.model.Genre
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class RegisterRequestBody(
 	var email: String = "",
@@ -18,7 +19,7 @@ data class RegisterRequestBody(
 	var description: String? = "",
 	var languages: List<String> = emptyList(),
 	var favoriteGenres: List<Genre> = emptyList(),
-	var favoriteArtistsIds: List<Int> = emptyList(),
+	var favoriteArtistsIds: List<UUID> = emptyList(),
 	var online: Boolean = false,
 	var lastOnline: LocalDateTime? = null
 )

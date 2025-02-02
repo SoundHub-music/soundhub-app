@@ -1,14 +1,19 @@
 package com.soundhub.data.api.services
 
 import com.soundhub.data.api.responses.lastfm.ArtistsByTagResponse
+import com.soundhub.data.api.responses.lastfm.LastFmArtistInfo
 import com.soundhub.data.api.responses.lastfm.LastFmSessionResponse
 import com.soundhub.data.api.responses.lastfm.LastFmUserInfoResponse
 import com.soundhub.data.api.responses.lastfm.SearchArtistResponseBody
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.API_SIG_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.ARTIST_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.LastFm.GET_ARTIST_INFO
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.GET_MOBILE_SESSION
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.GET_TOP_ARTISTS_BY_TAG_ENDPOINT
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.GET_USER_INFO
+import com.soundhub.utils.constants.ApiEndpoints.LastFm.LANG_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.LastFm.LIMIT_PARAM
+import com.soundhub.utils.constants.ApiEndpoints.LastFm.MBID_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.PAGE_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.PASSWORD_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.LastFm.SEARCH_ARTISTS_ENDPOINT
@@ -24,13 +29,22 @@ interface LastFmService {
 	@GET(GET_TOP_ARTISTS_BY_TAG_ENDPOINT)
 	suspend fun getArtistsByGenre(
 		@Query(TAG_PARAM) tag: String,
-		@Query(PAGE_PARAM) page: Int = 1
+		@Query(PAGE_PARAM) page: Int = 1,
+		@Query(LIMIT_PARAM) limit: Int? = null
 	): Response<ArtistsByTagResponse>
+
+	@GET(GET_ARTIST_INFO)
+	suspend fun getArtistInfo(
+		@Query(ARTIST_PARAM) artist: String? = null,
+		@Query(MBID_PARAM) mbid: String? = null,
+		@Query(LANG_PARAM) lang: String? = null,
+	): Response<LastFmArtistInfo>
 
 	@GET(SEARCH_ARTISTS_ENDPOINT)
 	suspend fun searchArtist(
-		@Query(ARTIST_PARAM) artist: String,
-		@Query(PAGE_PARAM) page: Int = 1
+		@Query(ARTIST_PARAM) artist: String?,
+		@Query(PAGE_PARAM) page: Int = 1,
+		@Query(LIMIT_PARAM) limit: Int? = null
 	): Response<SearchArtistResponseBody>
 
 	@POST(GET_MOBILE_SESSION)

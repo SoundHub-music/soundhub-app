@@ -13,8 +13,8 @@ import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.domain.enums.Gender
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.User
+import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.repository.AuthRepository
-import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.states.RegistrationState
 import com.soundhub.domain.states.interfaces.IUserDataFormState
@@ -46,12 +46,12 @@ class RegistrationViewModel @Inject constructor(
 	private val userCredsStore: UserCredsStore,
 	private val userRepository: UserRepository,
 	private val userDao: UserDao,
-	musicRepository: MusicRepository,
+	artistRepository: ArtistRepository,
 	loadGenresUseCase: LoadGenresUseCase,
 ) : BaseMusicPreferencesViewModel(
 	loadGenresUseCase = loadGenresUseCase,
 	uiStateDispatcher = uiStateDispatcher,
-	musicRepository = musicRepository
+	artistRepository = artistRepository
 ), IUserFormViewModel {
 	private val uiState = uiStateDispatcher.uiState
 	private val _registerState = MutableStateFlow(RegistrationState())

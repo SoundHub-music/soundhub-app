@@ -26,6 +26,7 @@ import com.soundhub.domain.model.Artist
 import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.layout.PostRegisterGridLayout
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import java.util.UUID
 
 @Composable
 fun ChooseArtistsScreen(
@@ -40,7 +41,7 @@ fun ChooseArtistsScreen(
 ) {
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 
-	PostRegisterGridLayout<Int>(
+	PostRegisterGridLayout<UUID>(
 		pagedItems = pagedArtists,
 		chosenItems = chosenArtists,
 		title = stringResource(id = R.string.screen_title_choose_artists),

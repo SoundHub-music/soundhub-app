@@ -3,11 +3,12 @@ package com.soundhub.domain.usecases.user
 import android.util.Log
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.User
-import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.repository.LastFmRepository
+import com.soundhub.utils.mappers.ArtistMapper
 import javax.inject.Inject
 
 class LoadAllUserDataUseCase @Inject constructor(
-	private val musicRepository: MusicRepository,
+	private val lastFmRepository: LastFmRepository,
 ) {
 	suspend operator fun invoke(user: User) {
 		user.friends.forEach { f ->
@@ -20,8 +21,14 @@ class LoadAllUserDataUseCase @Inject constructor(
 		val artists = mutableListOf<Artist>()
 
 		user.favoriteArtistsIds.forEach { id ->
-			musicRepository.getArtistById(id)
-				.onSuccess { response -> response.body?.let { artists.add(it) } }
+			lastFmRepository.getArtistInfo(mbid = id)
+				.onSuccess { response ->
+					response.body?.let {
+						val mappedArtist = ArtistMapper.impl.lastFmArtistToArtist(it.artist)
+
+						artists.add(mappedArtist)
+					}
+				}
 				.onFailure { e ->
 					Log.e(
 						"LoadAllUserDataUseCase",

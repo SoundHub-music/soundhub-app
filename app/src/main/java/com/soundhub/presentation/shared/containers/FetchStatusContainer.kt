@@ -106,7 +106,8 @@ private fun EmptyScreen(
 	onRefresh: suspend () -> Unit
 ) {
 	Column(
-		verticalArrangement = Arrangement.spacedBy(10.dp)
+		verticalArrangement = Arrangement.spacedBy(10.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Text(
 			text = text,

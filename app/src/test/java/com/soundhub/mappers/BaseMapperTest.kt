@@ -2,7 +2,6 @@ package com.soundhub.mappers
 
 import com.soundhub.data.api.requests.RegisterRequestBody
 import com.soundhub.data.api.requests.SendMessageRequest
-import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.domain.enums.Gender
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Chat
@@ -21,21 +20,10 @@ open class BaseMapperTest {
 	protected val artist =
 		Artist(
 			name = "Rammstein",
-			id = 126841,
+			id = UUID.randomUUID(),
 			cover = "https://some.link/cover.jpg",
 			genre = listOf("Metal"),
-			style = listOf("Metal")
 		)
-
-	protected val discogsArtist = DiscogsEntityResponse(
-		title = "Rammstein", id = 126841, thumb = "https://some.link/cover.jpg",
-		type = "artist",
-		coverImage = "https://some.link/cover.jpg",
-		resourceUrl = "https://some.link",
-		uri = "https://some.link",
-		genre = listOf("Metal"),
-		style = listOf("Metal")
-	)
 
 	protected val user = User(
 		email = "user@mail.com",

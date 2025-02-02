@@ -9,7 +9,7 @@ import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.User
-import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.states.UiState
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.user.UpdateUserUseCase
@@ -33,11 +33,11 @@ class EditMusicPreferencesViewModel @Inject constructor(
 	private val updateUserUseCase: UpdateUserUseCase,
 	private val loadGenresUseCase: LoadGenresUseCase,
 	private val userDao: UserDao,
-	musicRepository: MusicRepository,
+	artistRepository: ArtistRepository,
 ) : BaseMusicPreferencesViewModel(
 	loadGenresUseCase = loadGenresUseCase,
 	uiStateDispatcher = uiStateDispatcher,
-	musicRepository = musicRepository
+	artistRepository = artistRepository
 ) {
 	private var searchText = MutableStateFlow<String?>(null)
 	private val uiState: Flow<UiState> = uiStateDispatcher.uiState

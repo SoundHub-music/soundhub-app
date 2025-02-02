@@ -3,12 +3,12 @@ package com.soundhub.di
 import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.api.services.ChatService
 import com.soundhub.data.api.services.CountryService
+import com.soundhub.data.api.services.DiscogsService
 import com.soundhub.data.api.services.FileService
 import com.soundhub.data.api.services.GenreService
 import com.soundhub.data.api.services.InviteService
 import com.soundhub.data.api.services.LastFmService
 import com.soundhub.data.api.services.MessageService
-import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.services.UserService
 import com.soundhub.utils.constants.Constants.AUTHORIZED_SOUNDHUB_API_RETROFIT
@@ -68,7 +68,7 @@ object HttpServiceModule {
 	fun providesMusicService(
 		@Named(MUSIC_API_RETROFIT)
 		retrofit: Retrofit
-	): MusicService = retrofit.create(MusicService::class.java)
+	): DiscogsService = retrofit.create(DiscogsService::class.java)
 
 	@Provides
 	@Singleton

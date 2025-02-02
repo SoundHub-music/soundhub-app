@@ -3,31 +3,35 @@ package com.soundhub.data.sources
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
-import com.soundhub.data.api.responses.discogs.DiscogsResponse
-import com.soundhub.data.enums.DiscogsSearchType
+import com.soundhub.data.api.responses.lastfm.LastFmArtist
+import com.soundhub.data.api.responses.lastfm.LastFmPaginationResponse
+import com.soundhub.data.api.responses.lastfm.PaginatedArtistsResponse
+import com.soundhub.data.api.responses.lastfm.SearchArtistResponseBody
+import com.soundhub.data.exceptions.ArtistNotFoundException
 import com.soundhub.domain.model.Artist
-import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.states.GenreUiState
+import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.mappers.ArtistMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
+import kotlin.math.ceil
 
 class ArtistSource @Inject constructor(
-	private val musicRepository: MusicRepository,
+	private val artistRepository: ArtistRepository,
 	private val genreUiState: GenreUiState,
 	private val uiStateDispatcher: UiStateDispatcher,
 ) : PagingSource<String, Artist>() {
 	// unique page result cache
-	private val loadedArtistIds = mutableSetOf<Int>()
 	private var searchArtistJob: Job? = null
 	private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -41,19 +45,21 @@ class ArtistSource @Inject constructor(
 
 	override suspend fun load(params: LoadParams<String>): LoadResult<String, Artist> {
 		return try {
-			val nextPageUrl: String? = params.key
+			val nextPage: String? = params.key
 
-			if (nextPageUrl == null) fetchArtistsWithoutUrl(Constants.DEFAULT_ARTIST_PAGE_SIZE)
-			else fetchArtistsFromNextUrl(nextPageUrl)
+			fetchArtists(Constants.DEFAULT_ARTIST_PAGE_SIZE, nextPage)
 
 		} catch (e: Exception) {
 			LoadResult.Error(e)
 		}
 	}
 
-	private suspend fun fetchArtistsWithoutUrl(countPerPage: Int): LoadResult<String, Artist> {
+	private suspend fun fetchArtists(
+		countPerPage: Int,
+		page: String?
+	): LoadResult<String, Artist> {
 		return try {
-			val uiState = uiStateDispatcher.uiState.firstOrNull()
+			val uiState: UiState? = uiStateDispatcher.uiState.firstOrNull()
 			val searchText: String? = uiState?.searchBarText
 
 			Log.d("ArtistSource", "fetchArtistsWithoutUrl[search]: $searchText")
@@ -61,28 +67,17 @@ class ArtistSource @Inject constructor(
 			val chosenGenreNames = genreUiState.chosenGenres.mapNotNull { it.name }
 
 			if (searchText?.isNotEmpty() == true) {
-				searchArtistJob?.cancelAndJoin()
-
-				var response: DiscogsResponse? = null
-
-				searchArtistJob = scope.launch {
-					response = musicRepository.searchEntityByType(
-						query = searchText,
-						type = DiscogsSearchType.Artist,
-						countPerPage = countPerPage
-					).getOrThrow()
-
-				}
-
-				searchArtistJob?.join()
-
-				return createPageFromResponse(response)
+				return searchArtist(
+					query = searchText,
+					countPerPage = countPerPage,
+					page = page
+				)
 			}
 
-			val response = musicRepository.getArtistsByGenres(
+			val response = artistRepository.getArtistsByGenres(
 				genres = chosenGenreNames,
-				styles = chosenGenreNames,
-				countPerPage = countPerPage
+				countPerPage = countPerPage,
+				page = page?.toInt() ?: 1
 			).getOrThrow()
 
 			createPageFromResponse(response)
@@ -91,51 +86,67 @@ class ArtistSource @Inject constructor(
 		}
 	}
 
-	private suspend fun fetchArtistsFromNextUrl(url: String): LoadResult<String, Artist> {
-		return try {
-			val response = musicRepository.getDiscogsDataFromUrl(url).getOrThrow()
+	private suspend fun searchArtist(
+		query: String,
+		countPerPage: Int,
+		page: String?
+	): LoadResult<String, Artist> {
+		searchArtistJob?.cancelAndJoin()
+		val mapper = ArtistMapper.impl
 
-			createPageFromResponse(response, prevKey = url)
-		} catch (e: Exception) {
-			LoadResult.Error(e)
+		var response: SearchArtistResponseBody? = null
+
+		searchArtistJob = scope.launch {
+			response = artistRepository.searchEntityByType(
+				query = query,
+				countPerPage = countPerPage,
+				page = page?.toInt() ?: 1
+			).getOrNull()
 		}
+
+		searchArtistJob?.join()
+
+		return response?.let {
+			val (artistMatches, totalItems, _, perPage, query) = it.results
+
+			val rawArtists: List<LastFmArtist> = artistMatches.artist
+			val artists: List<Artist> = rawArtists.map(
+				mapper::lastFmArtistToArtist
+			)
+
+			val totalPages = BigDecimal(ceil(totalItems.toDouble() / perPage.toDouble())).toString()
+
+			val pagination = LastFmPaginationResponse(
+				page = query.startPage,
+				perPage = perPage,
+				totalPages = totalPages,
+			)
+
+			val response = PaginatedArtistsResponse(
+				artists = artists,
+				pagination = pagination
+			)
+
+			return createPageFromResponse(response, query.startPage)
+		} ?: throw ArtistNotFoundException()
 	}
 
-	private suspend fun createPageFromResponse(
-		response: DiscogsResponse?,
+	private fun createPageFromResponse(
+		response: PaginatedArtistsResponse?,
 		prevKey: String? = null
 	): LoadResult<String, Artist> {
-		val pagination = response?.pagination
-		val data = response?.results.orEmpty()
-		val artists = getArtistsFromResponse(data)
+		val pagination: LastFmPaginationResponse? = response?.pagination
+		val artists: List<Artist> = response?.artists.orEmpty()
 
-		val nextKey = pagination?.urls?.next
+		val totalPages: Int = pagination?.totalPages?.toInt() ?: 0
+		val currentPage: Int = pagination?.page?.toInt() ?: 0
+
+		val nextKey = if (currentPage < totalPages) currentPage + 1 else null
 
 		return LoadResult.Page(
-			prevKey = if (nextKey == prevKey) null else prevKey,
-			nextKey = pagination?.urls?.next,
+			prevKey = if (nextKey.toString() == prevKey) null else prevKey,
+			nextKey = nextKey?.toString(),
 			data = artists
 		)
-	}
-
-	private suspend fun getArtistsFromResponse(data: List<DiscogsEntityResponse>): List<Artist> {
-		val duplicateEntityRegex = Regex(Constants.DUPLICATE_MUSIC_ENTITY_PATTERN)
-
-		return data.mapNotNull { entity ->
-			val artistName = entity.title.substringBefore("-").trim()
-			delay(500)
-
-			musicRepository.searchArtistInReleases(artistName)
-				.getOrNull()?.let { artistBody ->
-					artistBody.genre = entity.genre.orEmpty()
-					artistBody.style = entity.style.orEmpty()
-
-					if (!duplicateEntityRegex.matches(artistBody.name.orEmpty())) {
-						artistBody
-					} else null
-				}
-		}.filter { it.id !in loadedArtistIds }
-			.distinctBy { it.id }
-			.also { artists -> loadedArtistIds.addAll(artists.map { it.id }) }
 	}
 }

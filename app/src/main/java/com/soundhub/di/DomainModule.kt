@@ -3,7 +3,8 @@ package com.soundhub.di
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.FileRepository
-import com.soundhub.domain.repository.MusicRepository
+import com.soundhub.domain.repository.GenreRepository
+import com.soundhub.domain.repository.LastFmRepository
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
@@ -30,29 +31,39 @@ object DomainModule {
 	@Singleton
 	fun providesUpdateUserUseCase(
 		userRepository: UserRepository
-	): UpdateUserUseCase = UpdateUserUseCase(userRepository)
+	): UpdateUserUseCase {
+		return UpdateUserUseCase(userRepository)
+	}
 
 	@Provides
 	@Singleton
-	fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase =
-		GetImageUseCase(fileRepository)
+	fun providesGetImageUseCase(fileRepository: FileRepository): GetImageUseCase {
+		return GetImageUseCase(fileRepository)
+	}
 
 	@Provides
 	@Singleton
 	fun providesLoadGenresUseCase(
-		musicRepository: MusicRepository,
+		genreRepository: GenreRepository,
 		uiStateDispatcher: UiStateDispatcher
-	): LoadGenresUseCase = LoadGenresUseCase(musicRepository, uiStateDispatcher)
+	): LoadGenresUseCase {
+		return LoadGenresUseCase(
+			genreRepository = genreRepository,
+			uiStateDispatcher = uiStateDispatcher
+		)
+	}
 
 	@Provides
 	@Singleton
-	fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase =
-		GetAllChatsByUserUseCase(chatRepository)
+	fun providesGetAllChatsByUserUseCase(chatRepository: ChatRepository): GetAllChatsByUserUseCase {
+		return GetAllChatsByUserUseCase(chatRepository)
+	}
 
 	@Provides
 	@Singleton
-	fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase =
-		GetOrCreateChatByUserUseCase(chatRepository)
+	fun providesGetOrCreateChatUseCase(chatRepository: ChatRepository): GetOrCreateChatByUserUseCase {
+		return GetOrCreateChatByUserUseCase(chatRepository)
+	}
 
 	@Provides
 	@Singleton
@@ -62,28 +73,32 @@ object DomainModule {
 
 	@Provides
 	@Singleton
-	fun providesLoadAllUserDataUseCase(musicRepository: MusicRepository): LoadAllUserDataUseCase =
-		LoadAllUserDataUseCase(
-			musicRepository = musicRepository,
-		)
+	fun providesLoadAllUserDataUseCase(lastFmRepository: LastFmRepository): LoadAllUserDataUseCase {
+		return LoadAllUserDataUseCase(lastFmRepository)
+	}
 
 	@Provides
 	@Singleton
 	fun providesGetPostsByUserUseCase(
 		postRepository: PostRepository,
 		postDao: PostDao
-	): GetPostsByUserUseCase = GetPostsByUserUseCase(postRepository, postDao)
+	): GetPostsByUserUseCase {
+		return GetPostsByUserUseCase(postRepository, postDao)
+	}
 
 	@Provides
 	@Singleton
 	fun providesDeletePostByIdUseCase(
 		postRepository: PostRepository,
-	): DeletePostByIdUseCase = DeletePostByIdUseCase(postRepository)
+	): DeletePostByIdUseCase {
+		return DeletePostByIdUseCase(postRepository)
+	}
 
 	@Provides
 	@Singleton
 	fun providesTogglePostLikeAndUpdateListUseCase(
 		postRepository: PostRepository
-	): TogglePostLikeAndUpdateListUseCase =
-		TogglePostLikeAndUpdateListUseCase(postRepository)
+	): TogglePostLikeAndUpdateListUseCase {
+		return TogglePostLikeAndUpdateListUseCase(postRepository)
+	}
 }

@@ -61,7 +61,7 @@ data class User(
 	var favoriteArtists: List<Artist> = emptyList(),
 
 	@Ignore
-	var favoriteArtistsIds: List<Int> = emptyList()
+	var favoriteArtistsIds: List<UUID> = emptyList()
 ) : IUser {
 	fun getFullName(): String = "$firstName $lastName".trim()
 

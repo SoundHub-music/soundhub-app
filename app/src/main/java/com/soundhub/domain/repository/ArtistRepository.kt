@@ -3,22 +3,20 @@ package com.soundhub.domain.repository
 import androidx.paging.PagingData
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.internal.HttpResult
-import com.soundhub.data.enums.DiscogsSearchType
+import com.soundhub.data.api.responses.lastfm.PaginatedArtistsResponse
+import com.soundhub.data.api.responses.lastfm.SearchArtistResponseBody
 import com.soundhub.data.enums.DiscogsSortType
 import com.soundhub.domain.model.Artist
-import com.soundhub.domain.model.Genre
 import com.soundhub.domain.model.Track
 import com.soundhub.domain.states.GenreUiState
 import kotlinx.coroutines.flow.Flow
 
-interface MusicRepository {
-	suspend fun getAllGenres(countPerPage: Int = 50): HttpResult<List<Genre>>
+interface ArtistRepository {
 	suspend fun getArtistsByGenres(
-		genres: List<String>?,
-		styles: List<String>?,
+		genres: List<String>,
 		page: Int = 1,
 		countPerPage: Int = 50
-	): HttpResult<DiscogsResponse>
+	): HttpResult<PaginatedArtistsResponse>
 
 	suspend fun getArtistById(artistId: Int): HttpResult<Artist?>
 
@@ -31,9 +29,9 @@ interface MusicRepository {
 
 	suspend fun searchEntityByType(
 		query: String?,
-		type: DiscogsSearchType,
-		countPerPage: Int = 50
-	): HttpResult<DiscogsResponse>
+		countPerPage: Int = 50,
+		page: Int = 1
+	): HttpResult<SearchArtistResponseBody>
 
 	suspend fun getDiscogsDataFromUrl(url: String): HttpResult<DiscogsResponse>
 

@@ -5,32 +5,34 @@ import com.google.gson.Gson
 import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.api.services.ChatService
 import com.soundhub.data.api.services.CountryService
+import com.soundhub.data.api.services.DiscogsService
 import com.soundhub.data.api.services.FileService
 import com.soundhub.data.api.services.GenreService
 import com.soundhub.data.api.services.InviteService
 import com.soundhub.data.api.services.LastFmService
 import com.soundhub.data.api.services.MessageService
-import com.soundhub.data.api.services.MusicService
 import com.soundhub.data.api.services.PostService
 import com.soundhub.data.api.services.UserService
+import com.soundhub.data.repository.ArtistRepositoryImpl
 import com.soundhub.data.repository.AuthRepositoryImpl
 import com.soundhub.data.repository.ChatRepositoryImpl
 import com.soundhub.data.repository.CountryRepositoryImpl
 import com.soundhub.data.repository.FileRepositoryImpl
+import com.soundhub.data.repository.GenreRepositoryImpl
 import com.soundhub.data.repository.InviteRepositoryImpl
 import com.soundhub.data.repository.LastFmRepositoryImpl
 import com.soundhub.data.repository.MessageRepositoryImpl
-import com.soundhub.data.repository.MusicRepositoryImpl
 import com.soundhub.data.repository.PostRepositoryImpl
 import com.soundhub.data.repository.UserRepositoryImpl
+import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.repository.AuthRepository
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.CountryRepository
 import com.soundhub.domain.repository.FileRepository
+import com.soundhub.domain.repository.GenreRepository
 import com.soundhub.domain.repository.InviteRepository
 import com.soundhub.domain.repository.LastFmRepository
 import com.soundhub.domain.repository.MessageRepository
-import com.soundhub.domain.repository.MusicRepository
 import com.soundhub.domain.repository.PostRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
@@ -146,16 +148,28 @@ object RepositoryModule {
 	fun providesMusicRepository(
 		@ApplicationContext
 		context: Context,
-		musicService: MusicService,
+		discogsService: DiscogsService,
 		uiStateDispatcher: UiStateDispatcher,
-		genreService: GenreService,
+		lastFmService: LastFmService,
 		gson: Gson
-	): MusicRepository = MusicRepositoryImpl(
-		musicService = musicService,
-		genreService = genreService,
-		context = context,
+	): ArtistRepository = ArtistRepositoryImpl(
 		uiStateDispatcher = uiStateDispatcher,
-		gson = gson
+		lastFmService = lastFmService,
+		discogsService = discogsService,
+		context = context,
+		gson = gson,
+	)
+
+	@Provides
+	@Singleton
+	fun providesGenreRepository(
+		genreService: GenreService,
+		gson: Gson,
+		@ApplicationContext context: Context
+	): GenreRepository = GenreRepositoryImpl(
+		genreService = genreService,
+		gson = gson,
+		context = context
 	)
 
 	@Provides

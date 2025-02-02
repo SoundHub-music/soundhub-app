@@ -7,6 +7,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.mapstruct.factory.Mappers
+import java.util.UUID
 
 @Mapper
 interface RegisterDataMapper {
@@ -26,6 +27,6 @@ interface RegisterDataMapper {
 
 		@JvmStatic
 		@Named("mapArtistsToIds")
-		fun mapArtistsToIds(list: List<Artist>): List<Int> = list.map { it.id }
+		fun mapArtistsToIds(list: List<Artist>): List<UUID> = list.map { it.id }
 	}
 }

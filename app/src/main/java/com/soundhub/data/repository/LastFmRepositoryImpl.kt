@@ -5,12 +5,15 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.BuildConfig
 import com.soundhub.data.api.responses.internal.HttpResult
+import com.soundhub.data.api.responses.lastfm.LastFmArtistInfo
 import com.soundhub.data.api.responses.lastfm.LastFmSessionResponse
 import com.soundhub.data.api.responses.lastfm.LastFmUserInfoResponse
 import com.soundhub.data.api.services.LastFmService
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.LastFmRepository
 import com.soundhub.utils.extensions.string.md5
+import retrofit2.Response
+import java.util.UUID
 import javax.inject.Inject
 
 class LastFmRepositoryImpl @Inject constructor(
@@ -19,18 +22,41 @@ class LastFmRepositoryImpl @Inject constructor(
 	context: Context
 ) : LastFmRepository, BaseRepository(gson, context) {
 
+	override suspend fun getArtistInfo(
+		artist: String?,
+		mbid: UUID?,
+		lang: String?
+	): HttpResult<LastFmArtistInfo> {
+		try {
+			val response: Response<LastFmArtistInfo> = lastFmService.getArtistInfo(
+				artist = artist,
+				mbid = mbid?.toString(),
+				lang = lang
+			)
+
+			return handleResponse(response)
+		} catch (e: Exception) {
+			return handleException(e)
+		}
+	}
+
 	override suspend fun getMobileSession(
 		username: String,
 		password: String
 	): HttpResult<LastFmSessionResponse> {
-		val sigKey: String = generateSigKey(username, password)
-		val response = lastFmService.getMobileSession(
-			username = username,
-			password = password,
-			apiSig = sigKey
-		)
+		try {
+			val sigKey: String = generateSigKey(username, password)
+			val response = lastFmService.getMobileSession(
+				username = username,
+				password = password,
+				apiSig = sigKey
+			)
 
-		return HttpResult.Success(body = response.body())
+			return HttpResult.Success(body = response.body())
+
+		} catch (e: Exception) {
+			return handleException(e)
+		}
 	}
 
 	override suspend fun getUserInfo(username: String): HttpResult<LastFmUserInfoResponse> {

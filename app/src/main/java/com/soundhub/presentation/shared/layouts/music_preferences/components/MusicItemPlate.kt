@@ -1,8 +1,13 @@
 package com.soundhub.presentation.shared.layouts.music_preferences.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +15,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,47 +62,58 @@ fun MusicItemPlate(
 		animationSpec = tween(durationMillis = 300), label = "b.color"
 	)
 
+	var isVisible by remember { mutableStateOf(false) }
 
-	Column(
-		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
-		horizontalAlignment = Alignment.CenterHorizontally,
+	LaunchedEffect(true) {
+		isVisible = true
+	}
+
+	AnimatedVisibility(
+		visible = isVisible,
+		enter = fadeIn() + slideInVertically(),
+		exit = fadeOut() + slideOutVertically()
 	) {
-		ElevatedCard(
-			modifier = Modifier
-				.width(width)
-				.height(height)
-				.border(
-					width = borderWidth,
-					color = borderColor,
-					shape = RoundedCornerShape(16.dp)
-				),
-			shape = RoundedCornerShape(16.dp),
-			onClick = {
-				if (clickable) {
-					isItemChosen = !isItemChosen
-					onClick(isItemChosen)
-				}
-			}
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
-			AsyncImage(
-				model = thumbnailUrl,
-				contentScale = ContentScale.Crop,
-				modifier = Modifier.fillMaxSize(),
-				contentDescription = null,
-				placeholder = placeholder,
-				fallback = placeholder,
-				error = placeholder
+			ElevatedCard(
+				modifier = Modifier
+					.width(width)
+					.height(height)
+					.border(
+						width = borderWidth,
+						color = borderColor,
+						shape = RoundedCornerShape(16.dp)
+					),
+				shape = RoundedCornerShape(16.dp),
+				onClick = {
+					if (clickable) {
+						isItemChosen = !isItemChosen
+						onClick(isItemChosen)
+					}
+				}
+			) {
+				AsyncImage(
+					model = thumbnailUrl,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+					contentDescription = null,
+					placeholder = placeholder,
+					fallback = placeholder,
+					error = placeholder
+				)
+			}
+			Text(
+				text = caption,
+				style = TextStyle(
+					fontSize = 15.sp,
+					textAlign = TextAlign.Center,
+					color = MaterialTheme.colorScheme.onSecondaryContainer,
+				)
 			)
 		}
-		Text(
-			text = caption,
-			style = TextStyle(
-				fontSize = 15.sp,
-				textAlign = TextAlign.Center,
-				color = MaterialTheme.colorScheme.onSecondaryContainer,
-			)
-		)
 	}
 }
 

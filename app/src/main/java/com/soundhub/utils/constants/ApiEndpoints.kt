@@ -80,17 +80,24 @@ sealed class ApiEndpoints {
 		private const val SEARCH_ARTISTS_METHOD = "method=artist.search"
 		private const val GET_MOBILE_SESSION_METHOD = "method=auth.getMobileSession"
 		private const val GET_USER_INFO_METHOD = "method=user.getinfo"
+		private const val GET_ARTIST_INFO_METHOD = "method=artist.getinfo"
 
 		const val USERNAME_PARAM = "username"
 		const val PASSWORD_PARAM = "password"
 		const val API_SIG_PARAM = "api_sig"
 		const val ARTIST_PARAM = "artist"
+		const val MBID_PARAM = "mbid"
+		const val LANG_PARAM = "lang"
 		const val TAG_PARAM = "tag"
 		const val PAGE_PARAM = "page"
 		const val USER_PARAM = "user"
+		const val LIMIT_PARAM = "limit"
 
 		const val GET_USER_INFO =
 			"$API_VERSION/?$GET_USER_INFO_METHOD&$LAST_FM_API_KEY&$JSON_RESPONSE_FORMAT"
+
+		const val GET_ARTIST_INFO =
+			"$API_VERSION/?$GET_ARTIST_INFO_METHOD&$LAST_FM_API_KEY&$JSON_RESPONSE_FORMAT"
 
 		const val GET_TOP_ARTISTS_BY_TAG_ENDPOINT = "$API_VERSION/?$GET_TOP_ARTISTS_METHOD&" +
 				"$LAST_FM_API_KEY&" +

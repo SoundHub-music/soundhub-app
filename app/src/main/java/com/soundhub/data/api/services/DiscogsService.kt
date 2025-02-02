@@ -18,7 +18,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
-interface MusicService {
+interface DiscogsService {
 	@GET(DATABASE_SEARCH)
 	@Headers("$AUTHORIZATION_HEADER: $DISCOGS_AUTHORIZATION")
 	suspend fun searchData(
