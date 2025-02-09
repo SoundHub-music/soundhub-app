@@ -12,6 +12,7 @@ import com.soundhub.presentation.pages.music.enums.ChosenMusicService
 import com.soundhub.utils.mappers.LastFmMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,7 +23,7 @@ import javax.inject.Inject
 class LastFmLoginViewModel @Inject constructor(
 	private val lastFmRepository: LastFmRepository,
 	private val lastFmDao: LastFmDao
-) : MusicServiceDialogViewModel() {
+) : MusicServiceBottomSheetViewModel() {
 	private val _lastFmUser = MutableStateFlow<LastFmUser?>(null)
 	val lastFmUser = _lastFmUser.asStateFlow()
 
@@ -34,48 +35,64 @@ class LastFmLoginViewModel @Inject constructor(
 
 	init {
 		initLastFmUser()
-		initHeaderIcon()
+		initServiceResourceIcon()
 	}
 
-	override fun initHeaderIcon() = mutableHeaderFormColor.update { R.color.last_fm_color }
+	private fun initServiceResourceIcon() {
+		_serviceLogoResourceState.update { R.drawable.last_fm }
+	}
 
 	private fun initLastFmUser() = viewModelScope.launch {
 		val user: LastFmUser? = lastFmDao.getLastFmSessionUser()
-		checkAuthority(user)
+		val isAuthorized = checkAuthority(user)
 
-		_lastFmUser.update { user }
-		getUserInfo()
+		if (isAuthorized) {
+			_lastFmUser.update { user }
+			loadUserInfo()
+		}
 	}
 
-	private fun getUserInfo() = viewModelScope.launch {
+	private fun loadUserInfo() = viewModelScope.launch {
 		val lastFmUser = _lastFmUser.value
+
 		lastFmRepository.getUserInfo(lastFmUser?.name ?: "")
 			.onSuccess { response ->
-				_userInfo.update { response.body?.user }
 				Log.d("LastFmViewModel", response.body?.user.toString())
+				_userInfo.update { response.body?.user }
 			}
 			.onFailure { error ->
 				Log.e("LastFmViewModel", "getUserInfo[1]: ${error.throwable?.stackTraceToString()}")
 			}
 	}
 
-	override fun login() = viewModelScope.launch(Dispatchers.IO) {
-		val (userName, password) = mutableLoginState.value
-		mutableStatus.update { ApiStatus.LOADING }
+	override fun login() {
+		viewModelScope.launch(Dispatchers.IO) {
+			val (userName, password) = _loginState.value
 
-		lastFmRepository.getMobileSession(userName, password)
-			.onSuccess { response ->
-				val user: LastFmUser? = LastFmMapper
-					.impl.lastFmSessionBodyToLastFmUser(response.body?.session)
+			mutableStatus.update { ApiStatus.LOADING }
 
-				user?.let { lastFmDao.saveLastFmSessionUser(user) }
-				mutableStatus.update { ApiStatus.SUCCESS }
-			}
-			.onFailure { mutableStatus.update { ApiStatus.ERROR } }
+			lastFmRepository.getMobileSession(userName, password)
+				.onSuccess { response ->
+					val user: LastFmUser? = LastFmMapper
+						.impl.lastFmSessionBodyToLastFmUser(response.body?.session)
+
+					user?.let { lastFmDao.saveLastFmSessionUser(user) }
+					mutableStatus.update { ApiStatus.SUCCESS }
+				}
+				.onFailure { mutableStatus.update { ApiStatus.ERROR } }
+				.finally {
+					delay(2000)
+					mutableStatus.update { ApiStatus.NOT_LAUNCHED }
+				}
+		}
 	}
 
-	override fun checkAuthority(user: LastFmUser?) = viewModelScope.launch {
-		Log.d("LastFmViewModel", "Last fm user $user")
-		mutableIsAuthorized.update { user?.sessionKey != null }
+	override fun checkAuthority(user: LastFmUser?): Boolean {
+		viewModelScope.launch {
+			Log.d("LastFmViewModel", "Last fm user $user")
+			mutableIsAuthorized.update { user?.sessionKey != null }
+		}
+
+		return user?.sessionKey != null
 	}
 }

@@ -32,9 +32,9 @@ import com.soundhub.presentation.pages.friends.FriendsViewModel
 import com.soundhub.presentation.pages.gallery.GalleryScreen
 import com.soundhub.presentation.pages.messenger.MessengerScreen
 import com.soundhub.presentation.pages.messenger.MessengerViewModel
-import com.soundhub.presentation.pages.music.FavoriteArtistsScreen
-import com.soundhub.presentation.pages.music.FavoriteGenresScreen
-import com.soundhub.presentation.pages.music.MusicScreen
+import com.soundhub.presentation.pages.music.screens.FavoriteArtistsScreen
+import com.soundhub.presentation.pages.music.screens.FavoriteGenresScreen
+import com.soundhub.presentation.pages.music.screens.MusicScreen
 import com.soundhub.presentation.pages.music.viewmodels.MusicViewModel
 import com.soundhub.presentation.pages.notifications.NotificationScreen
 import com.soundhub.presentation.pages.notifications.NotificationViewModel

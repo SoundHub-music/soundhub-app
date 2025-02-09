@@ -13,6 +13,7 @@ import javax.inject.Singleton
 object UiModule {
 	@Provides
 	@Singleton
-	fun providesUiEventDispatcher(userSettingsStore: UserSettingsStore): UiStateDispatcher =
-		UiStateDispatcher(userSettingsStore)
+	fun providesUiEventDispatcher(userSettingsStore: UserSettingsStore): UiStateDispatcher {
+		return UiStateDispatcher(userSettingsStore)
+	}
 }

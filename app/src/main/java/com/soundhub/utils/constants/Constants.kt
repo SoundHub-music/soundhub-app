@@ -169,6 +169,7 @@ object Constants {
 	const val DESTINATION_HEADER = "destination"
 
 	const val UNAUTHORIZED_USER_ERROR_CODE = 401
+	const val INVALID_ACCESS_TOKEN_MESSAGE = "Invalid access token"
 	const val NOT_FOUND_ERROR_CODE = 404
 	const val CONNECTION_TIMEOUT = 10L
 

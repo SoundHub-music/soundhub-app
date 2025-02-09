@@ -11,10 +11,12 @@ import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.api.services.UserService
+import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
+import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.enums.UriScheme
 import com.soundhub.utils.lib.HttpUtils
@@ -51,8 +53,17 @@ class UserRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override suspend fun getCurrentUser(): HttpResult<User?> {
+	override suspend fun getCurrentUser(userCreds: UserPreferences?): HttpResult<User?> {
 		try {
+			if (userCreds?.accessToken.isNullOrEmpty() || userCreds.refreshToken.isNullOrEmpty()) {
+				val response = ErrorResponse(
+					detail = Constants.INVALID_ACCESS_TOKEN_MESSAGE,
+					status = Constants.UNAUTHORIZED_USER_ERROR_CODE
+				)
+
+				return HttpResult.Error(errorBody = response)
+			}
+
 			val response: Response<User?> = userService.getCurrentUser()
 			Log.d("UserRepository", "getCurrentUser[1]: $response")
 

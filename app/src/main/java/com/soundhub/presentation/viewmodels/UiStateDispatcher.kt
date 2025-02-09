@@ -35,7 +35,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UiStateDispatcher @Inject constructor(
-	private val userSettingsStore: UserSettingsStore
+	private val userSettingsStore: UserSettingsStore,
+//	private val userDao: UserDao
 ) : ViewModel() {
 	private val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
 
@@ -96,6 +97,8 @@ class UiStateDispatcher @Inject constructor(
 	fun setAuthorizedUser(user: User?) = _uiState.update {
 		it.copy(authorizedUser = user)
 	}
+
+//	suspend fun getAuthorizedUser(): User? = userDao.getCurrentUser()
 
 	// search bar visibility
 	fun toggleSearchBarActive() = _uiState.update {

@@ -35,10 +35,6 @@
     <string name="screen_title_update_post">Edit Post</string>
     <string name="screen_title_friends">Friends</string>
 
-    <!-- music page tabs -->
-    <string name="music_main_page">Home</string>
-    <string name="music_library_page">Library</string>
-
     <!-- post registration page titles -->
     <string name="screen_title_choose_genres">Choose Genres</string>
     <string name="screen_title_choose_artists">Choose Artists</string>
@@ -144,9 +140,18 @@
     <string name="fetch_error_message">Error loading content :(</string>
     <string name="empty_notification_screen">Your notifications will appear here</string>
 
+    <!--    music page-->
+
+
     <!-- music section titles -->
     <string name="music_recommendation_section_title">Recommended for You</string>
     <string name="music_friend_music_section_title">What Your Friends Are Listening To</string>
+
+    <!-- music page tabs -->
+    <string name="music_main_page">Home</string>
+    <string name="music_library_page">Library</string>
+
+    <string name="music_artists_empty">You still don\'t have any favorite artists</string>
 
     <!-- music recommendation plate titles -->
     <string name="music_new_of_the_week">New This Week</string>

@@ -31,9 +31,9 @@ import com.soundhub.presentation.viewmodels.UiStateDispatcher
 fun BottomNavigationBar(
 	navController: NavController,
 	messengerViewModel: MessengerViewModel,
-	uiStateDispatcher: UiStateDispatcher,
-	navBarViewModel: NavBarViewModel = hiltViewModel()
+	uiStateDispatcher: UiStateDispatcher
 ) {
+	val navBarViewModel: NavBarViewModel = hiltViewModel()
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
 	val navRoute: NavBackStackEntry? by navController.currentBackStackEntryAsState()
 
@@ -41,7 +41,6 @@ fun BottomNavigationBar(
 	val navBarMenuItems by navBarViewModel.menuItems.collectAsState()
 
 	val navBarRoutes: List<String> = remember(navBarMenuItems) { navBarMenuItems.map { it.route } }
-
 
 	LaunchedEffect(key1 = uiState.currentRoute, key2 = navRoute) {
 		val checkRoute: (String) -> Boolean = { route ->

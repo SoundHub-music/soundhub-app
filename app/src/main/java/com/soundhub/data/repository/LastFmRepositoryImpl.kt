@@ -52,8 +52,7 @@ class LastFmRepositoryImpl @Inject constructor(
 				apiSig = sigKey
 			)
 
-			return HttpResult.Success(body = response.body())
-
+			return handleResponse(response)
 		} catch (e: Exception) {
 			return handleException(e)
 		}
@@ -76,16 +75,25 @@ class LastFmRepositoryImpl @Inject constructor(
 		val secret = BuildConfig.LAST_FM_SHARED_SECRET
 		val apiKey = BuildConfig.LAST_FM_API_KEY
 
-		val sigKey: String = StringBuilder()
-			.append("api_key")
-			.append(apiKey)
-			.append("method")
-			.append("auth.getMobileSession")
-			.append("password")
-			.append(password)
-			.append("username")
-			.append(username)
-			.append(secret)
+		val keyItemPairs = listOf(
+			"api_key" to apiKey,
+			"method" to "auth.getMobileSession",
+			"password" to password,
+			"username" to username,
+			null to secret
+		)
+
+		val sigKey: String = StringBuilder().apply {
+			keyItemPairs.forEach { (key, value) ->
+				if (key == null) {
+					append(value)
+					return@forEach
+				}
+
+				append(key)
+				append(value)
+			}
+		}
 			.toString()
 			.md5()
 

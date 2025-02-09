@@ -35,10 +35,6 @@
     <string name="screen_title_update_post">Редактирование поста</string>
     <string name="screen_title_friends">Друзья</string>
 
-    <!-- music page tabs -->
-    <string name="music_main_page">Главная</string>
-    <string name="music_library_page">Библиотека</string>
-
     <!-- post registration page titles-->
     <string name="screen_title_choose_genres">Выберите жанры</string>
     <string name="screen_title_choose_artists">Выберите исполнителей</string>
@@ -144,9 +140,17 @@
     <string name="fetch_error_message">Произошла ошибка во время загрузки :(</string>
     <string name="empty_notification_screen">Здесь появятся ваши уведомления</string>
 
+    <!--    music page-->
+
     <!-- music section titles-->
     <string name="music_recommendation_section_title">Подобрано для вас</string>
     <string name="music_friend_music_section_title">Что слушают ваши друзья</string>
+
+    <!-- music page tabs -->
+    <string name="music_main_page">Главная</string>
+    <string name="music_library_page">Библиотека</string>
+
+    <string name="music_artists_empty">У вас ещё нет любимых исполнителей</string>
 
     <!-- music recommendation plate titles-->
     <string name="music_new_of_the_week">Новинки недели</string>

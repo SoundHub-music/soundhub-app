@@ -58,8 +58,10 @@ class AuthenticationViewModel @Inject constructor(
 	}
 
 	suspend fun initializeUser(onSaveUser: suspend () -> Unit = {}) {
+		val userCreds = userCredsFlow.firstOrNull()
+
 		var authorizedUser: User? = userRepository
-			.getCurrentUser()
+			.getCurrentUser(userCreds)
 			.onSuccessReturn()
 
 		with(authorizedUser) {
