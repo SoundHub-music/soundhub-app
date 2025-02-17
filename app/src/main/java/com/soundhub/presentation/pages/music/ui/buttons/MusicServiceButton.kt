@@ -34,9 +34,9 @@ fun MusicServiceButton(
 	onClick: () -> Unit = {},
 	painter: Painter,
 	contentDescription: String? = null,
-	musicServiceBottomSheetViewModel: MusicServiceBottomSheetViewModel
+	bottomSheetViewModel: MusicServiceBottomSheetViewModel
 ) {
-	val isAuthorised by musicServiceBottomSheetViewModel.isAuthorizedState.collectAsState()
+	val isAuthorised by bottomSheetViewModel.isAuthorizedState.collectAsState()
 
 	LaunchedEffect(isAuthorised) {
 		Log.d("MusicServiceButton", "isAuthorised: $isAuthorised")

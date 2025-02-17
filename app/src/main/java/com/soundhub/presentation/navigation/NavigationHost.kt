@@ -36,6 +36,7 @@ import com.soundhub.presentation.pages.music.screens.FavoriteArtistsScreen
 import com.soundhub.presentation.pages.music.screens.FavoriteGenresScreen
 import com.soundhub.presentation.pages.music.screens.MusicScreen
 import com.soundhub.presentation.pages.music.viewmodels.MusicViewModel
+import com.soundhub.presentation.pages.music_profile.MusicProfile
 import com.soundhub.presentation.pages.notifications.NotificationScreen
 import com.soundhub.presentation.pages.notifications.NotificationViewModel
 import com.soundhub.presentation.pages.post_editor.PostEditorScreen
@@ -133,6 +134,10 @@ fun NavigationHost(
 				navController = navController,
 				uiStateDispatcher = uiStateDispatcher,
 			)
+		}
+
+		composable(Route.Music.LastFmProfile.route) {
+			MusicProfile(navController)
 		}
 
 		composable(Route.Music.route) {

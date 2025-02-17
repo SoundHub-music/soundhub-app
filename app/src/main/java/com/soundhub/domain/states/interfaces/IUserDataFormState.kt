@@ -1,7 +1,7 @@
 package com.soundhub.domain.states.interfaces
 
-import com.soundhub.data.model.interfaces.IUser
 import com.soundhub.domain.enums.Gender
+import com.soundhub.domain.model.interfaces.IUser
 import java.time.LocalDate
 import java.util.UUID
 

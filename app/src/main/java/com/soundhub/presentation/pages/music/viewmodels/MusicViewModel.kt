@@ -1,8 +1,6 @@
 package com.soundhub.presentation.pages.music.viewmodels
 
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
@@ -33,8 +31,8 @@ class MusicViewModel @Inject constructor(
 	private val _favoriteArtists = MutableStateFlow<List<Artist>>(emptyList())
 	val favoriteArtists: StateFlow<List<Artist>> = _favoriteArtists.asStateFlow()
 
-	private val _pagerLockState = MutableStateFlow(false)
-	val pagerLockState = _pagerLockState.asStateFlow()
+//	private val _pagerLockState = MutableStateFlow(false)
+//	val pagerLockState = _pagerLockState.asStateFlow()
 
 	@Composable
 	fun getMenuItems(): List<LibraryItemData> = listOf(
@@ -55,15 +53,15 @@ class MusicViewModel @Inject constructor(
 		)
 	)
 
-	fun setPagerLock(value: Boolean) = _pagerLockState.update { value }
+//	fun setPagerLock(value: Boolean) = _pagerLockState.update { value }
 
-	fun horizontalDragHandler(pointerInputScope: PointerInputScope) = viewModelScope.launch {
-		pointerInputScope.detectHorizontalDragGestures(
-			onDragStart = { setPagerLock(true) },
-			onDragEnd = { setPagerLock(false) },
-			onDragCancel = { setPagerLock(false) }
-		) { change, _ -> change.consume() }
-	}
+//	fun horizontalDragHandler(pointerInputScope: PointerInputScope) = viewModelScope.launch {
+//		pointerInputScope.detectHorizontalDragGestures(
+//			onDragStart = { setPagerLock(true) },
+//			onDragEnd = { setPagerLock(false) },
+//			onDragCancel = { setPagerLock(false) }
+//		) { change, _ -> change.consume() }
+//	}
 
 	fun loadUserFavoriteGenres() = viewModelScope.launch(Dispatchers.IO) {
 		val authorizedUser: User? = userDao.getCurrentUser()

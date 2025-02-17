@@ -31,6 +31,6 @@ internal fun MusicLibraryPage(
 			navController = navController,
 		)
 
-		MusicServiceList()
+		MusicServiceList(navController = navController)
 	}
 }

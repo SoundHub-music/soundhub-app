@@ -95,7 +95,7 @@ class PostEditorViewModel @Inject constructor(
 					sendUiEvent(UiEvent.PopBackStack)
 				}
 			}.onFailureWithContext { response ->
-				response.errorBody.detail?.let { message ->
+				response.errorBody.message?.let { message ->
 					toastText = UiText.DynamicString(message)
 					uiStateDispatcher.sendUiEvent(UiEvent.ShowToast(toastText))
 				}

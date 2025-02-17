@@ -1,6 +1,7 @@
 package com.soundhub.presentation.pages.profile
 
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
@@ -22,8 +23,11 @@ import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
 import com.soundhub.domain.usecases.post.TogglePostLikeAndUpdateListUseCase
 import com.soundhub.domain.usecases.user.GetUserByIdUseCase
+import com.soundhub.presentation.viewmodels.IProfileViewModel
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.enums.MediaFolder
+import com.soundhub.utils.lib.ImageUtils
 import com.soundhub.utils.lib.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -51,15 +55,30 @@ class ProfileViewModel @Inject constructor(
 	private val getUserByIdUseCase: GetUserByIdUseCase,
 	private val userDao: UserDao,
 	userCredsStore: UserCredsStore
-) : ViewModel() {
+) : ViewModel(), IProfileViewModel<User> {
 	private val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
 
 	private val _profileUiState: MutableStateFlow<ProfileUiState> =
 		MutableStateFlow(ProfileUiState())
-	val profileUiState = _profileUiState.asStateFlow()
+
+	override val profileUiState = _profileUiState.asStateFlow()
 
 	init {
 		initializeProfileState()
+	}
+	
+	override fun getUserName(): String {
+		val (profileOwner) = _profileUiState.value
+		return profileOwner?.getFullName() ?: ""
+	}
+
+	override fun getAvatarModel(): Any? {
+		val (profileOwner) = _profileUiState.value
+
+		return ImageUtils.getFileUrlOrLocalPath(
+			profileOwner?.avatarUrl?.toUri(),
+			MediaFolder.AVATAR
+		)
 	}
 
 	private fun initializeProfileState() = viewModelScope.launch(Dispatchers.Main) {

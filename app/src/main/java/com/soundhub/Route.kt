@@ -20,6 +20,7 @@ sealed class Route(var route: String) : Cloneable {
 		data object NewOfTheWeek : Route(route = Constants.MUSIC_NEW_OF_THE_WEEK)
 		data object NewOfTheMonth : Route(route = Constants.MUSIC_NEW_OF_THE_MONTH)
 		data object RecommendMusic : Route(route = Constants.MUSIC_RECOMMENDATIONS)
+		data object LastFmProfile: Route(route = Constants.LASTFM_PROFILE)
 
 		data object FavoriteGenres : Route(route = Constants.MUSIC_FAVORITE_GENRES)
 		data object FavoriteArtists : Route(route = Constants.MUSIC_FAVORITE_ARTISTS)

@@ -38,10 +38,19 @@ abstract class BaseRepository(
 		val errorBody = gson.fromJson(
 			response.errorBody()?.charStream(),
 			ErrorResponse::class.java
-		)
+		)?.apply {
+			if (message == null)
+				message = detail
+
+			if (detail == null)
+				detail = message
+
+			status = response.code()
+		}
 			?: ErrorResponse(
 				status = response.code(),
-				detail = context.getString(R.string.toast_common_error)
+				detail = context.getString(R.string.toast_common_error),
+				message = context.getString(R.string.toast_common_error),
 			)
 		Log.e("BaseRepository", "Error: $errorBody")
 		return HttpResult.Error(errorBody = errorBody)

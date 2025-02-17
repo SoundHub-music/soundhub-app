@@ -61,7 +61,8 @@ object Constants {
 		Route.Authentication.route,
 		Route.Profile.route,
 		Route.EditFavoriteArtists.route,
-		Route.EditFavoriteGenres.route
+		Route.EditFavoriteGenres.route,
+		Route.Music.LastFmProfile.route
 	)
 
 	val ROUTES_WITH_INNER_TOP_APP_BAR: List<String> = listOf(
@@ -75,7 +76,8 @@ object Constants {
 		Route.Music.route,
 		Route.Messenger.route,
 		Route.Music.FavoriteArtists.route,
-		Route.Music.FavoriteGenres.route
+		Route.Music.FavoriteGenres.route,
+		Route.Music.LastFmProfile.route
 	)
 
 	val ROUTES_WITH_SEARCH_BAR: List<String> = listOf(
@@ -134,6 +136,7 @@ object Constants {
 	const val MUSIC_FAVORITE_GENRES = "music-favorite-genres"
 	const val MUSIC_FAVORITE_ARTISTS = "music-favorite-artists"
 	const val MUSIC_PLAYLISTS = "music-playlists"
+	const val LASTFM_PROFILE = "lastfm-profile"
 
 	//endregion
 

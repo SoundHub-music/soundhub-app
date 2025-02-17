@@ -30,23 +30,19 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.soundhub.R
 import com.soundhub.Route
-import com.soundhub.domain.model.User
-import com.soundhub.domain.states.ProfileUiState
-import com.soundhub.presentation.pages.profile.ProfileViewModel
+import com.soundhub.domain.states.IProfileUiState
 import com.soundhub.presentation.shared.menu.AvatarDropdownMenu
-import com.soundhub.utils.enums.MediaFolder
-import com.soundhub.utils.lib.ImageUtils
+import com.soundhub.presentation.viewmodels.IProfileViewModel
 
 @Composable
-internal fun UserProfileAvatar(
+internal fun <T> UserProfileAvatar(
 	navController: NavHostController,
-	profileViewModel: ProfileViewModel,
+	profileViewModel: IProfileViewModel<T>,
 ) {
 	var selectedImageUri: Uri? by rememberSaveable { mutableStateOf(null) }
 	val isAvatarMenuExpandedState = rememberSaveable { mutableStateOf(false) }
@@ -91,23 +87,19 @@ private fun UserSettingsButton(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun Avatar(
+private fun <T> Avatar(
 	isAvatarMenuExpandedState: MutableState<Boolean>,
-	profileViewModel: ProfileViewModel
+	profileViewModel: IProfileViewModel<T>
 ) {
-	val profileUiState: ProfileUiState by profileViewModel.profileUiState.collectAsState()
-	val profileOwner: User? = profileUiState.profileOwner
+	val profileUiState: IProfileUiState<T> by profileViewModel.profileUiState.collectAsState()
+	val profileOwner: T? = profileUiState.profileOwner
 
-	val userFullName: String = profileOwner?.getFullName() ?: ""
+	val userFullName: String = profileViewModel.getUserName()
 	var modelUrl: Any? by remember { mutableStateOf(null) }
 	val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
 
 	LaunchedEffect(key1 = profileOwner) {
-		modelUrl =
-			ImageUtils.getFileUrlOrLocalPath(
-				profileOwner?.avatarUrl?.toUri(),
-				MediaFolder.AVATAR
-			)
+		modelUrl = profileViewModel.getAvatarModel()
 	}
 
 	AsyncImage(

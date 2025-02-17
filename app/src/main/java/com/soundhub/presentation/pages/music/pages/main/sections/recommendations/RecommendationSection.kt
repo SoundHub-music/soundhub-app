@@ -1,7 +1,5 @@
 package com.soundhub.presentation.pages.music.pages.main.sections.recommendations
 
-import android.util.Log
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,12 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,17 +18,10 @@ import androidx.compose.ui.unit.sp
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.presentation.pages.music.ui.cards.RecommendationPlate
-import com.soundhub.presentation.pages.music.viewmodels.MusicViewModel
 
 @Composable
-fun RecommendationSection(musicViewModel: MusicViewModel) {
+fun RecommendationSection() {
 	val lazyListState = rememberLazyListState()
-	val isRowDragged by lazyListState.interactionSource.collectIsDraggedAsState()
-
-	LaunchedEffect(key1 = isRowDragged) {
-		Log.d("RecommendationSection", "isDragged $isRowDragged")
-		musicViewModel.setPagerLock(isRowDragged)
-	}
 
 	val plates = listOf(
 		RecommendationPlateData(
@@ -73,9 +61,9 @@ fun RecommendationSection(musicViewModel: MusicViewModel) {
 			state = lazyListState,
 			modifier = Modifier
 				.padding(10.dp)
-				.pointerInput(isRowDragged) {
-					musicViewModel.horizontalDragHandler(this@pointerInput)
-				}
+//				.pointerInput(isRowDragged) {
+//					musicViewModel.horizontalDragHandler(this@pointerInput)
+//				}
 		) {
 			items(items = plates, key = { it.route }) { item ->
 				RecommendationPlate(gradientColor = item.gradientColor, text = item.title)

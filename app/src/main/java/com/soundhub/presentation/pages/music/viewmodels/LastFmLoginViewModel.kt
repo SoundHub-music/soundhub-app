@@ -3,12 +3,14 @@ package com.soundhub.presentation.pages.music.viewmodels
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.soundhub.R
-import com.soundhub.data.api.responses.lastfm.LastFmFullUser
+import com.soundhub.Route
 import com.soundhub.data.enums.ApiStatus
 import com.soundhub.data.local_database.dao.LastFmDao
+import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.model.LastFmUser
 import com.soundhub.domain.repository.LastFmRepository
 import com.soundhub.presentation.pages.music.enums.ChosenMusicService
+import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.mappers.LastFmMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,15 +21,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class LastFmLoginViewModel @Inject constructor(
 	private val lastFmRepository: LastFmRepository,
-	private val lastFmDao: LastFmDao
+	private val lastFmDao: LastFmDao,
+	private val uiStateDispatcher: UiStateDispatcher
 ) : MusicServiceBottomSheetViewModel() {
 	private val _lastFmUser = MutableStateFlow<LastFmUser?>(null)
 	val lastFmUser = _lastFmUser.asStateFlow()
 
-	private val _userInfo = MutableStateFlow<LastFmFullUser?>(null)
+	private val _userInfo = MutableStateFlow<LastFmUser?>(null)
 	val userInfo = _userInfo.asStateFlow()
 
 	override val chosenMusicService: ChosenMusicService
@@ -81,7 +85,13 @@ class LastFmLoginViewModel @Inject constructor(
 				}
 				.onFailure { mutableStatus.update { ApiStatus.ERROR } }
 				.finally {
-					delay(2000)
+					delay(1000)
+
+					if (statusState.value.isSuccess()) {
+						_eventChannel.send(MusicServiceEvent.CloseModal)
+						uiStateDispatcher.sendUiEvent(UiEvent.Navigate(Route.Music.LastFmProfile))
+					}
+
 					mutableStatus.update { ApiStatus.NOT_LAUNCHED }
 				}
 		}

@@ -6,10 +6,16 @@ import com.soundhub.domain.model.LastFmUser
 import com.soundhub.presentation.pages.music.enums.ChosenMusicService
 import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+
+sealed class MusicServiceEvent {
+	object CloseModal : MusicServiceEvent()
+}
 
 @HiltViewModel
 open class MusicServiceBottomSheetViewModel @Inject constructor() : ViewModel() {
@@ -18,6 +24,9 @@ open class MusicServiceBottomSheetViewModel @Inject constructor() : ViewModel() 
 
 	protected val _serviceLogoResourceState = MutableStateFlow<Int?>(null)
 	val serviceLogoResourceState = _serviceLogoResourceState.asStateFlow()
+
+	protected val _eventChannel = Channel<MusicServiceEvent>()
+	val eventChannel = _eventChannel.receiveAsFlow()
 
 	protected val mutableIsAuthorized = MutableStateFlow(false)
 	val isAuthorizedState = mutableIsAuthorized.asStateFlow()

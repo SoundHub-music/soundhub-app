@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.soundhub.R
-import com.soundhub.data.api.responses.lastfm.LastFmFullUser
+import com.soundhub.domain.model.LastFmUser
 import com.soundhub.presentation.pages.music.viewmodels.LastFmLoginViewModel
 import com.soundhub.presentation.pages.music.widgets.sheet.components.SummaryDetails
 import com.soundhub.presentation.shared.avatar.CircularAvatar
@@ -37,7 +37,7 @@ import com.soundhub.presentation.shared.avatar.CircularAvatar
 internal fun LastFmDetails(
 	lastFmLoginViewModel: LastFmLoginViewModel
 ) {
-	val lastFmUser: LastFmFullUser? by lastFmLoginViewModel.userInfo.collectAsState()
+	val lastFmUser: LastFmUser? by lastFmLoginViewModel.userInfo.collectAsState()
 	val uriHandler = LocalUriHandler.current
 	val lastFmUserAvatar: Uri? = lastFmUser?.images
 		?.firstOrNull { it.size == "medium" }
@@ -66,7 +66,7 @@ internal fun LastFmDetails(
 				)
 
 				TextButton(
-					onClick = { uriHandler.openUri(lastFmUser?.userLink ?: "") },
+					onClick = { uriHandler.openUri(lastFmUser?.url ?: "") },
 					contentPadding = PaddingValues(5.dp),
 					shape = RoundedCornerShape(10.dp)
 				) {
@@ -84,10 +84,12 @@ internal fun LastFmDetails(
 						),
 					)
 				}) {
-					Text(
-						text = user.playCount,
-						fontWeight = FontWeight.Black
-					)
+					user.playCount?.let {
+						Text(
+							text = user.playCount,
+							fontWeight = FontWeight.Black
+						)
+					}
 				}
 				SummaryDetails(title = {
 					Text(
@@ -96,14 +98,14 @@ internal fun LastFmDetails(
 						)
 					)
 				}) {
-					Text(
-						text = user.artistCount,
-						fontWeight = FontWeight.Black
-					)
+					user.artistCount?.let {
+						Text(
+							text = user.artistCount,
+							fontWeight = FontWeight.Black
+						)
+					}
 				}
-
 			}
-
 		}
 	}
 }

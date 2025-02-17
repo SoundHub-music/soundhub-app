@@ -1,4 +1,4 @@
-package com.soundhub.data.model.interfaces
+package com.soundhub.domain.model.interfaces
 
 import com.soundhub.domain.enums.Gender
 import java.io.Serializable

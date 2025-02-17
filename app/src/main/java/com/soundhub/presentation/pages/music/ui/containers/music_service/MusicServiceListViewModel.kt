@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.soundhub.R
 import com.soundhub.presentation.pages.music.viewmodels.LastFmLoginViewModel
 import com.soundhub.presentation.pages.music.viewmodels.MusicServiceBottomSheetViewModel
-import com.soundhub.presentation.pages.music.viewmodels.VKLoginViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,10 +47,6 @@ class MusicServiceListViewModel : ViewModel() {
 				R.drawable.last_fm,
 				hiltViewModel<LastFmLoginViewModel>()
 			),
-			Pair(
-				R.drawable.vk_logo,
-				hiltViewModel<VKLoginViewModel>()
-			)
 		)
 	}
 }
