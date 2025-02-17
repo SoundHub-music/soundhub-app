@@ -28,7 +28,9 @@ android.useAndroidX=true
 и [Last.FM](https://www.last.fm/api/accounts?suspend=1) ключи можно получить при регистрации
 приложения API
 
-[SoundHub API](https://github.com/Pr0gger1/soundhub-api)
+[Актуальная версия API](https://github.com/Pr0gger1/soundhub-api)
+
+[SoundHub API](https://github.com/LilYxa/soundhub-api)
 
 # Участники проекта
 
