@@ -7,12 +7,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
-import com.soundhub.presentation.pages.music.viewmodels.MusicServiceBottomSheetViewModel
+import com.soundhub.presentation.pages.music.viewmodels.MusicServiceViewModel
 
 @Composable
 fun MusicServiceSheetContainer(
 	modifier: Modifier = Modifier,
-	musicServiceBottomSheetViewModel: MusicServiceBottomSheetViewModel,
+	musicServiceViewModel: MusicServiceViewModel<*>,
 	formIcon: Painter?,
 	formIconDescription: String? = null,
 ) {
@@ -21,7 +21,7 @@ fun MusicServiceSheetContainer(
 		modifier = modifier.padding(horizontal = 5.dp)
 	) {
 		LoginMusicServiceSheet(
-			musicServiceViewModel = musicServiceBottomSheetViewModel,
+			musicServiceViewModel = musicServiceViewModel,
 			formIcon = formIcon,
 			formIconDescription = formIconDescription,
 		)

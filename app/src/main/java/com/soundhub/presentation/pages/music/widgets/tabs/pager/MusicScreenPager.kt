@@ -25,7 +25,8 @@ internal fun MusicScreenPager(
 	val pages = listOf(
 		@Composable {
 			MusicMainPage(uiStateDispatcher = uiStateDispatcher)
-		}, @Composable {
+		},
+		@Composable {
 			MusicLibraryPage(
 				musicViewModel = musicViewModel,
 				navController = navController

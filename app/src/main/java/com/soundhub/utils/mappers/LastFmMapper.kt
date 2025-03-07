@@ -13,7 +13,10 @@ interface LastFmMapper {
 	@Mapping(target = "sessionKey", source = "key")
 	fun lastFmSessionBodyToLastFmUser(session: LastFmSessionBody?): LastFmUser?
 
-	fun mergeUsers(@MappingTarget user: LastFmUserDto, userResponse: LastFmUserDto): LastFmUserDto
+	fun mergeUserDtos(
+		@MappingTarget user: LastFmUserDto,
+		userResponse: LastFmUserDto
+	): LastFmUserDto
 
 	companion object {
 		val impl: LastFmMapper = Mappers.getMapper(LastFmMapper::class.java)

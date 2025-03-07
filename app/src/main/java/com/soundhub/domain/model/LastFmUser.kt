@@ -25,10 +25,10 @@ data class LastFmUser(
 	@PrimaryKey
 	val name: String,
 	val age: String?,
-	val subscriber: String,
+	val subscriber: String?,
 
 	@SerializedName("key")
-	val sessionKey: String,
+	var sessionKey: String?,
 
 	@SerializedName("realname")
 	val realName: String?,

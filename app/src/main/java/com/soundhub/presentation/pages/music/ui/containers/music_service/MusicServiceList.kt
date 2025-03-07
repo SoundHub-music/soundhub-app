@@ -19,6 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,11 +35,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.R
-import com.soundhub.Route
 import com.soundhub.presentation.pages.music.ui.buttons.MusicServiceButton
-import com.soundhub.presentation.pages.music.viewmodels.MusicServiceBottomSheetViewModel
 import com.soundhub.presentation.pages.music.viewmodels.MusicServiceEvent
+import com.soundhub.presentation.pages.music.viewmodels.MusicServiceViewModel
 import com.soundhub.presentation.pages.music.widgets.sheet.MusicServiceSheetContainer
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,15 +60,15 @@ fun MusicServiceList(
 		)
 	)
 
-	val clickedServicePair: MusicServiceBottomSheetViewModel? by viewModel
+	val clickedServicePair: MusicServiceViewModel<*>? by viewModel
 		.clickedServicePair
 		.collectAsState()
 
-	val event = clickedServicePair?.eventChannel?.collectAsState(initial = null)
-
-	LaunchedEffect(key1 = event?.value) {
-		if (event?.value == MusicServiceEvent.CloseModal) {
-			viewModel.setShowModalSheet(false)
+	LaunchedEffect(key1 = clickedServicePair?.eventChannel) {
+		clickedServicePair?.eventChannel?.collectLatest { event ->
+			if (event == MusicServiceEvent.CloseModal) {
+				viewModel.setShowModalSheet(false)
+			}
 		}
 	}
 
@@ -95,20 +98,17 @@ fun MusicServiceList(
 				modifier = Modifier.fillMaxWidth()
 			) {
 				items(items = services, key = { it.first }) { service ->
+					var isAuthorized by remember {
+						mutableStateOf(false)
+					}
+
+					LaunchedEffect(service.second) {
+						isAuthorized = service.second.isAuthorized().await()
+					}
+
 					MusicServiceButton(
 						painter = painterResource(id = service.first),
-						bottomSheetViewModel = service.second,
-						onClick = {
-							val isAuthorized = service.second.isAuthorizedState.value
-
-							if (!isAuthorized) {
-								viewModel.setShowModalSheet(true)
-								viewModel.setClickedServicePair(service)
-								return@MusicServiceButton
-							}
-
-							navController.navigate(Route.Music.LastFmProfile.route)
-						}
+						onClick = { viewModel.onServiceClick(service, navController) }
 					)
 				}
 			}
@@ -125,7 +125,7 @@ fun MusicServiceList(
 				val logo = it.getServiceLogoResource()
 
 				MusicServiceSheetContainer(
-					musicServiceBottomSheetViewModel = it,
+					musicServiceViewModel = it,
 					formIcon = logo?.let { painterResource(logo) },
 				)
 			}

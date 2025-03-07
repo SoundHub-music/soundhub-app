@@ -1,5 +1,6 @@
 package com.soundhub.di
 
+import com.soundhub.data.local_database.dao.LastFmDao
 import com.soundhub.data.local_database.dao.PostDao
 import com.soundhub.domain.repository.ChatRepository
 import com.soundhub.domain.repository.FileRepository
@@ -10,6 +11,7 @@ import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.chat.GetAllChatsByUserUseCase
 import com.soundhub.domain.usecases.chat.GetOrCreateChatByUserUseCase
 import com.soundhub.domain.usecases.file.GetImageUseCase
+import com.soundhub.domain.usecases.lastfm.LastFmAuthUseCase
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.domain.usecases.post.DeletePostByIdUseCase
 import com.soundhub.domain.usecases.post.GetPostsByUserUseCase
@@ -67,9 +69,9 @@ object DomainModule {
 
 	@Provides
 	@Singleton
-	fun providesGetUserByIdUseCase(
-		userRepository: UserRepository,
-	): GetUserByIdUseCase = GetUserByIdUseCase(userRepository)
+	fun providesGetUserByIdUseCase(userRepository: UserRepository): GetUserByIdUseCase {
+		return GetUserByIdUseCase(userRepository)
+	}
 
 	@Provides
 	@Singleton
@@ -100,5 +102,17 @@ object DomainModule {
 		postRepository: PostRepository
 	): TogglePostLikeAndUpdateListUseCase {
 		return TogglePostLikeAndUpdateListUseCase(postRepository)
+	}
+
+	@Provides
+	@Singleton
+	fun providesLastFmAuthUseCase(
+		lastFmRepository: LastFmRepository,
+		lastFmDao: LastFmDao
+	): LastFmAuthUseCase {
+		return LastFmAuthUseCase(
+			lastFmRepository,
+			lastFmDao
+		)
 	}
 }

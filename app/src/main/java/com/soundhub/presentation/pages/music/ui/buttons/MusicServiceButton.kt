@@ -16,14 +16,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.soundhub.R
-import com.soundhub.presentation.pages.music.viewmodels.MusicServiceBottomSheetViewModel
 import com.soundhub.presentation.theme.acceptColor
 import com.soundhub.presentation.theme.onAcceptColor
 
@@ -34,17 +31,15 @@ fun MusicServiceButton(
 	onClick: () -> Unit = {},
 	painter: Painter,
 	contentDescription: String? = null,
-	bottomSheetViewModel: MusicServiceBottomSheetViewModel
+	isAuthorized: Boolean = false
 ) {
-	val isAuthorised by bottomSheetViewModel.isAuthorizedState.collectAsState()
-
-	LaunchedEffect(isAuthorised) {
-		Log.d("MusicServiceButton", "isAuthorised: $isAuthorised")
+	LaunchedEffect(isAuthorized) {
+		Log.d("MusicServiceButton", "isAuthorized: $isAuthorized")
 	}
 
 	BadgedBox(
 		badge = {
-			if (isAuthorised)
+			if (isAuthorized)
 				Badge(
 					modifier = Modifier
 						.offset(x = (-15).dp)

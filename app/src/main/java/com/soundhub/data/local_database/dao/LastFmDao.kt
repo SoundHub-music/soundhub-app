@@ -21,4 +21,7 @@ interface LastFmDao {
 	@Transaction
 	@Delete
 	suspend fun deleteLastFmSessionUser(user: LastFmUser)
+
+	@Query(Queries.TRUNCATE_LAST_FM_USER)
+	suspend fun truncateLastFmSessionUser()
 }

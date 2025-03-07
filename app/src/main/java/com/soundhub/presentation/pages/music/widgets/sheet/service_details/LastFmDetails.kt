@@ -27,17 +27,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.soundhub.R
-import com.soundhub.domain.model.LastFmUser
-import com.soundhub.presentation.pages.music.viewmodels.LastFmLoginViewModel
+import com.soundhub.presentation.pages.music.viewmodels.LastFmServiceViewModel
 import com.soundhub.presentation.pages.music.widgets.sheet.components.SummaryDetails
 import com.soundhub.presentation.shared.avatar.CircularAvatar
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun LastFmDetails(
-	lastFmLoginViewModel: LastFmLoginViewModel
+	lastFmServiceViewModel: LastFmServiceViewModel
 ) {
-	val lastFmUser: LastFmUser? by lastFmLoginViewModel.userInfo.collectAsState()
+	val state by lastFmServiceViewModel.profileUiState.collectAsState()
+	val lastFmUser = state.profileOwner
 	val uriHandler = LocalUriHandler.current
 	val lastFmUserAvatar: Uri? = lastFmUser?.images
 		?.firstOrNull { it.size == "medium" }
@@ -78,11 +78,7 @@ internal fun LastFmDetails(
 		lastFmUser?.let { user ->
 			FlowRow {
 				SummaryDetails(title = {
-					Text(
-						text = stringResource(
-							id = R.string.last_fm_scrobble_track_count
-						),
-					)
+					Text(text = stringResource(id = R.string.last_fm_scrobble_track_count))
 				}) {
 					user.playCount?.let {
 						Text(
@@ -92,11 +88,7 @@ internal fun LastFmDetails(
 					}
 				}
 				SummaryDetails(title = {
-					Text(
-						text = stringResource(
-							id = R.string.last_fm_scrobble_artist_count
-						)
-					)
+					Text(text = stringResource(id = R.string.last_fm_scrobble_artist_count))
 				}) {
 					user.artistCount?.let {
 						Text(

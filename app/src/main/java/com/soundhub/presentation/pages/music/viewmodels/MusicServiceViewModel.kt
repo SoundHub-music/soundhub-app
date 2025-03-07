@@ -2,42 +2,47 @@ package com.soundhub.presentation.pages.music.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.soundhub.data.enums.ApiStatus
-import com.soundhub.domain.model.LastFmUser
 import com.soundhub.presentation.pages.music.enums.ChosenMusicService
-import com.soundhub.utils.constants.Constants
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.soundhub.presentation.viewmodels.IProfileViewModel
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 sealed class MusicServiceEvent {
 	object CloseModal : MusicServiceEvent()
 }
 
-@HiltViewModel
-open class MusicServiceBottomSheetViewModel @Inject constructor() : ViewModel() {
+data class MusicServiceLoginState(
+	val userName: String = "",
+	val password: String = ""
+)
+
+abstract class MusicServiceViewModel<T> : ViewModel(), IProfileViewModel<T> {
 	protected val _loginState = MutableStateFlow(MusicServiceLoginState())
 	val loginState = _loginState.asStateFlow()
 
 	protected val _serviceLogoResourceState = MutableStateFlow<Int?>(null)
-	val serviceLogoResourceState = _serviceLogoResourceState.asStateFlow()
 
 	protected val _eventChannel = Channel<MusicServiceEvent>()
 	val eventChannel = _eventChannel.receiveAsFlow()
 
-	protected val mutableIsAuthorized = MutableStateFlow(false)
-	val isAuthorizedState = mutableIsAuthorized.asStateFlow()
+	protected val _isAuthorizedState = MutableStateFlow(false)
+	val isAuthorizedState = _isAuthorizedState.asStateFlow()
 
-	protected val mutableStatus = MutableStateFlow(ApiStatus.NOT_LAUNCHED)
-	val statusState = mutableStatus.asStateFlow()
+	protected val _statusState = MutableStateFlow(ApiStatus.NOT_LAUNCHED)
+	val statusState = _statusState.asStateFlow()
 
-	open val chosenMusicService: ChosenMusicService
-		get() = throw NotImplementedError(Constants.PROPERTY_NOT_IMPLEMENTED_ERROR)
+	abstract val chosenMusicService: ChosenMusicService
 
-	fun resetState() {
+	override fun onCleared() {
+		super.onCleared()
+		_loginState.update { MusicServiceLoginState() }
+	}
+
+	fun resetFormState() {
 		_loginState.update { MusicServiceLoginState() }
 	}
 
@@ -53,14 +58,8 @@ open class MusicServiceBottomSheetViewModel @Inject constructor() : ViewModel() 
 		it.copy(password = value)
 	}
 
-	open fun checkAuthority(user: LastFmUser?): Boolean {
-		return false
-	}
-
-	open fun login() {}
+	abstract fun isAuthorized(): Deferred<Boolean>
+	abstract fun checkAuthority(user: T?): Deferred<Boolean>
+	abstract fun login()
+	abstract fun logout()
 }
-
-data class MusicServiceLoginState(
-	val userName: String = "",
-	val password: String = ""
-)
