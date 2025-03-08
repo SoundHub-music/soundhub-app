@@ -30,7 +30,7 @@ android.useAndroidX=true
 
 [Актуальная версия API](https://github.com/Pr0gger1/soundhub-api)
 
-[SoundHub API (оригинальный репозиторий,разработка прекращена)](https://github.com/LilYxa/soundhub-api)
+[SoundHub API (оригинальный репозиторий, разработка прекращена)](https://github.com/LilYxa/soundhub-api)
 
 # Участники проекта
 
