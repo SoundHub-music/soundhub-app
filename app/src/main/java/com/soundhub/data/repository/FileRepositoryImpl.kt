@@ -5,8 +5,8 @@ import android.util.Log
 import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.FileService
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.FileRepository
+import com.soundhub.domain.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -20,7 +20,7 @@ class FileRepositoryImpl @Inject constructor(
 	private val fileService: FileService,
 	private val context: Context,
 	gson: Gson
-) : FileRepository, BaseRepository(gson, context) {
+) : FileRepository, Repository(gson, context) {
 	override suspend fun getFile(
 		folderName: String?,
 		fileNameUrl: String?,

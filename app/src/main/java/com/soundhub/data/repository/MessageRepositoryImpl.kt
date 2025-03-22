@@ -13,8 +13,8 @@ import com.soundhub.data.api.responses.internal.UnreadMessagesResponse
 import com.soundhub.data.api.services.MessageService
 import com.soundhub.data.sources.MessageSource
 import com.soundhub.domain.model.Message
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.MessageRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.utils.constants.Constants
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -25,7 +25,7 @@ class MessageRepositoryImpl @Inject constructor(
 	private val messageService: MessageService,
 	gson: Gson,
 	context: Context
-) : MessageRepository, BaseRepository(gson, context) {
+) : MessageRepository, Repository(gson, context) {
 	override suspend fun getMessageById(
 		messageId: UUID
 	): HttpResult<Message?> {

@@ -62,7 +62,7 @@ class AuthenticationViewModel @Inject constructor(
 
 		var authorizedUser: User? = userRepository
 			.getCurrentUser(userCreds)
-			.onSuccessReturn()
+			.getOrNull()
 
 		with(authorizedUser) {
 			this?.let { userDao.saveOrReplaceUser(this) }

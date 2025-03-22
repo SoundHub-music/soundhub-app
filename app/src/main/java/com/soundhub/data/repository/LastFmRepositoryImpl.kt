@@ -9,8 +9,8 @@ import com.soundhub.data.api.responses.lastfm.LastFmArtistInfo
 import com.soundhub.data.api.responses.lastfm.LastFmSessionResponse
 import com.soundhub.data.api.responses.lastfm.LastFmUserInfoResponse
 import com.soundhub.data.api.services.LastFmService
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.LastFmRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.utils.extensions.string.md5
 import retrofit2.Response
 import java.util.UUID
@@ -20,7 +20,7 @@ class LastFmRepositoryImpl @Inject constructor(
 	private val lastFmService: LastFmService,
 	gson: Gson,
 	context: Context
-) : LastFmRepository, BaseRepository(gson, context) {
+) : LastFmRepository, Repository(gson, context) {
 
 	override suspend fun getArtistInfo(
 		artist: String?,

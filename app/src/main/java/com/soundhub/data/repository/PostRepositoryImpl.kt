@@ -6,8 +6,8 @@ import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.PostService
 import com.soundhub.domain.model.Post
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.PostRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.lib.HttpUtils
@@ -24,7 +24,7 @@ class PostRepositoryImpl @Inject constructor(
 	private val context: Context,
 	private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
 	private val gson: Gson
-) : PostRepository, BaseRepository(gson, context) {
+) : PostRepository, Repository(gson, context) {
 	override suspend fun getPostById(postId: UUID): HttpResult<Post?> {
 		try {
 			val response: Response<Post?> = postService.getPostById(postId)

@@ -37,13 +37,18 @@ class WebSocketClient @Inject constructor(
 	private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
 	fun connect(url: String) = coroutineScope.launch {
-		val bearerToken: String = getBearerToken(userCredsFlow.firstOrNull()?.accessToken)
-		val header: Map<String, String> = mapOf(AUTHORIZATION_HEADER to bearerToken)
-		val stompHeader = StompHeader(AUTHORIZATION_HEADER, bearerToken)
+		val stompHeaders = getConnectionStompHeaders()
 
-		stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url, header)
-		stompClient?.connect(listOf(stompHeader))
+		stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
+		stompClient?.connect(stompHeaders)
 		Log.i("WebSocketClient", "connect[1]: connected successfully")
+	}
+
+	private suspend fun getConnectionStompHeaders(): List<StompHeader> {
+		val accessToken = userCredsFlow.firstOrNull()?.accessToken
+		val bearerToken: String = getBearerToken(accessToken)
+
+		return listOf(StompHeader(AUTHORIZATION_HEADER, bearerToken))
 	}
 
 	fun sendMessage(
@@ -133,8 +138,8 @@ class WebSocketClient @Inject constructor(
 	}
 
 	fun disconnect() {
-		stompClient?.disconnect()
 		Log.i("WebSocketClient", "Disconnected")
+		stompClient?.disconnect()
 	}
 
 	private fun replaceParam(id: UUID, endpoint: String): String {

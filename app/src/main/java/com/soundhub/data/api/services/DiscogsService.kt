@@ -2,13 +2,10 @@ package com.soundhub.data.api.services
 
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
-import com.soundhub.data.api.responses.discogs.release.DiscogsReleaseResponse
-import com.soundhub.utils.constants.ApiEndpoints
 import com.soundhub.utils.constants.ApiEndpoints.Music.ARTIST_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.ApiEndpoints.Music.DATABASE_SEARCH
 import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTISTS
 import com.soundhub.utils.constants.ApiEndpoints.Music.GET_ARTIST_RELEASES
-import com.soundhub.utils.constants.ApiEndpoints.Music.RELEASE_ID_DYNAMIC_PARAM
 import com.soundhub.utils.constants.Constants.DISCOGS_AUTHORIZATION
 import com.soundhub.utils.lib.HttpUtils.Companion.AUTHORIZATION_HEADER
 import retrofit2.Response
@@ -59,11 +56,5 @@ interface DiscogsService {
 		@Query("sort") sortType: String? = null,
 		@Query("sort_order") sortOrder: String? = null
 	): Response<DiscogsResponse>
-
-	@GET(ApiEndpoints.Music.GET_RELEASE_BY_ID)
-	suspend fun getReleaseById(
-		@Path(RELEASE_ID_DYNAMIC_PARAM)
-		releaseId: Int
-	): Response<DiscogsReleaseResponse>
 }
 

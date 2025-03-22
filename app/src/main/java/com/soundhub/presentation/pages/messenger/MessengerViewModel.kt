@@ -20,6 +20,7 @@ import com.soundhub.domain.services.MessengerAndroidService
 import com.soundhub.domain.services.MessengerAndroidService.Companion.BROADCAST_MESSAGE_KEY
 import com.soundhub.domain.states.MessengerUiState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import com.soundhub.utils.constants.Constants.MAX_MESSAGE_PREVIEW_LENGTH
 import com.soundhub.utils.lib.SearchUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -44,8 +45,6 @@ class MessengerViewModel @Inject constructor(
 ) : ViewModel() {
 	private val uiState = uiStateDispatcher.uiState
 	val userCreds: Flow<UserPreferences> = userCredsStore.getCreds()
-
-	private val MAX_MESSAGE_PREVIEW_LENGTH = 20
 
 	private val _messengerUiState = MutableStateFlow(MessengerUiState())
 	val messengerUiState = _messengerUiState.asStateFlow()
@@ -103,7 +102,7 @@ class MessengerViewModel @Inject constructor(
 			chatId = chatId,
 			pageSize = 10,
 			page = 1
-		).onSuccessReturn()
+		).getOrNull()
 			?.content
 			?.firstOrNull()
 	}
@@ -123,7 +122,7 @@ class MessengerViewModel @Inject constructor(
 	suspend fun getUnreadChatCount(): Int {
 		val authorizedUser: User? = userDao.getCurrentUser()
 		val messages = messageRepository.getAllUnreadMessages()
-			.onSuccessReturn()
+			.getOrNull()
 			?.messages
 			.orEmpty()
 
@@ -140,7 +139,7 @@ class MessengerViewModel @Inject constructor(
 
 	suspend fun getUnreadMessageCountByChatId(chatId: UUID?): Int {
 		val unreadMessages: UnreadMessagesResponse? = messageRepository.getAllUnreadMessages()
-			.onSuccessReturn()
+			.getOrNull()
 
 		return unreadMessages?.messages
 			?.filter { msg -> msg.chatId == chatId }
@@ -185,23 +184,24 @@ class MessengerViewModel @Inject constructor(
 	}
 
 	private suspend fun getChats(): List<Chat> {
-		var chats: MutableList<Chat> = mutableListOf()
-		userDao.getCurrentUser()?.let { user ->
-			chatRepository.getAllChatsByUserId(user.id)
-				.onSuccess { response ->
-					val responseChats = response.body.orEmpty().filter { it.totalMessages > 0 }
-					_messengerUiState.update { it.copy(status = ApiStatus.SUCCESS) }
-					chats.addAll(responseChats)
-				}
-				.onFailure { error ->
-					val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
-					uiStateDispatcher.sendUiEvent(errorEvent)
-					_messengerUiState.update {
-						it.copy(status = ApiStatus.ERROR)
-					}
-				}
-		}
+		val user = userDao.getCurrentUser()
 
-		return chats
+		if (user == null)
+			return emptyList()
+
+		return chatRepository.getAllChatsByUserId(user.id)
+			.onFailure { error ->
+				val errorEvent: UiEvent = UiEvent.Error(error.errorBody, error.throwable)
+				uiStateDispatcher.sendUiEvent(errorEvent)
+				_messengerUiState.update {
+					it.copy(status = ApiStatus.ERROR)
+				}
+			}
+			.onSuccessGet { response ->
+				val responseChats = response.body.orEmpty().filter { it.totalMessages > 0 }
+				_messengerUiState.update { it.copy(status = ApiStatus.SUCCESS) }
+
+				return@onSuccessGet responseChats
+			}.orEmpty()
 	}
 }

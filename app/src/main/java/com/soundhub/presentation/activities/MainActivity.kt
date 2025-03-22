@@ -24,7 +24,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soundhub.R
-import com.soundhub.data.local_database.dao.UserDao
 import com.soundhub.domain.events.UiEvent
 import com.soundhub.domain.services.MessengerAndroidService
 import com.soundhub.presentation.layout.RootLayout
@@ -45,7 +44,6 @@ import com.soundhub.utils.extensions.context_wrapper.stopAndroidService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -58,8 +56,6 @@ class MainActivity : ComponentActivity() {
 	private val navigationViewModel: NavigationViewModel by viewModels()
 	private val musicViewModel: MusicViewModel by viewModels()
 
-	@Inject
-	lateinit var userDao: UserDao
 	private lateinit var navController: NavHostController
 	private var isMessengerConnected = false
 	private lateinit var messengerAndroidService: MessengerAndroidService

@@ -10,6 +10,6 @@ class GetUserByIdUseCase @Inject constructor(
 ) {
 	suspend operator fun invoke(userId: UUID): User? {
 		return userRepository.getUserById(userId)
-			.onSuccessReturn()
+			.getOrNull()
 	}
 }

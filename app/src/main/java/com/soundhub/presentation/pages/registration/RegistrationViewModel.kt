@@ -143,21 +143,21 @@ class RegistrationViewModel @Inject constructor(
 		userRepository.checkUserExistenceByEmail(authForm.email).onSuccess { response ->
 			val isUserExists = response.body?.isUserExists == true
 
-			if (!isUserExists) {
-				_registerState.update {
-					it.copy(
-						email = authForm.email,
-						password = authForm.password
-					)
-				}
-			} else {
+			if (isUserExists) {
 				val message = UiText.StringResource(
 					R.string.toast_user_with_such_email_already_exists
 				)
 
 				uiEvent = UiEvent.ShowToast(message)
+				return@onSuccess
 			}
 
+			_registerState.update {
+				it.copy(
+					email = authForm.email,
+					password = authForm.password
+				)
+			}
 		}.onFailure {
 			val message = UiText.StringResource(R.string.toast_registration_error)
 			uiEvent = UiEvent.ShowToast(message)

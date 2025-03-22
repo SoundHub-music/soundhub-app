@@ -6,8 +6,8 @@ import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.InviteService
 import com.soundhub.domain.model.Invite
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.InviteRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import retrofit2.Response
 import java.util.UUID
@@ -18,7 +18,7 @@ class InviteRepositoryImpl @Inject constructor(
 	private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
 	gson: Gson,
 	context: Context
-) : InviteRepository, BaseRepository(gson, context) {
+) : InviteRepository, Repository(gson, context) {
 	override suspend fun createInvite(recipientId: UUID): HttpResult<Invite> {
 		try {
 			val response: Response<Invite> = inviteService.createInvite(recipientId)

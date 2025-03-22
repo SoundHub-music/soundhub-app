@@ -17,23 +17,29 @@ private val Context.settingsStore: DataStore<Preferences> by preferencesDataStor
 	name = DATASTORE_USER_SETTINGS
 )
 
-class UserSettingsStore(private val context: Context) : BaseDataStore<UserSettings>() {
-	private object PreferenceKeys {
-		val appTheme: Preferences.Key<String> = stringPreferencesKey(DATASTORE_APP_THEME)
+interface UserSettingsObject {
+	val appTheme: Preferences.Key<String>
+}
+
+class UserSettingsStore(
+	private val context: Context
+) : BaseDataStore<UserSettings, UserSettingsObject>() {
+	override val preferenceKeys = object : UserSettingsObject {
+		override val appTheme: Preferences.Key<String> = stringPreferencesKey(DATASTORE_APP_THEME)
 	}
 
 	override suspend fun updateCreds(creds: UserSettings?) {
 		context.settingsStore.edit { pref ->
-			pref[PreferenceKeys.appTheme] = creds?.appTheme?.toString() ?: ""
+			pref[preferenceKeys.appTheme] = creds?.appTheme?.toString() ?: AppTheme.AUTO.toString()
 		}
 	}
 
 	override fun getCreds(): Flow<UserSettings> {
 		return context.settingsStore.data.map { pref ->
 			runCatching {
-				UserSettings(
-					appTheme = AppTheme.valueOf(pref[PreferenceKeys.appTheme].toString())
-				)
+				val value = pref[preferenceKeys.appTheme].toString()
+
+				UserSettings(AppTheme.valueOf(value))
 			}.getOrDefault(UserSettings())
 		}
 	}

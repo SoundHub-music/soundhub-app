@@ -28,7 +28,7 @@ class LastFmAuthUseCase @Inject constructor(
 				?: throw Exception("User mapping failed")
 
 			val fullData = lastFmRepository.getUserInfo(user.name)
-				.onSuccessReturn()
+				.getOrNull()
 				?.user
 
 			fullData?.apply { sessionKey = user.sessionKey }

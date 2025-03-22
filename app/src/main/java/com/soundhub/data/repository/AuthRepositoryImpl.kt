@@ -12,7 +12,7 @@ import com.soundhub.data.api.services.AuthService
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.domain.model.User
 import com.soundhub.domain.repository.AuthRepository
-import com.soundhub.domain.repository.BaseRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.utils.enums.ContentTypes
 import com.soundhub.utils.lib.HttpUtils
@@ -28,7 +28,7 @@ class AuthRepositoryImpl @Inject constructor(
 	private val userRepository: UserRepository,
 	private val context: Context,
 	private val gson: Gson
-) : AuthRepository, BaseRepository(gson, context) {
+) : AuthRepository, Repository(gson, context) {
 	override suspend fun signIn(body: SignInRequestBody): HttpResult<UserPreferences> {
 		try {
 			val signInResponse: Response<UserPreferences> = authService.signIn(body)

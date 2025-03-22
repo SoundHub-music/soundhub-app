@@ -6,8 +6,8 @@ import com.google.gson.Gson
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.CountryService
 import com.soundhub.domain.model.Country
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.CountryRepository
+import com.soundhub.domain.repository.Repository
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ class CountryRepositoryImpl @Inject constructor(
 	private val countryService: CountryService,
 	gson: Gson,
 	context: Context
-) : CountryRepository, BaseRepository(gson, context) {
+) : CountryRepository, Repository(gson, context) {
 	override suspend fun getAllCountryNames(): HttpResult<List<Country>> {
 		try {
 			val response: Response<List<Country>> = countryService.getAllCountryNames()

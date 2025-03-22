@@ -9,7 +9,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +51,7 @@ fun MusicItemPlate(
 	width: Dp = 72.dp,
 	height: Dp = 72.dp
 ) {
-	val tertiaryColor = MaterialTheme.colorScheme.tertiary
+	val selectionColor = MaterialTheme.colorScheme.error
 	val placeholder: Painter = painterResource(id = R.drawable.musical_note)
 
 	var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
@@ -58,7 +62,7 @@ fun MusicItemPlate(
 	)
 
 	val borderColor by animateColorAsState(
-		targetValue = if (isItemChosen) tertiaryColor else Color.Transparent,
+		targetValue = if (isItemChosen) selectionColor else Color.Transparent,
 		animationSpec = tween(durationMillis = 300), label = "b.color"
 	)
 

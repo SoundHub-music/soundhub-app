@@ -31,7 +31,9 @@ class MessageSource(
 				)
 			}
 
-			val data: List<Message> = response?.getOrNull()?.content.orEmpty()
+			val data: List<Message> = response?.getOrThrow()
+				?.content
+				.orEmpty()
 
 			return LoadResult.Page(
 				prevKey = if (nextPageNumber > 1) nextPageNumber - 1 else null,

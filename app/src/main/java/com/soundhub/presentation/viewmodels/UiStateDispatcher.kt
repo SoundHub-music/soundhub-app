@@ -36,7 +36,6 @@ import javax.inject.Inject
 @HiltViewModel
 class UiStateDispatcher @Inject constructor(
 	private val userSettingsStore: UserSettingsStore,
-//	private val userDao: UserDao
 ) : ViewModel() {
 	private val userSettings: Flow<UserSettings> = userSettingsStore.getCreds()
 

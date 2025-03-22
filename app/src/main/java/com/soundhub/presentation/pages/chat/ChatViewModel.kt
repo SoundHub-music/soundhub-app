@@ -121,7 +121,7 @@ class ChatViewModel @Inject constructor(
 	suspend fun getMessageById(messageId: UUID): Message? {
 		return messageRepository
 			.getMessageById(messageId)
-			.onSuccessReturn()
+			.getOrNull()
 	}
 
 	fun cacheMessages(list: List<Message>) = _chatUiState.update { it.copy(cachedMessages = list) }
@@ -175,11 +175,12 @@ class ChatViewModel @Inject constructor(
 			}
 	}
 
-	fun setMessageContent(message: String) =
+	fun setMessageContent(message: String) {
 		_chatUiState.update { it.copy(messageContent = message) }
+	}
 
-	private fun clearMessageContent() = _chatUiState.update {
-		it.copy(messageContent = "")
+	private fun clearMessageContent() {
+		_chatUiState.update { it.copy(messageContent = "") }
 	}
 
 	fun onSendMessageClick(lazyListState: LazyListState) = viewModelScope.launch(Dispatchers.Main) {
@@ -273,15 +274,19 @@ class ChatViewModel @Inject constructor(
 			deleterId = deleterId,
 		)
 
-	fun setCheckMessageMode(check: Boolean) = _chatUiState.update {
-		it.copy(isCheckMessageModeEnabled = check)
+	fun setCheckMessageMode(check: Boolean) {
+		_chatUiState.update {
+			it.copy(isCheckMessageModeEnabled = check)
+		}
 	}
 
-	fun unsetCheckMessagesMode() = _chatUiState.update {
-		it.copy(
-			isCheckMessageModeEnabled = false,
-			checkedMessages = emptySet()
-		)
+	fun unsetCheckMessagesMode() {
+		_chatUiState.update {
+			it.copy(
+				isCheckMessageModeEnabled = false,
+				checkedMessages = emptySet()
+			)
+		}
 	}
 
 	fun unsetReplyMessageMode() {

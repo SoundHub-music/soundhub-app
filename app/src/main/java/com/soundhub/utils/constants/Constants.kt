@@ -142,7 +142,6 @@ object Constants {
 
 	//region response error body type
 	const val METHOD_NOT_IMPLEMENTED_ERROR = "This method should be implemented"
-	const val PROPERTY_NOT_IMPLEMENTED_ERROR = "This property should be implemented"
 
 	//endregion
 
@@ -165,8 +164,12 @@ object Constants {
 	const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
 	const val LAST_FM_API = "https://ws.audioscrobbler.com/"
 	const val DISCOGS_API = "https://api.discogs.com/"
+	const val DISCOGS_AUTHORIZATION =
+		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
 
-	// websocket constants
+	//endregion
+
+	//region websocket constants
 	const val SOUNDHUB_WEBSOCKET = "ws://${BuildConfig.SOUNDHUB_API_HOSTNAME}/ws"
 	const val DELETER_ID_HEADER = "DeleterId"
 	const val DESTINATION_HEADER = "destination"
@@ -178,17 +181,17 @@ object Constants {
 
 	const val CACHE_SIZE: Long = 10 * 1024 * 1024
 
-	// Discogs API authorization header
-	const val DISCOGS_AUTHORIZATION =
-		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
-
 	//endregion
 
 	//region Paging constants
 	const val DEFAULT_MESSAGE_PAGE_SIZE = 100
 	const val DEFAULT_MESSAGE_PAGE = 1
-
 	const val DEFAULT_ARTIST_PAGE_SIZE = 2
+
+	//endregion
+
+	//region other constants
+	const val MAX_MESSAGE_PREVIEW_LENGTH = 20
 
 	//endregion
 }

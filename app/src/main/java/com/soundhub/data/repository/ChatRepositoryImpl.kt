@@ -8,8 +8,8 @@ import com.soundhub.data.api.responses.internal.ApiStateResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import com.soundhub.data.api.services.ChatService
 import com.soundhub.domain.model.Chat
-import com.soundhub.domain.repository.BaseRepository
 import com.soundhub.domain.repository.ChatRepository
+import com.soundhub.domain.repository.Repository
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class ChatRepositoryImpl @Inject constructor(
 	private val chatService: ChatService,
 	gson: Gson,
 	context: Context
-) : ChatRepository, BaseRepository(gson, context) {
+) : ChatRepository, Repository(gson, context) {
 	override suspend fun getAllChatsByUserId(userId: UUID): HttpResult<List<Chat>> {
 		try {
 			val response: Response<List<Chat>> = chatService

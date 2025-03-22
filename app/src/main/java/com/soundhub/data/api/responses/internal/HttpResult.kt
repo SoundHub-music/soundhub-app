@@ -27,16 +27,15 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 		return this
 	}
 
+	suspend fun onSuccessGet(callback: suspend (Success<T>) -> T): T? {
+		if (this is Success) return callback(this)
+		return null
+	}
+
 	suspend fun onSuccessWithContext(
 		context: CoroutineDispatcher = Dispatchers.Main,
 		callback: suspend (Success<T>) -> Unit
 	): HttpResult<T> = withContext(context) { onSuccess(callback) }
-
-	fun onSuccessReturn(): T? {
-		if (this is Success)
-			return this.body
-		return null
-	}
 
 	suspend fun onFailure(callback: suspend (Error<T>) -> Unit): HttpResult<T> {
 		if (this is Error) callback(this)
@@ -83,7 +82,6 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 		}
 
 		val message: String? = errorDetail ?: throwable?.message
-
-		throw IllegalStateException(message)
+		throw throwable ?: IllegalStateException(message)
 	}
 }

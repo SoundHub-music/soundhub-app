@@ -8,8 +8,8 @@ import com.soundhub.data.api.responses.internal.ErrorResponse
 import com.soundhub.data.api.responses.internal.HttpResult
 import retrofit2.Response
 
-abstract class BaseRepository(
-	private val gson: Gson,
+abstract class Repository(
+	private val gson: Gson = Gson(),
 	private val context: Context
 ) {
 	protected suspend fun <In, Out> handleResponse(
@@ -34,6 +34,14 @@ abstract class BaseRepository(
 		} else getError<T, T>(response)
 	}
 
+	protected fun <T> handleException(e: Exception): HttpResult<T> {
+		Log.e("BaseRepository", "Exception: ${e.stackTraceToString()}")
+		return HttpResult.Error(
+			errorBody = ErrorResponse(detail = e.localizedMessage),
+			throwable = e
+		)
+	}
+
 	private fun <In, Out> getError(response: Response<In>): HttpResult<Out> {
 		val errorBody = gson.fromJson(
 			response.errorBody()?.charStream(),
@@ -54,13 +62,5 @@ abstract class BaseRepository(
 			)
 		Log.e("BaseRepository", "Error: $errorBody")
 		return HttpResult.Error(errorBody = errorBody)
-	}
-
-	protected fun <T> handleException(e: Exception): HttpResult<T> {
-		Log.e("BaseRepository", "Exception: ${e.stackTraceToString()}")
-		return HttpResult.Error(
-			errorBody = ErrorResponse(detail = e.localizedMessage),
-			throwable = e
-		)
 	}
 }

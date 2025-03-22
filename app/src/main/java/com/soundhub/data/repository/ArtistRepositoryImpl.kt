@@ -22,12 +22,15 @@ import com.soundhub.data.sources.ArtistSource
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Track
 import com.soundhub.domain.repository.ArtistRepository
-import com.soundhub.domain.repository.BaseRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.states.GenreUiState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -39,7 +42,7 @@ class ArtistRepositoryImpl @Inject constructor(
 	private val uiStateDispatcher: UiStateDispatcher,
 	context: Context,
 	gson: Gson
-) : BaseRepository(gson, context), ArtistRepository {
+) : Repository(gson, context), ArtistRepository {
 	override suspend fun getArtistsByGenres(
 		genres: List<String>,
 		page: Int,

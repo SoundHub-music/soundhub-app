@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,7 +51,7 @@ fun <T : Any> PostRegisterGridLayout(
 	ContentContainer(
 		modifier = Modifier
 			.background(MaterialTheme.colorScheme.background)
-			.fillMaxSize(),
+			.fillMaxSize()
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,6 +83,9 @@ fun <T : Any> PostRegisterGridLayout(
 				state = lazyGridState,
 				columns = GridCells.Adaptive(minSize = 100.dp),
 				contentPadding = PaddingValues(all = 10.dp),
+				modifier = Modifier
+					.fillMaxHeight()
+					.padding(bottom = 50.dp),
 				content = {
 					if (pagedItems != null) {
 						items(

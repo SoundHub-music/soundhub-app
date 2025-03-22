@@ -1,7 +1,6 @@
 package com.soundhub.presentation.pages.authentication.ui.forms
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
@@ -65,10 +64,6 @@ fun AuthForm(
 
 	LaunchedEffect(key1 = authFormState.isRegisterForm) {
 		buttonFormText = getButtonFormText(authFormState.isRegisterForm, context)
-	}
-
-	LaunchedEffect(key1 = authFormState) {
-		Log.d("AuthForm", "state: $authFormState")
 	}
 
 	Column(

@@ -13,7 +13,7 @@ import com.soundhub.data.api.responses.internal.UserExistenceResponse
 import com.soundhub.data.api.services.UserService
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.domain.model.User
-import com.soundhub.domain.repository.BaseRepository
+import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.repository.UserRepository
 import com.soundhub.domain.usecases.user.LoadAllUserDataUseCase
 import com.soundhub.utils.constants.Constants
@@ -33,7 +33,7 @@ class UserRepositoryImpl @Inject constructor(
 	private val loadAllUserDataUseCase: LoadAllUserDataUseCase,
 	private val context: Context,
 	private val gson: Gson
-) : UserRepository, BaseRepository(gson, context) {
+) : UserRepository, Repository(gson, context) {
 	override suspend fun getUserById(id: UUID?): HttpResult<User?> {
 		try {
 			val response: Response<User?> = userService.getUserById(id)
