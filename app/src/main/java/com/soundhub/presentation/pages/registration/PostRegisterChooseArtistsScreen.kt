@@ -1,6 +1,5 @@
 package com.soundhub.presentation.pages.registration
 
-import android.util.Log
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,15 +19,12 @@ fun PostRegisterChooseArtistsScreen(
 	val artistUiState: ArtistUiState by registrationViewModel.artistUiState.collectAsState()
 	val lazyGridState = rememberLazyGridState()
 
-	val pagedArtists = remember { registrationViewModel.getArtistPage() }
-		.collectAsLazyPagingItems()
+	val pagedArtists = remember {
+		registrationViewModel.getArtistPage()
+	}.collectAsLazyPagingItems()
 
 	LaunchedEffect(key1 = true) {
 		uiStateDispatcher.onSearchValueDebounceChange { pagedArtists.refresh() }
-	}
-
-	LaunchedEffect(key1 = artistUiState) {
-		Log.d("PostRegisterChooseArtistsScreen", "ui state: $artistUiState")
 	}
 
 	ChooseArtistsScreen(

@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.soundhub.domain.model.MusicEntity
@@ -20,8 +20,11 @@ internal fun <T, U : MusicEntity<T>> MusicGridLayout(items: List<U>) {
 			verticalArrangement = Arrangement.spacedBy(20.dp),
 			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			items(items = items, key = { it.id.toString() }) { genre ->
+			itemsIndexed(
+				items = items,
+				key = { index, item -> item.id.toString() }) { index, genre ->
 				MusicItemPlate(
+					index = index,
 					caption = genre.name ?: "",
 					clickable = false,
 					thumbnailUrl = genre.cover,

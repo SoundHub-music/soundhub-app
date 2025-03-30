@@ -162,7 +162,7 @@ object Constants {
 	//region network constants
 	const val COUNTRIES_API = "https://restcountries.com/v3.1/"
 	const val SOUNDHUB_API = "http://${BuildConfig.SOUNDHUB_API_HOSTNAME}/api/v1/"
-	const val LAST_FM_API = "https://ws.audioscrobbler.com/"
+	const val LAST_FM_API = "https://ws.audioscrobbler.com/2.0/"
 	const val DISCOGS_API = "https://api.discogs.com/"
 	const val DISCOGS_AUTHORIZATION =
 		"Discogs key=${BuildConfig.DISCOGS_KEY}, secret=${BuildConfig.DISCOGS_SECRET}"
@@ -186,7 +186,7 @@ object Constants {
 	//region Paging constants
 	const val DEFAULT_MESSAGE_PAGE_SIZE = 100
 	const val DEFAULT_MESSAGE_PAGE = 1
-	const val DEFAULT_ARTIST_PAGE_SIZE = 2
+	const val DEFAULT_ARTIST_PAGE_SIZE = 20
 
 	//endregion
 

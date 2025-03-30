@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -75,11 +79,9 @@ fun <T : Any> PostRegisterGridLayout(
 
 			topContent()
 
-
 			if (isRefreshLoading)
 				CircleLoader(modifier = Modifier.padding(top = 20.dp))
-
-			LazyVerticalGrid(
+			else LazyVerticalGrid(
 				state = lazyGridState,
 				columns = GridCells.Adaptive(minSize = 100.dp),
 				contentPadding = PaddingValues(all = 10.dp),
@@ -87,26 +89,12 @@ fun <T : Any> PostRegisterGridLayout(
 					.fillMaxHeight()
 					.padding(bottom = 50.dp),
 				content = {
-					if (pagedItems != null) {
-						items(
-							count = pagedItems.itemCount,
-							key = { "${pagedItems.peek(it)?.id}_$it" }
-						) { index ->
-							val item = pagedItems[index] ?: return@items
-
-							GridItem(
-								item = item,
-								onItemPlateClick = onItemPlateClick,
-								chosenItems = chosenItems
-							)
-						}
-					} else items(items = items.orEmpty(), key = { it.id }) { item ->
-						GridItem(
-							item = item,
-							onItemPlateClick = onItemPlateClick,
-							chosenItems = chosenItems
-						)
-					}
+					gridContent(
+						pagedItems = pagedItems,
+						items = items,
+						chosenItems = chosenItems,
+						onItemPlateClick = onItemPlateClick
+					)
 				}
 			)
 		}
@@ -121,18 +109,49 @@ fun <T : Any> PostRegisterGridLayout(
 	}
 }
 
+private fun <T : Any> LazyGridScope.gridContent(
+	pagedItems: LazyPagingItems<out MusicEntity<T>>?,
+	items: List<MusicEntity<T>>?,
+	chosenItems: List<MusicEntity<T>>,
+	onItemPlateClick: (isChosen: Boolean, item: MusicEntity<T>) -> Unit
+) {
+	val renderItem: @Composable (Int, MusicEntity<T>) -> Unit = { index, item ->
+		GridItem(item, index, onItemPlateClick, chosenItems)
+	}
+
+	if (pagedItems != null) {
+		items(
+			count = pagedItems.itemCount,
+			key = { it }
+		) { index ->
+			val item = pagedItems[index] ?: return@items
+			renderItem(index, item)
+		}
+	} else {
+		itemsIndexed(items = items.orEmpty(), key = { _, item -> item.id }) { index, item ->
+			renderItem(index, item)
+		}
+	}
+}
+
 @Composable
 private fun <T : Any> GridItem(
 	item: MusicEntity<T>,
+	index: Int,
 	onItemPlateClick: (isChosen: Boolean, item: MusicEntity<T>) -> Unit,
 	chosenItems: List<MusicEntity<T>>
 ) {
+	val isChosen by remember(chosenItems, item.id) {
+		derivedStateOf { chosenItems.any { it.id == item.id } }
+	}
+
 	MusicItemPlate(
 		modifier = Modifier.padding(bottom = 20.dp),
+		index = index,
 		caption = item.name ?: "",
 		thumbnailUrl = item.cover,
 		onClick = { isChosen -> onItemPlateClick(isChosen, item) },
-		isChosen = item.id in chosenItems.map { it.id },
+		isChosen = isChosen,
 		width = 90.dp,
 		height = 90.dp
 	)

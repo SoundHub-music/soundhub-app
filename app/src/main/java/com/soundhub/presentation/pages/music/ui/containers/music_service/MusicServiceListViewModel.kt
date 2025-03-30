@@ -3,6 +3,7 @@ package com.soundhub.presentation.pages.music.ui.containers.music_service
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.soundhub.R
 import com.soundhub.Route
@@ -11,6 +12,7 @@ import com.soundhub.presentation.pages.music.viewmodels.MusicServiceViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 typealias MusicServicePair = Pair<Int, MusicServiceViewModel<*>>
 
@@ -46,15 +48,17 @@ class MusicServiceListViewModel : ViewModel() {
 		clickedServicePair: MusicServicePair,
 		navController: NavHostController
 	) {
-		val isAuthorized = clickedServicePair.second.isAuthorizedState.value
+		viewModelScope.launch {
+			val isAuthorized = clickedServicePair.second.isAuthorized().await()
 
-		if (!isAuthorized) {
-			setShowModalSheet(true)
-			setClickedServicePair(clickedServicePair)
-			return
+			if (!isAuthorized) {
+				setShowModalSheet(true)
+				setClickedServicePair(clickedServicePair)
+				return@launch
+			}
+
+			navController.navigate(Route.Music.LastFmProfile.route)
 		}
-
-		navController.navigate(Route.Music.LastFmProfile.route)
 	}
 
 	@Composable

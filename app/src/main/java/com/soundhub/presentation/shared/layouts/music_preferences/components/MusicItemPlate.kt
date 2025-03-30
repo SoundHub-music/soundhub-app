@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -38,11 +39,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.size.Size
 import com.soundhub.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun MusicItemPlate(
 	modifier: Modifier = Modifier,
+	index: Int,
 	clickable: Boolean = true,
 	caption: String,
 	thumbnailUrl: String?,
@@ -68,14 +74,21 @@ fun MusicItemPlate(
 
 	var isVisible by remember { mutableStateOf(false) }
 
-	LaunchedEffect(true) {
+	LaunchedEffect(Unit) {
+		delay(index * 10L)
 		isVisible = true
 	}
 
 	AnimatedVisibility(
 		visible = isVisible,
-		enter = fadeIn() + slideInVertically(),
-		exit = fadeOut() + slideOutVertically()
+		enter = fadeIn(animationSpec = tween(250, delayMillis = index * 30)) +
+				slideInVertically(
+					animationSpec = tween(250, delayMillis = index * 30),
+					initialOffsetY = { it / 2 }
+				),
+		exit = fadeOut(animationSpec = tween(100)) +
+				slideOutVertically(animationSpec = tween(100)),
+		label = "plate_$index"
 	) {
 		Column(
 			modifier = modifier,
@@ -100,7 +113,13 @@ fun MusicItemPlate(
 				}
 			) {
 				AsyncImage(
-					model = thumbnailUrl,
+					model = ImageRequest.Builder(LocalContext.current)
+						.data(thumbnailUrl)
+						.crossfade(true)
+						.diskCacheKey(thumbnailUrl)
+						.memoryCacheKey(thumbnailUrl)
+						.size(Size.ORIGINAL)
+						.build(),
 					contentScale = ContentScale.Crop,
 					modifier = Modifier.fillMaxSize(),
 					contentDescription = null,
@@ -124,5 +143,5 @@ fun MusicItemPlate(
 @Preview
 @Composable
 private fun ItemPlatePreview() {
-	MusicItemPlate(caption = "Rap", thumbnailUrl = "")
+	MusicItemPlate(index = 1, caption = "Rap", thumbnailUrl = "")
 }

@@ -19,7 +19,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -38,19 +37,21 @@ class ArtistSource @Inject constructor(
 	override val keyReuseSupported: Boolean = true
 
 	override fun getRefreshKey(state: PagingState<String, Artist>): String? {
+		Log.d("ArtistSource[getRefreshKey]", "${state.anchorPosition}")
 		return state.anchorPosition?.let {
 			state.closestPageToPosition(it)?.nextKey ?: state.closestPageToPosition(it)?.prevKey
 		}
 	}
 
 	override suspend fun load(params: LoadParams<String>): LoadResult<String, Artist> {
-		return try {
+		try {
+			Log.d("ArtistSource[params]", "$params")
 			val nextPage: String? = params.key
+			val response = fetchArtists(Constants.DEFAULT_ARTIST_PAGE_SIZE, nextPage)
 
-			fetchArtists(Constants.DEFAULT_ARTIST_PAGE_SIZE, nextPage)
-
+			return response
 		} catch (e: Exception) {
-			LoadResult.Error(e)
+			return LoadResult.Error(e)
 		}
 	}
 
@@ -58,11 +59,12 @@ class ArtistSource @Inject constructor(
 		countPerPage: Int,
 		page: String?
 	): LoadResult<String, Artist> {
-		return try {
+		try {
 			val uiState: UiState? = uiStateDispatcher.uiState.firstOrNull()
 			val searchText: String? = uiState?.searchBarText
 
-			Log.d("ArtistSource", "fetchArtistsWithoutUrl[search]: $searchText")
+			Log.d("ArtistSource", "fetchArtists[countPerPage]: $countPerPage")
+			Log.d("ArtistSource", "fetchArtists[search]: $searchText")
 
 			val chosenGenreNames = genreUiState.chosenGenres.mapNotNull { it.name }
 
@@ -80,23 +82,23 @@ class ArtistSource @Inject constructor(
 				page = page?.toInt() ?: 1
 			).getOrThrow()
 
-			createPageFromResponse(response)
+			return createPageFromResponse(response)
 		} catch (e: Exception) {
-			LoadResult.Error(e)
+			return LoadResult.Error(e)
 		}
 	}
 
-	private suspend fun searchArtist(
+	private fun searchArtist(
 		query: String,
 		countPerPage: Int,
 		page: String?
 	): LoadResult<String, Artist> {
-		searchArtistJob?.cancelAndJoin()
+//		searchArtistJob?.cancelAndJoin()
 		val mapper = ArtistMapper.impl
 
 		var response: SearchArtistResponseBody? = null
 
-		searchArtistJob = scope.launch {
+		searchArtistJob = scope.launch(Dispatchers.IO) {
 			response = artistRepository.searchEntityByType(
 				query = query,
 				countPerPage = countPerPage,
@@ -104,7 +106,7 @@ class ArtistSource @Inject constructor(
 			).getOrNull()
 		}
 
-		searchArtistJob?.join()
+//		searchArtistJob?.join()
 
 		return response?.let {
 			val (artistMatches, totalItems, _, perPage, query) = it.results
@@ -127,25 +129,27 @@ class ArtistSource @Inject constructor(
 				pagination = pagination
 			)
 
-			return createPageFromResponse(response, query.startPage)
+			return createPageFromResponse(response)
 		} ?: throw ArtistNotFoundException()
 	}
 
 	private fun createPageFromResponse(
 		response: PaginatedArtistsResponse?,
-		prevKey: String? = null
 	): LoadResult<String, Artist> {
 		val pagination: LastFmPaginationResponse? = response?.pagination
-		val artists: List<Artist> = response?.artists.orEmpty()
+		val artists: List<Artist> = response?.artists
+			.orEmpty()
+			.distinctBy { it.id }
 
-		val totalPages: Int = pagination?.totalPages?.toInt() ?: 0
-		val currentPage: Int = pagination?.page?.toInt() ?: 0
+		val totalPages: Int = pagination?.totalPages?.toInt() ?: 1
+		val currentPage: Int = pagination?.page?.toInt() ?: 1
 
-		val nextKey = if (currentPage < totalPages) currentPage + 1 else null
+		val prevKey = if (currentPage > 1) (currentPage - 1).toString() else null
+		val nextKey = if (currentPage < totalPages) (currentPage + 1).toString() else null
 
 		return LoadResult.Page(
-			prevKey = if (nextKey.toString() == prevKey) null else prevKey,
-			nextKey = nextKey?.toString(),
+			prevKey = prevKey,
+			nextKey = nextKey,
 			data = artists
 		)
 	}

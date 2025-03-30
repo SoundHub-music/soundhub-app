@@ -25,16 +25,15 @@ import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.repository.Repository
 import com.soundhub.domain.states.GenreUiState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.math.ceil
 
 class ArtistRepositoryImpl @Inject constructor(
 	private val discogsService: DiscogsService,
@@ -50,7 +49,6 @@ class ArtistRepositoryImpl @Inject constructor(
 	): HttpResult<PaginatedArtistsResponse> {
 		try {
 			val paginatedArtistsData = PaginatedArtistsResponse()
-			val limit: Int = ceil(genres.size.toDouble() / countPerPage).toInt()
 
 			withContext(Dispatchers.IO) {
 				genres.forEach { genre ->
@@ -58,7 +56,6 @@ class ArtistRepositoryImpl @Inject constructor(
 						lastFmService.getArtistsByGenre(
 							tag = genre,
 							page = page,
-							limit = limit
 						)
 
 					if (!response.isSuccessful) {
@@ -82,25 +79,25 @@ class ArtistRepositoryImpl @Inject constructor(
 
 	private suspend fun parallelLoadDiscogsArtistData(artistResponse: PaginatedArtistsResponse) {
 		coroutineScope {
-			val artistsToUpdate = artistResponse.artists.map { artist ->
-				val deferredDiscogsResponse: Deferred<DiscogsResponse?> = async {
-					discogsService.searchData(
+			val deferredTasks = artistResponse.artists.map { artist ->
+				async(Dispatchers.IO) {
+					val response = discogsService.searchData(
 						query = artist.name,
 						type = DiscogsSearchType.Artist.type
 					).body()
-				}
 
-				artist to deferredDiscogsResponse
+					response?.results?.firstOrNull()?.let { firstRecord ->
+						Pair(artist, firstRecord)
+					}
+				}
 			}
 
-			artistsToUpdate.forEach { (artist, response) ->
-				val data: DiscogsResponse? = response.await()
-				val firstRecord = data?.results?.firstOrNull()
+			deferredTasks.awaitAll().forEach { pair ->
+				val artist = pair?.first
+				val record = pair?.second
 
-				firstRecord?.let {
-					artist.cover = it.thumb
-					artist.discogsId = it.id
-				}
+				artist?.cover = record?.thumb
+				artist?.discogsId = record?.id
 			}
 		}
 	}
@@ -115,17 +112,7 @@ class ArtistRepositoryImpl @Inject constructor(
 		paginatedArtists.apply {
 			if (pagination == null) {
 				this.pagination = paginationResponse
-				return
 			}
-
-			this.pagination = paginationResponse?.copy(
-				total = minOf(pagination.total, paginationResponse.total),
-				totalPages = minOf(
-					pagination.totalPages,
-					paginationResponse.totalPages
-				),
-				page = minOf(pagination.page, paginationResponse.page),
-			)
 		}
 
 		val transformedArtists: List<Artist> = artistsResponse.mapIndexed { index, artist ->

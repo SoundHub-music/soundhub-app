@@ -67,8 +67,8 @@ fun FetchStatusContainer(
 
 	when {
 		status.isLoading() -> LoadingScreen(
-			handleLoading = handleLoading,
-			loaderModifier = loaderModifier
+			modifier = loaderModifier,
+			handleLoading = handleLoading
 		)
 
 		status.isError() -> ErrorScreen(
@@ -136,11 +136,13 @@ private fun ErrorScreen(
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		Row(
-			modifier = Modifier.fillMaxWidth(0.8f)
+			modifier = Modifier.fillMaxWidth(0.8f),
+			horizontalArrangement = Arrangement.Center
 		) {
 			Text(
 				text = text,
 				style = textStyle,
+				textAlign = TextAlign.Center
 			)
 		}
 
@@ -150,7 +152,7 @@ private fun ErrorScreen(
 
 @Composable
 private fun LoadingScreen(
-	loaderModifier: Modifier = Modifier,
+	modifier: Modifier = Modifier,
 	handleLoading: Boolean
 ) {
 	if (!handleLoading) return
@@ -159,6 +161,6 @@ private fun LoadingScreen(
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
 	) {
-		CircleLoader(modifier = loaderModifier)
+		CircleLoader(modifier = modifier)
 	}
 }

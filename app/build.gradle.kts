@@ -85,7 +85,16 @@ android {
 
 	packaging {
 		resources {
-			excludes += "/META-INF/{AL2.0,LGPL2.1}"
+			excludes += listOf(
+				"/META-INF/{AL2.0,LGPL2.1}",
+				"META-INF/LICENSE.md",
+				"META-INF/LICENSE",
+				"META-INF/LICENSE.txt",
+				"META-INF/NOTICE",
+				"META-INF/NOTICE.txt",
+				"META-INF/ASL2.0",
+				"META-INF/LICENSE-notice.md"
+			)
 		}
 	}
 }
@@ -131,9 +140,13 @@ dependencies {
 	androidTestImplementation(libs.testExtJunit)
 	androidTestImplementation(libs.espressoCore)
 	androidTestImplementation(libs.composeUiTestJunit4)
+	androidTestImplementation(libs.mockk.android)
 	debugImplementation(libs.composeUiTooling)
 	debugImplementation(libs.composeUiTestManifest)
 	testImplementation(libs.coroutinesTest)
+	testImplementation(libs.mockk)
+	testImplementation(libs.robolectric)
+
 
 	// Kotlin Coroutines
 	implementation(libs.coroutinesCore)
@@ -180,8 +193,14 @@ dependencies {
 	implementation(libs.rxandroid)
 
 	implementation(libs.paging.compose)
+
+	implementation(libs.kotlinx.coroutines.android)
 }
 
 kapt {
 	correctErrorTypes = true
+}
+
+tasks.withType<Test> {
+	jvmArgs("--add-opens", "java.base/java.time=ALL-UNNAMED")
 }

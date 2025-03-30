@@ -1,5 +1,6 @@
 package com.soundhub.presentation.pages.music.ui.containers.music_service
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -104,11 +105,13 @@ fun MusicServiceList(
 
 					LaunchedEffect(service.second) {
 						isAuthorized = service.second.isAuthorized().await()
+						Log.d("MusicServiceList", isAuthorized.toString())
 					}
 
 					MusicServiceButton(
 						painter = painterResource(id = service.first),
-						onClick = { viewModel.onServiceClick(service, navController) }
+						onClick = { viewModel.onServiceClick(service, navController) },
+						isAuthorized = isAuthorized
 					)
 				}
 			}
