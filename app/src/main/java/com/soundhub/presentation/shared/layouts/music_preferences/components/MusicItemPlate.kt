@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,6 +56,62 @@ fun MusicItemPlate(
 	width: Dp = 72.dp,
 	height: Dp = 72.dp
 ) {
+	var isItemChosen by rememberSaveable { mutableStateOf(isChosen) }
+
+	VisibilityAnimationWrapper(index = index) {
+		ItemContent(
+			modifier = modifier,
+			clickable = clickable,
+			caption = caption,
+			thumbnailUrl = thumbnailUrl,
+			onClick = onClick,
+			isChosen = isItemChosen,
+			width = width,
+			height = height,
+		)
+	}
+}
+
+@Composable
+private fun VisibilityAnimationWrapper(
+	index: Int,
+	content: @Composable () -> Unit = {}
+) {
+	var isVisible by rememberSaveable {
+		mutableStateOf(false)
+	}
+
+	LaunchedEffect(Unit) {
+		if (!isVisible) {
+			delay(index * 10L)
+			isVisible = true
+		}
+	}
+
+	AnimatedVisibility(
+		visible = isVisible,
+		enter = fadeIn(animationSpec = tween(250, delayMillis = index * 30)) +
+				slideInVertically(
+					animationSpec = tween(250, delayMillis = index * 30),
+					initialOffsetY = { it / 2 }
+				),
+		exit = fadeOut(animationSpec = tween(100)) +
+				slideOutVertically(animationSpec = tween(100)),
+		label = "plate_$index"
+	) { content() }
+}
+
+@Composable
+private fun ItemContent(
+	modifier: Modifier = Modifier,
+	clickable: Boolean = true,
+	caption: String,
+	thumbnailUrl: String?,
+	onClick: (Boolean) -> Unit = {},
+	isChosen: Boolean = false,
+	width: Dp = 72.dp,
+	height: Dp = 72.dp
+) {
 	val selectionColor = MaterialTheme.colorScheme.error
 	val placeholder: Painter = painterResource(id = R.drawable.musical_note)
 
@@ -72,71 +127,52 @@ fun MusicItemPlate(
 		animationSpec = tween(durationMillis = 300), label = "b.color"
 	)
 
-	var isVisible by remember { mutableStateOf(false) }
-
-	LaunchedEffect(Unit) {
-		delay(index * 10L)
-		isVisible = true
-	}
-
-	AnimatedVisibility(
-		visible = isVisible,
-		enter = fadeIn(animationSpec = tween(250, delayMillis = index * 30)) +
-				slideInVertically(
-					animationSpec = tween(250, delayMillis = index * 30),
-					initialOffsetY = { it / 2 }
-				),
-		exit = fadeOut(animationSpec = tween(100)) +
-				slideOutVertically(animationSpec = tween(100)),
-		label = "plate_$index"
+	Column(
+		modifier = modifier,
+		verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		Column(
-			modifier = modifier,
-			verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
-			horizontalAlignment = Alignment.CenterHorizontally,
-		) {
-			ElevatedCard(
-				modifier = Modifier
-					.width(width)
-					.height(height)
-					.border(
-						width = borderWidth,
-						color = borderColor,
-						shape = RoundedCornerShape(16.dp)
-					),
-				shape = RoundedCornerShape(16.dp),
-				onClick = {
-					if (clickable) {
-						isItemChosen = !isItemChosen
-						onClick(isItemChosen)
-					}
+		ElevatedCard(
+			modifier = Modifier
+				.width(width)
+				.height(height)
+				.border(
+					width = borderWidth,
+					color = borderColor,
+					shape = RoundedCornerShape(16.dp)
+				),
+			shape = RoundedCornerShape(16.dp),
+			onClick = {
+				if (clickable) {
+					isItemChosen = !isItemChosen
+					onClick(isItemChosen)
 				}
-			) {
-				AsyncImage(
-					model = ImageRequest.Builder(LocalContext.current)
-						.data(thumbnailUrl)
-						.crossfade(true)
-						.diskCacheKey(thumbnailUrl)
-						.memoryCacheKey(thumbnailUrl)
-						.size(Size.ORIGINAL)
-						.build(),
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.fillMaxSize(),
-					contentDescription = null,
-					placeholder = placeholder,
-					fallback = placeholder,
-					error = placeholder
-				)
 			}
-			Text(
-				text = caption,
-				style = TextStyle(
-					fontSize = 15.sp,
-					textAlign = TextAlign.Center,
-					color = MaterialTheme.colorScheme.onSecondaryContainer,
-				)
+		) {
+			AsyncImage(
+				model = ImageRequest.Builder(LocalContext.current)
+					.data(thumbnailUrl)
+					.crossfade(true)
+					.diskCacheKey(thumbnailUrl)
+					.memoryCacheKey(thumbnailUrl)
+					.size(Size(width.value.toInt(), height.value.toInt()))
+					.build(),
+				contentScale = ContentScale.Crop,
+				modifier = Modifier.fillMaxSize(),
+				contentDescription = null,
+				placeholder = placeholder,
+				fallback = placeholder,
+				error = placeholder
 			)
 		}
+		Text(
+			text = caption,
+			style = TextStyle(
+				fontSize = 15.sp,
+				textAlign = TextAlign.Center,
+				color = MaterialTheme.colorScheme.onSecondaryContainer,
+			)
+		)
 	}
 }
 

@@ -90,10 +90,10 @@ fun <T : Any> PostRegisterGridLayout(
 					.padding(bottom = 50.dp),
 				content = {
 					gridContent(
+						onItemPlateClick = onItemPlateClick,
+						chosenItems = chosenItems,
 						pagedItems = pagedItems,
 						items = items,
-						chosenItems = chosenItems,
-						onItemPlateClick = onItemPlateClick
 					)
 				}
 			)
@@ -116,14 +116,16 @@ private fun <T : Any> LazyGridScope.gridContent(
 	onItemPlateClick: (isChosen: Boolean, item: MusicEntity<T>) -> Unit
 ) {
 	val renderItem: @Composable (Int, MusicEntity<T>) -> Unit = { index, item ->
-		GridItem(item, index, onItemPlateClick, chosenItems)
+		GridItem(
+			item = item,
+			index = index,
+			onItemPlateClick = onItemPlateClick,
+			chosenItems = chosenItems
+		)
 	}
 
 	if (pagedItems != null) {
-		items(
-			count = pagedItems.itemCount,
-			key = { it }
-		) { index ->
+		items(count = pagedItems.itemCount, key = { it }) { index ->
 			val item = pagedItems[index] ?: return@items
 			renderItem(index, item)
 		}
@@ -136,6 +138,7 @@ private fun <T : Any> LazyGridScope.gridContent(
 
 @Composable
 private fun <T : Any> GridItem(
+	modifier: Modifier = Modifier,
 	item: MusicEntity<T>,
 	index: Int,
 	onItemPlateClick: (isChosen: Boolean, item: MusicEntity<T>) -> Unit,
@@ -146,13 +149,13 @@ private fun <T : Any> GridItem(
 	}
 
 	MusicItemPlate(
-		modifier = Modifier.padding(bottom = 20.dp),
+		modifier = modifier.padding(bottom = 20.dp),
 		index = index,
 		caption = item.name ?: "",
 		thumbnailUrl = item.cover,
 		onClick = { isChosen -> onItemPlateClick(isChosen, item) },
 		isChosen = isChosen,
 		width = 90.dp,
-		height = 90.dp
+		height = 90.dp,
 	)
 }

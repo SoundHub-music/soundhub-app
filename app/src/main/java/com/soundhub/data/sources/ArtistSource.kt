@@ -19,9 +19,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import javax.inject.Inject
 import kotlin.math.ceil
 
@@ -61,14 +61,14 @@ class ArtistSource @Inject constructor(
 	): LoadResult<String, Artist> {
 		try {
 			val uiState: UiState? = uiStateDispatcher.uiState.firstOrNull()
-			val searchText: String? = uiState?.searchBarText
+			val searchText: String = uiState?.searchBarText.orEmpty()
 
 			Log.d("ArtistSource", "fetchArtists[countPerPage]: $countPerPage")
 			Log.d("ArtistSource", "fetchArtists[search]: $searchText")
 
 			val chosenGenreNames = genreUiState.chosenGenres.mapNotNull { it.name }
 
-			if (searchText?.isNotEmpty() == true) {
+			if (searchText.isNotEmpty()) {
 				return searchArtist(
 					query = searchText,
 					countPerPage = countPerPage,
@@ -88,25 +88,22 @@ class ArtistSource @Inject constructor(
 		}
 	}
 
-	private fun searchArtist(
+	private suspend fun searchArtist(
 		query: String,
 		countPerPage: Int,
 		page: String?
 	): LoadResult<String, Artist> {
-//		searchArtistJob?.cancelAndJoin()
 		val mapper = ArtistMapper.impl
-
 		var response: SearchArtistResponseBody? = null
 
+		searchArtistJob?.cancelAndJoin()
 		searchArtistJob = scope.launch(Dispatchers.IO) {
 			response = artistRepository.searchEntityByType(
 				query = query,
 				countPerPage = countPerPage,
 				page = page?.toInt() ?: 1
 			).getOrNull()
-		}
-
-//		searchArtistJob?.join()
+		}.apply { join() }
 
 		return response?.let {
 			val (artistMatches, totalItems, _, perPage, query) = it.results
@@ -116,7 +113,7 @@ class ArtistSource @Inject constructor(
 				mapper::lastFmArtistToArtist
 			)
 
-			val totalPages = BigDecimal(ceil(totalItems.toDouble() / perPage.toDouble())).toString()
+			val totalPages = ceil(totalItems.toDouble() / perPage.toDouble()).toString()
 
 			val pagination = LastFmPaginationResponse(
 				page = query.startPage,

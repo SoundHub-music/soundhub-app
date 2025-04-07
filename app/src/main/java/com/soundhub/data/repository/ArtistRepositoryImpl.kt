@@ -2,11 +2,7 @@ package com.soundhub.data.repository
 
 import android.content.Context
 import android.util.Log
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.google.gson.Gson
-import com.soundhub.data.api.responses.discogs.DiscogsEntityResponse
 import com.soundhub.data.api.responses.discogs.DiscogsResponse
 import com.soundhub.data.api.responses.discogs.artist.DiscogsArtistResponse
 import com.soundhub.data.api.responses.internal.ErrorResponse
@@ -18,19 +14,18 @@ import com.soundhub.data.api.services.DiscogsService
 import com.soundhub.data.api.services.LastFmService
 import com.soundhub.data.enums.DiscogsSearchType
 import com.soundhub.data.enums.DiscogsSortType
-import com.soundhub.data.sources.ArtistSource
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Track
 import com.soundhub.domain.repository.ArtistRepository
 import com.soundhub.domain.repository.Repository
-import com.soundhub.domain.states.GenreUiState
-import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.util.UUID
 import javax.inject.Inject
@@ -38,7 +33,6 @@ import javax.inject.Inject
 class ArtistRepositoryImpl @Inject constructor(
 	private val discogsService: DiscogsService,
 	private val lastFmService: LastFmService,
-	private val uiStateDispatcher: UiStateDispatcher,
 	context: Context,
 	gson: Gson
 ) : Repository(gson, context), ArtistRepository {
@@ -50,55 +44,66 @@ class ArtistRepositoryImpl @Inject constructor(
 		try {
 			val paginatedArtistsData = PaginatedArtistsResponse()
 
-			withContext(Dispatchers.IO) {
-				genres.forEach { genre ->
-					val response: Response<ArtistsByTagResponse> =
-						lastFmService.getArtistsByGenre(
-							tag = genre,
-							page = page,
-						)
+			genres.forEach { genre ->
+				val response: Response<ArtistsByTagResponse> =
+					lastFmService.getArtistsByGenre(
+						tag = genre,
+						page = page,
+					)
 
-					if (!response.isSuccessful) {
-						return@forEach
-					}
-
-					val body: ArtistsByTagResponse? = response.body()
-
-					body?.let { mapArtistResponseToArtistList(it, paginatedArtistsData) }
+				if (!response.isSuccessful) {
+					return@forEach
 				}
+
+				val body: ArtistsByTagResponse? = response.body()
+
+				body?.let { mapArtistResponseToArtistList(it, paginatedArtistsData) }
 			}
 
-			parallelLoadDiscogsArtistData(paginatedArtistsData)
-
-			return HttpResult.Success(paginatedArtistsData)
+			return HttpResult.Success(paginatedArtistsData).also {
+				parallelLoadDiscogsArtistData(paginatedArtistsData)
+			}
 		} catch (e: Exception) {
 			Log.e("ArtistRepository", "getArtistsByGenres[2]: ${e.stackTraceToString()}")
 			return handleException(e)
 		}
 	}
 
-	private suspend fun parallelLoadDiscogsArtistData(artistResponse: PaginatedArtistsResponse) {
-		coroutineScope {
-			val deferredTasks = artistResponse.artists.map { artist ->
-				async(Dispatchers.IO) {
-					val response = discogsService.searchData(
-						query = artist.name,
-						type = DiscogsSearchType.Artist.type
-					).body()
+	@OptIn(ExperimentalCoroutinesApi::class)
+	private fun parallelLoadDiscogsArtistData(artistResponse: PaginatedArtistsResponse) {
+		CoroutineScope(Dispatchers.IO).launch {
+			artistResponse.artists.asFlow()
+				.flatMapMerge(concurrency = 6) { artist ->
+					flow {
+						val response = discogsService.searchData(
+							query = artist.name,
+							type = DiscogsSearchType.Artist.type
+						)
 
-					response?.results?.firstOrNull()?.let { firstRecord ->
-						Pair(artist, firstRecord)
+						if (response.code() == 429) {
+							Log.d(
+								"ArtistRepository",
+								"parallelLoadDiscogsArtistData: ${response.code()}"
+							)
+							// stop making request for 2 minutes
+							delay(120 * 1000L)
+						}
+
+						response.body()?.let {
+							emit(artist to it)
+						}
 					}
 				}
-			}
+				.collect { (artist, response) -> updateArtistAvatar(artist, response) }
+		}
+	}
 
-			deferredTasks.awaitAll().forEach { pair ->
-				val artist = pair?.first
-				val record = pair?.second
+	private fun updateArtistAvatar(artist: Artist, response: DiscogsResponse?) {
+		val firstRecord = response?.results?.firstOrNull()
 
-				artist?.cover = record?.thumb
-				artist?.discogsId = record?.id
-			}
+		firstRecord?.let {
+			artist.cover = it.thumb
+			artist.discogsId = it.id
 		}
 	}
 
@@ -107,11 +112,11 @@ class ArtistRepositoryImpl @Inject constructor(
 		paginatedArtists: PaginatedArtistsResponse
 	) {
 		val (artistsResponse, paginationResponse) = response.topArtistsBody
-		val (artists, pagination) = paginatedArtists
+		val (artists) = paginatedArtists
 
 		paginatedArtists.apply {
 			if (pagination == null) {
-				this.pagination = paginationResponse
+				pagination = paginationResponse
 			}
 		}
 
@@ -127,59 +132,6 @@ class ArtistRepositoryImpl @Inject constructor(
 		}
 
 		paginatedArtists.artists = (artists + transformedArtists).distinctBy { it.name }
-	}
-
-
-	override suspend fun searchArtistInReleases(artistName: String): HttpResult<Artist?> {
-		try {
-			val response: Response<DiscogsResponse> = discogsService.searchData(
-				query = artistName,
-				type = DiscogsSearchType.Artist.type,
-				countPerPage = 5
-			)
-			Log.d("ArtistRepository", "searchArtistByName[1]: $response")
-
-			return handleResponse<DiscogsResponse, Artist?>(response) {
-				val desiredArtist: Artist? = findArtistOrGetFirst(
-					discogsResponseList = response.body()?.results.orEmpty(),
-					artistName = artistName
-				)
-
-				return@handleResponse HttpResult.Success(body = desiredArtist)
-			}
-		} catch (e: Exception) {
-			Log.e("ArtistRepository", "searchArtistByName[3]: ${e.stackTraceToString()}")
-			return handleException(e)
-		}
-	}
-
-	private fun findArtistOrGetFirst(
-		discogsResponseList: List<DiscogsEntityResponse>,
-		artistName: String
-	): Artist? {
-		var desiredArtist: Artist? = null
-		discogsResponseList.forEach { artist ->
-			if (artist.title.lowercase() == artistName.lowercase()) {
-				desiredArtist = Artist(
-					discogsId = artist.id,
-					name = artist.title,
-					cover = artist.coverImage
-				)
-
-				return@forEach
-			}
-		}
-
-		if (desiredArtist == null && discogsResponseList.isNotEmpty()) {
-			val firstArtist: DiscogsEntityResponse = discogsResponseList[0]
-			desiredArtist = Artist(
-				discogsId = firstArtist.id,
-				name = firstArtist.title,
-				cover = firstArtist.thumb
-			)
-		}
-
-		return desiredArtist
 	}
 
 	override suspend fun getArtistById(artistId: Int): HttpResult<Artist?> {
@@ -253,19 +205,4 @@ class ArtistRepositoryImpl @Inject constructor(
 			)
 		}
 	}
-
-	override fun getArtistPage(
-		genreUiState: GenreUiState,
-		searchText: String?,
-		pageSize: Int
-	): Flow<PagingData<Artist>> = Pager(
-		config = PagingConfig(pageSize = pageSize),
-		pagingSourceFactory = {
-			ArtistSource(
-				artistRepository = this,
-				genreUiState = genreUiState,
-				uiStateDispatcher = uiStateDispatcher
-			)
-		}
-	).flow
 }

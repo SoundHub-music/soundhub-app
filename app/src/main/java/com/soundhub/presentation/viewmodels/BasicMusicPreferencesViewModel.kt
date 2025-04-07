@@ -2,8 +2,11 @@ package com.soundhub.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.soundhub.data.sources.ArtistSource
 import com.soundhub.domain.model.Artist
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.repository.ArtistRepository
@@ -11,7 +14,6 @@ import com.soundhub.domain.states.ArtistUiState
 import com.soundhub.domain.states.GenreUiState
 import com.soundhub.domain.usecases.music.LoadGenresUseCase
 import com.soundhub.utils.constants.Constants
-import com.soundhub.utils.extensions.flow.distinctBy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -52,11 +54,16 @@ open class BaseMusicPreferencesViewModel(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	fun getArtistPage(): Flow<PagingData<Artist>> {
 		return searchText.flatMapLatest { text ->
-			artistRepository.getArtistPage(
-				genreUiState = _genreUiState.value,
-				searchText = text,
-				pageSize = Constants.DEFAULT_ARTIST_PAGE_SIZE,
-			).distinctBy { it.name }.cachedIn(viewModelScope)
+			Pager(
+				config = PagingConfig(pageSize = Constants.DEFAULT_ARTIST_PAGE_SIZE),
+				pagingSourceFactory = {
+					ArtistSource(
+						artistRepository = artistRepository,
+						genreUiState = genreUiState.value,
+						uiStateDispatcher = uiStateDispatcher
+					)
+				}
+			).flow.cachedIn(viewModelScope)
 		}
 	}
 

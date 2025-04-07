@@ -43,8 +43,8 @@ android {
 		applicationId = "com.soundhub"
 		minSdk = 26
 		targetSdk = 35
-		versionCode = 115
-		versionName = "1.1.5"
+		versionCode = 120
+		versionName = "1.2.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
