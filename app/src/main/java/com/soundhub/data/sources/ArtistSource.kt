@@ -15,25 +15,14 @@ import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
 import com.soundhub.utils.mappers.ArtistMapper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.ceil
 
 class ArtistSource @Inject constructor(
 	private val artistRepository: ArtistRepository,
 	private val genreUiState: GenreUiState,
 	private val uiStateDispatcher: UiStateDispatcher,
 ) : PagingSource<String, Artist>() {
-	// unique page result cache
-	private var searchArtistJob: Job? = null
-	private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
 	override val keyReuseSupported: Boolean = true
 
 	override fun getRefreshKey(state: PagingState<String, Artist>): String? {
@@ -94,26 +83,26 @@ class ArtistSource @Inject constructor(
 		page: String?
 	): LoadResult<String, Artist> {
 		val mapper = ArtistMapper.impl
-		var response: SearchArtistResponseBody? = null
-
-		searchArtistJob?.cancelAndJoin()
-		searchArtistJob = scope.launch(Dispatchers.IO) {
-			response = artistRepository.searchEntityByType(
-				query = query,
-				countPerPage = countPerPage,
-				page = page?.toInt() ?: 1
-			).getOrNull()
-		}.apply { join() }
+		var response: SearchArtistResponseBody? = artistRepository.searchEntityByType(
+			query = query,
+			countPerPage = countPerPage,
+			page = page?.toInt() ?: 1
+		).onFailure {
+			Log.d("ArtistSource", "searchArtist[1]: $it")
+		}.onSuccessGet { it.body }
 
 		return response?.let {
 			val (artistMatches, totalItems, _, perPage, query) = it.results
 
-			val rawArtists: List<LastFmArtist> = artistMatches.artist
-			val artists: List<Artist> = rawArtists.map(
-				mapper::lastFmArtistToArtist
-			)
+			val rawArtists: List<LastFmArtist> =
+				artistMatches.artist.filter { it.mbid.isNotEmpty() }
+			val artists: List<Artist> = rawArtists.map(mapper::lastFmArtistToArtist)
 
-			val totalPages = ceil(totalItems.toDouble() / perPage.toDouble()).toString()
+			val totalPages = runCatching {
+				val totalValue = (totalItems.toDouble() / perPage.toDouble())
+
+				totalValue.toInt().toString()
+			}.getOrElse { "1" }
 
 			val pagination = LastFmPaginationResponse(
 				page = query.startPage,
@@ -138,8 +127,13 @@ class ArtistSource @Inject constructor(
 			.orEmpty()
 			.distinctBy { it.id }
 
-		val totalPages: Int = pagination?.totalPages?.toInt() ?: 1
-		val currentPage: Int = pagination?.page?.toInt() ?: 1
+		val totalPages: Int = runCatching {
+			pagination?.totalPages?.toInt() ?: 1
+		}.getOrElse { 1 }
+
+		val currentPage: Int = runCatching {
+			pagination?.page?.toInt() ?: 1
+		}.getOrElse { 1 }
 
 		val prevKey = if (currentPage > 1) (currentPage - 1).toString() else null
 		val nextKey = if (currentPage < totalPages) (currentPage + 1).toString() else null

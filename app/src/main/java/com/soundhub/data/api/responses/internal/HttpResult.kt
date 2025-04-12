@@ -27,7 +27,7 @@ sealed class HttpResult<T>(val status: ApiStatus) {
 		return this
 	}
 
-	suspend fun onSuccessGet(callback: suspend (Success<T>) -> T): T? {
+	suspend fun onSuccessGet(callback: suspend (Success<T>) -> T?): T? {
 		if (this is Success) return callback(this)
 		return null
 	}
