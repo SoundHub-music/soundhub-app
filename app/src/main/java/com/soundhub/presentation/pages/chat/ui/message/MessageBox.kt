@@ -52,10 +52,16 @@ internal fun MessageBox(
 	chatViewModel: ChatViewModel,
 	lazyListState: LazyListState
 ) {
-	var contentAlignment by remember { mutableStateOf(Alignment.CenterEnd) }
+	val contentAlignment by remember(isOwnMessage) {
+		derivedStateOf {
+			if (isOwnMessage) Alignment.CenterEnd
+			else Alignment.CenterStart
+		}
+	}
 
 	val highlightedMessageId: UUID? by chatViewModel.highlightedMessageId.collectAsState()
 	val chatUiState: ChatUiState by chatViewModel.chatUiState.collectAsState()
+
 	val isCheckMessagesModeEnabled: Boolean = chatUiState.isCheckMessageModeEnabled
 	val checkedMessages: Set<Message> = chatUiState.checkedMessages
 	var replyToMessage: Message? by remember { mutableStateOf(null) }
@@ -76,38 +82,12 @@ internal fun MessageBox(
 			)
 		)
 
+	val messageParameters = getMessageParameters(isOwnMessage, modifier)
+
 	LaunchedEffect(message) {
 		if (message.replyToMessageId != null) {
 			replyToMessage = chatViewModel.getMessageById(message.replyToMessageId)
 		}
-	}
-
-	val messageParameters = object : MessageParameters {
-		override val boxGradient = listOf(
-			Color(0xFFD0BCFF),
-			Color(0xFF966BF1)
-		)
-		override val contentColor = if (isOwnMessage)
-			MaterialTheme.colorScheme.onSecondaryContainer
-		else
-			MaterialTheme.colorScheme.background
-
-		override val boxModifier = if (isOwnMessage) modifier
-			.background(
-				color = MaterialTheme.colorScheme.secondaryContainer,
-				shape = RoundedCornerShape(10.dp)
-			)
-		else modifier
-			.background(
-				brush = Brush.verticalGradient(boxGradient),
-				shape = RoundedCornerShape(10.dp)
-			)
-	}
-
-	LaunchedEffect(isOwnMessage) {
-		contentAlignment = if (isOwnMessage)
-			Alignment.CenterEnd
-		else Alignment.CenterStart
 	}
 
 	Box(
@@ -142,5 +122,33 @@ internal fun MessageBox(
 				lazyListState = lazyListState
 			)
 		}
+	}
+}
+
+@Composable
+private fun getMessageParameters(
+	isOwnMessage: Boolean,
+	modifier: Modifier = Modifier
+): MessageParameters {
+	return object : MessageParameters {
+		override val boxGradient = listOf(
+			Color(0xFFD0BCFF),
+			Color(0xFF966BF1)
+		)
+		override val contentColor = if (isOwnMessage)
+			MaterialTheme.colorScheme.onSecondaryContainer
+		else
+			MaterialTheme.colorScheme.background
+
+		override val boxModifier = if (isOwnMessage) modifier
+			.background(
+				color = MaterialTheme.colorScheme.secondaryContainer,
+				shape = RoundedCornerShape(10.dp)
+			)
+		else modifier
+			.background(
+				brush = Brush.verticalGradient(boxGradient),
+				shape = RoundedCornerShape(10.dp)
+			)
 	}
 }

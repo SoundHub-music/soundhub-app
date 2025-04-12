@@ -1,5 +1,6 @@
 package com.soundhub.presentation.pages.chat.ui.message.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,7 +24,7 @@ internal fun MessageCheckbox(
 	content: @Composable () -> Unit,
 ) {
 	BadgedBox(badge = {
-		if (isCheckMessagesModeEnabled && message in checkedMessages) {
+		AnimatedVisibility(visible = isCheckMessagesModeEnabled && message in checkedMessages) {
 			Badge(
 				containerColor = MaterialTheme.colorScheme.errorContainer
 			) {
