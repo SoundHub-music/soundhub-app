@@ -49,7 +49,7 @@ fun CircularAvatar(
 				.fillMaxSize()
 				.clickable { onClick() },
 			contentScale = ContentScale.Crop,
-			error = painterResource(R.drawable.circular_user)
+			error = painterResource(R.drawable.user_placeholder)
 		)
 	}
 }

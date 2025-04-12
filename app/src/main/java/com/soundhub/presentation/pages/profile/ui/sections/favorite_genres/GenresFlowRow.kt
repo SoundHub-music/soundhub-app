@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +22,6 @@ import com.soundhub.Route
 import com.soundhub.domain.model.Genre
 import com.soundhub.domain.states.ProfileUiState
 import com.soundhub.presentation.pages.profile.ProfileViewModel
-import kotlin.random.Random
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -37,9 +35,8 @@ internal fun GenresFlowRow(
 		.profileUiState.collectAsState()
 
 	val genreList: List<Genre> = profileUiState.profileOwner?.favoriteGenres.orEmpty()
-	val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
 	val colors = remember(genreList) {
-		List(genreList.size) { generateContrastColor(onPrimaryColor) }
+		genreList.map { genre -> generateContrastColor(genre.name ?: "") }
 	}
 
 	FlowRow(
@@ -70,11 +67,6 @@ internal fun GenresFlowRow(
 	}
 }
 
-private fun generateContrastColor(baseColor: Color): Color {
-	val contrastFactor = 1f
-	val r = (baseColor.red + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
-	val g = (baseColor.green + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
-	val b = (baseColor.blue + (Random.nextFloat() - 0.5f) * contrastFactor).coerceIn(0f, 1f)
-
-	return Color(r, g, b)
+private fun generateContrastColor(genreName: String): Color {
+	return Color(genreName.hashCode()).copy(alpha = 0.3f)
 }

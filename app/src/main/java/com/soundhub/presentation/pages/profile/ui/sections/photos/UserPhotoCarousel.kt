@@ -72,7 +72,7 @@ fun UserPhotoCarousel(
 							navController.navigate("${Route.Gallery.route}/$index")
 						},
 					model = images[index],
-					failure = placeholder(R.drawable.circular_user),
+					failure = placeholder(R.drawable.user_placeholder),
 					contentDescription = null
 				)
 			}

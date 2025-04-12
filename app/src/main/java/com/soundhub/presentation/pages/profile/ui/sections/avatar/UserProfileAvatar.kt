@@ -3,6 +3,7 @@ package com.soundhub.presentation.pages.profile.ui.sections.avatar
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,12 +12,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,7 +81,14 @@ private fun UserSettingsButton(
 			.padding(top = 20.dp, start = 16.dp, end = 16.dp),
 		horizontalArrangement = Arrangement.End
 	) {
-		IconButton(onClick = { navController.navigate(Route.Settings.route) }) {
+		IconButton(
+			onClick = { navController.navigate(Route.Settings.route) },
+			modifier = Modifier
+				.background(
+					MaterialTheme.colorScheme.primaryContainer,
+					shape = CircleShape
+				)
+		) {
 			Icon(imageVector = Icons.Rounded.Settings, contentDescription = null)
 		}
 	}
@@ -95,18 +104,15 @@ private fun <T> Avatar(
 	val profileOwner: T? = profileUiState.profileOwner
 
 	val userFullName: String = profileViewModel.getUserName()
-	var modelUrl: Any? by remember { mutableStateOf(null) }
-	val defaultAvatar: Painter = painterResource(id = R.drawable.circular_user)
-
-	LaunchedEffect(key1 = profileOwner) {
-		modelUrl = profileViewModel.getAvatarModel()
-	}
+	val modelUrl: Any? = remember(profileOwner) { profileViewModel.getAvatarModel() }
+	val defaultAvatar: Painter = painterResource(id = R.drawable.user_placeholder)
 
 	AsyncImage(
 		model = modelUrl,
 		contentScale = ContentScale.Crop,
-		error = defaultAvatar,
 		contentDescription = userFullName,
+		placeholder = defaultAvatar,
+		error = defaultAvatar,
 		modifier = Modifier
 			.fillMaxSize()
 			.clickable {
