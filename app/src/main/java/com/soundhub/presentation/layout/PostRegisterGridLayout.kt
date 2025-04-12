@@ -145,7 +145,7 @@ private fun <T : Any> GridItem(
 	chosenItems: List<MusicEntity<T>>
 ) {
 	val isChosen by remember(chosenItems, item.id) {
-		derivedStateOf { chosenItems.any { it.id == item.id } }
+		derivedStateOf { chosenItems.contains(item) }
 	}
 
 	MusicItemPlate(
