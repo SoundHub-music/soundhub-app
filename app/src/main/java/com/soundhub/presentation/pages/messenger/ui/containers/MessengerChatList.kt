@@ -69,6 +69,15 @@ internal fun MessengerChatList(
 		)
 	}
 
+	if (filteredChats.isEmpty()) {
+		EmptyMessengerScreen(
+			navController = navController,
+			uiStateDispatcher = uiStateDispatcher
+		)
+
+		return
+	}
+
 	FetchStatusContainer(
 		status = fetchStatus,
 		modifier = Modifier.fillMaxSize(),
@@ -80,13 +89,6 @@ internal fun MessengerChatList(
 				.padding(vertical = 5.dp),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
 		) {
-			item {
-				if (filteredChats.isEmpty())
-					EmptyMessengerScreen(
-						navController = navController,
-						uiStateDispatcher = uiStateDispatcher
-					)
-			}
 			items(items = filteredChats, key = { it.id }) { chat ->
 				ChatCard(
 					chat = chat,

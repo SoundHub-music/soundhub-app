@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.layout.ProfileLayout
@@ -19,29 +20,9 @@ fun ProfileScreen(
 	navController: NavHostController,
 	userId: UUID?,
 	uiStateDispatcher: UiStateDispatcher,
-	profileViewModel: ProfileViewModel,
+	profileViewModel: ProfileViewModel = hiltViewModel(),
 ) {
-//	val configuration = LocalConfiguration.current
 	val uiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-
-//	val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-//		bottomSheetState = rememberStandardBottomSheetState(
-//			skipHiddenState = true,
-//			initialValue = SheetValue.PartiallyExpanded
-//		)
-//	)
-//
-//	val bottomSheetState = scaffoldState.bottomSheetState
-//
-//	val partiallyExpandedSheetHeight: Int by remember {
-//		derivedStateOf { floor(configuration.screenHeightDp / 2.0).toInt() }
-//	}
-//
-//	var targetCornerRadius by remember { mutableStateOf(30.dp) }
-//	val animatedCornerRadius by animateDpAsState(
-//		targetValue = targetCornerRadius,
-//		label = "bottom sheet corner animation"
-//	)
 
 	LaunchedEffect(key1 = userId) {
 		Log.d("ProfileScreen", "userId: $userId")
@@ -60,18 +41,6 @@ fun ProfileScreen(
 		}
 	}
 
-//	// changing bottom sheet border radius
-//	LaunchedEffect(bottomSheetState) {
-//		snapshotFlow { bottomSheetState.targetValue }
-//			.collect { sheetValue ->
-//				targetCornerRadius = when (sheetValue) {
-//					SheetValue.Expanded -> 0.dp
-//					SheetValue.PartiallyExpanded -> 30.dp
-//					else -> 30.dp
-//				}
-//			}
-//	}
-
 	ProfileLayout(
 		navController = navController,
 		profileViewModel = profileViewModel
@@ -82,34 +51,5 @@ fun ProfileScreen(
 			profileViewModel = profileViewModel
 		)
 	}
-
-//	BottomSheetScaffold(
-//		scaffoldState = scaffoldState,
-//		sheetContainerColor = MaterialTheme.colorScheme.primaryContainer,
-//		sheetContent = {
-//			UserProfileContainer(
-//				navController = navController,
-//				uiStateDispatcher = uiStateDispatcher,
-//				profileViewModel = profileViewModel
-//			)
-//		},
-//		sheetShape = RoundedCornerShape(
-//			topStart = animatedCornerRadius,
-//			topEnd = animatedCornerRadius
-//		),
-//		sheetPeekHeight = partiallyExpandedSheetHeight.dp
-//	) {
-//		Column(
-//			modifier = Modifier
-//				.fillMaxWidth()
-//				.background(MaterialTheme.colorScheme.background),
-//			verticalArrangement = Arrangement.spacedBy((-30).dp)
-//		) {
-//			UserProfileAvatar(
-//				navController = navController,
-//				profileViewModel = profileViewModel
-//			)
-//		}
-//	}
 }
 

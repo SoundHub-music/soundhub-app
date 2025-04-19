@@ -66,7 +66,7 @@ class ProfileViewModel @Inject constructor(
 	init {
 		initializeProfileState()
 	}
-	
+
 	override fun getUserName(): String {
 		val (profileOwner) = _profileUiState.value
 		return profileOwner?.getFullName() ?: ""
@@ -224,12 +224,17 @@ class ProfileViewModel @Inject constructor(
 	suspend fun loadProfileOwner(id: UUID) {
 		val authorizedUser: User? = userDao.getCurrentUser()
 
+
 		if (authorizedUser?.id == id) {
+			Log.d("ProfileViewModel", "loadProfileOwner: authorizedUser is $authorizedUser")
+
 			setProfileOwner(authorizedUser)
 			return
 		}
 
 		val profileOwner: User? = getUserByIdUseCase(id)
+		Log.d("ProfileViewModel", "loadProfileOwner: profileOwner is $profileOwner")
+
 		if (authorizedUser == null || profileOwner == null)
 			return
 

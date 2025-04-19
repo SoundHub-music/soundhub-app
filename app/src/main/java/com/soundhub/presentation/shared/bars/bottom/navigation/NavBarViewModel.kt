@@ -12,7 +12,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
-import com.soundhub.domain.model.User
+import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.shared.bars.bottom.navigation.model.NavBarIconType
 import com.soundhub.presentation.shared.bars.bottom.navigation.model.NavBarMenuItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,6 @@ class NavBarViewModel @Inject constructor(
 	}
 
 	suspend fun loadNavBarItems() {
-		val authorizedUser: User? = userDao.getCurrentUser()
 		val navBarButtons = listOf(
 			NavBarMenuItem(
 				route = Route.PostLine.route,
@@ -55,12 +54,18 @@ class NavBarViewModel @Inject constructor(
 				icon = NavBarIconType.VectorIcon(Icons.Rounded.Email)
 			),
 			NavBarMenuItem(
-				route = Route.Profile.getStringRouteWithNavArg(authorizedUser?.id.toString()),
+				route = Route.Profile.route,
 				icon = NavBarIconType.VectorIcon(Icons.Rounded.AccountCircle)
 			)
 		)
 
-		_menuItems.update { navBarButtons }
+		userDao.observeCurrentUser().collect { user ->
+			navBarButtons.last().apply {
+				route = Route.Profile.getStringRouteWithNavArg(user?.id.toString())
+			}
+
+			_menuItems.update { navBarButtons }
+		}
 	}
 
 	fun onMenuItemClick(
@@ -83,4 +88,21 @@ class NavBarViewModel @Inject constructor(
 	}
 
 	fun setSelectedItem(value: String?) = _selectedItem.update { value }
+
+	fun updateSelectedItem(uiState: UiState) {
+		val navBarRoutes = _menuItems.value.map { it.route }
+
+		val isInRoutesOrContains: Boolean = _selectedItem.value in navBarRoutes
+				|| navBarRoutes.any { checkRoute(it, uiState) }
+
+		val selectedItem = if (isInRoutesOrContains) {
+			navBarRoutes.firstOrNull { checkRoute(it, uiState) }
+		} else null
+
+		setSelectedItem(selectedItem)
+	}
+
+	private fun checkRoute(route: String, uiState: UiState): Boolean {
+		return uiState.currentRoute?.contains(route) == true
+	}
 }

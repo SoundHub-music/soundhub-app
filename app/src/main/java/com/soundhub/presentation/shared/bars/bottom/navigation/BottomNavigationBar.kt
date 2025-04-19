@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -40,20 +39,8 @@ fun BottomNavigationBar(
 	val selectedItemState by navBarViewModel.selectedItem.collectAsState()
 	val navBarMenuItems by navBarViewModel.menuItems.collectAsState()
 
-	val navBarRoutes: List<String> = remember(navBarMenuItems) { navBarMenuItems.map { it.route } }
-
 	LaunchedEffect(key1 = uiState.currentRoute, key2 = navRoute) {
-		val checkRoute: (String) -> Boolean = { route ->
-			uiState.currentRoute?.contains(route) == true
-		}
-		val isInRoutesOrContains: Boolean = selectedItemState in navBarRoutes ||
-				navBarRoutes.any { checkRoute(it) }
-
-		val selectedItem = if (isInRoutesOrContains) {
-			navBarRoutes.firstOrNull { checkRoute(it) }
-		} else null
-
-		navBarViewModel.setSelectedItem(selectedItem)
+		navBarViewModel.updateSelectedItem(uiState)
 		Log.d("BottomNavigationBar", "selected page: $selectedItemState")
 	}
 

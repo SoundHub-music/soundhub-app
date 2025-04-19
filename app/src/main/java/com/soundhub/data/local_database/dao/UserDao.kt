@@ -8,11 +8,15 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.soundhub.domain.model.User
 import com.soundhub.utils.constants.Queries
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
 	@Query(Queries.GET_USER)
 	suspend fun getCurrentUser(): User?
+
+	@Query(Queries.GET_USER)
+	fun observeCurrentUser(): Flow<User?>
 
 	@Transaction
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

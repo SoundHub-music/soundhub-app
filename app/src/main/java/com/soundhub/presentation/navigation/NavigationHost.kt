@@ -42,7 +42,6 @@ import com.soundhub.presentation.pages.notifications.NotificationViewModel
 import com.soundhub.presentation.pages.post_editor.PostEditorScreen
 import com.soundhub.presentation.pages.postline.PostLineScreen
 import com.soundhub.presentation.pages.profile.ProfileScreen
-import com.soundhub.presentation.pages.profile.ProfileViewModel
 import com.soundhub.presentation.pages.registration.FillUserDataScreen
 import com.soundhub.presentation.pages.registration.PostRegisterChooseArtistsScreen
 import com.soundhub.presentation.pages.registration.PostRegisterChooseGenresScreen
@@ -172,37 +171,46 @@ fun NavigationHost(
 			route = Route.Messenger.Chat.route,
 			arguments = listOf(navArgument(Constants.CHAT_NAV_ARG) { NavType.StringType })
 		) { entry ->
-			runCatching {
-				val argument: String? = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
-				val chatId: UUID = UUID.fromString(argument)
+			val argument: String? = entry.arguments?.getString(Constants.CHAT_NAV_ARG)
+			val chatId: UUID? = runCatching {
+				UUID.fromString(argument)
+			}.onFailure { error ->
+				Log.d("NavigationHost", "ChatScreen[error]: ${error.stackTraceToString()}")
+				navController.popBackStack()
+				return@composable
+			}.getOrNull()
 
-				ChatScreen(
-					chatId = chatId,
-					navController = navController,
-					uiStateDispatcher = uiStateDispatcher
-				)
+			if (chatId == null) {
+				navController.popBackStack()
+				return@composable
 			}
-				.onFailure { error ->
-					Log.d("NavigationHost", "ChatScreen[error]: ${error.stackTraceToString()}")
-				}
+
+			ChatScreen(
+				chatId = chatId,
+				navController = navController,
+				uiStateDispatcher = uiStateDispatcher
+			)
 		}
 
 		composable(
 			route = Route.Profile.route,
 			arguments = listOf(navArgument(Constants.PROFILE_NAV_ARG) { NavType.StringType })
 		) { entry ->
-			runCatching {
-				val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
-				val userId: UUID? = argument?.let { UUID.fromString(argument) }
-				val profileViewModel: ProfileViewModel = hiltViewModel()
+			val argument = entry.arguments?.getString(Constants.PROFILE_NAV_ARG)
+			val userId: UUID? = runCatching {
+				argument?.let { UUID.fromString(argument) }
+			}.onFailure {
+				navController.popBackStack()
+				return@composable
+			}.getOrNull()
 
-				ProfileScreen(
-					navController = navController,
-					uiStateDispatcher = uiStateDispatcher,
-					profileViewModel = profileViewModel,
-					userId = userId
-				)
-			}
+			Log.d("NavigationHost", "userId: $userId")
+
+			ProfileScreen(
+				navController = navController,
+				uiStateDispatcher = uiStateDispatcher,
+				userId = userId
+			)
 		}
 
 		composable(

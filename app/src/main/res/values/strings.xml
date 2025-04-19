@@ -43,7 +43,7 @@
     <!-- user data form field placeholders -->
     <string name="text_field_name_label">First Name*</string>
     <string name="text_field_last_name_label">Last Name*</string>
-    <string name="text_field_description_label">Tell Us About Yourself</string>
+    <string name="text_field_description_label">Describe yourself</string>
     <string name="dropdown_label_gender">Gender*</string>
     <string name="gender_item_female">Female</string>
     <string name="gender_item_male">Male</string>

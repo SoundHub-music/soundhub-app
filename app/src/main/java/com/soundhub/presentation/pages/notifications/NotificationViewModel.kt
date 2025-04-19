@@ -71,13 +71,13 @@ class NotificationViewModel @Inject constructor(
 		val uiEvent = UiEvent.ShowToast(toastText)
 
 		inviteRepository.acceptInvite(invite.id)
-			.onSuccessWithContext {
+			.onSuccess {
 				deleteNotificationById(invite.id)
 				val authorizedUser: User? = userDao.getCurrentUser()
 
 				updateAuthorizedUser(authorizedUser, invite.sender)
 			}
-			.onFailureWithContext { error ->
+			.onFailure { error ->
 				val errorEvent: UiEvent = UiEvent.Error(
 					error.errorBody,
 					error.throwable,
@@ -85,15 +85,16 @@ class NotificationViewModel @Inject constructor(
 				)
 				uiStateDispatcher.sendUiEvent(errorEvent)
 			}
-			.finallyWithContext {
+			.finally {
 				uiStateDispatcher.sendUiEvent(uiEvent)
 			}
 	}
 
-	private fun updateAuthorizedUser(user: User?, inviteSender: User) = user?.let {
+	private suspend fun updateAuthorizedUser(user: User?, inviteSender: User) = user?.let {
 		with(it) {
 			friends += inviteSender
 			uiStateDispatcher.setAuthorizedUser(this)
+			userDao.saveOrReplaceUser(this)
 		}
 	}
 
