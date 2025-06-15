@@ -12,9 +12,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.soundhub.R
 import com.soundhub.Route
 import com.soundhub.data.local_database.dao.UserDao
+import com.soundhub.domain.model.User
 import com.soundhub.domain.states.UiState
 import com.soundhub.presentation.shared.bars.bottom.navigation.model.NavBarIconType
 import com.soundhub.presentation.shared.bars.bottom.navigation.model.NavBarMenuItem
+import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class NavBarViewModel @Inject constructor(
@@ -39,8 +42,8 @@ class NavBarViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun loadNavBarItems() {
-		val navBarButtons = listOf(
+	companion object {
+		val NAVBAR_BUTTONS = listOf(
 			NavBarMenuItem(
 				route = Route.PostLine.route,
 				icon = NavBarIconType.VectorIcon(Icons.Rounded.Home),
@@ -58,14 +61,25 @@ class NavBarViewModel @Inject constructor(
 				icon = NavBarIconType.VectorIcon(Icons.Rounded.AccountCircle)
 			)
 		)
+	}
 
-		userDao.observeCurrentUser().collect { user ->
-			navBarButtons.last().apply {
-				route = Route.Profile.getStringRouteWithNavArg(user?.id.toString())
-			}
+	suspend fun loadNavBarItems() {
+		userDao.observeCurrentUser().collect { user -> updateUserLink(NAVBAR_BUTTONS, user) }
+	}
 
-			_menuItems.update { navBarButtons }
+	private fun updateUserLink(buttons: List<NavBarMenuItem>, currentUser: User?) {
+		val profileButton =
+			buttons.find { button -> button.route.startsWith(Constants.PROFILE_ROOT_ROUTE) }
+
+		var link = Route.Profile.route
+
+		if (profileButton != null && currentUser != null) {
+			link = Route.Profile.getStringRouteWithNavArg(currentUser.id.toString())
 		}
+
+		profileButton?.apply { route = link }
+
+		_menuItems.update { buttons }
 	}
 
 	fun onMenuItemClick(
@@ -75,16 +89,19 @@ class NavBarViewModel @Inject constructor(
 		_selectedItem.update { menuItem.route }
 		Log.d("BottomNavigationBar", "onMenuItemClick: ${menuItem.route}")
 
-		if (!menuItem.route.contains("null"))
-			navController.navigate(menuItem.route) {
-				popUpTo(navController.graph.findStartDestination().id) {
-					saveState = true
-					inclusive = true
-				}
+		if (menuItem.route.contains("null")) {
+			return
+		}
 
-				launchSingleTop = true
-				restoreState = true
+		navController.navigate(menuItem.route) {
+			popUpTo(navController.graph.findStartDestination().id) {
+				saveState = true
+				inclusive = true
 			}
+
+			launchSingleTop = true
+			restoreState = true
+		}
 	}
 
 	fun setSelectedItem(value: String?) = _selectedItem.update { value }
