@@ -107,14 +107,20 @@ class MessengerViewModel @Inject constructor(
 			?.firstOrNull()
 	}
 
-	fun updateUnreadMessageCount() = viewModelScope.launch(Dispatchers.IO) {
-		messageRepository.getAllUnreadMessages()
-			.onSuccessWithContext { response ->
-				response.body?.let { body ->
-					_messengerUiState.update {
-						it.copy(unreadMessagesCount = body.count)
-					}
+	suspend fun updateMessenger() {
+		loadChats()
+		updateUnreadMessageCount()
+	}
 
+	private fun updateUnreadMessageCount() = viewModelScope.launch(Dispatchers.IO) {
+		messageRepository.getAllUnreadMessages()
+			.onSuccess { response ->
+				val response = response.body
+
+				if (response != null) {
+					_messengerUiState.update {
+						it.copy(unreadMessagesCount = response.count)
+					}
 				}
 			}
 	}
@@ -178,6 +184,7 @@ class MessengerViewModel @Inject constructor(
 
 	suspend fun loadChats() {
 		val chats = getChats()
+
 		_messengerUiState.update {
 			it.copy(chats = chats)
 		}

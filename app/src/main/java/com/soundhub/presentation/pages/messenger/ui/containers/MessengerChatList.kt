@@ -12,7 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -43,24 +43,20 @@ internal fun MessengerChatList(
 		.collectAsState()
 
 	val uiState: UiState by uiStateDispatcher.uiState.collectAsState(initial = UiState())
-	val authorizedUser: User? = uiState.authorizedUser
 
+	val authorizedUser: User? = uiState.authorizedUser
 	val chats: List<Chat> = messengerUiState.chats
 	val searchBarText: String = uiState.searchBarText
-	var filteredChats: List<Chat> by rememberSaveable { mutableStateOf(chats) }
-	val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 	val fetchStatus: ApiStatus = messengerUiState.status
+	val messageChannel: Flow<Message> = uiStateDispatcher.receivedMessages
 
-	LaunchedEffect(key1 = messageChannel) {
-		messageChannel.collect {
-			messengerViewModel.loadChats()
-			messengerViewModel.updateUnreadMessageCount()
-			filteredChats = chats
-		}
+	var filteredChats by remember { mutableStateOf(emptyList<Chat>()) }
+
+	LaunchedEffect(messageChannel) {
+		messageChannel.collect { messengerViewModel.updateMessenger() }
 	}
 
 	LaunchedEffect(key1 = searchBarText, key2 = chats) {
-		Log.d("MessengerChatList", "searchbar text: $searchBarText")
 		Log.d("MessengerChatList", "chats: $chats")
 		filteredChats = messengerViewModel.filterChats(
 			chats = chats,
@@ -81,7 +77,7 @@ internal fun MessengerChatList(
 	FetchStatusContainer(
 		status = fetchStatus,
 		modifier = Modifier.fillMaxSize(),
-		onRefresh = { messengerViewModel.loadChats() }
+		onRefresh = messengerViewModel::loadChats
 	) {
 		LazyColumn(
 			modifier = modifier
