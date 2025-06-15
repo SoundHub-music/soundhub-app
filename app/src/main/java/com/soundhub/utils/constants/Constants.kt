@@ -112,7 +112,8 @@ object Constants {
 	const val CHOOSE_ARTISTS_ROUTE = "$AUTHENTICATION_ROUTE/chooseArtists"
 	const val FILL_DATA_REGISTRATION_ROUTE = "$AUTHENTICATION_ROUTE/fillDataRegister"
 
-	const val PROFILE_ROUTE = "profile/{$PROFILE_NAV_ARG}"
+	const val PROFILE_ROOT_ROUTE = "profile"
+	const val PROFILE_ROUTE = "$PROFILE_ROOT_ROUTE/{$PROFILE_NAV_ARG}"
 	const val FRIENDS_ROUTE = "${PROFILE_ROUTE}/friends"
 	const val POSTLINE_ROUTE = "postline"
 	const val MUSIC_ROUTE = "music"
