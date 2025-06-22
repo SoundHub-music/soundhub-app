@@ -44,7 +44,11 @@ class AuthRepositoryImpl @Inject constructor(
 	override suspend fun signUp(body: RegisterRequestBody): HttpResult<UserPreferences> {
 		try {
 			val avatarFormData: MultipartBody.Part? = HttpUtils
-				.prepareMediaFormData(body.avatarUrl, context)
+				.prepareMediaFormData(
+					imageUrl = body.avatarUrl,
+					fileName = null,
+					context = context
+				)
 
 			val requestBody: RequestBody = gson.toJson(body)
 				.toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())

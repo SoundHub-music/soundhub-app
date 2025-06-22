@@ -88,7 +88,11 @@ class UserRepositoryImpl @Inject constructor(
 
 			// if user has an avatar with path from server we do not a form data
 			if (avatarUri?.scheme != UriScheme.HTTP.scheme)
-				avatarFormData = HttpUtils.prepareMediaFormData(user?.avatarUrl, context)
+				avatarFormData = HttpUtils.prepareMediaFormData(
+					imageUrl = user?.avatarUrl,
+					fileName = user?.id?.toString(),
+					context = context
+				)
 
 			val userRequestBody: RequestBody = gson.toJson(user)
 				.toRequestBody(ContentTypes.JSON.type.toMediaTypeOrNull())

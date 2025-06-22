@@ -65,7 +65,11 @@ class PostRepositoryImpl @Inject constructor(
 	override suspend fun addPost(post: Post): HttpResult<Post> {
 		try {
 			val imagesFormDataList: List<MultipartBody.Part> = post.images.mapNotNull {
-				HttpUtils.prepareMediaFormData(it, context)
+				HttpUtils.prepareMediaFormData(
+					imageUrl = it,
+					fileName = null,
+					context = context
+				)
 			}
 
 			val postRequestBody: RequestBody = gson.toJson(post)
@@ -120,7 +124,11 @@ class PostRepositoryImpl @Inject constructor(
 	): HttpResult<Post> {
 		try {
 			val imageFormData: List<MultipartBody.Part?> = newImages.map {
-				HttpUtils.prepareMediaFormData(it, context)
+				HttpUtils.prepareMediaFormData(
+					imageUrl = it,
+					fileName = post.id.toString(),
+					context = context
+				)
 			}
 
 			val postRequestBody: RequestBody = gson.toJson(post)

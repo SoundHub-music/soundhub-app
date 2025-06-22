@@ -37,10 +37,15 @@ class HttpUtils {
 		 * @param imageUrl url to image file
 		 * @param context Android context
 		 */
-		suspend fun prepareMediaFormData(imageUrl: String?, context: Context): MultipartBody.Part? {
+		suspend fun prepareMediaFormData(
+			imageUrl: String?,
+			fileName: String?,
+			context: Context
+		): MultipartBody.Part? {
 			val tempFile: File? = createTempMediaFile(
 				imageUri = imageUrl,
-				context = context
+				context = context,
+				fileName = fileName
 			)
 
 			return createImageFormData(tempFile)
@@ -71,7 +76,11 @@ class HttpUtils {
 		 * @param imageUri uri to image file
 		 * @param context Android context
 		 */
-		private suspend fun createTempMediaFile(imageUri: String?, context: Context): File? {
+		private suspend fun createTempMediaFile(
+			imageUri: String?,
+			fileName: String?,
+			context: Context
+		): File? {
 			try {
 				val uri: Uri? = imageUri?.toUri()
 
@@ -84,7 +93,10 @@ class HttpUtils {
 				} ?: ""
 
 				val inputStream = context.contentResolver.openInputStream(uri)
-				val fileName = "${UUID.randomUUID()}$fileExtension"
+				var fileName = fileName ?: UUID.randomUUID().toString()
+
+				fileName += fileExtension
+
 				val tempFile = File(context.cacheDir, fileName)
 
 				withContext(Dispatchers.IO) {
@@ -110,6 +122,7 @@ class HttpUtils {
 		private fun getFileExtension(fileUri: Uri, context: Context): String? {
 			val fileType: String? = context.contentResolver.getType(fileUri)
 			Log.d("HttpUtils", "getFileExtension[1]: fileType = $fileType")
+
 			return MimeTypeMap.getSingleton().getExtensionFromMimeType(fileType)
 		}
 	}
