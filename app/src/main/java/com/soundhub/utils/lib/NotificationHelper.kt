@@ -82,7 +82,7 @@ class NotificationHelper(
 			.load(
 				ImageUtils.getImageUrlWithFolderQuery(
 					message.author?.avatarUrl,
-					MediaFolder.AVATAR
+					MediaFolder.AVATAR.folderName
 				)
 			)
 			.circleCrop()

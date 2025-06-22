@@ -54,6 +54,9 @@ import com.soundhub.presentation.pages.user_editor.profile.EditUserProfileScreen
 import com.soundhub.presentation.viewmodels.MainViewModel
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
 import com.soundhub.utils.constants.Constants
+import com.soundhub.utils.constants.Constants.GALLERY_INITIAL_PAGE_NAV_ARG
+import com.soundhub.utils.constants.Constants.GALLERY_SUBFOLDER_NAV_ARG
+import com.soundhub.utils.constants.Constants.POST_EDITOR_NAV_ARG
 import java.util.UUID
 
 @Composable
@@ -253,22 +256,32 @@ fun NavigationHost(
 		}
 
 		composable(
-			route = "${Route.Gallery.route}/{${Constants.GALLERY_INITIAL_PAGE_NAV_ARG}}",
-			arguments = listOf(navArgument(Constants.GALLERY_INITIAL_PAGE_NAV_ARG) { NavType.StringType })
+			route = "${Route.Gallery.route}/{${GALLERY_INITIAL_PAGE_NAV_ARG}}?$GALLERY_SUBFOLDER_NAV_ARG={${GALLERY_SUBFOLDER_NAV_ARG}}",
+			arguments = listOf(
+				navArgument(GALLERY_INITIAL_PAGE_NAV_ARG) { NavType.StringType },
+				navArgument(GALLERY_SUBFOLDER_NAV_ARG) { NavType.StringType }
+			)
 		) { entry ->
 			mainViewModel.setTopBarTitle(null)
-			val images = uiStateDispatcher.uiState
+
+			val images: List<String> = uiStateDispatcher.uiState
 				.collectAsState(initial = UiState())
 				.value
 				.galleryImageUrls
 
 			val initialPage: Int = entry.arguments
-				?.getString(Constants.GALLERY_INITIAL_PAGE_NAV_ARG)
+				?.getString(GALLERY_INITIAL_PAGE_NAV_ARG)
 				?.toInt() ?: 0
+
+			val subFolder: String? = entry.arguments
+				?.getString(GALLERY_SUBFOLDER_NAV_ARG)
+
+			Log.d("NavigationHost", "Gallery: subFolder is $subFolder")
 
 			GalleryScreen(
 				images = images,
 				initialPage = initialPage,
+				subFolder = subFolder
 			)
 		}
 
@@ -281,10 +294,10 @@ fun NavigationHost(
 		// post editing route
 		composable(
 			route = Route.PostEditor.route,
-			arguments = listOf(navArgument(Constants.POST_EDITOR_NAV_ARG) { NavType.StringType })
+			arguments = listOf(navArgument(POST_EDITOR_NAV_ARG) { NavType.StringType })
 		) { entry ->
 			runCatching {
-				val postArgument = entry.arguments?.getString(Constants.POST_EDITOR_NAV_ARG)
+				val postArgument = entry.arguments?.getString(POST_EDITOR_NAV_ARG)
 				val postId: UUID? = postArgument?.let { UUID.fromString(it) }
 
 				mainViewModel.setTopBarTitle(stringResource(id = R.string.screen_title_update_post))

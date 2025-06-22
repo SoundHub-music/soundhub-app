@@ -13,6 +13,7 @@ fun GalleryScreen(
 	modifier: Modifier = Modifier,
 	images: List<String> = emptyList(),
 	initialPage: Int = 0,
+	subFolder: String? = null
 ) {
 	val pagerState = rememberPagerState(
 		initialPage = initialPage,
@@ -25,5 +26,6 @@ fun GalleryScreen(
 		images = images,
 		contentScale = ContentScale.Fit,
 		clickable = false,
+		subFolder = subFolder
 	)
 }

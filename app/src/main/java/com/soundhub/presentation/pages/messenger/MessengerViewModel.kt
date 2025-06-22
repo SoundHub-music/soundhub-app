@@ -73,16 +73,9 @@ class MessengerViewModel @Inject constructor(
 		}
 	)
 
-	init {
-		viewModelScope.launch(Dispatchers.IO) {
-			loadChats()
-		}
-	}
-
 	override fun onCleared() {
 		super.onCleared()
 		Log.d("MessengerViewModel", "viewmodel was cleared")
-		_messengerUiState.update { MessengerUiState() }
 	}
 
 	fun getMessageReceiversWithIntentFilters() = listOf(
@@ -183,7 +176,7 @@ class MessengerViewModel @Inject constructor(
 	}
 
 	suspend fun loadChats() {
-		val chats = getChats()
+		val chats: List<Chat> = getChats()
 
 		_messengerUiState.update {
 			it.copy(chats = chats)

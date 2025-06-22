@@ -98,6 +98,7 @@ class UserRepositoryImpl @Inject constructor(
 				user = userRequestBody,
 				userAvatar = avatarFormData,
 			)
+
 			Log.d("UserRepository", "updateUserById[1]: $response")
 			return handleResponse(response)
 		} catch (e: Exception) {

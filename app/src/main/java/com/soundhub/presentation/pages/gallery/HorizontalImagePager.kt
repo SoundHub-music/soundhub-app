@@ -39,11 +39,11 @@ fun HorizontalImagePager(
 	height: Dp = 300.dp,
 	clickable: Boolean = true,
 	mediaFolder: MediaFolder = MediaFolder.POST_PICTURE,
+	subFolder: String? = null,
 	pagerViewModel: HorizontalImagePagerViewModel = hiltViewModel()
 ) {
 	val userCreds = pagerViewModel.userCreds.collectAsState()
 	val context = LocalContext.current
-
 
 	HorizontalPager(
 		state = pagerState,
@@ -56,7 +56,9 @@ fun HorizontalImagePager(
 		val preparedUrl: String? = ImageUtils
 			.getImageUrlWithFolderQuery(
 				currentImage,
-				mediaFolder
+				subFolder?.let {
+					"${mediaFolder.folderName}/$subFolder"
+				} ?: mediaFolder.folderName
 			)
 
 		Box(
@@ -83,7 +85,8 @@ fun HorizontalImagePager(
 							clickable = clickable,
 							navController = navController,
 							images = images,
-							page = page
+							page = page,
+							subFolder = subFolder
 						)
 					}
 					.alpha(pagerViewModel.getImageOpacity(pagerState, page)),

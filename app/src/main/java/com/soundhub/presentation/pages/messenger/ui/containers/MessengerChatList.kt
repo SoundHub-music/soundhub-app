@@ -56,6 +56,10 @@ internal fun MessengerChatList(
 		messageChannel.collect { messengerViewModel.updateMessenger() }
 	}
 
+	LaunchedEffect(true) {
+		messengerViewModel.loadChats()
+	}
+
 	LaunchedEffect(key1 = searchBarText, key2 = chats) {
 		Log.d("MessengerChatList", "chats: $chats")
 		filteredChats = messengerViewModel.filterChats(

@@ -56,6 +56,7 @@ fun PostCard(
 		PostImages(
 			images = post.images,
 			navController = navController,
+			postId = post.id
 		)
 		PostBottomPanel(
 			post = post,

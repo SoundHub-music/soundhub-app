@@ -93,6 +93,7 @@ object Constants {
 	const val PROFILE_NAV_ARG = "userId"
 	const val CHAT_NAV_ARG = "chatId"
 	const val GALLERY_INITIAL_PAGE_NAV_ARG = "imageIndex"
+	const val GALLERY_SUBFOLDER_NAV_ARG = "subFolder"
 	const val POST_EDITOR_NAV_ARG = "postId"
 
 	val ALL_NAV_ARGS: List<String> = listOf(

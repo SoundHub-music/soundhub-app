@@ -1,5 +1,6 @@
 package com.soundhub.presentation.pages.gallery
 
+import android.util.Log
 import androidx.compose.foundation.pager.PagerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.soundhub.Route
 import com.soundhub.data.datastore.UserCredsStore
 import com.soundhub.data.datastore.model.UserPreferences
 import com.soundhub.presentation.viewmodels.UiStateDispatcher
+import com.soundhub.utils.constants.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,16 +37,31 @@ class HorizontalImagePagerViewModel @Inject constructor(
 		}
 	}
 
+	override fun onCleared() {
+		super.onCleared()
+		Log.d("HorizontalImagePagerViewModel", "viewmodel was cleared")
+
+		uiStateDispatcher.setGalleryUrls(emptyList())
+	}
+
 	fun onImageClick(
 		clickable: Boolean = false,
 		navController: NavHostController?,
 		images: List<String>,
+		subFolder: String?,
 		page: Int
 	) {
 		if (!clickable) return
 
 		uiStateDispatcher.setGalleryUrls(images)
-		navController?.navigate("${Route.Gallery.route}/${page}")
+
+		var route = "${Route.Gallery.route}/${page}"
+
+		if (subFolder != null) {
+			route += "?${Constants.GALLERY_SUBFOLDER_NAV_ARG}=$subFolder"
+		}
+
+		navController?.navigate(route)
 	}
 
 	fun getImageOpacity(pagerState: PagerState, page: Int): Float {

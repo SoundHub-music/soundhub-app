@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.core.net.toUri
 import com.soundhub.utils.enums.ContentTypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,9 +52,15 @@ class HttpUtils {
 		 */
 		private fun createImageFormData(imageFile: File?): MultipartBody.Part? {
 			if (imageFile == null) return null
+
+			val requestBody = imageFile.asRequestBody(
+				ContentTypes.IMAGE_ALL.type.toMediaTypeOrNull()
+			)
+
 			val formData: MultipartBody.Part = MultipartBody.Part.createFormData(
-				FILE_REQUEST_NAME, imageFile.name, imageFile
-					.asRequestBody(ContentTypes.IMAGE_ALL.type.toMediaTypeOrNull())
+				FILE_REQUEST_NAME,
+				imageFile.name,
+				requestBody
 			)
 			Log.d("HttpUtils", "getImageFormData[1]: generated formdata: ${formData.body}")
 			return formData
@@ -66,15 +73,19 @@ class HttpUtils {
 		 */
 		private suspend fun createTempMediaFile(imageUri: String?, context: Context): File? {
 			try {
-				val uri: Uri = Uri.parse(imageUri)
+				val uri: Uri? = imageUri?.toUri()
+
+				if (uri == null) {
+					return null
+				}
+
 				val fileExtension: String = getFileExtension(uri, context)?.let {
 					if (it.isNotEmpty()) ".$it" else ""
 				} ?: ""
 
 				val inputStream = context.contentResolver.openInputStream(uri)
-				val fileName = "temp_image_${UUID.randomUUID()}$fileExtension"
+				val fileName = "${UUID.randomUUID()}$fileExtension"
 				val tempFile = File(context.cacheDir, fileName)
-
 
 				withContext(Dispatchers.IO) {
 					tempFile.createNewFile()
@@ -90,7 +101,6 @@ class HttpUtils {
 				return null
 			}
 		}
-
 
 		/**
 		 * returns file extension from the specified uri after point

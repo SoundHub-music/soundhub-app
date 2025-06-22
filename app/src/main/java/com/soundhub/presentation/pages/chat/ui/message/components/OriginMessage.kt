@@ -1,6 +1,7 @@
 package com.soundhub.presentation.pages.chat.ui.message.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -35,6 +36,7 @@ internal fun OriginMessage(
 	messageParameters: MessageParameters = EmptyMessageParameters,
 ) {
 	val coroutineScope = rememberCoroutineScope()
+	val dividerColor = if (isSystemInDarkTheme()) Color(0xFF6741EE) else Color(0xFF9079E6)
 
 	replyToMessage?.let { message ->
 		Row(
@@ -53,7 +55,7 @@ internal fun OriginMessage(
 		) {
 			VerticalDivider(
 				thickness = 3.dp,
-				color = Color(0xFF6741EE),
+				color = dividerColor,
 				modifier = Modifier.clip(RoundedCornerShape(10.dp))
 			)
 			Column {

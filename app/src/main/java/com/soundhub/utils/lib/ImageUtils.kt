@@ -18,7 +18,7 @@ class ImageUtils {
 			mediaFolder: MediaFolder
 		): String? = uri?.let {
 			if (uri.scheme == UriScheme.HTTP.scheme)
-				getImageUrlWithFolderQuery(uri.toString(), mediaFolder)
+				getImageUrlWithFolderQuery(uri.toString(), mediaFolder.folderName)
 			else uri.toString()
 		}
 
@@ -29,14 +29,14 @@ class ImageUtils {
 		 */
 		fun getImageUrlWithFolderQuery(
 			imageUrl: String?,
-			folder: MediaFolder
+			folder: String
 		): String? {
 			return imageUrl?.let { url ->
 				var urlWithParam: String = url
 				val urlRegex = Regex(Constants.URL_WITH_PARAMS_REGEX)
 
 				if (!urlRegex.matches(url)) {
-					urlWithParam += FOLDER_NAME_PARAM + folder.folderName
+					urlWithParam += FOLDER_NAME_PARAM + folder
 				}
 
 				urlWithParam

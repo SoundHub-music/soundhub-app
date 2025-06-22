@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -33,13 +32,11 @@ import com.soundhub.utils.constants.Constants
 import java.util.UUID
 
 internal interface MessageParameters {
-	val boxGradient: List<Color>
 	val contentColor: Color
 	val boxModifier: Modifier
 }
 
 internal object EmptyMessageParameters : MessageParameters {
-	override val boxGradient = emptyList<Color>()
 	override val contentColor = Color.Unspecified
 	override val boxModifier = Modifier
 }
@@ -130,11 +127,9 @@ private fun getMessageParameters(
 	isOwnMessage: Boolean,
 	modifier: Modifier = Modifier
 ): MessageParameters {
+	val borderShape = RoundedCornerShape(10.dp)
+
 	return object : MessageParameters {
-		override val boxGradient = listOf(
-			Color(0xFFD0BCFF),
-			Color(0xFF966BF1)
-		)
 		override val contentColor = if (isOwnMessage)
 			MaterialTheme.colorScheme.onSecondaryContainer
 		else
@@ -143,12 +138,12 @@ private fun getMessageParameters(
 		override val boxModifier = if (isOwnMessage) modifier
 			.background(
 				color = MaterialTheme.colorScheme.secondaryContainer,
-				shape = RoundedCornerShape(10.dp)
+				shape = borderShape
 			)
 		else modifier
 			.background(
-				brush = Brush.verticalGradient(boxGradient),
-				shape = RoundedCornerShape(10.dp)
+				color = MaterialTheme.colorScheme.primary,
+				shape = borderShape
 			)
 	}
 }
