@@ -82,6 +82,24 @@
     <string name="menu_action_open_avatar">Открыть фото</string>
     <string name="menu_action_change_avatar">Обновить аватар</string>
 
+    <!-- chat screen -->
+    <string name="chat_time_ago">назад</string>
+    <string name="chat_time_now">Сейчас</string>
+
+    <plurals name="minute">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минут</item>
+        <item quantity="many">%d минуты</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
+
+    <plurals name="hour">
+        <item quantity="one">%d час</item>
+        <item quantity="few">%d часов</item>
+        <item quantity="many">%d часов</item>
+        <item quantity="other">%d часов</item>
+    </plurals>
+
     <!-- chat menu actions-->
     <string name="chat_menu_open_profile">Открыть профиль</string>
     <string name="chat_menu_search">Поиск</string>

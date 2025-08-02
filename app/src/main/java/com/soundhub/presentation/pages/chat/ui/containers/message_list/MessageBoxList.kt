@@ -71,14 +71,6 @@ fun MessageBoxList(
 		derivedStateOf { lazyListState.firstVisibleItemIndex }
 	}
 
-	LaunchedEffect(key1 = messageSnapshot) {
-		chatViewModel.cacheMessages(messageSnapshot)
-
-		unreadMessageCount = messageSnapshot.count {
-			it.isNotReadAndNotSentBy(authorizedUser)
-		}
-	}
-
 	val stickyDate: LocalDate? by remember {
 		derivedStateOf {
 			if (pagedMessages.itemCount == 0)
@@ -88,6 +80,15 @@ fun MessageBoxList(
 				val message: Message? = pagedMessages.peek(lazyListState.firstVisibleItemIndex)
 				return@runCatching message?.createdAt?.toLocalDate()
 			}.getOrNull()
+		}
+	}
+
+
+	LaunchedEffect(key1 = messageSnapshot) {
+		chatViewModel.cacheMessages(messageSnapshot)
+
+		unreadMessageCount = messageSnapshot.count {
+			it.isNotReadAndNotSentBy(authorizedUser)
 		}
 	}
 

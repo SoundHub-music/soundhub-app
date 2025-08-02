@@ -82,6 +82,26 @@
     <string name="menu_action_open_avatar">Open Photo</string>
     <string name="menu_action_change_avatar">Update Avatar</string>
 
+    <!-- chat screen -->
+    <string name="chat_time_ago">ago</string>
+    <string name="chat_time_now">Now</string>
+
+    <plurals name="minute">
+        <item quantity="one">%d minute</item>
+        <item quantity="zero">%d minutes</item>
+        <item quantity="few">%d minutes</item>
+        <item quantity="two">%d minutes</item>
+        <item quantity="many">%d minutes</item>
+    </plurals>
+
+    <plurals name="hour">
+        <item quantity="one">%d hour</item>
+        <item quantity="zero">%d hours</item>
+        <item quantity="few">%d hours</item>
+        <item quantity="two">%d hours</item>
+        <item quantity="many">%d hours</item>
+    </plurals>
+
     <!-- chat menu actions -->
     <string name="chat_menu_open_profile">Open Profile</string>
     <string name="chat_menu_search">Search</string>
@@ -141,8 +161,6 @@
     <string name="empty_notification_screen">Your notifications will appear here</string>
 
     <!--    music page-->
-
-
     <!-- music section titles -->
     <string name="music_recommendation_section_title">Recommended for You</string>
     <string name="music_friend_music_section_title">What Your Friends Are Listening To</string>

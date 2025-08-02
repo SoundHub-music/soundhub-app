@@ -2,7 +2,7 @@
 androidxCore = "1.15.0"
 coilCompose = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
-gradle = "8.10.1"
+gradle = "8.12.0"
 lifecycle = "2.8.7"
 activity = "1.10.1"
 composeBom = "2025.03.01"
